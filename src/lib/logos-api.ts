@@ -1,4 +1,5 @@
-import { getSupabaseClient } from "@/lib/supabase";
+import { createLabeledImageDataUri } from "@/lib/runtime-safety";
+import { getSupabaseClient, reportPublicSupabaseFallback } from "@/lib/supabase";
 import type { Database } from "@/lib/supabase-types";
 
 export interface ClientLogo {
@@ -9,18 +10,15 @@ export interface ClientLogo {
   order: number;
 }
 
-const defaultLogos: ClientLogo[] = [
-  { id: "fallback-logo-1", name: "Google", image: "https://logo.clearbit.com/google.com", visible: true, order: 0 },
-  { id: "fallback-logo-2", name: "Microsoft", image: "https://logo.clearbit.com/microsoft.com", visible: true, order: 1 },
-  { id: "fallback-logo-3", name: "Apple", image: "https://logo.clearbit.com/apple.com", visible: true, order: 2 },
-  { id: "fallback-logo-4", name: "Amazon", image: "https://logo.clearbit.com/amazon.com", visible: true, order: 3 },
-  { id: "fallback-logo-5", name: "Meta", image: "https://logo.clearbit.com/meta.com", visible: true, order: 4 },
-  { id: "fallback-logo-6", name: "Netflix", image: "https://logo.clearbit.com/netflix.com", visible: true, order: 5 },
-  { id: "fallback-logo-7", name: "Spotify", image: "https://logo.clearbit.com/spotify.com", visible: true, order: 6 },
-  { id: "fallback-logo-8", name: "Adobe", image: "https://logo.clearbit.com/adobe.com", visible: true, order: 7 },
-  { id: "fallback-logo-9", name: "Stripe", image: "https://logo.clearbit.com/stripe.com", visible: true, order: 8 },
-  { id: "fallback-logo-10", name: "Shopify", image: "https://logo.clearbit.com/shopify.com", visible: true, order: 9 },
-];
+const defaultLogoNames = ["Google", "Microsoft", "Apple", "Amazon", "Meta", "Netflix", "Spotify", "Adobe", "Stripe", "Shopify"];
+
+const defaultLogos: ClientLogo[] = defaultLogoNames.map((name, index) => ({
+  id: `fallback-logo-${index + 1}`,
+  name,
+  image: createLabeledImageDataUri(name, { background: "#ffffff", foreground: "#0f172a", fontSize: 28 }),
+  visible: true,
+  order: index,
+}));
 
 interface FetchLogosOptions {
   includeHidden?: boolean;
@@ -105,7 +103,6 @@ export async function fetchLogos(options: FetchLogosOptions = {}): Promise<Clien
     const logos = (data ?? []).map(mapLogoRow);
 
     if (logos.length === 0 && !options.includeHidden) {
-      console.warn("Client logos fallback activated: Supabase returned no published logos.");
       return getDefaultLogos();
     }
 
@@ -115,7 +112,7 @@ export async function fetchLogos(options: FetchLogosOptions = {}): Promise<Clien
       return wrapLogoError("fetch logos", error);
     }
 
-    console.warn("Client logos fallback activated: Supabase fetch failed.", error);
+    reportPublicSupabaseFallback("client logos", error);
     return getDefaultLogos();
   }
 }
@@ -206,18 +203,12 @@ export async function deleteAllLogos(): Promise<void> {
 
 export async function seedDemoLogos(): Promise<ClientLogo[]> {
   try {
-    const demos: Omit<ClientLogo, "id">[] = [
-      { name: "Google", image: "https://logo.clearbit.com/google.com", visible: true, order: 0 },
-      { name: "Microsoft", image: "https://logo.clearbit.com/microsoft.com", visible: true, order: 0 },
-      { name: "Apple", image: "https://logo.clearbit.com/apple.com", visible: true, order: 0 },
-      { name: "Amazon", image: "https://logo.clearbit.com/amazon.com", visible: true, order: 0 },
-      { name: "Meta", image: "https://logo.clearbit.com/meta.com", visible: true, order: 0 },
-      { name: "Netflix", image: "https://logo.clearbit.com/netflix.com", visible: true, order: 0 },
-      { name: "Spotify", image: "https://logo.clearbit.com/spotify.com", visible: true, order: 0 },
-      { name: "Adobe", image: "https://logo.clearbit.com/adobe.com", visible: true, order: 0 },
-      { name: "Stripe", image: "https://logo.clearbit.com/stripe.com", visible: true, order: 0 },
-      { name: "Shopify", image: "https://logo.clearbit.com/shopify.com", visible: true, order: 0 },
-    ];
+    const demos: Omit<ClientLogo, "id">[] = defaultLogoNames.map((name) => ({
+      name,
+      image: createLabeledImageDataUri(name, { background: "#ffffff", foreground: "#0f172a", fontSize: 28 }),
+      visible: true,
+      order: 0,
+    }));
 
     const startOrder = await getNextLogoDisplayOrder();
     const supabase = getSupabaseClient();

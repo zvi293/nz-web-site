@@ -30,7 +30,6 @@ const Header = () => {
   const navigate = useNavigate();
   const logoRef = useRef<HTMLAnchorElement>(null);
   const navRef = useRef<HTMLElement>(null);
-  const ctaRef = useRef<HTMLAnchorElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -42,15 +41,20 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    tl.from(logoRef.current, { y: -20, opacity: 0, duration: 0.6 })
-      .from(
-        navRef.current ? navRef.current.children : [],
-        { y: -20, opacity: 0, duration: 0.5, stagger: 0.08 },
-        "-=0.3"
-      )
-      .from(ctaRef.current, { y: -20, opacity: 0, duration: 0.5 }, "-=0.2");
+      if (logoRef.current) {
+        tl.from(logoRef.current, { y: -20, opacity: 0, duration: 0.6 });
+      }
+
+      const navItems = navRef.current ? Array.from(navRef.current.children) : [];
+      if (navItems.length > 0) {
+        tl.from(navItems, { y: -20, opacity: 0, duration: 0.5, stagger: 0.08 }, "-=0.3");
+      }
+    });
+
+    return () => ctx.revert();
   }, []);
 
   return (

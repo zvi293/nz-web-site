@@ -1,4 +1,4 @@
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseClient, reportPublicSupabaseFallback } from "@/lib/supabase";
 import type { Database } from "@/lib/supabase-types";
 
 export interface Project {
@@ -149,7 +149,6 @@ export async function fetchProjects(options: FetchProjectsOptions = {}): Promise
     const projects = (data ?? []).map(mapProjectRow);
 
     if (projects.length === 0 && !options.includeUnpublished) {
-      console.warn("Projects fallback activated: Supabase returned no published projects.");
       return getDefaultProjects();
     }
 
@@ -159,7 +158,7 @@ export async function fetchProjects(options: FetchProjectsOptions = {}): Promise
       return wrapProjectError("fetch projects", error);
     }
 
-    console.warn("Projects fallback activated: Supabase fetch failed.", error);
+    reportPublicSupabaseFallback("projects", error);
     return getDefaultProjects();
   }
 }

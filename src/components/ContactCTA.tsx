@@ -33,30 +33,33 @@ const ContactCTA = () => {
     const sparkles = sparklesRef.current.filter(Boolean);
 
     const ctx = gsap.context(() => {
-      // Set initial hidden states
       gsap.set(card, { y: 40, opacity: 0, scale: 0.95 });
-      gsap.set(glowLine, { x: "-100%" });
-      gsap.set(icon, { opacity: 0, scale: 0.5, rotation: -90 });
-      gsap.set(titles, { y: 30, opacity: 0 });
-      gsap.set(desc, { y: 15, opacity: 0, filter: "blur(4px)" });
-      gsap.set(btn, { y: 20, opacity: 0, scale: 0.9 });
-      gsap.set(sparkles, { scale: 0, opacity: 0 });
+      if (glowLine) gsap.set(glowLine, { x: "-100%" });
+      if (icon) gsap.set(icon, { opacity: 0, scale: 0.5, rotation: -90 });
+      if (titles.length > 0) gsap.set(titles, { y: 30, opacity: 0 });
+      if (desc) gsap.set(desc, { y: 15, opacity: 0, filter: "blur(4px)" });
+      if (btn) gsap.set(btn, { y: 20, opacity: 0, scale: 0.9 });
+      if (sparkles.length > 0) gsap.set(sparkles, { scale: 0, opacity: 0 });
 
-      // Scrub-based parallax for orbs
-      gsap.to(orb1Ref.current, {
-        y: -60, scale: 1.2,
-        scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 0.8 },
-      });
-      gsap.to(orb2Ref.current, {
-        y: 50, x: 30,
-        scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 0.8 },
-      });
-      gsap.to(orb3Ref.current, {
-        y: -40,
-        scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 0.8 },
-      });
+      if (orb1Ref.current) {
+        gsap.to(orb1Ref.current, {
+          y: -60, scale: 1.2,
+          scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 0.8 },
+        });
+      }
+      if (orb2Ref.current) {
+        gsap.to(orb2Ref.current, {
+          y: 50, x: 30,
+          scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 0.8 },
+        });
+      }
+      if (orb3Ref.current) {
+        gsap.to(orb3Ref.current, {
+          y: -40,
+          scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 0.8 },
+        });
+      }
 
-      // Card entrance
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top 88%",
@@ -69,12 +72,12 @@ const ContactCTA = () => {
 
       function resetToHidden() {
         gsap.set(card, { y: 40, opacity: 0, scale: 0.95 });
-        gsap.set(glowLine, { x: "-100%" });
-        gsap.set(icon, { opacity: 0, scale: 0.5, rotation: -90 });
-        gsap.set(titles, { y: 30, opacity: 0 });
-        gsap.set(desc, { y: 15, opacity: 0, filter: "blur(4px)" });
-        gsap.set(btn, { y: 20, opacity: 0, scale: 0.9 });
-        gsap.set(sparkles, { scale: 0, opacity: 0 });
+        if (glowLine) gsap.set(glowLine, { x: "-100%" });
+        if (icon) gsap.set(icon, { opacity: 0, scale: 0.5, rotation: -90 });
+        if (titles.length > 0) gsap.set(titles, { y: 30, opacity: 0 });
+        if (desc) gsap.set(desc, { y: 15, opacity: 0, filter: "blur(4px)" });
+        if (btn) gsap.set(btn, { y: 20, opacity: 0, scale: 0.9 });
+        if (sparkles.length > 0) gsap.set(sparkles, { scale: 0, opacity: 0 });
       }
 
       function playEntrance() {
@@ -83,24 +86,36 @@ const ContactCTA = () => {
         tl.to(card, {
           y: 0, opacity: 1, scale: 1, duration: 1.4, ease: "power3.out",
         })
-        .to(glowLine, {
-          x: "200%", duration: 1.6, ease: "power2.inOut",
-        }, "-=0.8")
-        .to(icon, {
-          opacity: 1, scale: 1, rotation: 0, duration: 1, ease: "power2.out",
-        }, "-=1")
-        .to(titles, {
-          y: 0, opacity: 1, duration: 0.9, stagger: 0.18, ease: "power2.out",
-        }, "-=0.6")
-        .to(desc, {
-          y: 0, opacity: 1, filter: "blur(0px)", duration: 0.8, ease: "power2.out",
-        }, "-=0.4")
-        .to(btn, {
-          y: 0, opacity: 1, scale: 1, duration: 0.9, ease: "power2.out",
-        }, "-=0.3")
-        .to(sparkles, {
-          scale: 1, opacity: 1, duration: 0.6, stagger: { each: 0.08, from: "center" }, ease: "power2.out",
-        }, "-=0.4");
+        if (glowLine) {
+          tl.to(glowLine, {
+            x: "200%", duration: 1.6, ease: "power2.inOut",
+          }, "-=0.8");
+        }
+        if (icon) {
+          tl.to(icon, {
+            opacity: 1, scale: 1, rotation: 0, duration: 1, ease: "power2.out",
+          }, "-=1");
+        }
+        if (titles.length > 0) {
+          tl.to(titles, {
+            y: 0, opacity: 1, duration: 0.9, stagger: 0.18, ease: "power2.out",
+          }, "-=0.6");
+        }
+        if (desc) {
+          tl.to(desc, {
+            y: 0, opacity: 1, filter: "blur(0px)", duration: 0.8, ease: "power2.out",
+          }, "-=0.4");
+        }
+        if (btn) {
+          tl.to(btn, {
+            y: 0, opacity: 1, scale: 1, duration: 0.9, ease: "power2.out",
+          }, "-=0.3");
+        }
+        if (sparkles.length > 0) {
+          tl.to(sparkles, {
+            scale: 1, opacity: 1, duration: 0.6, stagger: { each: 0.08, from: "center" }, ease: "power2.out",
+          }, "-=0.4");
+        }
       }
 
       // Floating + pulsing glow

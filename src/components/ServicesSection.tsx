@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as LucideIcons from "lucide-react";
 
 import { fetchServices, type ServiceRow } from "@/lib/services-api";
+import { isRenderableAssetUrl, isSafeInlineSvg } from "@/lib/runtime-safety";
 
 import servicePlanning from "@/assets/service-planning.jpg";
 import serviceUiux from "@/assets/service-uiux.jpg";
@@ -20,15 +21,16 @@ const fallbackImagesByOrder: Record<number, string> = {
 };
 
 const getServiceImage = (service: ServiceRow) => {
-  if (service.image) return service.image;
-  return fallbackImagesByOrder[service.order] || servicePlanning;
+  return isRenderableAssetUrl(service.image)
+    ? service.image
+    : fallbackImagesByOrder[service.order] || servicePlanning;
 };
 
 const IconRenderer = ({ service }: { service: ServiceRow }) => {
-  if (service.iconType === "image" && service.iconImage) {
+  if (service.iconType === "image" && isRenderableAssetUrl(service.iconImage)) {
     return <img src={service.iconImage} alt={`אייקון שירות ${service.badge}`} className="h-7 w-7 object-contain" />;
   }
-  if (service.iconType === "svg" && service.iconSvg) {
+  if (service.iconType === "svg" && isSafeInlineSvg(service.iconSvg)) {
     return <div className="h-7 w-7 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: service.iconSvg }} />;
   }
   
@@ -51,6 +53,8 @@ const ServiceVisual = ({
 }: { service: ServiceRow; index: number; }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const hasVideo = Boolean(service.video && isRenderableAssetUrl(service.video) && !videoFailed);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -69,7 +73,7 @@ const ServiceVisual = ({
 
   // Video playback with delay
   useEffect(() => {
-    if (!service.video || !videoRef.current || !containerRef.current) return;
+    if (!hasVideo || !videoRef.current || !containerRef.current) return;
     const video = videoRef.current;
     let timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -113,7 +117,7 @@ const ServiceVisual = ({
       if (timer) clearTimeout(timer);
       st.kill();
     };
-  }, [service.video]);
+  }, [hasVideo]);
 
   return (
     <div
@@ -128,7 +132,7 @@ const ServiceVisual = ({
           "0 20px 60px -12px hsl(220 20% 14% / 0.18), 0 8px 24px -8px hsl(217 91% 60% / 0.12)"
         }}>
         
-        {service.video ?
+        {hasVideo ?
         <>
             <img
             src={getServiceImage(service)}
@@ -142,6 +146,7 @@ const ServiceVisual = ({
             loop
             playsInline
             preload="auto"
+            onError={() => setVideoFailed(true)}
             className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700" />
           
           </> :

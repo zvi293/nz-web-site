@@ -49,6 +49,7 @@ import AdminServicesTab from "@/components/AdminServicesTab";
 import AdminAboutTab from "@/components/AdminAboutTab";
 import AdminSiteSettingsTab from "@/components/AdminSiteSettingsTab";
 import AdminFaqTab from "@/components/AdminFaqTab";
+import { isRenderableAssetUrl } from "@/lib/runtime-safety";
 const emptyForm = {
   title: "",
   description: "",
@@ -174,12 +175,20 @@ const AdminPortfolio = () => {
     }
   };
 
+  const isAllowedImageUrl = (value: string) => {
+    if (!value) {
+      return false;
+    }
+
+    return isRenderableAssetUrl(value);
+  };
+
   const validateProjectForm = () => {
     if (!form.title.trim()) return "יש להזין שם פרויקט.";
     if (!form.description.trim() || form.description.trim().length < 10) return "יש להזין תיאור משמעותי לפרויקט.";
     if (!form.tags.split(",").map((tag) => tag.trim()).filter(Boolean).length) return "יש להזין לפחות תגית אחת.";
     if (!form.image.trim()) return "יש להזין תמונת פרויקט או להעלות קובץ.";
-    if (!isAllowedExternalUrl(form.image.trim())) return "קישור תמונת הפרויקט אינו תקין.";
+    if (!isAllowedImageUrl(form.image.trim())) return "קישור תמונת הפרויקט אינו תקין.";
     if (form.link.trim() && !isAllowedExternalUrl(form.link.trim())) return "קישור הפרויקט אינו תקין.";
     return null;
   };
@@ -187,7 +196,7 @@ const AdminPortfolio = () => {
   const validateLogoForm = () => {
     if (!logoName.trim()) return "יש להזין שם לקוח.";
     if (!logoImage.trim()) return "יש להזין תמונת לוגו או להעלות קובץ.";
-    if (!isAllowedExternalUrl(logoImage.trim())) return "קישור הלוגו אינו תקין.";
+    if (!isAllowedImageUrl(logoImage.trim())) return "קישור הלוגו אינו תקין.";
     return null;
   };
 

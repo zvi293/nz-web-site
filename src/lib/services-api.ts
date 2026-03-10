@@ -1,4 +1,4 @@
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseClient, reportPublicSupabaseFallback } from "@/lib/supabase";
 import type { Database } from "@/lib/supabase-types";
 
 export interface ServiceRow {
@@ -300,6 +300,7 @@ export async function fetchServices(options: FetchServicesOptions = {}): Promise
       return wrapServiceError("fetch services", error);
     }
 
+    reportPublicSupabaseFallback("services", error);
     return getDefaultServices();
   }
 }

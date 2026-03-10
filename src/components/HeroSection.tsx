@@ -9,72 +9,86 @@ const HeroSection = () => {
   const buttonsRef = useRef<HTMLDivElement>(null);
   const visualRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
-  const badgeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: "power2.out" }, delay: 0.3 });
+    const layers: HTMLDivElement[] = [];
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power2.out" }, delay: 0.3 });
 
-    tl.from(badgeRef.current, { opacity: 0, y: 16, duration: 0.6 }).
-    from(h1Ref.current, { opacity: 0, y: 40, duration: 1 }, "-=0.2").
-    from(subtextRef.current, { opacity: 0, y: 20, duration: 0.8 }, "-=0.4").
-    from(buttonsRef.current, { opacity: 0, y: 20, duration: 0.8, scale: 0.97 }, "-=0.3");
-
-    // Card-stack building effect for hero image
-    const imgEl = imgRef.current;
-    if (!imgEl) return;
-
-    const container = imgEl.parentElement!;
-    container.style.position = "relative";
-
-    const layers = [0, 1, 2].map((i) => {
-      const layer = document.createElement("div");
-      layer.style.cssText = `
-        position: absolute; inset: 0; border-radius: 1rem;
-        background: hsl(var(--primary) / ${0.07 - i * 0.015});
-        transform: translateY(${(3 - i) * 18}px) scale(${0.92 + i * 0.025});
-        opacity: 0; pointer-events: none;
-      `;
-      container.insertBefore(layer, imgEl);
-      return layer;
-    });
-
-    gsap.set(imgEl, { opacity: 0, y: 60, scale: 0.88 });
-
-    const stackTl = gsap.timeline({ delay: 0.8 });
-
-    layers.forEach((layer, i) => {
-      stackTl.to(layer, {
-        opacity: 1,
-        y: (3 - i) * 6,
-        duration: 0.7,
-        ease: "power1.out"
-      }, i * 0.25);
-    });
-
-    stackTl.to(imgEl, {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      duration: 1.6,
-      ease: "power1.out"
-    }, 0.3);
-
-    stackTl.to(layers, {
-      opacity: 0,
-      duration: 1,
-      ease: "power1.inOut",
-      stagger: 0.12,
-      onComplete: () => {
-        layers.forEach((l) => l.remove());
-        gsap.to(imgEl, {
-          y: -30,
-          duration: 2.8,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut"
-        });
+      if (h1Ref.current) {
+        tl.from(h1Ref.current, { opacity: 0, y: 40, duration: 1 });
       }
-    }, "+=0.1");
+      if (subtextRef.current) {
+        tl.from(subtextRef.current, { opacity: 0, y: 20, duration: 0.8 }, "-=0.4");
+      }
+      if (buttonsRef.current) {
+        tl.from(buttonsRef.current, { opacity: 0, y: 20, duration: 0.8, scale: 0.97 }, "-=0.3");
+      }
+
+      const imgEl = imgRef.current;
+      if (!imgEl) return;
+
+      const container = imgEl.parentElement;
+      if (!container) return;
+      container.style.position = "relative";
+
+      layers.push(
+        ...[0, 1, 2].map((i) => {
+          const layer = document.createElement("div");
+          layer.style.cssText = `
+            position: absolute; inset: 0; border-radius: 1rem;
+            background: hsl(var(--primary) / ${0.07 - i * 0.015});
+            transform: translateY(${(3 - i) * 18}px) scale(${0.92 + i * 0.025});
+            opacity: 0; pointer-events: none;
+          `;
+          container.insertBefore(layer, imgEl);
+          return layer;
+        }),
+      );
+
+      gsap.set(imgEl, { opacity: 0, y: 60, scale: 0.88 });
+
+      const stackTl = gsap.timeline({ delay: 0.8 });
+
+      layers.forEach((layer, i) => {
+        stackTl.to(layer, {
+          opacity: 1,
+          y: (3 - i) * 6,
+          duration: 0.7,
+          ease: "power1.out"
+        }, i * 0.25);
+      });
+
+      stackTl.to(imgEl, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 1.6,
+        ease: "power1.out"
+      }, 0.3);
+
+      stackTl.to(layers, {
+        opacity: 0,
+        duration: 1,
+        ease: "power1.inOut",
+        stagger: 0.12,
+        onComplete: () => {
+          layers.forEach((l) => l.remove());
+          gsap.to(imgEl, {
+            y: -30,
+            duration: 2.8,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+          });
+        }
+      }, "+=0.1");
+    }, sectionRef);
+
+    return () => {
+      ctx.revert();
+      layers.forEach((layer) => layer.remove());
+    };
   }, []);
 
   return (
