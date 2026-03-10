@@ -13,6 +13,31 @@ export interface Project {
   order: number;
 }
 
+const defaultProjects: Project[] = [
+  {
+    id: "fallback-project-1",
+    title: "פדות עמרם - סטודיו לעיצוב גבות",
+    description: "פיתוח אתר בוטיק הכולל אוטומציה מלאה ליומן תורים, התממשקות למערכות חיצוניות ופאנל ניהול מאובטח.",
+    tags: ["מערכת קביעת תורים", "דשבורד ניהול", "עיצוב תדמית"],
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800",
+    link: "#",
+    featured: true,
+    published: true,
+    order: 0,
+  },
+  {
+    id: "fallback-project-2",
+    title: "קליניקה לטיפול רגשי",
+    description: "אתר תדמית מקצועי המשלב מערכת חכמה לאיסוף לידים, שליחת טפסים ומיילים אוטומטיים, יחד עם חיבור מהיר לווואטסאפ ושיחה ישירה.",
+    tags: ["איסוף לידים חכם", "אוטומציית מיילים", "אתר תדמית"],
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800",
+    link: "#",
+    featured: true,
+    published: true,
+    order: 1,
+  },
+];
+
 interface FetchProjectsOptions {
   includeUnpublished?: boolean;
 }
@@ -52,6 +77,10 @@ function mapProjectRow(row: ProjectRow): Project {
 
 function normalizeTags(tags: string[]): string[] {
   return tags.map((tag) => tag.trim()).filter(Boolean);
+}
+
+function getDefaultProjects(): Project[] {
+  return [...defaultProjects].sort((a, b) => a.order - b.order);
 }
 
 function mapProjectInsert(project: Omit<Project, "id">, displayOrder: number): ProjectInsert {
@@ -117,9 +146,21 @@ export async function fetchProjects(options: FetchProjectsOptions = {}): Promise
       throw error;
     }
 
-    return (data ?? []).map(mapProjectRow);
+    const projects = (data ?? []).map(mapProjectRow);
+
+    if (projects.length === 0 && !options.includeUnpublished) {
+      console.warn("Projects fallback activated: Supabase returned no published projects.");
+      return getDefaultProjects();
+    }
+
+    return projects;
   } catch (error) {
-    return wrapProjectError("fetch projects", error);
+    if (options.includeUnpublished) {
+      return wrapProjectError("fetch projects", error);
+    }
+
+    console.warn("Projects fallback activated: Supabase fetch failed.", error);
+    return getDefaultProjects();
   }
 }
 

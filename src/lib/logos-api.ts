@@ -9,6 +9,19 @@ export interface ClientLogo {
   order: number;
 }
 
+const defaultLogos: ClientLogo[] = [
+  { id: "fallback-logo-1", name: "Google", image: "https://logo.clearbit.com/google.com", visible: true, order: 0 },
+  { id: "fallback-logo-2", name: "Microsoft", image: "https://logo.clearbit.com/microsoft.com", visible: true, order: 1 },
+  { id: "fallback-logo-3", name: "Apple", image: "https://logo.clearbit.com/apple.com", visible: true, order: 2 },
+  { id: "fallback-logo-4", name: "Amazon", image: "https://logo.clearbit.com/amazon.com", visible: true, order: 3 },
+  { id: "fallback-logo-5", name: "Meta", image: "https://logo.clearbit.com/meta.com", visible: true, order: 4 },
+  { id: "fallback-logo-6", name: "Netflix", image: "https://logo.clearbit.com/netflix.com", visible: true, order: 5 },
+  { id: "fallback-logo-7", name: "Spotify", image: "https://logo.clearbit.com/spotify.com", visible: true, order: 6 },
+  { id: "fallback-logo-8", name: "Adobe", image: "https://logo.clearbit.com/adobe.com", visible: true, order: 7 },
+  { id: "fallback-logo-9", name: "Stripe", image: "https://logo.clearbit.com/stripe.com", visible: true, order: 8 },
+  { id: "fallback-logo-10", name: "Shopify", image: "https://logo.clearbit.com/shopify.com", visible: true, order: 9 },
+];
+
 interface FetchLogosOptions {
   includeHidden?: boolean;
 }
@@ -50,6 +63,10 @@ function mapLogoInsert(logo: Omit<ClientLogo, "id">, displayOrder: number): Clie
   };
 }
 
+function getDefaultLogos(): ClientLogo[] {
+  return [...defaultLogos].sort((a, b) => a.order - b.order);
+}
+
 async function getNextLogoDisplayOrder(): Promise<number> {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
@@ -85,9 +102,21 @@ export async function fetchLogos(options: FetchLogosOptions = {}): Promise<Clien
       throw error;
     }
 
-    return (data ?? []).map(mapLogoRow);
+    const logos = (data ?? []).map(mapLogoRow);
+
+    if (logos.length === 0 && !options.includeHidden) {
+      console.warn("Client logos fallback activated: Supabase returned no published logos.");
+      return getDefaultLogos();
+    }
+
+    return logos;
   } catch (error) {
-    return wrapLogoError("fetch logos", error);
+    if (options.includeHidden) {
+      return wrapLogoError("fetch logos", error);
+    }
+
+    console.warn("Client logos fallback activated: Supabase fetch failed.", error);
+    return getDefaultLogos();
   }
 }
 
