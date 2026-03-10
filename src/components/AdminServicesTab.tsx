@@ -20,6 +20,7 @@ import {
   type ServiceRow,
   type DeletedServiceRow,
 } from "@/lib/services-api";
+import { isSafeInlineSvg } from "@/lib/runtime-safety";
 import { toast } from "sonner";
 
 const lucideIconNames = [
@@ -139,6 +140,8 @@ const AdminServicesTab = () => {
     if (!form.body.trim() || form.body.trim().length < 10) return "יש להזין תיאור משמעותי של השירות.";
     if (form.iconType === "image" && !form.iconImage?.trim()) return "יש להזין תמונת אייקון או להעלות קובץ.";
     if (form.iconType === "svg" && !form.iconSvg?.trim()) return "יש להזין קוד SVG תקין.";
+
+    if (form.iconType === "svg" && !isSafeInlineSvg(form.iconSvg)) return "קוד ה-SVG אינו תקין או כולל נתיב שבור.";
 
     for (const [value, label] of [
       [form.image, "קישור תמונת השירות"],
@@ -272,6 +275,8 @@ const AdminServicesTab = () => {
     const colors = generateColorsFromHue(hue, sat);
     setForm(prev => ({ ...prev, ...colors }));
   };
+
+  const svgPreviewMarkup = form.iconType === "svg" && isSafeInlineSvg(form.iconSvg) ? form.iconSvg : null;
 
   return (
     <div className="space-y-6">
@@ -702,7 +707,7 @@ const AdminServicesTab = () => {
                     />
                     {form.iconSvg && (
                       <div className="flex items-center gap-2">
-                        <div className="h-10 w-10 rounded-lg border border-border p-1 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: form.iconSvg }} />
+                        {svgPreviewMarkup ? <div className="h-10 w-10 rounded-lg border border-border p-1 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: svgPreviewMarkup }} /> : <div className="h-10 w-10 rounded-lg border border-destructive/40 bg-destructive/5 p-1 flex items-center justify-center text-destructive"><FileCode className="h-4 w-4" /></div>}
                         <span className="text-xs text-muted-foreground">תצוגה מקדימה</span>
                       </div>
                     )}
