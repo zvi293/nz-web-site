@@ -1,4 +1,4 @@
-import { createLabeledImageDataUri } from "@/lib/runtime-safety";
+import { createLabeledImageDataUri, normalizeLogoImageUrl } from "@/lib/runtime-safety";
 import { getSupabaseClient, reportPublicSupabaseFallback } from "@/lib/supabase";
 import type { Database } from "@/lib/supabase-types";
 
@@ -46,7 +46,7 @@ function mapLogoRow(row: ClientLogoRow): ClientLogo {
   return {
     id: row.id,
     name: row.name,
-    image: row.image_url,
+    image: normalizeLogoImageUrl(row.name, row.image_url),
     visible: row.is_published,
     order: row.display_order,
   };

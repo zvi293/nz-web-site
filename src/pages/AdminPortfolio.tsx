@@ -49,7 +49,7 @@ import AdminServicesTab from "@/components/AdminServicesTab";
 import AdminAboutTab from "@/components/AdminAboutTab";
 import AdminSiteSettingsTab from "@/components/AdminSiteSettingsTab";
 import AdminFaqTab from "@/components/AdminFaqTab";
-import { isRenderableAssetUrl } from "@/lib/runtime-safety";
+import { isBlockedLogoUrl, isRenderableAssetUrl } from "@/lib/runtime-safety";
 const emptyForm = {
   title: "",
   description: "",
@@ -180,7 +180,7 @@ const AdminPortfolio = () => {
       return false;
     }
 
-    return isRenderableAssetUrl(value);
+    return isRenderableAssetUrl(value) && !isBlockedLogoUrl(value);
   };
 
   const validateProjectForm = () => {
