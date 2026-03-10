@@ -1,0 +1,287 @@
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+
+html {
+  scroll-behavior: smooth;
+}
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 220 20% 14%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 14%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 20% 30%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.75rem;
+
+    --header-bg: 220 20% 98%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 20% 30%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 220 20% 30%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217 91% 60%;
+  }
+
+  .dark {
+    --background: 222 20% 9%;
+    --foreground: 210 20% 95%;
+
+    --card: 222 20% 12%;
+    --card-foreground: 210 20% 95%;
+
+    --popover: 222 20% 12%;
+    --popover-foreground: 210 20% 95%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 222 18% 16%;
+    --secondary-foreground: 210 20% 80%;
+
+    --muted: 222 18% 16%;
+    --muted-foreground: 220 10% 56%;
+
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 18% 20%;
+    --input: 222 18% 20%;
+    --ring: 217 91% 60%;
+
+    --header-bg: 222 20% 9%;
+
+    --sidebar-background: 222 20% 9%;
+    --sidebar-foreground: 210 20% 80%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 18% 16%;
+    --sidebar-accent-foreground: 210 20% 80%;
+    --sidebar-border: 222 18% 20%;
+    --sidebar-ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-heebo antialiased;
+  }
+
+  /* Hide default cursor on desktop when custom cursor is active */
+  @media (min-width: 1024px) {
+    * {
+      cursor: none !important;
+    }
+  }
+}
+
+@layer utilities {
+  .text-gradient-brand {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(217 91% 55%), hsl(199 89% 48%));
+  }
+
+  .glass-card {
+    background: hsl(0 0% 100% / 0.7);
+    backdrop-filter: blur(16px);
+    border: 1px solid hsl(220 13% 91%);
+  }
+
+  .soft-shadow {
+    box-shadow: 0 4px 24px -4px hsl(220 20% 14% / 0.08), 0 2px 8px -2px hsl(220 20% 14% / 0.04);
+  }
+
+  .soft-shadow-lg {
+    box-shadow: 0 10px 40px -8px hsl(220 20% 14% / 0.12), 0 4px 16px -4px hsl(220 20% 14% / 0.06);
+  }
+
+  .btn-glow {
+    box-shadow: 0 4px 20px -2px hsl(217 91% 60% / 0.3);
+    transition: box-shadow 0.4s ease, transform 0.2s ease;
+  }
+  .btn-glow:hover {
+    box-shadow: 0 8px 32px -4px hsl(217 91% 60% / 0.45);
+  }
+
+  .nav-link-hover::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, hsl(199 89% 48%), hsl(217 91% 60%));
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+  .nav-link-hover:hover::after {
+    width: 100%;
+  }
+}
+
+/* Accessibility Classes */
+
+/* Readable Font */
+.a11y-readable-font,
+.a11y-readable-font * {
+  font-family: Arial, Helvetica, sans-serif !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Highlight Links */
+.a11y-highlight-links a {
+  outline: 3px solid hsl(217 91% 60%) !important;
+  outline-offset: 2px !important;
+  text-decoration: underline !important;
+  background-color: hsl(217 91% 60% / 0.15) !important;
+}
+
+/* Highlight Titles */
+.a11y-highlight-titles h1,
+.a11y-highlight-titles h2,
+.a11y-highlight-titles h3,
+.a11y-highlight-titles h4,
+.a11y-highlight-titles h5,
+.a11y-highlight-titles h6 {
+  outline: 3px solid hsl(45 93% 47%) !important;
+  outline-offset: 4px !important;
+  background-color: hsl(45 93% 47% / 0.1) !important;
+}
+
+/* High Contrast Dark */
+.a11y-high-contrast-dark {
+  background-color: #000 !important;
+}
+.a11y-high-contrast-dark *:not([data-a11y-exclude]):not([data-a11y-exclude] *) {
+  background-color: #000 !important;
+  color: #ffff00 !important;
+  border-color: #ffff00 !important;
+}
+.a11y-high-contrast-dark a:not([data-a11y-exclude] *) {
+  color: #00ffff !important;
+  text-decoration: underline !important;
+}
+.a11y-high-contrast-dark button:not([data-a11y-exclude] *) {
+  background-color: #333 !important;
+  border: 2px solid #ffff00 !important;
+}
+.a11y-high-contrast-dark input:not([data-a11y-exclude] *),
+.a11y-high-contrast-dark textarea:not([data-a11y-exclude] *),
+.a11y-high-contrast-dark select:not([data-a11y-exclude] *) {
+  background-color: #111 !important;
+  color: #fff !important;
+  border: 2px solid #ffff00 !important;
+}
+.a11y-high-contrast-dark img,
+.a11y-high-contrast-dark video {
+  filter: brightness(0.9) contrast(1.2) !important;
+}
+
+/* High Contrast Light */
+.a11y-high-contrast-light {
+  background-color: #fff !important;
+}
+.a11y-high-contrast-light *:not([data-a11y-exclude]):not([data-a11y-exclude] *) {
+  background-color: #fff !important;
+  color: #000 !important;
+  border-color: #000 !important;
+}
+.a11y-high-contrast-light a:not([data-a11y-exclude] *) {
+  color: #0000cc !important;
+  text-decoration: underline !important;
+}
+.a11y-high-contrast-light button:not([data-a11y-exclude] *) {
+  background-color: #eee !important;
+  border: 2px solid #000 !important;
+  color: #000 !important;
+}
+.a11y-high-contrast-light input:not([data-a11y-exclude] *),
+.a11y-high-contrast-light textarea:not([data-a11y-exclude] *),
+.a11y-high-contrast-light select:not([data-a11y-exclude] *) {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+
+/* Grayscale */
+.a11y-grayscale {
+  filter: grayscale(100%) !important;
+}
+
+/* Invert Colors */
+.a11y-invert-colors {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+.a11y-invert-colors img,
+.a11y-invert-colors video {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+/* Combined filters */
+.a11y-grayscale.a11y-invert-colors {
+  filter: grayscale(100%) invert(100%) hue-rotate(180deg) !important;
+}
+
+/* Pause Animations */
+.a11y-pause-animations *,
+.a11y-pause-animations *::before,
+.a11y-pause-animations *::after {
+  animation-play-state: paused !important;
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+  transition: none !important;
+}
+
+/* Big Cursor */
+.a11y-big-cursor,
+.a11y-big-cursor * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M8 8L40 20L24 26L18 40Z' fill='%23000' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") 8 8, auto !important;
+}
+
+/* Focus Outline */
+.a11y-focus-outline *:focus {
+  outline: 4px solid hsl(0 84% 60%) !important;
+  outline-offset: 4px !important;
+  box-shadow: 0 0 0 8px hsl(0 84% 60% / 0.25) !important;
+}
+
+/* Reading Guide Active (the line is rendered in React) */
+.a11y-reading-guide-active {
+  /* Body class marker */
+}
