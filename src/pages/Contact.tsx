@@ -7,7 +7,7 @@ import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
-import { getContactInfo, getMailtoHref, getTelHref } from "@/lib/contact-utils";
+import { getMailtoHref, getTelHref, useContactInfo } from "@/lib/contact-utils";
 
 const floatingParticles = Array.from({ length: 8 }, (_, i) => ({
   id: i,
@@ -20,24 +20,24 @@ const floatingParticles = Array.from({ length: 8 }, (_, i) => ({
 
 const Contact = () => {
   const heroRef = useRef<HTMLDivElement>(null);
-  const contact = getContactInfo();
+  const contact = useContactInfo();
   const infoCards = [
     {
       icon: Phone,
-      title: "׳˜׳׳₪׳•׳",
+      title: "טלפון",
       value: contact.phone,
       href: getTelHref(contact.phone)
     },
     {
       icon: Mail,
-      title: "׳׳™׳׳™׳™׳",
+      title: "אימייל",
       value: contact.email,
       href: getMailtoHref(contact.email)
     },
     {
       icon: Clock,
-      title: "׳©׳¢׳•׳× ׳₪׳¢׳™׳׳•׳×",
-      value: "׳׳³ג€“׳”׳³ 09:00ג€“18:00"
+      title: "שעות פעילות",
+      value: "א׳–ה׳ 09:00–18:00"
     }
   ];
 
@@ -95,13 +95,13 @@ const Contact = () => {
 
         <div className="relative z-10 container mx-auto max-w-4xl px-6 text-center">
           <h1 className="hero-anim text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-5 leading-tight font-heebo">
-            ׳‘׳•׳׳• ׳ ׳‘׳ ׳” ׳׳©׳”׳•
-            <span className="text-primary"> ׳׳“׳”׳™׳ </span>
-            ׳™׳—׳“
+            בואו נבנה משהו
+            <span className="text-primary"> מדהים </span>
+            יחד
           </h1>
 
           <p className="hero-anim text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed font-heebo">
-            ׳¡׳₪׳¨׳• ׳׳ ׳• ׳¢׳ ׳”׳₪׳¨׳•׳™׳§׳˜ ׳©׳׳›׳ ׳•׳׳ ׳—׳ ׳• ׳ ׳—׳–׳•׳¨ ׳׳׳™׳›׳ ׳¢׳ ׳”׳¦׳¢׳” ׳׳•׳×׳׳׳× ׳׳™׳©׳™׳×
+            ספרו לנו על הפרויקט שלכם ואנחנו נחזור אליכם עם הצעה מותאמת אישית
           </p>
         </div>
       </section>

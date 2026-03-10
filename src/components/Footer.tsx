@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Phone, Mail, MessageCircle, Facebook, Instagram, Linkedin, Twitter, Github, Youtube } from "lucide-react";
-import { fetchSiteSettings } from "@/lib/site-settings-api";
+import { useSiteSettings } from "@/lib/site-settings-api";
 import { getMailtoHref, getTelHref, getWhatsAppHref } from "@/lib/contact-utils";
 
 const Footer = () => {
-  const siteSettings = fetchSiteSettings();
+  const { settings: siteSettings } = useSiteSettings();
   const { contact, social, footer: footerSettings, socialVisibility } = siteSettings;
 
   const allSocialIcons = [

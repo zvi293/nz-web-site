@@ -12,7 +12,21 @@ const ClientLogosSection = () => {
   const scrollerInnerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setLogos(fetchLogos());
+    let active = true;
+
+    void fetchLogos()
+      .then((rows) => {
+        if (active) {
+          setLogos(rows);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -92,7 +106,7 @@ const ClientLogosSection = () => {
             
               <img
               src={logo.image}
-              alt={`לוגו לקוח – ${logo.name}`}
+              alt={`לוגו לקוח - ${logo.name}`}
               className="max-h-10 md:max-h-12 max-w-full object-contain" />
             
             </div>

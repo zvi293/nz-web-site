@@ -6,10 +6,10 @@ import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
-import { getContactInfo, getMailtoHref, getTelHref } from "@/lib/contact-utils";
+import { getMailtoHref, getTelHref, useContactInfo } from "@/lib/contact-utils";
 
 const Terms = () => {
-  const contact = getContactInfo();
+  const contact = useContactInfo();
 
   return (
     <main className="relative bg-background pt-[72px]" dir="rtl">

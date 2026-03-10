@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, GripVertical, Save, RotateCcw, Archive } from "lucide-react";
+import { Plus, Trash2, Save, RotateCcw, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,30 +15,69 @@ import {
   addDeletedAboutItem,
   permanentlyDeleteAboutItem,
   getDeletedAboutItem,
+  getDefaultAboutData,
   type AboutPageData,
   type AboutColumn,
   type DeletedAboutItem,
 } from "@/lib/about-api";
 
 const AdminAboutTab = () => {
-  const [data, setData] = useState<AboutPageData>(fetchAboutData());
-  const [deletedItems, setDeletedItems] = useState<DeletedAboutItem[]>(fetchDeletedAboutItems());
+  const [data, setData] = useState<AboutPageData>(getDefaultAboutData());
+  const [deletedItems, setDeletedItems] = useState<DeletedAboutItem[]>([]);
   const [showRecycleBin, setShowRecycleBin] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const reloadDeleted = () => setDeletedItems(fetchDeletedAboutItems());
+  const loadAboutState = async () => {
+    setLoading(true);
 
-  const handleSave = () => {
+    try {
+      const [aboutData, deletedAboutItems] = await Promise.all([
+        fetchAboutData(),
+        fetchDeletedAboutItems(),
+      ]);
+
+      setData(aboutData);
+      setDeletedItems(deletedAboutItems);
+    } catch (error) {
+      console.error(error);
+      toast.error("אירעה שגיאה בטעינת תוכן עמוד מי אנחנו");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadAboutState();
+  }, []);
+
+  const reloadDeleted = async () => {
+    try {
+      setDeletedItems(await fetchDeletedAboutItems());
+    } catch (error) {
+      console.error(error);
+      toast.error("אירעה שגיאה בטעינת סל המחזור");
+    }
+  };
+
+  const handleSave = async () => {
     setSaving(true);
-    saveAboutData(data);
-    setTimeout(() => {
-      setSaving(false);
+
+    try {
+      const savedData = await saveAboutData(data);
+      setData(savedData);
+      await reloadDeleted();
       toast.success("הדף נשמר בהצלחה!");
-    }, 300);
+    } catch (error) {
+      console.error(error);
+      toast.error("שמירת עמוד מי אנחנו נכשלה");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const updateColumn = (colIndex: number, updates: Partial<AboutColumn>) => {
-    setData(prev => {
+    setData((prev) => {
       const columns = [...prev.columns] as [AboutColumn, AboutColumn, AboutColumn];
       columns[colIndex] = { ...columns[colIndex], ...updates };
       return { ...prev, columns };
@@ -46,7 +85,7 @@ const AdminAboutTab = () => {
   };
 
   const addItem = (colIndex: number) => {
-    setData(prev => {
+    setData((prev) => {
       const columns = [...prev.columns] as [AboutColumn, AboutColumn, AboutColumn];
       columns[colIndex] = {
         ...columns[colIndex],
@@ -56,27 +95,33 @@ const AdminAboutTab = () => {
     });
   };
 
-  const removeItem = (colIndex: number, itemIndex: number) => {
+  const removeItem = async (colIndex: number, itemIndex: number) => {
     const item = data.columns[colIndex].items[itemIndex];
-    addDeletedAboutItem({
-      type: "column-item",
-      label: `${data.columns[colIndex].title} → ${item.title}`,
-      data: { colIndex, item },
-    });
-    reloadDeleted();
-    toast.success(`"${item.title}" הועבר לסל המחזור`);
-    setData(prev => {
-      const columns = [...prev.columns] as [AboutColumn, AboutColumn, AboutColumn];
-      columns[colIndex] = {
-        ...columns[colIndex],
-        items: columns[colIndex].items.filter((_, i) => i !== itemIndex),
-      };
-      return { ...prev, columns };
-    });
+    const nextColumns = [...data.columns] as [AboutColumn, AboutColumn, AboutColumn];
+    nextColumns[colIndex] = {
+      ...nextColumns[colIndex],
+      items: nextColumns[colIndex].items.filter((_, index) => index !== itemIndex),
+    };
+    const nextData = { ...data, columns: nextColumns };
+
+    try {
+      await addDeletedAboutItem({
+        type: "column-item",
+        label: `${data.columns[colIndex].title} ? ${item.title}`,
+        data: { colIndex, item },
+      });
+      const savedData = await saveAboutData(nextData);
+      setData(savedData);
+      await reloadDeleted();
+      toast.success(`"${item.title}" הועבר לסל המחזור`);
+    } catch (error) {
+      console.error(error);
+      toast.error("העברת הפריט לסל המחזור נכשלה");
+    }
   };
 
   const updateItem = (colIndex: number, itemIndex: number, field: "title" | "desc", value: string) => {
-    setData(prev => {
+    setData((prev) => {
       const columns = [...prev.columns] as [AboutColumn, AboutColumn, AboutColumn];
       const items = [...columns[colIndex].items];
       items[itemIndex] = { ...items[itemIndex], [field]: value };
@@ -86,59 +131,93 @@ const AdminAboutTab = () => {
   };
 
   const addVisionParagraph = () => {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
       visionParagraphs: [...prev.visionParagraphs, "פסקה חדשה..."],
     }));
   };
 
-  const removeVisionParagraph = (index: number) => {
+  const removeVisionParagraph = async (index: number) => {
     const paragraph = data.visionParagraphs[index];
-    addDeletedAboutItem({
-      type: "vision-paragraph",
-      label: paragraph.substring(0, 50) + (paragraph.length > 50 ? "..." : ""),
-      data: { paragraph },
-    });
-    reloadDeleted();
-    toast.success("הפסקה הועברה לסל המחזור");
-    setData(prev => ({
-      ...prev,
-      visionParagraphs: prev.visionParagraphs.filter((_, i) => i !== index),
-    }));
-  };
+    const nextData = {
+      ...data,
+      visionParagraphs: data.visionParagraphs.filter((_, itemIndex) => itemIndex !== index),
+    };
 
-  const handleRestoreAboutItem = (id: string) => {
-    const item = getDeletedAboutItem(id);
-    if (!item) return;
-
-    if (item.type === "column-item") {
-      const { colIndex, item: accItem } = item.data;
-      setData(prev => {
-        const columns = [...prev.columns] as [AboutColumn, AboutColumn, AboutColumn];
-        if (columns[colIndex]) {
-          columns[colIndex] = {
-            ...columns[colIndex],
-            items: [...columns[colIndex].items, accItem],
-          };
-        }
-        return { ...prev, columns };
+    try {
+      await addDeletedAboutItem({
+        type: "vision-paragraph",
+        label: paragraph.substring(0, 50) + (paragraph.length > 50 ? "..." : ""),
+        data: { paragraph },
       });
-    } else if (item.type === "vision-paragraph") {
-      setData(prev => ({
-        ...prev,
-        visionParagraphs: [...prev.visionParagraphs, item.data.paragraph],
-      }));
+      const savedData = await saveAboutData(nextData);
+      setData(savedData);
+      await reloadDeleted();
+      toast.success("הפסקה הועברה לסל המחזור");
+    } catch (error) {
+      console.error(error);
+      toast.error("העברת הפסקה לסל המחזור נכשלה");
     }
-
-    permanentlyDeleteAboutItem(id);
-    reloadDeleted();
-    toast.success("הפריט שוחזר בהצלחה");
   };
 
-  const handlePermanentDeleteAboutItem = (id: string) => {
-    permanentlyDeleteAboutItem(id);
-    reloadDeleted();
-    toast.success("הפריט נמחק לצמיתות");
+  const handleRestoreAboutItem = async (id: string) => {
+    try {
+      const deletedItem = await getDeletedAboutItem(id);
+      if (!deletedItem) {
+        return;
+      }
+
+      let nextData = data;
+
+      if (deletedItem.type === "column-item" && deletedItem.data && typeof deletedItem.data === "object") {
+        const entry = deletedItem.data as { colIndex?: number; item?: { title?: string; desc?: string } };
+        if (typeof entry.colIndex === "number" && data.columns[entry.colIndex] && entry.item) {
+          const columns = [...data.columns] as [AboutColumn, AboutColumn, AboutColumn];
+          columns[entry.colIndex] = {
+            ...columns[entry.colIndex],
+            items: [
+              ...columns[entry.colIndex].items,
+              {
+                title: typeof entry.item.title === "string" ? entry.item.title : "",
+                desc: typeof entry.item.desc === "string" ? entry.item.desc : "",
+              },
+            ],
+          };
+          nextData = { ...data, columns };
+        }
+      }
+
+      if (deletedItem.type === "vision-paragraph" && deletedItem.data && typeof deletedItem.data === "object") {
+        const entry = deletedItem.data as { paragraph?: string };
+        nextData = {
+          ...data,
+          visionParagraphs: [
+            ...data.visionParagraphs,
+            typeof entry.paragraph === "string" ? entry.paragraph : "",
+          ],
+        };
+      }
+
+      await permanentlyDeleteAboutItem(id);
+      const savedData = await saveAboutData(nextData);
+      setData(savedData);
+      await reloadDeleted();
+      toast.success("הפריט שוחזר בהצלחה");
+    } catch (error) {
+      console.error(error);
+      toast.error("שחזור הפריט נכשל");
+    }
+  };
+
+  const handlePermanentDeleteAboutItem = async (id: string) => {
+    try {
+      await permanentlyDeleteAboutItem(id);
+      await reloadDeleted();
+      toast.success("הפריט נמחק לצמיתות");
+    } catch (error) {
+      console.error(error);
+      toast.error("מחיקת הפריט נכשלה");
+    }
   };
 
   return (
@@ -159,11 +238,11 @@ const AdminAboutTab = () => {
               </span>
             )}
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setData(fetchAboutData())} className="gap-1.5">
+          <Button variant="outline" size="sm" onClick={() => void loadAboutState()} className="gap-1.5" disabled={loading || saving}>
             <RotateCcw className="h-3.5 w-3.5" />
             בטל שינויים
           </Button>
-          <Button size="sm" onClick={handleSave} disabled={saving} className="gap-1.5">
+          <Button size="sm" onClick={() => void handleSave()} disabled={saving || loading} className="gap-1.5">
             <Save className="h-3.5 w-3.5" />
             {saving ? "שומר..." : "שמור הכל"}
           </Button>
@@ -265,7 +344,7 @@ const AdminAboutTab = () => {
                           variant="ghost"
                           size="icon"
                           className="h-6 w-6 text-destructive hover:bg-destructive/10"
-                          onClick={() => removeItem(colIdx, itemIdx)}
+                          onClick={() => void removeItem(colIdx, itemIdx)}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -324,7 +403,7 @@ const AdminAboutTab = () => {
                         variant="ghost"
                         size="icon"
                         className="h-6 w-6 text-destructive"
-                        onClick={() => removeVisionParagraph(i)}
+                        onClick={() => void removeVisionParagraph(i)}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
@@ -429,7 +508,7 @@ const AdminAboutTab = () => {
                       </p>
                     </div>
                     <div className="flex gap-1.5">
-                      <Button variant="outline" size="sm" onClick={() => handleRestoreAboutItem(item.id)} className="gap-1 h-7 text-xs">
+                      <Button variant="outline" size="sm" onClick={() => void handleRestoreAboutItem(item.id)} className="gap-1 h-7 text-xs">
                         <RotateCcw className="h-3 w-3" />
                         שחזר
                       </Button>
@@ -437,7 +516,7 @@ const AdminAboutTab = () => {
                         variant="outline"
                         size="sm"
                         className="h-7 text-xs text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                        onClick={() => handlePermanentDeleteAboutItem(item.id)}
+                        onClick={() => void handlePermanentDeleteAboutItem(item.id)}
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>

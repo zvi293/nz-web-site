@@ -78,6 +78,7 @@ const emptyForm: Omit<ServiceRow, "id"> = {
   reverse: false,
   tags: [],
   order: 0,
+  published: true,
   ...defaultColors,
 };
 
@@ -96,16 +97,31 @@ const AdminServicesTab = () => {
   const iconImageInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
-    const data = await fetchServices();
-    setServices(data);
-    setDeletedServices(fetchDeletedServices());
+    const [activeServices, recycledServices] = await Promise.all([
+      fetchServices({ includeHidden: true }),
+      fetchDeletedServices(),
+    ]);
+    setServices(activeServices);
+    setDeletedServices(recycledServices);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    void load();
+  }, []);
+
+  const runServiceTask = async <T,>(task: () => Promise<T>, errorMessage: string): Promise<T | null> => {
+    try {
+      return await task();
+    } catch (error) {
+      console.error(error);
+      toast.error(errorMessage);
+      return null;
+    }
+  };
 
   const openNew = () => {
     setEditingId(null);
-    setForm({ ...emptyForm, order: services.length + 1 });
+    setForm({ ...emptyForm, order: services.length + 1, published: true });
     setTagsInput("");
     setDialogOpen(true);
   };
@@ -117,40 +133,100 @@ const AdminServicesTab = () => {
     setDialogOpen(true);
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    const payload = {
-      ...form,
-      tags: tagsInput.split(",").map(t => t.trim()).filter(Boolean),
-    };
+  const validateServiceForm = () => {
+    if (!form.badge.trim()) return "יש להזין תגית לשירות.";
+    if (!form.title.trim()) return "יש להזין כותרת לשירות.";
+    if (!form.body.trim() || form.body.trim().length < 10) return "יש להזין תיאור משמעותי של השירות.";
+    if (form.iconType === "image" && !form.iconImage?.trim()) return "יש להזין תמונת אייקון או להעלות קובץ.";
+    if (form.iconType === "svg" && !form.iconSvg?.trim()) return "יש להזין קוד SVG תקין.";
 
-    if (editingId) {
-      await updateService(editingId, payload);
-    } else {
-      await createService(payload);
+    for (const [value, label] of [
+      [form.image, "קישור תמונת השירות"],
+      [form.video, "קישור הווידאו"],
+      [form.iconImage, "קישור תמונת האייקון"],
+    ] as const) {
+      if (value && !value.startsWith("data:")) {
+        try {
+          new URL(value);
+        } catch {
+          return `${label} אינו תקין.`;
+        }
+      }
     }
-    setDialogOpen(false);
-    await load();
-    setLoading(false);
+
+    return null;
+  };
+
+  const handleSubmit = async () => {
+    const validationError = validateServiceForm();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const payload = {
+        ...form,
+        tags: tagsInput.split(",").map(t => t.trim()).filter(Boolean),
+      };
+
+      const saved = await runServiceTask(async () => {
+        if (editingId) {
+          await updateService(editingId, payload);
+        } else {
+          await createService(payload);
+        }
+
+        await load();
+        return true;
+      }, "לא ניתן היה לשמור את השירות כרגע.");
+
+      if (saved) {
+        setDialogOpen(false);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    const service = services.find(s => s.id === id);
-    await deleteService(id);
-    await load();
-    toast.success(`"${service?.title}" הועבר לסל המחזור`);
+    if (!window.confirm("להעביר את השירות לסל המחזור?")) return;
+    const service = services.find((s) => s.id === id);
+    const deleted = await runServiceTask(async () => {
+      await deleteService(id);
+      await load();
+      return true;
+    }, "לא ניתן היה להעביר את השירות לסל המחזור.");
+
+    if (deleted) {
+      toast.success(`"${service?.title}" הועבר לסל המחזור`);
+    }
   };
 
-  const handleRestore = (id: string) => {
-    restoreService(id);
-    load();
-    toast.success("השירות שוחזר בהצלחה");
+  const handleRestore = async (id: string) => {
+    const restored = await runServiceTask(async () => {
+      await restoreService(id);
+      await load();
+      return true;
+    }, "לא ניתן היה לשחזר את השירות כרגע.");
+
+    if (restored) {
+      toast.success("השירות שוחזר בהצלחה");
+    }
   };
 
-  const handlePermanentDelete = (id: string) => {
-    permanentlyDeleteService(id);
-    setDeletedServices(fetchDeletedServices());
-    toast.success("השירות נמחק לצמיתות");
+  const handlePermanentDelete = async (id: string) => {
+    if (!window.confirm("למחוק את השירות לצמיתות?")) return;
+    const deleted = await runServiceTask(async () => {
+      await permanentlyDeleteService(id);
+      await load();
+      return true;
+    }, "לא ניתן היה למחוק את השירות לצמיתות כרגע.");
+
+    if (deleted) {
+      toast.success("השירות נמחק לצמיתות");
+    }
   };
 
   const moveService = async (index: number, direction: "up" | "down") => {
@@ -162,9 +238,12 @@ const AdminServicesTab = () => {
     newServices[index].order = newServices[swapIdx].order;
     newServices[swapIdx].order = tempOrder;
     
-    await updateService(newServices[index].id, { order: newServices[index].order });
-    await updateService(newServices[swapIdx].id, { order: newServices[swapIdx].order });
-    await load();
+    await runServiceTask(async () => {
+      await updateService(newServices[index].id, { order: newServices[index].order });
+      await updateService(newServices[swapIdx].id, { order: newServices[swapIdx].order });
+      await load();
+      return true;
+    }, "לא ניתן היה לעדכן את סדר השירותים כרגע.");
   };
 
   const handleFileUpload = (field: "image" | "video" | "iconImage", file: File) => {
@@ -235,8 +314,8 @@ const AdminServicesTab = () => {
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6"
-                  disabled={i === 0}
-                  onClick={() => moveService(i, "up")}
+                  disabled={i === 0 || loading}
+                  onClick={() => void moveService(i, "up")}
                 >
                   <ChevronUp className="h-3.5 w-3.5" />
                 </Button>
@@ -244,8 +323,8 @@ const AdminServicesTab = () => {
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6"
-                  disabled={i === services.length - 1}
-                  onClick={() => moveService(i, "down")}
+                  disabled={i === services.length - 1 || loading}
+                  onClick={() => void moveService(i, "down")}
                 >
                   <ChevronDown className="h-3.5 w-3.5" />
                 </Button>
@@ -277,21 +356,43 @@ const AdminServicesTab = () => {
                   >
                     {service.badge}
                   </span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${service.published ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"}`}>
+                    {service.published ? "מפורסם" : "מוסתר"}
+                  </span>
                   <span className="text-[10px] text-muted-foreground">
                     {service.reverse ? "הפוך" : "רגיל"} · {service.tags.length} תגיות
                   </span>
                 </div>
               </div>
 
-              <div className="flex gap-1.5 flex-shrink-0">
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => openEdit(service)}>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] text-muted-foreground">{service.published ? "גלוי" : "מוסתר"}</span>
+                  <Switch
+                    checked={service.published}
+                    disabled={loading}
+                    onCheckedChange={async (checked) => {
+                      const updated = await runServiceTask(async () => {
+                        await updateService(service.id, { published: checked });
+                        await load();
+                        return true;
+                      }, "לא ניתן היה לעדכן את מצב הפרסום כרגע.");
+
+                      if (updated) {
+                        toast.success(checked ? "השירות פורסם" : "השירות הוסתר");
+                      }
+                    }}
+                  />
+                </div>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => openEdit(service)} disabled={loading}>
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
                 <Button
                   variant="outline"
                   size="icon"
                   className="h-8 w-8 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                  onClick={() => handleDelete(service.id)}
+                  onClick={() => void handleDelete(service.id)}
+                  disabled={loading}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -412,6 +513,13 @@ const AdminServicesTab = () => {
                   onCheckedChange={(v) => setForm(prev => ({ ...prev, reverse: v }))}
                 />
                 <Label>לייאוט הפוך (תמונה בצד שמאל)</Label>
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch
+                  checked={form.published}
+                  onCheckedChange={(v) => setForm(prev => ({ ...prev, published: v }))}
+                />
+                <Label>הצג את השירות באתר</Label>
               </div>
             </TabsContent>
 

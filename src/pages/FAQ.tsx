@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, HelpCircle } from "lucide-react";
@@ -12,10 +13,16 @@ import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
-import { fetchFaqItems } from "@/lib/faq-api";
+import { fetchFaqItems, getDefaultFaqItems, type FaqItem } from "@/lib/faq-api";
 
 const FAQ = () => {
-  const faqItems = fetchFaqItems().filter(item => item.visible);
+  const [faqItems, setFaqItems] = useState<FaqItem[]>(() => getDefaultFaqItems().filter((item) => item.visible));
+
+  useEffect(() => {
+    void fetchFaqItems()
+      .then((items) => setFaqItems(items.filter((item) => item.visible)))
+      .catch(() => undefined);
+  }, []);
 
   return (
     <main className="relative bg-background pt-[72px]" dir="rtl">

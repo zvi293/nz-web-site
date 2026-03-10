@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Pencil, Trash2, ArrowRight, X, Upload, Eye, Image, FolderOpen, Mail, Settings, LayoutGrid, Search, Filter, Clock, CheckCircle2, AlertCircle, XCircle, MessageCircle, Phone, Building2, FileText, ChevronDown, SortAsc, SortDesc, User, CalendarIcon, RotateCcw, Archive, HelpCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowRight, X, Upload, Eye, Image, FolderOpen, Mail, Settings, LayoutGrid, Search, Filter, Clock, CheckCircle2, AlertCircle, XCircle, MessageCircle, Phone, Building2, FileText, ChevronDown, ChevronUp, SortAsc, SortDesc, User, CalendarIcon, RotateCcw, Archive, HelpCircle, LogOut } from "lucide-react";
 import { format, isToday, isThisWeek, isThisMonth, isAfter, isBefore, startOfDay, endOfDay } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { useAdminAuth } from "@/components/auth/AuthProvider";
+import { useToast } from "@/hooks/use-toast";
 import {
   fetchProjects,
   createProject,
@@ -23,6 +26,7 @@ import {
 import {
   fetchLogos,
   addLogo,
+  updateLogo,
   deleteLogo,
   deleteAllLogos,
   seedDemoLogos,
@@ -37,7 +41,6 @@ import {
   deleteLead,
   restoreLead,
   permanentlyDeleteLead,
-  getLeadCounts,
   type Lead,
   type LeadStatus,
 } from "@/lib/leads-api";
@@ -46,9 +49,20 @@ import AdminServicesTab from "@/components/AdminServicesTab";
 import AdminAboutTab from "@/components/AdminAboutTab";
 import AdminSiteSettingsTab from "@/components/AdminSiteSettingsTab";
 import AdminFaqTab from "@/components/AdminFaqTab";
-const emptyForm = { title: "", description: "", tags: "", image: "", link: "" };
+const emptyForm = {
+  title: "",
+  description: "",
+  tags: "",
+  image: "",
+  link: "",
+  featured: true,
+  published: true,
+  order: 0,
+};
 
 const AdminPortfolio = () => {
+  const { signOut, user } = useAdminAuth();
+  const { toast } = useToast();
   const [projects, setProjects] = useState<Project[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -58,6 +72,7 @@ const AdminPortfolio = () => {
   const [logos, setLogos] = useState<ClientLogo[]>([]);
   const [logoName, setLogoName] = useState("");
   const [logoImage, setLogoImage] = useState("");
+  const [logoLoading, setLogoLoading] = useState(false);
 
   // Leads state
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -76,38 +91,146 @@ const AdminPortfolio = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({ name: "", email: "", phone: "", companyName: "", subject: "", notes: "" });
 
-  const load = async () => {
-    const data = await fetchProjects();
-    setProjects(data);
-    setLogos(fetchLogos());
-    setLeads(fetchLeads());
-    setDeletedLeads(fetchDeletedLeads());
+  const refreshLeads = async () => {
+    const [activeLeads, recycledLeads] = await Promise.all([fetchLeads(), fetchDeletedLeads()]);
+    setLeads(activeLeads);
+    setDeletedLeads(recycledLeads);
+    return activeLeads;
   };
 
-  useEffect(() => { load(); }, []);
+  const runLeadTask = async <T,>(task: () => Promise<T>, title: string): Promise<T | null> => {
+    try {
+      return await task();
+    } catch (error) {
+      console.error(error);
+      toast({
+        title,
+        description: "אין אפשרות להשלים את פעולת הפניות כרגע.",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
+  const runLogoTask = async <T,>(task: () => Promise<T>, title: string): Promise<T | null> => {
+    try {
+      return await task();
+    } catch (error) {
+      console.error(error);
+      toast({
+        title,
+        description: "לא ניתן היה להשלים את פעולת הלוגואים כרגע.",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
+  const load = async () => {
+    const [projectData, logoData] = await Promise.all([
+      runProjectTask(() => fetchProjects({ includeUnpublished: true }), "שגיאה בטעינת הפרויקטים"),
+      runLogoTask(() => fetchLogos({ includeHidden: true }), "שגיאה בטעינת הלוגואים"),
+    ]);
+
+    if (projectData) {
+      setProjects(projectData);
+    }
+
+    if (logoData) {
+      setLogos(logoData);
+    }
+
+    await runLeadTask(refreshLeads, "שגיאה בטעינת הפניות");
+  };
+
+  const runProjectTask = async <T,>(task: () => Promise<T>, title: string): Promise<T | null> => {
+    try {
+      return await task();
+    } catch (error) {
+      console.error(error);
+      toast({
+        title,
+        description: "לא ניתן היה להשלים את פעולת הפרויקטים כרגע.",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    void load();
+  }, []);
+
+  const isAllowedExternalUrl = (value: string) => {
+    if (!value || value.startsWith("data:")) {
+      return true;
+    }
+
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch {
+      return false;
+    }
+  };
+
+  const validateProjectForm = () => {
+    if (!form.title.trim()) return "יש להזין שם פרויקט.";
+    if (!form.description.trim() || form.description.trim().length < 10) return "יש להזין תיאור משמעותי לפרויקט.";
+    if (!form.tags.split(",").map((tag) => tag.trim()).filter(Boolean).length) return "יש להזין לפחות תגית אחת.";
+    if (!form.image.trim()) return "יש להזין תמונת פרויקט או להעלות קובץ.";
+    if (!isAllowedExternalUrl(form.image.trim())) return "קישור תמונת הפרויקט אינו תקין.";
+    if (form.link.trim() && !isAllowedExternalUrl(form.link.trim())) return "קישור הפרויקט אינו תקין.";
+    return null;
+  };
+
+  const validateLogoForm = () => {
+    if (!logoName.trim()) return "יש להזין שם לקוח.";
+    if (!logoImage.trim()) return "יש להזין תמונת לוגו או להעלות קובץ.";
+    if (!isAllowedExternalUrl(logoImage.trim())) return "קישור הלוגו אינו תקין.";
+    return null;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    const payload = {
-      title: form.title,
-      description: form.description,
-      tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-      image: form.image,
-      link: form.link,
-      featured: true,
-    };
-
-    if (editingId) {
-      await updateProject(editingId, payload);
-    } else {
-      await createProject(payload);
+    const validationError = validateProjectForm();
+    if (validationError) {
+      toast({
+        title: "לא ניתן לשמור את הפרויקט",
+        description: validationError,
+        variant: "destructive",
+      });
+      return;
     }
 
-    setForm(emptyForm);
-    setEditingId(null);
-    await load();
-    setLoading(false);
+    setLoading(true);
+    try {
+      const payload = {
+        title: form.title,
+        description: form.description,
+        tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
+        image: form.image,
+        link: form.link,
+        featured: form.featured,
+        published: form.published,
+        order: form.order,
+      };
+
+      const saved = await runProjectTask(
+        () => (editingId ? updateProject(editingId, payload) : createProject(payload)),
+        editingId ? "שגיאה בעדכון הפרויקט" : "שגיאה ביצירת הפרויקט",
+      );
+
+      if (!saved) {
+        return;
+      }
+
+      setForm(emptyForm);
+      setEditingId(null);
+      await load();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEdit = (project: Project) => {
@@ -118,11 +241,19 @@ const AdminPortfolio = () => {
       tags: project.tags.join(", "),
       image: project.image,
       link: project.link,
+      featured: project.featured,
+      published: project.published,
+      order: project.order,
     });
   };
 
   const handleDelete = async (id: string) => {
-    await deleteProject(id);
+    if (!window.confirm("למחוק את הפרויקט לצמיתות?")) return;
+    const deleted = await runProjectTask(() => deleteProject(id), "שגיאה במחיקת הפרויקט");
+    if (!deleted) {
+      return;
+    }
+
     await load();
   };
 
@@ -131,27 +262,138 @@ const AdminPortfolio = () => {
     setForm(emptyForm);
   };
 
-  const handleAddLogo = () => {
-    if (!logoImage) return;
-    addLogo({ name: logoName || "לוגו", image: logoImage });
-    setLogoName("");
-    setLogoImage("");
-    setLogos(fetchLogos());
+  const handleAddLogo = async () => {
+    const validationError = validateLogoForm();
+    if (validationError) {
+      toast({
+        title: "לא ניתן לשמור את הלוגו",
+        description: validationError,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLogoLoading(true);
+    try {
+      const created = await runLogoTask(
+        () => addLogo({ name: logoName.trim(), image: logoImage.trim(), visible: true, order: logos.length }),
+        "שגיאה בהוספת הלוגו",
+      );
+
+      if (!created) {
+        return;
+      }
+
+      setLogoName("");
+      setLogoImage("");
+      const updated = await runLogoTask(() => fetchLogos({ includeHidden: true }), "שגיאה ברענון הלוגואים");
+      if (updated) {
+        setLogos(updated);
+      }
+    } finally {
+      setLogoLoading(false);
+    }
   };
 
-  const handleDeleteLogo = (id: string) => {
-    deleteLogo(id);
-    setLogos(fetchLogos());
+  const handleDeleteLogo = async (id: string) => {
+    if (!window.confirm("למחוק את הלוגו לצמיתות?")) return;
+    setLogoLoading(true);
+    try {
+      const deleted = await runLogoTask(() => deleteLogo(id), "שגיאה במחיקת לוגו");
+      if (deleted === null) {
+        return;
+      }
+
+      const updated = await runLogoTask(() => fetchLogos({ includeHidden: true }), "שגיאה ברענון הלוגואים");
+      if (updated) {
+        setLogos(updated);
+      }
+    } finally {
+      setLogoLoading(false);
+    }
   };
 
-  const handleDeleteAllLogos = () => {
-    deleteAllLogos();
-    setLogos(fetchLogos());
+  const handleDeleteAllLogos = async () => {
+    if (!window.confirm("למחוק את כל הלוגואים לצמיתות?")) return;
+    setLogoLoading(true);
+    try {
+      const deleted = await runLogoTask(deleteAllLogos, "שגיאה במחיקת כל הלוגואים");
+      if (deleted === null) {
+        return;
+      }
+
+      setLogos([]);
+    } finally {
+      setLogoLoading(false);
+    }
   };
 
-  const handleSeedDemos = () => {
-    const all = seedDemoLogos();
-    setLogos(all);
+  const handleSeedDemos = async () => {
+    setLogoLoading(true);
+    try {
+      const all = await runLogoTask(seedDemoLogos, "שגיאה בטעינת לוגואים לדוגמה");
+      if (all) {
+        setLogos(all);
+      }
+    } finally {
+      setLogoLoading(false);
+    }
+  };
+
+  const moveProject = async (index: number, direction: "up" | "down") => {
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= projects.length) return;
+
+    const current = projects[index];
+    const target = projects[swapIndex];
+
+    const updated = await runProjectTask(async () => {
+      await updateProject(current.id, { order: target.order });
+      await updateProject(target.id, { order: current.order });
+      return load();
+    }, "שגיאה בעדכון סדר הפרויקטים");
+
+    if (!updated) return;
+  };
+
+  const moveLogo = async (index: number, direction: "up" | "down") => {
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= logos.length) return;
+
+    const current = logos[index];
+    const target = logos[swapIndex];
+
+    setLogoLoading(true);
+    try {
+      const moved = await runLogoTask(async () => {
+        await updateLogo(current.id, { order: target.order });
+        await updateLogo(target.id, { order: current.order });
+        return fetchLogos({ includeHidden: true });
+      }, "שגיאה בעדכון סדר הלוגואים");
+
+      if (moved) {
+        setLogos(moved);
+      }
+    } finally {
+      setLogoLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "התנתקת בהצלחה",
+        description: "ממשק הניהול נסגר.",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "שגיאה בהתנתקות",
+        description: "לא ניתן היה לנתק את הסשן כרגע.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -163,12 +405,19 @@ const AdminPortfolio = () => {
             <Settings className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-bold text-foreground">לוח בקרה</h1>
           </div>
-          <Link to="/">
+          <div className="flex items-center gap-2">
+            {user?.email && <span className="hidden text-sm text-muted-foreground md:inline">{user.email}</span>}
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => void handleLogout()}>
+              <LogOut className="h-4 w-4" />
+              התנתקות
+            </Button>
+            <Link to="/">
             <Button variant="ghost" size="sm" className="gap-2">
               חזרה לאתר
               <ArrowRight className="h-4 w-4" />
             </Button>
-          </Link>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -354,6 +603,16 @@ const AdminPortfolio = () => {
                       <Label htmlFor="link">קישור לאתר</Label>
                       <Input id="link" value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="https://..." />
                     </div>
+                    <div className="flex flex-wrap gap-6 rounded-lg border border-border bg-secondary/20 px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Switch checked={form.featured} onCheckedChange={(checked) => setForm({ ...form, featured: checked })} />
+                        <Label>הצג גם בדף הבית</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch checked={form.published} onCheckedChange={(checked) => setForm({ ...form, published: checked })} />
+                        <Label>פרסם באתר</Label>
+                      </div>
+                    </div>
                     <div className="flex gap-2">
                       <Button type="submit" disabled={loading} className="flex-1">
                         {loading ? "שומר..." : editingId ? "עדכן פרויקט" : "הוסף פרויקט"}
@@ -380,11 +639,19 @@ const AdminPortfolio = () => {
                   {projects.length === 0 && (
                     <p className="text-muted-foreground text-sm text-center py-8">אין פרויקטים עדיין. הוסף את הפרויקט הראשון!</p>
                   )}
-                  {projects.map((project) => (
+                  {projects.map((project, index) => (
                     <div
                       key={project.id}
-                      className={`flex items-center gap-3 rounded-xl border p-3 transition-shadow hover:shadow-md ${project.featured ? 'border-primary/30 bg-primary/5' : 'border-border bg-card'}`}
+                      className={`flex items-center gap-3 rounded-xl border p-3 transition-shadow hover:shadow-md ${project.featured ? 'border-primary/30 bg-primary/5' : 'border-border bg-card'} ${!project.published ? "opacity-70 border-dashed" : ""}`}
                     >
+                      <div className="flex flex-col gap-1">
+                        <Button variant="ghost" size="icon" className="h-6 w-6" disabled={index === 0 || loading} onClick={() => void moveProject(index, "up")}>
+                          <ChevronUp className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" disabled={index === projects.length - 1 || loading} onClick={() => void moveProject(index, "down")}>
+                          <ChevronDown className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                       <img
                         src={project.image}
                         alt={project.title}
@@ -396,6 +663,9 @@ const AdminPortfolio = () => {
                           {project.featured && (
                             <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">מוצג</span>
                           )}
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${project.published ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"}`}>
+                            {project.published ? "מפורסם" : "מוסתר"}
+                          </span>
                         </div>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {project.tags.slice(0, 2).map((tag) => (
@@ -409,8 +679,10 @@ const AdminPortfolio = () => {
                         <Select
                           value={project.featured ? "featured" : "projects-only"}
                           onValueChange={async (value) => {
-                            await updateProject(project.id, { featured: value === "featured" });
-                            await load();
+                            await runProjectTask(async () => {
+                              await updateProject(project.id, { featured: value === "featured" });
+                              await load();
+                            }, "שגיאה בעדכון התצוגה בדף הבית");
                           }}
                         >
                           <SelectTrigger className="h-8 w-32 text-xs">
@@ -421,10 +693,27 @@ const AdminPortfolio = () => {
                             <SelectItem value="projects-only">פרויקטים בלבד</SelectItem>
                           </SelectContent>
                         </Select>
-                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleEdit(project)}>
+                        <Select
+                          value={project.published ? "published" : "hidden"}
+                          onValueChange={async (value) => {
+                            await runProjectTask(async () => {
+                              await updateProject(project.id, { published: value === "published" });
+                              await load();
+                            }, "שגיאה בעדכון מצב הפרסום");
+                          }}
+                        >
+                          <SelectTrigger className="h-8 w-28 text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="published">מפורסם</SelectItem>
+                            <SelectItem value="hidden">מוסתר</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleEdit(project)} disabled={loading}>
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
-                        <Button variant="outline" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive hover:text-destructive-foreground" onClick={() => handleDelete(project.id)}>
+                        <Button variant="outline" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive hover:text-destructive-foreground" onClick={() => void handleDelete(project.id)} disabled={loading}>
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
@@ -495,9 +784,9 @@ const AdminPortfolio = () => {
                       </button>
                     </div>
                   )}
-                  <Button type="button" onClick={handleAddLogo} disabled={!logoImage} className="w-full">
+                  <Button type="button" onClick={() => void handleAddLogo()} disabled={!logoImage || !logoName.trim() || logoLoading} className="w-full">
                     <Plus className="h-4 w-4 ml-1" />
-                    הוסף לוגו
+                    {logoLoading ? "שומר..." : "הוסף לוגו"}
                   </Button>
                 </CardContent>
               </Card>
@@ -510,12 +799,12 @@ const AdminPortfolio = () => {
                     <span className="text-sm font-normal text-muted-foreground">({logos.length})</span>
                   </CardTitle>
                   <div className="flex gap-2 pt-2">
-                    <Button variant="outline" size="sm" onClick={handleSeedDemos}>
+                    <Button variant="outline" size="sm" onClick={() => void handleSeedDemos()} disabled={logoLoading}>
                       <Plus className="h-3.5 w-3.5 ml-1" />
                       הוסף 10 לדוגמה
                     </Button>
                     {logos.length > 0 && (
-                      <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive hover:text-destructive-foreground" onClick={handleDeleteAllLogos}>
+                      <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive hover:text-destructive-foreground" onClick={() => void handleDeleteAllLogos()} disabled={logoLoading}>
                         <Trash2 className="h-3.5 w-3.5 ml-1" />
                         מחק הכל
                       </Button>
@@ -527,14 +816,54 @@ const AdminPortfolio = () => {
                     <p className="text-muted-foreground text-sm text-center py-8">אין לוגואים עדיין. הוסף את הלוגו הראשון!</p>
                   )}
                   <div className="grid grid-cols-3 gap-3 max-h-[400px] overflow-y-auto">
-                    {logos.map((logo) => (
-                      <div key={logo.id} className="group relative rounded-xl border border-border bg-card p-3 flex flex-col items-center gap-2">
+                    {logos.map((logo, index) => (
+                      <div key={logo.id} className={`group relative rounded-xl border bg-card p-3 flex flex-col items-center gap-2 ${logo.visible ? "border-border" : "border-dashed opacity-70"}`}>
+                        <div className="absolute top-1 right-1 flex flex-col gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => void moveLogo(index, "up")}
+                            disabled={index === 0 || logoLoading}
+                            className="rounded bg-background/90 p-0.5 text-foreground shadow disabled:opacity-30"
+                          >
+                            <ChevronUp className="h-3 w-3" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void moveLogo(index, "down")}
+                            disabled={index === logos.length - 1 || logoLoading}
+                            className="rounded bg-background/90 p-0.5 text-foreground shadow disabled:opacity-30"
+                          >
+                            <ChevronDown className="h-3 w-3" />
+                          </button>
+                        </div>
                         <div className="h-12 w-full flex items-center justify-center">
                           <img src={logo.image} alt={logo.name} className="max-h-full max-w-full object-contain" />
                         </div>
                         <span className="text-[10px] text-muted-foreground truncate max-w-full">{logo.name}</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-muted-foreground">{logo.visible ? "גלוי" : "מוסתר"}</span>
+                          <Switch
+                            checked={logo.visible}
+                            disabled={logoLoading}
+                            onCheckedChange={async (checked) => {
+                              setLogoLoading(true);
+                              try {
+                                const updated = await runLogoTask(async () => {
+                                  await updateLogo(logo.id, { visible: checked });
+                                  return fetchLogos({ includeHidden: true });
+                                }, "שגיאה בעדכון מצב הלוגו");
+                                if (updated) {
+                                  setLogos(updated);
+                                }
+                              } finally {
+                                setLogoLoading(false);
+                              }
+                            }}
+                          />
+                        </div>
                         <button
-                          onClick={() => handleDeleteLogo(logo.id)}
+                          onClick={() => void handleDeleteLogo(logo.id)}
+                          disabled={logoLoading}
                           className="absolute top-1 left-1 rounded-full bg-destructive/80 p-1 text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="h-3 w-3" />
@@ -551,7 +880,12 @@ const AdminPortfolio = () => {
           <TabsContent value="contact" className="space-y-6">
             {/* Lead Stats */}
             {(() => {
-              const counts = getLeadCounts();
+              const counts = {
+                total: leads.length,
+                pending: leads.filter((lead) => lead.status === "pending").length,
+                handled: leads.filter((lead) => lead.status === "handled").length,
+                rejected: leads.filter((lead) => lead.status === "rejected").length,
+              };
               return (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <button onClick={() => setLeadFilter("all")} className={`rounded-xl border p-3 text-center transition-colors ${leadFilter === "all" ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-secondary/50"}`}>
@@ -794,9 +1128,11 @@ const AdminPortfolio = () => {
                           <div className="flex flex-col gap-1.5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                             <Select
                               value={lead.status}
-                              onValueChange={(val) => {
-                                updateLeadStatus(lead.id, val as LeadStatus);
-                                setLeads(fetchLeads());
+                              onValueChange={async (val) => {
+                                await runLeadTask(async () => {
+                                  await updateLeadStatus(lead.id, val as LeadStatus);
+                                  await refreshLeads();
+                                }, "שגיאה בעדכון סטטוס");
                               }}
                             >
                               <SelectTrigger className="h-8 w-28 text-xs">
@@ -830,10 +1166,11 @@ const AdminPortfolio = () => {
                                 variant="outline"
                                 size="icon"
                                 className="h-8 w-8 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                                onClick={() => {
-                                  deleteLead(lead.id);
-                                  setLeads(fetchLeads());
-                                  setDeletedLeads(fetchDeletedLeads());
+                                onClick={async () => {
+                                  await runLeadTask(async () => {
+                                    await deleteLead(lead.id);
+                                    await refreshLeads();
+                                  }, "שגיאה במחיקת פניה");
                                 }}
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
@@ -856,9 +1193,12 @@ const AdminPortfolio = () => {
                             <div className="flex gap-2 mt-2">
                               <Button
                                 size="sm"
-                                onClick={() => {
-                                  updateLeadNotes(lead.id, noteText);
-                                  setLeads(fetchLeads());
+                                onClick={async () => {
+                                  const updated = await runLeadTask(async () => {
+                                    await updateLeadNotes(lead.id, noteText);
+                                    return refreshLeads();
+                                  }, "שגיאה בשמירת הערה");
+                                  if (!updated) return;
                                   setExpandedLeadId(null);
                                   setEditingNoteId(null);
                                 }}
@@ -906,7 +1246,7 @@ const AdminPortfolio = () => {
                             <div className="flex items-center gap-2 flex-wrap mb-1">
                               <h3 className="font-semibold text-foreground">{lead.name}</h3>
                               <span className="text-xs text-muted-foreground">
-                                {lead.email} · {lead.phone}
+                                {lead.email} ֲ· {lead.phone}
                               </span>
                             </div>
                             <p className="text-sm text-muted-foreground line-clamp-1">{lead.subject}</p>
@@ -919,10 +1259,11 @@ const AdminPortfolio = () => {
                               variant="outline"
                               size="sm"
                               className="gap-1.5 text-primary"
-                              onClick={() => {
-                                restoreLead(lead.id);
-                                setLeads(fetchLeads());
-                                setDeletedLeads(fetchDeletedLeads());
+                              onClick={async () => {
+                                await runLeadTask(async () => {
+                                  await restoreLead(lead.id);
+                                  await refreshLeads();
+                                }, "שגיאה בשחזור פניה");
                               }}
                             >
                               <RotateCcw className="h-3.5 w-3.5" />
@@ -932,9 +1273,11 @@ const AdminPortfolio = () => {
                               variant="outline"
                               size="icon"
                               className="h-8 w-8 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                              onClick={() => {
-                                permanentlyDeleteLead(lead.id);
-                                setDeletedLeads(fetchDeletedLeads());
+                              onClick={async () => {
+                                await runLeadTask(async () => {
+                                  await permanentlyDeleteLead(lead.id);
+                                  await refreshLeads();
+                                }, "שגיאה במחיקה סופית");
                               }}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -974,11 +1317,13 @@ const AdminPortfolio = () => {
                       <p className="text-xs text-muted-foreground mb-1">סטטוס</p>
                       <Select
                         value={selectedLead.status}
-                        onValueChange={(val) => {
-                          updateLeadStatus(selectedLead.id, val as LeadStatus);
-                          const updated = fetchLeads();
-                          setLeads(updated);
-                          setSelectedLead(updated.find(l => l.id === selectedLead.id) || null);
+                        onValueChange={async (val) => {
+                          const updated = await runLeadTask(async () => {
+                            await updateLeadStatus(selectedLead.id, val as LeadStatus);
+                            return refreshLeads();
+                          }, "שגיאה בעדכון סטטוס");
+                          if (!updated) return;
+                          setSelectedLead(updated.find((lead) => lead.id === selectedLead.id) || null);
                         }}
                       >
                         <SelectTrigger className="h-8 w-full text-xs">
@@ -1026,7 +1371,7 @@ const AdminPortfolio = () => {
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Clock className="h-3 w-3" />
                     {new Date(selectedLead.createdAt).toLocaleDateString("he-IL", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                    <span>·</span>
+                    <span>ֲ·</span>
                     {selectedLead.sendMethod === "whatsapp" ? <><MessageCircle className="h-3 w-3" /> וואטסאפ</> : <><Mail className="h-3 w-3" /> אימייל</>}
                   </div>
 
@@ -1045,10 +1390,13 @@ const AdminPortfolio = () => {
                       <Pencil className="h-4 w-4" />
                       ערוך פניה
                     </Button>
-                    <Button variant="outline" className="gap-2 text-destructive hover:bg-destructive hover:text-destructive-foreground" onClick={() => {
-                      deleteLead(selectedLead.id);
-                      setLeads(fetchLeads());
-                      setDeletedLeads(fetchDeletedLeads());
+                    <Button variant="outline" className="gap-2 text-destructive hover:bg-destructive hover:text-destructive-foreground" onClick={async () => {
+                      const deleted = await runLeadTask(async () => {
+                        await deleteLead(selectedLead.id);
+                        await refreshLeads();
+                        return true;
+                      }, "שגיאה במחיקת פניה");
+                      if (!deleted) return;
                       setSelectedLead(null);
                     }}>
                       <Trash2 className="h-4 w-4" />
@@ -1087,11 +1435,13 @@ const AdminPortfolio = () => {
                     <Textarea value={editForm.notes} onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })} rows={2} />
                   </div>
                   <div className="flex gap-2 pt-2">
-                    <Button className="flex-1" onClick={() => {
-                      updateLead(selectedLead.id, editForm);
-                      const updated = fetchLeads();
-                      setLeads(updated);
-                      setSelectedLead(updated.find(l => l.id === selectedLead.id) || null);
+                    <Button className="flex-1" onClick={async () => {
+                      const updated = await runLeadTask(async () => {
+                        await updateLead(selectedLead.id, editForm);
+                        return refreshLeads();
+                      }, "שגיאה בשמירת הפניה");
+                      if (!updated) return;
+                      setSelectedLead(updated.find((lead) => lead.id === selectedLead.id) || null);
                       setIsEditing(false);
                     }}>
                       שמור שינויים
@@ -1111,3 +1461,5 @@ const AdminPortfolio = () => {
 };
 
 export default AdminPortfolio;
+
+

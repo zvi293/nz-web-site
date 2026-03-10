@@ -1,4 +1,7 @@
-// Site-wide settings API
+import { useEffect, useSyncExternalStore } from "react";
+
+import { getSupabaseClient } from "@/lib/supabase";
+import type { Database } from "@/lib/supabase-types";
 
 export interface ContactInfo {
   ownerName: string;
@@ -74,7 +77,16 @@ export interface SiteSettings {
   terms: TermsSettings;
 }
 
-const LS_KEY = "nz-web-site-settings";
+interface SiteSettingsStoreState {
+  settings: SiteSettings;
+  isLoading: boolean;
+  error: string | null;
+}
+
+type SiteSettingsRow = Database["public"]["Tables"]["site_settings"]["Row"];
+type SiteSettingsInsert = Database["public"]["Tables"]["site_settings"]["Insert"];
+
+const SITE_SETTINGS_ROW_ID = "default";
 
 const defaultSettings: SiteSettings = {
   contact: {
@@ -142,19 +154,276 @@ const defaultSettings: SiteSettings = {
   },
 };
 
-export function fetchSiteSettings(): SiteSettings {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    return raw ? { ...defaultSettings, ...JSON.parse(raw) } : defaultSettings;
-  } catch {
-    return defaultSettings;
-  }
+let siteSettingsState: SiteSettingsStoreState = {
+  settings: cloneSettings(defaultSettings),
+  isLoading: false,
+  error: null,
+};
+
+let inFlightLoad: Promise<SiteSettings> | null = null;
+let hasLoadedSiteSettings = false;
+let hasAttemptedInitialLoad = false;
+const listeners = new Set<() => void>();
+
+function cloneSettings(settings: SiteSettings): SiteSettings {
+  return JSON.parse(JSON.stringify(settings)) as SiteSettings;
 }
 
-export function saveSiteSettings(settings: SiteSettings): void {
-  localStorage.setItem(LS_KEY, JSON.stringify(settings));
+function emitSiteSettingsChange() {
+  listeners.forEach((listener) => listener());
+}
+
+function setSiteSettingsState(nextState: SiteSettingsStoreState) {
+  siteSettingsState = nextState;
+  emitSiteSettingsChange();
+}
+
+function subscribeSiteSettings(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function getSiteSettingsSnapshot() {
+  return siteSettingsState;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function normalizeLegalSections(value: unknown, fallback: LegalPageSection[]): LegalPageSection[] {
+  if (!Array.isArray(value)) {
+    return fallback;
+  }
+
+  return value.map((section, index) => {
+    if (!isRecord(section)) {
+      return fallback[index] ?? { id: crypto.randomUUID(), title: "", content: "" };
+    }
+
+    return {
+      id: typeof section.id === "string" && section.id ? section.id : fallback[index]?.id ?? crypto.randomUUID(),
+      title: typeof section.title === "string" ? section.title : fallback[index]?.title ?? "",
+      content: typeof section.content === "string" ? section.content : fallback[index]?.content ?? "",
+    };
+  });
+}
+
+function mergeSiteSettings(input: unknown): SiteSettings {
+  const source = isRecord(input) ? input : {};
+  const contact = isRecord(source.contact) ? source.contact : {};
+  const seo = isRecord(source.seo) ? source.seo : {};
+  const footer = isRecord(source.footer) ? source.footer : {};
+  const social = isRecord(source.social) ? source.social : {};
+  const socialVisibility = isRecord(source.socialVisibility) ? source.socialVisibility : {};
+  const accessibility = isRecord(source.accessibility) ? source.accessibility : {};
+  const privacy = isRecord(source.privacy) ? source.privacy : {};
+  const terms = isRecord(source.terms) ? source.terms : {};
+
+  return {
+    contact: {
+      ...defaultSettings.contact,
+      ownerName: typeof contact.ownerName === "string" ? contact.ownerName : defaultSettings.contact.ownerName,
+      phone: typeof contact.phone === "string" ? contact.phone : defaultSettings.contact.phone,
+      email: typeof contact.email === "string" ? contact.email : defaultSettings.contact.email,
+      whatsappNumber:
+        typeof contact.whatsappNumber === "string" ? contact.whatsappNumber : defaultSettings.contact.whatsappNumber,
+      whatsappMessage:
+        typeof contact.whatsappMessage === "string"
+          ? contact.whatsappMessage
+          : defaultSettings.contact.whatsappMessage,
+    },
+    seo: {
+      ...defaultSettings.seo,
+      siteTitle: typeof seo.siteTitle === "string" ? seo.siteTitle : defaultSettings.seo.siteTitle,
+      siteDescription:
+        typeof seo.siteDescription === "string" ? seo.siteDescription : defaultSettings.seo.siteDescription,
+      keywords: typeof seo.keywords === "string" ? seo.keywords : defaultSettings.seo.keywords,
+      ogImage: typeof seo.ogImage === "string" ? seo.ogImage : defaultSettings.seo.ogImage,
+    },
+    footer: {
+      ...defaultSettings.footer,
+      tagline: typeof footer.tagline === "string" ? footer.tagline : defaultSettings.footer.tagline,
+      copyrightText:
+        typeof footer.copyrightText === "string" ? footer.copyrightText : defaultSettings.footer.copyrightText,
+      showAdminLink:
+        typeof footer.showAdminLink === "boolean" ? footer.showAdminLink : defaultSettings.footer.showAdminLink,
+    },
+    social: {
+      ...defaultSettings.social,
+      facebook: typeof social.facebook === "string" ? social.facebook : defaultSettings.social.facebook,
+      instagram: typeof social.instagram === "string" ? social.instagram : defaultSettings.social.instagram,
+      linkedin: typeof social.linkedin === "string" ? social.linkedin : defaultSettings.social.linkedin,
+      twitter: typeof social.twitter === "string" ? social.twitter : defaultSettings.social.twitter,
+      github: typeof social.github === "string" ? social.github : defaultSettings.social.github,
+      youtube: typeof social.youtube === "string" ? social.youtube : defaultSettings.social.youtube,
+    },
+    socialVisibility: {
+      ...defaultSettings.socialVisibility,
+      facebook:
+        typeof socialVisibility.facebook === "boolean"
+          ? socialVisibility.facebook
+          : defaultSettings.socialVisibility.facebook,
+      instagram:
+        typeof socialVisibility.instagram === "boolean"
+          ? socialVisibility.instagram
+          : defaultSettings.socialVisibility.instagram,
+      linkedin:
+        typeof socialVisibility.linkedin === "boolean"
+          ? socialVisibility.linkedin
+          : defaultSettings.socialVisibility.linkedin,
+      twitter:
+        typeof socialVisibility.twitter === "boolean"
+          ? socialVisibility.twitter
+          : defaultSettings.socialVisibility.twitter,
+      github:
+        typeof socialVisibility.github === "boolean"
+          ? socialVisibility.github
+          : defaultSettings.socialVisibility.github,
+      youtube:
+        typeof socialVisibility.youtube === "boolean"
+          ? socialVisibility.youtube
+          : defaultSettings.socialVisibility.youtube,
+    },
+    accessibility: {
+      ...defaultSettings.accessibility,
+      coordinatorName:
+        typeof accessibility.coordinatorName === "string"
+          ? accessibility.coordinatorName
+          : defaultSettings.accessibility.coordinatorName,
+      coordinatorPhone:
+        typeof accessibility.coordinatorPhone === "string"
+          ? accessibility.coordinatorPhone
+          : defaultSettings.accessibility.coordinatorPhone,
+      coordinatorEmail:
+        typeof accessibility.coordinatorEmail === "string"
+          ? accessibility.coordinatorEmail
+          : defaultSettings.accessibility.coordinatorEmail,
+      lastUpdated:
+        typeof accessibility.lastUpdated === "string"
+          ? accessibility.lastUpdated
+          : defaultSettings.accessibility.lastUpdated,
+      sections: normalizeLegalSections(accessibility.sections, defaultSettings.accessibility.sections),
+    },
+    privacy: {
+      ...defaultSettings.privacy,
+      lastUpdated: typeof privacy.lastUpdated === "string" ? privacy.lastUpdated : defaultSettings.privacy.lastUpdated,
+      sections: normalizeLegalSections(privacy.sections, defaultSettings.privacy.sections),
+    },
+    terms: {
+      ...defaultSettings.terms,
+      lastUpdated: typeof terms.lastUpdated === "string" ? terms.lastUpdated : defaultSettings.terms.lastUpdated,
+      sections: normalizeLegalSections(terms.sections, defaultSettings.terms.sections),
+    },
+  };
+}
+
+function mapSiteSettingsRow(row: SiteSettingsRow | null): SiteSettings {
+  if (!row) {
+    return cloneSettings(defaultSettings);
+  }
+
+  return mergeSiteSettings(row.settings);
+}
+
+function mapSiteSettingsInsert(settings: SiteSettings): SiteSettingsInsert {
+  return {
+    id: SITE_SETTINGS_ROW_ID,
+    settings: settings as unknown as Database["public"]["Tables"]["site_settings"]["Insert"]["settings"],
+  };
+}
+
+export function fetchSiteSettings(): SiteSettings {
+  return siteSettingsState.settings;
 }
 
 export function getDefaultSettings(): SiteSettings {
-  return defaultSettings;
+  return cloneSettings(defaultSettings);
+}
+
+export async function loadSiteSettings(force = false): Promise<SiteSettings> {
+  if (!force && inFlightLoad) {
+    return inFlightLoad;
+  }
+
+  if (force) {
+    hasAttemptedInitialLoad = true;
+  }
+
+  setSiteSettingsState({
+    ...siteSettingsState,
+    isLoading: true,
+    error: null,
+  });
+
+  inFlightLoad = (async () => {
+    try {
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase.from("site_settings").select("*").eq("id", SITE_SETTINGS_ROW_ID).maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      const settings = mapSiteSettingsRow(data ?? null);
+      hasLoadedSiteSettings = true;
+      setSiteSettingsState({
+        settings,
+        isLoading: false,
+        error: null,
+      });
+      return settings;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      setSiteSettingsState({
+        settings: siteSettingsState.settings,
+        isLoading: false,
+        error: message,
+      });
+      throw error;
+    } finally {
+      inFlightLoad = null;
+    }
+  })();
+
+  return inFlightLoad;
+}
+
+export async function saveSiteSettings(settings: SiteSettings): Promise<SiteSettings> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("site_settings")
+    .upsert(mapSiteSettingsInsert(settings), { onConflict: "id" })
+    .select("*")
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  const mergedSettings = mapSiteSettingsRow(data);
+  setSiteSettingsState({
+    settings: mergedSettings,
+    isLoading: false,
+    error: null,
+  });
+  return mergedSettings;
+}
+
+export function useSiteSettings() {
+  const snapshot = useSyncExternalStore(subscribeSiteSettings, getSiteSettingsSnapshot, getSiteSettingsSnapshot);
+
+  useEffect(() => {
+    if (!hasAttemptedInitialLoad && !snapshot.isLoading && inFlightLoad === null) {
+      hasAttemptedInitialLoad = true;
+      void loadSiteSettings().catch(() => undefined);
+    }
+  }, [snapshot.isLoading]);
+
+  return snapshot;
+}
+
+export function useContactInfo(): ContactInfo {
+  const { settings } = useSiteSettings();
+  return settings.contact;
 }

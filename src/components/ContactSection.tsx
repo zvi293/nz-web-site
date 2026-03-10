@@ -7,7 +7,7 @@ import { Send, CheckCircle, Mail, MessageCircle, User, Phone, Building2, FileTex
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { addLead } from "@/lib/leads-api";
-import { getContactInfo, getMailtoHref, getWhatsAppHref } from "@/lib/contact-utils";
+import { getMailtoHref, getWhatsAppHref, useContactInfo } from "@/lib/contact-utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,7 +49,7 @@ const ContactSection = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const contact = getContactInfo();
+  const contact = useContactInfo();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -117,8 +117,7 @@ const ContactSection = () => {
     setIsSubmitting(true);
 
     try {
-      // Save lead to localStorage
-      addLead({
+      await addLead({
         name: data.name,
         email: data.email,
         phone: data.phone,

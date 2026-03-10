@@ -11,11 +11,26 @@ import { toast } from "sonner";
 import { fetchFaqItems, saveFaqItems, getDefaultFaqItems, type FaqItem } from "@/lib/faq-api";
 
 const AdminFaqTab = () => {
-  const [items, setItems] = useState<FaqItem[]>([]);
+  const [items, setItems] = useState<FaqItem[]>(() => getDefaultFaqItems());
   const [hasChanges, setHasChanges] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const loadFaqItems = async () => {
+    try {
+      setLoading(true);
+      const loadedItems = await fetchFaqItems({ includeHidden: true });
+      setItems(loadedItems);
+      setHasChanges(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("לא ניתן היה לטעון את השאלות הנפוצות כרגע.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setItems(fetchFaqItems());
+    void loadFaqItems();
   }, []);
 
   const updateItems = (updater: (prev: FaqItem[]) => FaqItem[]) => {
@@ -26,15 +41,31 @@ const AdminFaqTab = () => {
     });
   };
 
-  const handleSave = () => {
-    saveFaqItems(items);
-    setHasChanges(false);
-    toast.success("שאלות נפוצות נשמרו בהצלחה!");
+  const handleSave = async () => {
+    const invalidItem = items.find((item) => !item.question.trim() || !item.answer.trim());
+    if (invalidItem) {
+      const itemIndex = items.findIndex((item) => item.id === invalidItem.id) + 1;
+      toast.error(`שאלה ${itemIndex} חייבת לכלול גם שאלה וגם תשובה.`);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const savedItems = await saveFaqItems(items);
+      setItems(savedItems);
+      setHasChanges(false);
+      toast.success("שאלות נפוצות נשמרו בהצלחה!");
+    } catch (error) {
+      console.error(error);
+      toast.error("לא ניתן היה לטעון את השאלות הנפוצות כרגע.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const addItem = () => {
     const newItem: FaqItem = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       question: "",
       answer: "",
       visible: true,
@@ -44,6 +75,7 @@ const AdminFaqTab = () => {
   };
 
   const removeItem = (id: string) => {
+    if (!window.confirm("למחוק את השאלה מרשימת ה-FAQ?")) return;
     updateItems(prev => prev.filter(item => item.id !== id).map((item, i) => ({ ...item, order: i })));
   };
 
@@ -62,6 +94,7 @@ const AdminFaqTab = () => {
   };
 
   const resetToDefaults = () => {
+    if (!window.confirm("לאפס את רשימת ה-FAQ לברירת המחדל?")) return;
     setItems(getDefaultFaqItems());
     setHasChanges(true);
     toast.info("שוחזרו ברירות המחדל – לחץ שמור כדי לעדכן");
@@ -85,15 +118,15 @@ const AdminFaqTab = () => {
           )}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={resetToDefaults}>
+          <Button variant="outline" size="sm" onClick={resetToDefaults} disabled={loading}>
             <RotateCcw className="h-3.5 w-3.5 ml-1" />
             ברירת מחדל
           </Button>
-          <Button variant="outline" size="sm" onClick={addItem}>
+          <Button variant="outline" size="sm" onClick={addItem} disabled={loading}>
             <Plus className="h-3.5 w-3.5 ml-1" />
             הוסף שאלה
           </Button>
-          <Button size="sm" onClick={handleSave} disabled={!hasChanges}>
+          <Button size="sm" onClick={() => void handleSave()} disabled={!hasChanges || loading}>
             <Save className="h-3.5 w-3.5 ml-1" />
             שמור
           </Button>
@@ -114,14 +147,14 @@ const AdminFaqTab = () => {
                   <div className="flex flex-col">
                     <button
                       onClick={() => moveItem(index, -1)}
-                      disabled={index === 0}
+                      disabled={index === 0 || loading}
                       className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
                     >
                       <ChevronUp className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => moveItem(index, 1)}
-                      disabled={index === items.length - 1}
+                      disabled={index === items.length - 1 || loading}
                       className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
                     >
                       <ChevronDown className="h-4 w-4" />
@@ -139,6 +172,7 @@ const AdminFaqTab = () => {
                     {item.visible ? <Eye className="h-3.5 w-3.5 text-primary" /> : <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />}
                     <Switch
                       checked={item.visible}
+                      disabled={loading}
                       onCheckedChange={(checked) => updateField(item.id, "visible", checked)}
                     />
                   </div>
@@ -147,6 +181,7 @@ const AdminFaqTab = () => {
                     size="icon"
                     className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                     onClick={() => removeItem(item.id)}
+                    disabled={loading}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -162,6 +197,7 @@ const AdminFaqTab = () => {
                   placeholder="הקלד שאלה..."
                   dir="rtl"
                   className="font-heebo"
+                  disabled={loading}
                 />
               </div>
 
@@ -180,6 +216,7 @@ const AdminFaqTab = () => {
                   dir="rtl"
                   className="font-heebo min-h-[80px] resize-y"
                   rows={3}
+                  disabled={loading}
                 />
               </div>
             </CardContent>
@@ -192,7 +229,7 @@ const AdminFaqTab = () => {
           <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <HelpCircle className="h-10 w-10 mb-3 opacity-40" />
             <p className="text-sm font-heebo">אין שאלות נפוצות עדיין</p>
-            <Button variant="outline" size="sm" className="mt-3" onClick={addItem}>
+            <Button variant="outline" size="sm" className="mt-3" onClick={addItem} disabled={loading}>
               <Plus className="h-3.5 w-3.5 ml-1" />
               הוסף שאלה ראשונה
             </Button>

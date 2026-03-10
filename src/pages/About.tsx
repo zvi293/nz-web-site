@@ -5,10 +5,9 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
 import { Plus, Minus } from "lucide-react";
 import { useState, useEffect } from "react";
-import { fetchAboutData, type AboutPageData } from "@/lib/about-api";
+import { fetchAboutData, getDefaultAboutData, type AboutPageData } from "@/lib/about-api";
 
 interface AccordionColumnProps {
   title: string;
@@ -72,13 +71,28 @@ const AccordionColumn = ({ title, items, delayOffset = 0 }: AccordionColumnProps
 };
 
 const About = () => {
-  const [data, setData] = useState<AboutPageData | null>(null);
+  const [data, setData] = useState<AboutPageData>(getDefaultAboutData());
 
   useEffect(() => {
-    setData(fetchAboutData());
-  }, []);
+    let isActive = true;
 
-  if (!data) return null;
+    const loadAboutData = async () => {
+      try {
+        const aboutData = await fetchAboutData();
+        if (isActive) {
+          setData(aboutData);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    void loadAboutData();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   return (
     <main className="relative bg-background pt-[72px]" dir="rtl">

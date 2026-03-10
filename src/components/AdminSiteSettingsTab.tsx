@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import {
   Save, RotateCcw, Globe, Phone, Mail, FileText, Shield, Scale, Link as LinkIcon,
   Search, Settings2, Plus, Trash2, MessageCircle, Facebook, Instagram, Linkedin,
@@ -16,21 +16,34 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
-  fetchSiteSettings,
   saveSiteSettings,
   getDefaultSettings,
+  useSiteSettings,
   type SiteSettings,
   type LegalPageSection,
 } from "@/lib/site-settings-api";
 
 const AdminSiteSettingsTab = () => {
-  const [settings, setSettings] = useState<SiteSettings>(fetchSiteSettings());
+  const { settings: storedSettings, isLoading, error } = useSiteSettings();
+  const [settings, setSettings] = useState<SiteSettings>(storedSettings);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [seoPreviewDevice, setSeoPreviewDevice] = useState<"desktop" | "mobile">("desktop");
   const [lastSaved, setLastSaved] = useState<string | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!hasChanges) {
+      setSettings(storedSettings);
+    }
+  }, [hasChanges, storedSettings]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("לא ניתן היה לטעון את הגדרות האתר מ-Supabase.");
+    }
+  }, [error]);
 
   const updateSettings = (updater: (prev: SiteSettings) => SiteSettings) => {
     setSettings(prev => {
@@ -42,13 +55,16 @@ const AdminSiteSettingsTab = () => {
 
   const handleSave = () => {
     setSaving(true);
-    saveSiteSettings(settings);
-    setTimeout(() => {
-      setSaving(false);
+    void saveSiteSettings(settings).then(() => {
       setHasChanges(false);
       setLastSaved(new Date().toLocaleTimeString("he-IL"));
       toast.success("ההגדרות נשמרו בהצלחה!");
-    }, 300);
+    }).catch((saveError) => {
+      console.error(saveError);
+      toast.error("לא ניתן היה לשמור את הגדרות האתר.");
+    }).finally(() => {
+      setSaving(false);
+    });
   };
 
   const handleReset = () => {
@@ -315,7 +331,7 @@ const AdminSiteSettingsTab = () => {
             <RotateCcw className="h-3.5 w-3.5" />
             אפס
           </Button>
-          <Button size="sm" onClick={handleSave} disabled={saving} className="gap-1.5">
+          <Button size="sm" onClick={handleSave} disabled={saving || isLoading} className="gap-1.5">
             <Save className="h-3.5 w-3.5" />
             {saving ? "שומר..." : "שמור הכל"}
           </Button>
@@ -783,3 +799,4 @@ const AdminSiteSettingsTab = () => {
 };
 
 export default AdminSiteSettingsTab;
+

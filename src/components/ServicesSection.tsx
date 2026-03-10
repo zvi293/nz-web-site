@@ -12,16 +12,16 @@ import serviceSeo from "@/assets/service-seo.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const fallbackImages: Record<string, string> = {
-  "1": servicePlanning,
-  "2": serviceUiux,
-  "3": serviceDev,
-  "4": serviceSeo,
+const fallbackImagesByOrder: Record<number, string> = {
+  1: servicePlanning,
+  2: serviceUiux,
+  3: serviceDev,
+  4: serviceSeo,
 };
 
 const getServiceImage = (service: ServiceRow) => {
   if (service.image) return service.image;
-  return fallbackImages[service.id] || servicePlanning;
+  return fallbackImagesByOrder[service.order] || servicePlanning;
 };
 
 const IconRenderer = ({ service }: { service: ServiceRow }) => {
