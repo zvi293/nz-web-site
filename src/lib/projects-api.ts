@@ -53,12 +53,34 @@ class ProjectRepositoryError extends Error {
   }
 }
 
-function wrapProjectError(action: string, error: unknown): never {
+function formatProjectError(error: unknown): string {
   if (error instanceof Error) {
-    throw new ProjectRepositoryError(action, error.message);
+    return error.message;
   }
 
-  throw new ProjectRepositoryError(action, "Unknown error");
+  if (typeof error === "object" && error !== null) {
+    const details = [];
+
+    const message = "message" in error && typeof error.message === "string" ? error.message : null;
+    const code = "code" in error && typeof error.code === "string" ? error.code : null;
+    const hint = "hint" in error && typeof error.hint === "string" ? error.hint : null;
+    const detail = "details" in error && typeof error.details === "string" ? error.details : null;
+
+    if (message) details.push(message);
+    if (code) details.push(`code: ${code}`);
+    if (detail) details.push(`details: ${detail}`);
+    if (hint) details.push(`hint: ${hint}`);
+
+    if (details.length > 0) {
+      return details.join(" | ");
+    }
+  }
+
+  return "Unknown error";
+}
+
+function wrapProjectError(action: string, error: unknown): never {
+  throw new ProjectRepositoryError(action, formatProjectError(error));
 }
 
 function mapProjectRow(row: ProjectRow): Project {

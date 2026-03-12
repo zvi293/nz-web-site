@@ -651,7 +651,7 @@ const AdminPortfolio = () => {
                   {projects.map((project, index) => (
                     <div
                       key={project.id}
-                      className={`flex items-center gap-3 rounded-xl border p-3 transition-shadow hover:shadow-md ${project.featured ? 'border-primary/30 bg-primary/5' : 'border-border bg-card'} ${!project.published ? "opacity-70 border-dashed" : ""}`}
+                      className={`flex items-start gap-3 rounded-xl border p-3 transition-shadow hover:shadow-md ${project.featured ? 'border-primary/30 bg-primary/5' : 'border-border bg-card'} ${!project.published ? "opacity-70 border-dashed" : ""}`}
                     >
                       <div className="flex flex-col gap-1">
                         <Button variant="ghost" size="icon" className="h-6 w-6" disabled={index === 0 || loading} onClick={() => void moveProject(index, "up")}>
@@ -666,65 +666,73 @@ const AdminPortfolio = () => {
                         alt={project.title}
                         className="h-14 w-20 rounded-lg object-cover flex-shrink-0"
                       />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-foreground truncate text-sm">{project.title}</h3>
-                          {project.featured && (
-                            <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">מוצג</span>
-                          )}
-                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${project.published ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"}`}>
-                            {project.published ? "מפורסם" : "מוסתר"}
-                          </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                          <div className="min-w-0 flex-1">
+                            <h3 className="min-w-0 text-sm font-semibold leading-5 text-foreground">
+                              {project.title}
+                            </h3>
+                            <div className="mt-1 flex flex-wrap items-center gap-2">
+                              {project.featured && (
+                                <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">מוצג</span>
+                              )}
+                              <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${project.published ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"}`}>
+                                {project.published ? "מפורסם" : "מוסתר"}
+                              </span>
+                            </div>
+                            <div className="mt-2 max-w-xs">
+                              <Select
+                                value={project.featured ? "featured" : "projects-only"}
+                                onValueChange={async (value) => {
+                                  await runProjectTask(async () => {
+                                    await updateProject(project.id, { featured: value === "featured" });
+                                    await load();
+                                  }, "שגיאה בעדכון התצוגה בדף הבית");
+                                }}
+                              >
+                                <SelectTrigger className="h-8 w-full text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="featured">דף ראשי</SelectItem>
+                                  <SelectItem value="projects-only">פרויקטים בלבד</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {project.tags.slice(0, 2).map((tag) => (
+                                <span key={tag} className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="grid w-full grid-cols-3 gap-1.5 sm:flex sm:flex-wrap sm:justify-end lg:w-auto lg:flex-nowrap lg:justify-start lg:gap-1.5 lg:self-start">
+                            <Select
+                              value={project.published ? "published" : "hidden"}
+                              onValueChange={async (value) => {
+                                await runProjectTask(async () => {
+                                  await updateProject(project.id, { published: value === "published" });
+                                  await load();
+                                }, "שגיאה בעדכון מצב הפרסום");
+                              }}
+                            >
+                              <SelectTrigger className="col-span-3 h-8 w-full text-xs sm:min-w-[7rem] sm:flex-1 lg:col-span-1 lg:w-28 lg:flex-none">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="published">מפורסם</SelectItem>
+                                <SelectItem value="hidden">מוסתר</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <Button variant="outline" size="icon" className="h-8 w-full sm:w-8" onClick={() => handleEdit(project)} disabled={loading}>
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="outline" size="icon" className="h-8 w-full text-destructive hover:bg-destructive hover:text-destructive-foreground sm:w-8" onClick={() => void handleDelete(project.id)} disabled={loading}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {project.tags.slice(0, 2).map((tag) => (
-                            <span key={tag} className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="flex gap-1.5 flex-shrink-0">
-                        <Select
-                          value={project.featured ? "featured" : "projects-only"}
-                          onValueChange={async (value) => {
-                            await runProjectTask(async () => {
-                              await updateProject(project.id, { featured: value === "featured" });
-                              await load();
-                            }, "שגיאה בעדכון התצוגה בדף הבית");
-                          }}
-                        >
-                          <SelectTrigger className="h-8 w-32 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="featured">דף ראשי</SelectItem>
-                            <SelectItem value="projects-only">פרויקטים בלבד</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Select
-                          value={project.published ? "published" : "hidden"}
-                          onValueChange={async (value) => {
-                            await runProjectTask(async () => {
-                              await updateProject(project.id, { published: value === "published" });
-                              await load();
-                            }, "שגיאה בעדכון מצב הפרסום");
-                          }}
-                        >
-                          <SelectTrigger className="h-8 w-28 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="published">מפורסם</SelectItem>
-                            <SelectItem value="hidden">מוסתר</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleEdit(project)} disabled={loading}>
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button variant="outline" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive hover:text-destructive-foreground" onClick={() => void handleDelete(project.id)} disabled={loading}>
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
                       </div>
                     </div>
                   ))}

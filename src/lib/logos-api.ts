@@ -102,10 +102,6 @@ export async function fetchLogos(options: FetchLogosOptions = {}): Promise<Clien
 
     const logos = (data ?? []).map(mapLogoRow);
 
-    if (logos.length === 0 && !options.includeHidden) {
-      return getDefaultLogos();
-    }
-
     return logos;
   } catch (error) {
     if (options.includeHidden) {
