@@ -7,29 +7,67 @@ const HeroSection = () => {
   const h1Ref = useRef<HTMLHeadingElement>(null);
   const subtextRef = useRef<HTMLParagraphElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
-  const visualRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const fallbackTimeoutRef = useRef<number | null>(null);
+  const floatTweenRef = useRef<gsap.core.Tween | null>(null);
+  const stackTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
+    let isActive = true;
     const layers: HTMLDivElement[] = [];
+    const revealTargets = [h1Ref.current, subtextRef.current, buttonsRef.current, imgRef.current].filter(
+      (node): node is HTMLElement => Boolean(node),
+    );
+    const forceVisible = () => {
+      if (!isActive) {
+        return;
+      }
+
+      revealTargets.forEach((target) => {
+        gsap.set(target, { opacity: 1, x: 0, y: 0, scale: 1, clearProps: "visibility" });
+      });
+    };
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power2.out" }, delay: 0.3 });
+      if (prefersReducedMotion) {
+        forceVisible();
+        return;
+      }
+
+      introTimelineRef.current = gsap.timeline({ defaults: { ease: "power2.out" } });
+      const tl = introTimelineRef.current;
 
       if (h1Ref.current) {
-        tl.from(h1Ref.current, { opacity: 0, y: 40, duration: 1 });
+        tl.fromTo(h1Ref.current, { opacity: 0.88, y: 14 }, { opacity: 1, y: 0, duration: 0.45, immediateRender: false });
       }
       if (subtextRef.current) {
-        tl.from(subtextRef.current, { opacity: 0, y: 20, duration: 0.8 }, "-=0.4");
+        tl.fromTo(
+          subtextRef.current,
+          { opacity: 0.9, y: 10 },
+          { opacity: 1, y: 0, duration: 0.35, immediateRender: false },
+          "-=0.22",
+        );
       }
       if (buttonsRef.current) {
-        tl.from(buttonsRef.current, { opacity: 0, y: 20, duration: 0.8, scale: 0.97 }, "-=0.3");
+        tl.fromTo(
+          buttonsRef.current,
+          { opacity: 0.92, y: 10, scale: 0.985 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.35, immediateRender: false },
+          "-=0.18",
+        );
       }
 
       const imgEl = imgRef.current;
-      if (!imgEl) return;
+      if (!imgEl) {
+        return;
+      }
 
       const container = imgEl.parentElement;
-      if (!container) return;
+      if (!container) {
+        return;
+      }
       container.style.position = "relative";
 
       layers.push(
@@ -46,35 +84,44 @@ const HeroSection = () => {
         }),
       );
 
-      gsap.set(imgEl, { opacity: 0, y: 60, scale: 0.88 });
-
-      const stackTl = gsap.timeline({ delay: 0.8 });
+      stackTimelineRef.current = gsap.timeline({ onInterrupt: forceVisible });
+      const stackTl = stackTimelineRef.current;
 
       layers.forEach((layer, i) => {
         stackTl.to(layer, {
           opacity: 1,
           y: (3 - i) * 6,
-          duration: 0.7,
+          duration: 0.22,
           ease: "power1.out"
-        }, i * 0.25);
+        }, i * 0.08);
       });
 
-      stackTl.to(imgEl, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 1.6,
-        ease: "power1.out"
-      }, 0.3);
+      stackTl.fromTo(
+        imgEl,
+        { opacity: 0.92, y: 18, scale: 0.97 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.65,
+          ease: "power1.out",
+          immediateRender: false,
+        },
+        0.08,
+      );
 
       stackTl.to(layers, {
         opacity: 0,
-        duration: 1,
+        duration: 0.28,
         ease: "power1.inOut",
         stagger: 0.12,
         onComplete: () => {
+          if (fallbackTimeoutRef.current !== null) {
+            window.clearTimeout(fallbackTimeoutRef.current);
+            fallbackTimeoutRef.current = null;
+          }
           layers.forEach((l) => l.remove());
-          gsap.to(imgEl, {
+          floatTweenRef.current = gsap.to(imgEl, {
             y: -30,
             duration: 2.8,
             repeat: -1,
@@ -85,7 +132,27 @@ const HeroSection = () => {
       }, "+=0.1");
     }, sectionRef);
 
+    if (!prefersReducedMotion) {
+      fallbackTimeoutRef.current = window.setTimeout(() => {
+        forceVisible();
+        layers.forEach((layer) => layer.remove());
+      }, 650);
+    } else {
+      forceVisible();
+    }
+
     return () => {
+      isActive = false;
+      if (fallbackTimeoutRef.current !== null) {
+        window.clearTimeout(fallbackTimeoutRef.current);
+        fallbackTimeoutRef.current = null;
+      }
+      floatTweenRef.current?.kill();
+      floatTweenRef.current = null;
+      stackTimelineRef.current?.kill();
+      stackTimelineRef.current = null;
+      introTimelineRef.current?.kill();
+      introTimelineRef.current = null;
       ctx.revert();
       layers.forEach((layer) => layer.remove());
     };
@@ -156,7 +223,7 @@ const HeroSection = () => {
         </div>
 
         {/* Left Side – Visual */}
-        <div ref={visualRef} className="flex flex-1 items-center justify-center">
+        <div className="flex flex-1 items-center justify-center">
           <div className="relative">
             <img
               ref={imgRef}
