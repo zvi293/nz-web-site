@@ -17,6 +17,8 @@ type ContactEmailPayload = {
 
 type JsonRecord = Record<string, unknown>;
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 function jsonResponse(status: number, body: JsonRecord) {
   return new Response(JSON.stringify(body), {
     status,
@@ -29,6 +31,10 @@ function jsonResponse(status: number, body: JsonRecord) {
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function isValidEmail(value: string): boolean {
+  return emailPattern.test(value);
 }
 
 function parsePayload(payload: unknown): ContactEmailPayload | null {
@@ -50,10 +56,16 @@ function parsePayload(payload: unknown): ContactEmailPayload | null {
     return null;
   }
 
+  const email = candidate.email.trim();
+
+  if (!isValidEmail(email)) {
+    return null;
+  }
+
   return {
     leadId: candidate.leadId.trim(),
     name: candidate.name.trim(),
-    email: candidate.email.trim(),
+    email,
     phone: candidate.phone.trim(),
     companyName: isNonEmptyString(candidate.companyName) ? candidate.companyName.trim() : undefined,
     subject: candidate.subject.trim(),
@@ -85,39 +97,68 @@ function formatTimestamp(value: string): string {
   }).format(date);
 }
 
-function buildHtmlEmail(payload: ContactEmailPayload): string {
-  const rows = [
-    ["שם מלא", payload.name],
-    ["אימייל", payload.email],
-    ["טלפון", payload.phone],
-    ["שם חברה / עסק", payload.companyName ?? "לא נמסר"],
-    ["נושא הפנייה", payload.subject],
-    ["אופן פנייה", "אימייל"],
-    ["נשלח בתאריך", formatTimestamp(payload.createdAt)],
-    ["מזהה ליד", payload.leadId],
-  ];
+function buildFieldRow(label: string, value: string): string {
+  return `
+    <tr>
+      <td style="padding:12px 14px;font-weight:700;border-bottom:1px solid #e5e7eb;white-space:nowrap;color:#0f172a;">${escapeHtml(label)}</td>
+      <td style="padding:12px 14px;border-bottom:1px solid #e5e7eb;color:#334155;">${escapeHtml(value)}</td>
+    </tr>`;
+}
 
-  const rowHtml = rows
-    .map(
-      ([label, value]) => `
-        <tr>
-          <td style="padding:10px 12px;font-weight:700;border-bottom:1px solid #e5e7eb;white-space:nowrap;">${escapeHtml(label)}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;">${escapeHtml(value)}</td>
-        </tr>`,
-    )
-    .join("");
+function buildReplyLink(email: string, subject: string): string {
+  const replySubject = encodeURIComponent(`Re: ${subject}`);
+  return `mailto:${encodeURIComponent(email)}?subject=${replySubject}`;
+}
+
+function buildHtmlEmail(payload: ContactEmailPayload): string {
+  const createdAt = formatTimestamp(payload.createdAt);
+  const companyName = payload.companyName ?? "לא נמסר";
+  const replyLink = buildReplyLink(payload.email, payload.subject);
+
+  const detailRows = [
+    buildFieldRow("שם מלא", payload.name),
+    buildFieldRow("אימייל", payload.email),
+    buildFieldRow("טלפון", payload.phone),
+    buildFieldRow("שם חברה / עסק", companyName),
+    buildFieldRow("אופן פנייה", "אימייל"),
+    buildFieldRow("נשלח בתאריך", createdAt),
+    buildFieldRow("Lead ID", payload.leadId),
+  ].join("");
 
   return `
-    <div dir="rtl" style="font-family:Arial,sans-serif;background:#f8fafc;padding:24px;color:#0f172a;">
-      <div style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
-        <div style="padding:24px;background:linear-gradient(135deg,#0f172a,#2563eb);color:#ffffff;">
-          <h1 style="margin:0;font-size:24px;">פניית צור קשר חדשה</h1>
-          <p style="margin:8px 0 0;font-size:14px;opacity:0.9;">המערכת קיבלה ליד חדש מטופס יצירת הקשר באתר.</p>
+    <div dir="rtl" style="margin:0;background:#f8fafc;padding:32px 16px;font-family:Arial,sans-serif;color:#0f172a;">
+      <div style="max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#0f172a 0%,#2563eb 100%);padding:28px 24px;color:#ffffff;">
+          <div style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.8;">NZ WEB</div>
+          <h1 style="margin:10px 0 8px;font-size:28px;line-height:1.2;">פניית צור קשר חדשה</h1>
+          <p style="margin:0;font-size:15px;line-height:1.7;opacity:0.9;">התקבלה פנייה חדשה מטופס יצירת הקשר באתר ומומלץ לטפל בה בהקדם.</p>
         </div>
+
         <div style="padding:24px;">
-          <table style="width:100%;border-collapse:collapse;font-size:15px;">
-            <tbody>${rowHtml}</tbody>
-          </table>
+          <div style="margin-bottom:20px;border:1px solid #dbeafe;background:#eff6ff;border-radius:16px;padding:18px;">
+            <div style="font-size:12px;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:0.08em;">נושא הפנייה</div>
+            <div style="margin-top:8px;font-size:22px;font-weight:700;line-height:1.5;color:#0f172a;">${escapeHtml(payload.subject)}</div>
+          </div>
+
+          <div style="margin-bottom:20px;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
+            <table style="width:100%;border-collapse:collapse;font-size:15px;">
+              <tbody>${detailRows}</tbody>
+            </table>
+          </div>
+
+          <div style="margin-bottom:20px;border:1px solid #e2e8f0;border-radius:16px;padding:20px;background:#f8fafc;">
+            <div style="margin-bottom:10px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.08em;">תוכן הפנייה</div>
+            <div style="font-size:16px;line-height:1.9;color:#0f172a;white-space:pre-wrap;">${escapeHtml(payload.subject)}</div>
+          </div>
+
+          <div style="margin-top:24px;text-align:center;">
+            <a href="${replyLink}" style="display:inline-block;border-radius:999px;background:#2563eb;padding:14px 24px;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;">
+              השב ללקוח
+            </a>
+            <div style="margin-top:10px;font-size:13px;color:#64748b;">
+              לחיצה על הכפתור תפתח reply ישיר אל ${escapeHtml(payload.email)}
+            </div>
+          </div>
         </div>
       </div>
     </div>`;
@@ -132,9 +173,12 @@ function buildTextEmail(payload: ContactEmailPayload): string {
     `טלפון: ${payload.phone}`,
     `שם חברה / עסק: ${payload.companyName ?? "לא נמסר"}`,
     `נושא הפנייה: ${payload.subject}`,
+    `תוכן הפנייה: ${payload.subject}`,
     "אופן פנייה: אימייל",
     `נשלח בתאריך: ${formatTimestamp(payload.createdAt)}`,
-    `מזהה ליד: ${payload.leadId}`,
+    `Lead ID: ${payload.leadId}`,
+    "",
+    `Reply ישיר: ${payload.email}`,
   ].join("\n");
 }
 
@@ -185,20 +229,25 @@ Deno.serve(async (request) => {
     });
   }
 
+  const resendRequestBody: Record<string, unknown> = {
+    from: senderEmail,
+    to: [recipientEmail],
+    subject: `פניית צור קשר חדשה | ${payload.name} | ${payload.subject}`,
+    html: buildHtmlEmail(payload),
+    text: buildTextEmail(payload),
+  };
+
+  if (isValidEmail(payload.email)) {
+    resendRequestBody.reply_to = payload.email;
+  }
+
   const resendResponse = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendApiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      from: senderEmail,
-      to: [recipientEmail],
-      reply_to: payload.email,
-      subject: `פניית צור קשר חדשה - ${payload.name}`,
-      html: buildHtmlEmail(payload),
-      text: buildTextEmail(payload),
-    }),
+    body: JSON.stringify(resendRequestBody),
   });
 
   if (!resendResponse.ok) {
