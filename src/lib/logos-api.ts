@@ -28,6 +28,8 @@ interface FetchLogosOptions {
 type ClientLogoRow = Database["public"]["Tables"]["client_logos"]["Row"];
 type ClientLogoInsert = Database["public"]["Tables"]["client_logos"]["Insert"];
 
+const PUBLIC_LOGO_SELECT = "id,name,image_url,is_published,display_order,created_at";
+
 class ClientLogoRepositoryError extends Error {
   constructor(action: string, message: string) {
     super(`Client logo repository failed to ${action}: ${message}`);
@@ -83,7 +85,7 @@ export async function fetchLogos(options: FetchLogosOptions = {}): Promise<Clien
     const supabase = getSupabaseClient();
     let query = supabase
       .from("client_logos")
-      .select("*")
+      .select(options.includeHidden ? "*" : PUBLIC_LOGO_SELECT)
       .order("display_order", { ascending: true })
       .order("created_at", { ascending: true });
 

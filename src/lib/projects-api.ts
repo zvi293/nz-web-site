@@ -47,6 +47,8 @@ type ProjectRow = Database["public"]["Tables"]["projects"]["Row"];
 type ProjectInsert = Database["public"]["Tables"]["projects"]["Insert"];
 type ProjectUpdate = Database["public"]["Tables"]["projects"]["Update"];
 
+const PUBLIC_PROJECT_SELECT = "id,title,description,tags,image_url,project_url,is_featured,is_published,display_order,created_at";
+
 class ProjectRepositoryError extends Error {
   constructor(action: string, message: string) {
     super(`Project repository failed to ${action}: ${message}`);
@@ -129,7 +131,7 @@ export async function fetchProjects(options: FetchProjectsOptions = {}): Promise
     const supabase = getSupabaseClient();
     let query = supabase
       .from("projects")
-      .select("*")
+      .select(options.includeUnpublished ? "*" : PUBLIC_PROJECT_SELECT)
       .order("display_order", { ascending: true })
       .order("created_at", { ascending: true });
 

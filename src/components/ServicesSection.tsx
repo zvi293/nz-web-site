@@ -6,10 +6,10 @@ import * as LucideIcons from "lucide-react";
 import { fetchServices, type ServiceRow } from "@/lib/services-api";
 import { isRenderableAssetUrl, isSafeInlineSvg } from "@/lib/runtime-safety";
 
-import servicePlanning from "@/assets/service-planning.jpg";
-import serviceUiux from "@/assets/service-uiux.jpg";
-import serviceDev from "@/assets/service-dev.jpg";
-import serviceSeo from "@/assets/service-seo.jpg";
+import servicePlanning from "@/assets/service-planning.webp";
+import serviceUiux from "@/assets/service-uiux.webp";
+import serviceDev from "@/assets/service-dev.webp";
+import serviceSeo from "@/assets/service-seo.webp";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -53,8 +53,55 @@ const ServiceVisual = ({
 }: { service: ServiceRow; index: number; }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const playTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shouldPlayRef = useRef(false);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [videoSrc, setVideoSrc] = useState<string | null>(null);
   const hasVideo = Boolean(service.video && isRenderableAssetUrl(service.video) && !videoFailed);
+  const posterSrc = getServiceImage(service);
+
+  const clearPlayTimer = () => {
+    if (playTimerRef.current) {
+      clearTimeout(playTimerRef.current);
+      playTimerRef.current = null;
+    }
+  };
+
+  const resetVideo = () => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    clearPlayTimer();
+    video.style.opacity = "0";
+    video.pause();
+    video.currentTime = 0;
+  };
+
+  const revealAndPlay = () => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    clearPlayTimer();
+    playTimerRef.current = setTimeout(() => {
+      if (!shouldPlayRef.current) {
+        return;
+      }
+
+      video.style.opacity = "1";
+      video.play().catch(() => {});
+    }, 120);
+  };
+
+  useEffect(() => {
+    setVideoSrc(null);
+    setVideoFailed(false);
+    shouldPlayRef.current = false;
+    clearPlayTimer();
+  }, [service.id, service.video]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -75,49 +122,51 @@ const ServiceVisual = ({
   useEffect(() => {
     if (!hasVideo || !videoRef.current || !containerRef.current) return;
     const video = videoRef.current;
-    let timer: ReturnType<typeof setTimeout> | null = null;
 
     const st = ScrollTrigger.create({
       trigger: containerRef.current,
       start: "top 90%",
       end: "bottom 10%",
       onEnter: () => {
-        video.style.opacity = "0";
-        video.pause();
-        video.currentTime = 0;
-        timer = setTimeout(() => {
-          video.style.opacity = "1";
-          video.play().catch(() => {});
-        }, 400);
+        shouldPlayRef.current = true;
+        if (!videoSrc && service.video) {
+          setVideoSrc(service.video);
+        }
+        if (video.readyState >= 2) {
+          revealAndPlay();
+        } else {
+          video.style.opacity = "0";
+          video.load();
+        }
       },
       onLeave: () => {
-        if (timer) clearTimeout(timer);
-        video.style.opacity = "0";
-        video.pause();
-        video.currentTime = 0;
+        shouldPlayRef.current = false;
+        resetVideo();
       },
       onEnterBack: () => {
-        video.style.opacity = "0";
-        video.pause();
-        video.currentTime = 0;
-        timer = setTimeout(() => {
-          video.style.opacity = "1";
-          video.play().catch(() => {});
-        }, 400);
+        shouldPlayRef.current = true;
+        if (!videoSrc && service.video) {
+          setVideoSrc(service.video);
+        }
+        if (video.readyState >= 2) {
+          revealAndPlay();
+        } else {
+          video.style.opacity = "0";
+          video.load();
+        }
       },
       onLeaveBack: () => {
-        if (timer) clearTimeout(timer);
-        video.style.opacity = "0";
-        video.pause();
-        video.currentTime = 0;
+        shouldPlayRef.current = false;
+        resetVideo();
       }
     });
 
     return () => {
-      if (timer) clearTimeout(timer);
+      shouldPlayRef.current = false;
+      clearPlayTimer();
       st.kill();
     };
-  }, [hasVideo]);
+  }, [hasVideo, service.video, videoSrc]);
 
   return (
     <div
@@ -137,15 +186,23 @@ const ServiceVisual = ({
             <img
             src={getServiceImage(service)}
             alt={`שירות ${service.badge} – NZ-web`}
-            className="w-full h-auto object-cover" />
+            className="w-full h-auto object-cover"
+            loading="lazy"
+            decoding="async" />
           
             <video
             ref={videoRef}
-            src={service.video}
+            src={videoSrc ?? undefined}
             muted
             loop
             playsInline
-            preload="auto"
+            preload="metadata"
+            poster={posterSrc}
+            onCanPlay={() => {
+              if (shouldPlayRef.current) {
+                revealAndPlay();
+              }
+            }}
             onError={() => setVideoFailed(true)}
             className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700" />
           
@@ -154,7 +211,9 @@ const ServiceVisual = ({
         <img
           src={getServiceImage(service)}
           alt={`שירות ${service.badge} – NZ-web`}
-          className="w-full h-auto object-cover" />
+          className="w-full h-auto object-cover"
+          loading="lazy"
+          decoding="async" />
 
         }
       </div>

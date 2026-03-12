@@ -1,11 +1,31 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
 const CustomCursor = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
+  const [isEnabled, setIsEnabled] = useState(false);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const updateEnabledState = () => setIsEnabled(mediaQuery.matches);
+
+    updateEnabledState();
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", updateEnabledState);
+      return () => mediaQuery.removeEventListener("change", updateEnabledState);
+    }
+
+    mediaQuery.addListener(updateEnabledState);
+    return () => mediaQuery.removeListener(updateEnabledState);
+  }, []);
+
+  useEffect(() => {
+    if (!isEnabled) {
+      return;
+    }
+
     const cursor = cursorRef.current;
     const follower = followerRef.current;
     if (!cursor || !follower) return;
@@ -66,7 +86,11 @@ const CustomCursor = () => {
         el.removeEventListener("mouseleave", onLeaveInteractive);
       });
     };
-  }, []);
+  }, [isEnabled]);
+
+  if (!isEnabled) {
+    return null;
+  }
 
   return (
     <>

@@ -85,6 +85,13 @@ interface SiteSettingsStoreState {
   error: string | null;
 }
 
+interface IdleDeadlineLike {
+  didTimeout: boolean;
+  timeRemaining: () => number;
+}
+
+type IdleCallbackHandle = number;
+
 type SiteSettingsRow = Database["public"]["Tables"]["site_settings"]["Row"];
 type SiteSettingsInsert = Database["public"]["Tables"]["site_settings"]["Insert"];
 
@@ -166,6 +173,8 @@ let siteSettingsState: SiteSettingsStoreState = {
 let inFlightLoad: Promise<SiteSettings> | null = null;
 let hasLoadedSiteSettings = false;
 let hasAttemptedInitialLoad = false;
+let hasScheduledInitialLoad = false;
+let scheduledInitialLoadCleanup: (() => void) | null = null;
 const listeners = new Set<() => void>();
 
 function cloneSettings(settings: SiteSettings): SiteSettings {
@@ -434,15 +443,64 @@ export async function saveSiteSettings(settings: SiteSettings): Promise<SiteSett
   return mergedSettings;
 }
 
+function scheduleInitialSiteSettingsLoad() {
+  if (hasScheduledInitialLoad || hasAttemptedInitialLoad || inFlightLoad !== null || hasLoadedSiteSettings) {
+    return;
+  }
+
+  hasScheduledInitialLoad = true;
+
+  const runLoad = () => {
+    scheduledInitialLoadCleanup = null;
+    if (hasAttemptedInitialLoad || inFlightLoad !== null || hasLoadedSiteSettings) {
+      return;
+    }
+
+    hasAttemptedInitialLoad = true;
+    void loadSiteSettings().catch(() => undefined);
+  };
+
+  if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+    const handle = window.requestIdleCallback(
+      (_deadline: IdleDeadlineLike) => {
+        runLoad();
+      },
+      { timeout: 1200 },
+    );
+
+    scheduledInitialLoadCleanup = () => {
+      window.cancelIdleCallback(handle);
+      scheduledInitialLoadCleanup = null;
+      hasScheduledInitialLoad = false;
+    };
+
+    return;
+  }
+
+  const handle = window.setTimeout(runLoad, 150);
+  scheduledInitialLoadCleanup = () => {
+    window.clearTimeout(handle);
+    scheduledInitialLoadCleanup = null;
+    hasScheduledInitialLoad = false;
+  };
+}
+
 export function useSiteSettings() {
   const snapshot = useSyncExternalStore(subscribeSiteSettings, getSiteSettingsSnapshot, getSiteSettingsSnapshot);
 
   useEffect(() => {
     if (!hasAttemptedInitialLoad && !snapshot.isLoading && inFlightLoad === null) {
-      hasAttemptedInitialLoad = true;
-      void loadSiteSettings().catch(() => undefined);
+      scheduleInitialSiteSettingsLoad();
     }
   }, [snapshot.isLoading]);
+
+  useEffect(() => {
+    return () => {
+      if (listeners.size === 0 && scheduledInitialLoadCleanup) {
+        scheduledInitialLoadCleanup();
+      }
+    };
+  }, []);
 
   return snapshot;
 }

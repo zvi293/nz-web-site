@@ -21,6 +21,8 @@ const LogoCard = ({ logo }: { logo: ClientLogo }) => {
         src={src}
         alt={`לוגו לקוח - ${logo.name}`}
         className="max-h-10 max-w-full object-contain md:max-h-12"
+        loading="lazy"
+        decoding="async"
         onError={() => setSrc(fallbackSrc)}
       />
     </div>
@@ -29,11 +31,54 @@ const LogoCard = ({ logo }: { logo: ClientLogo }) => {
 
 const ClientLogosSection = () => {
   const [logos, setLogos] = useState<ClientLogo[]>([]);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const triggerRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const scrollerInnerRef = useRef<HTMLDivElement>(null);
+  const hasRequestedRef = useRef(false);
 
   useEffect(() => {
+    if (shouldLoad) {
+      return;
+    }
+
+    if (typeof window === "undefined" || typeof window.IntersectionObserver === "undefined") {
+      setShouldLoad(true);
+      return;
+    }
+
+    const target = triggerRef.current;
+    if (!target) {
+      setShouldLoad(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShouldLoad(true);
+          observer.disconnect();
+        }
+      },
+      {
+        rootMargin: "1200px 0px",
+      },
+    );
+
+    observer.observe(target);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [shouldLoad]);
+
+  useEffect(() => {
+    if (!shouldLoad || hasRequestedRef.current) {
+      return;
+    }
+
+    hasRequestedRef.current = true;
     let active = true;
 
     void fetchLogos().then((rows) => {
@@ -45,7 +90,7 @@ const ClientLogosSection = () => {
     return () => {
       active = false;
     };
-  }, []);
+  }, [shouldLoad]);
 
   const visibleLogos = useMemo(
     () =>
@@ -107,6 +152,10 @@ const ClientLogosSection = () => {
       Array.from(inner.querySelectorAll("[data-clone]")).forEach((el) => el.remove());
     };
   }, [visibleLogos]);
+
+  if (!shouldLoad) {
+    return <div ref={triggerRef} className="h-px w-full" aria-hidden="true" />;
+  }
 
   if (visibleLogos.length === 0) return null;
 

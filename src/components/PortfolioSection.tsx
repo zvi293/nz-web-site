@@ -26,6 +26,8 @@ const ProjectCardImage = ({ project }: { project: Project }) => {
       src={src}
       alt={`פרויקט ${project.title} - בניית אתר מקצועי`}
       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+      loading="lazy"
+      decoding="async"
       onError={() => setSrc(fallbackSrc)}
     />
   );
