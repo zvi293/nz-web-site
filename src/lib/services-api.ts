@@ -293,8 +293,7 @@ export async function fetchServices(options: FetchServicesOptions = {}): Promise
       throw error;
     }
 
-    const services = (data ?? []).map(mapServiceRow);
-    return services.length > 0 ? services : getDefaultServices();
+    return (data ?? []).map(mapServiceRow);
   } catch (error) {
     if (options.includeHidden) {
       return wrapServiceError("fetch services", error);

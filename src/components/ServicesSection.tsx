@@ -270,6 +270,10 @@ const ServicesSection = () => {
     return () => ctx.revert();
   }, [services]);
 
+  if (services.length === 0) {
+    return null;
+  }
+
   return (
     <section
       ref={sectionRef}

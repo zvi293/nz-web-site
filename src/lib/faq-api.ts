@@ -98,14 +98,7 @@ export async function fetchFaqItems(options: FetchFaqItemsOptions = {}): Promise
       throw error;
     }
 
-    const rows = (data ?? []).map(mapFaqRow);
-    if (rows.length === 0) {
-      return cloneFaqItems(
-        options.includeHidden ? defaultFaqItems : defaultFaqItems.filter((item) => item.visible),
-      );
-    }
-
-    return rows;
+    return (data ?? []).map(mapFaqRow);
   } catch (error) {
     return wrapFaqError("fetch FAQ items", error);
   }

@@ -168,13 +168,7 @@ export async function fetchProjects(options: FetchProjectsOptions = {}): Promise
       throw error;
     }
 
-    const projects = (data ?? []).map(mapProjectRow);
-
-    if (projects.length === 0 && !options.includeUnpublished) {
-      return getDefaultProjects();
-    }
-
-    return projects;
+    return (data ?? []).map(mapProjectRow);
   } catch (error) {
     if (options.includeUnpublished) {
       return wrapProjectError("fetch projects", error);
