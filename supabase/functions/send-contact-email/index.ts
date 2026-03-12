@@ -13,19 +13,25 @@ type ContactEmailPayload = {
   subject: string;
   sendMethod: "email";
   createdAt: string;
+  submittedAt: string;
+  honeypot?: string;
 };
 
 type JsonRecord = Record<string, unknown>;
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const displayEmailPattern = /^(?:.+<)?([^<>@\s]+@[^<>@\s]+\.[^<>@\s]+)>?$/;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const MIN_SUBMIT_DURATION_MS = 2_500;
+const requestCooldowns = new Map<string, number>();
 
-function jsonResponse(status: number, body: JsonRecord) {
+function jsonResponse(status: number, body: JsonRecord, headers?: HeadersInit) {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       ...corsHeaders,
       "Content-Type": "application/json",
+      ...headers,
     },
   });
 }
@@ -52,6 +58,32 @@ function extractEmailAddress(value: string): string | null {
   return isValidEmail(match[1]) ? match[1] : null;
 }
 
+function normalizeIp(request: Request): string | null {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    const firstIp = forwardedFor.split(",")[0]?.trim();
+    if (firstIp) {
+      return firstIp;
+    }
+  }
+
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  return realIp || null;
+}
+
+function cleanupExpiredCooldowns(now: number) {
+  for (const [key, expiresAt] of requestCooldowns.entries()) {
+    if (expiresAt <= now) {
+      requestCooldowns.delete(key);
+    }
+  }
+}
+
+function getRateLimitKey(request: Request, payload: ContactEmailPayload): string {
+  const ip = normalizeIp(request) ?? "unknown-ip";
+  return `${ip}:${payload.email.toLowerCase()}:${payload.sendMethod}`;
+}
+
 function parsePayload(payload: unknown): ContactEmailPayload | null {
   if (typeof payload !== "object" || payload === null) {
     return null;
@@ -66,13 +98,13 @@ function parsePayload(payload: unknown): ContactEmailPayload | null {
     !isNonEmptyString(candidate.phone) ||
     !isNonEmptyString(candidate.subject) ||
     !isNonEmptyString(candidate.createdAt) ||
+    !isNonEmptyString(candidate.submittedAt) ||
     candidate.sendMethod !== "email"
   ) {
     return null;
   }
 
   const email = candidate.email.trim();
-
   if (!isValidEmail(email)) {
     return null;
   }
@@ -86,6 +118,8 @@ function parsePayload(payload: unknown): ContactEmailPayload | null {
     subject: candidate.subject.trim(),
     sendMethod: "email",
     createdAt: candidate.createdAt.trim(),
+    submittedAt: candidate.submittedAt.trim(),
+    honeypot: isNonEmptyString(candidate.honeypot) ? candidate.honeypot.trim() : undefined,
   };
 }
 
@@ -110,6 +144,17 @@ function formatTimestamp(value: string): string {
     timeStyle: "short",
     timeZone: "Asia/Jerusalem",
   }).format(date);
+}
+
+function getSubmissionDurationMs(payload: ContactEmailPayload): number | null {
+  const createdAt = new Date(payload.createdAt).getTime();
+  const submittedAt = new Date(payload.submittedAt).getTime();
+
+  if (Number.isNaN(createdAt) || Number.isNaN(submittedAt)) {
+    return null;
+  }
+
+  return submittedAt - createdAt;
 }
 
 function buildFieldRow(label: string, value: string): string {
@@ -143,19 +188,20 @@ function buildHtmlEmail(payload: ContactEmailPayload): string {
   return `
     <div dir="rtl" style="margin:0;background:#f8fafc;padding:32px 16px;font-family:Arial,sans-serif;color:#0f172a;">
       <div style="max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;">
-        <div style="background:linear-gradient(135deg,#0f172a 0%,#2563eb 100%);padding:28px 24px;color:#ffffff;">
-          <div style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.8;">NZ WEB</div>
-          <h1 style="margin:10px 0 8px;font-size:28px;line-height:1.2;">פניית צור קשר חדשה</h1>
-          <p style="margin:0;font-size:15px;line-height:1.7;opacity:0.9;">התקבלה פנייה חדשה מטופס יצירת הקשר באתר ומומלץ לטפל בה בהקדם.</p>
+        <div style="background:linear-gradient(135deg,#0f172a 0%,#2563eb 100%);padding:28px 24px 22px;color:#ffffff;">
+          <div style="display:inline-block;border:1px solid rgba(255,255,255,0.22);border-radius:999px;padding:6px 12px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.92;">NZ WEB • Contact Lead</div>
+          <h1 style="margin:14px 0 8px;font-size:28px;line-height:1.2;">פניית צור קשר חדשה</h1>
+          <p style="margin:0;font-size:15px;line-height:1.7;opacity:0.9;">התקבלה פנייה חדשה מטופס יצירת הקשר באתר. כל פרטי הליד זמינים כאן לטיפול מהיר.</p>
         </div>
 
-        <div style="padding:24px;">
-          <div style="margin-bottom:20px;border:1px solid #dbeafe;background:#eff6ff;border-radius:16px;padding:18px;">
+        <div style="padding:24px;background:#ffffff;">
+          <div style="margin-bottom:20px;border:1px solid #dbeafe;background:linear-gradient(180deg,#eff6ff 0%,#f8fbff 100%);border-radius:16px;padding:18px;">
             <div style="font-size:12px;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:0.08em;">נושא הפנייה</div>
             <div style="margin-top:8px;font-size:22px;font-weight:700;line-height:1.5;color:#0f172a;">${escapeHtml(payload.subject)}</div>
           </div>
 
           <div style="margin-bottom:20px;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
+            <div style="padding:14px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:13px;font-weight:700;color:#334155;letter-spacing:0.04em;">פרטי הליד</div>
             <table style="width:100%;border-collapse:collapse;font-size:15px;">
               <tbody>${detailRows}</tbody>
             </table>
@@ -166,13 +212,14 @@ function buildHtmlEmail(payload: ContactEmailPayload): string {
             <div style="font-size:16px;line-height:1.9;color:#0f172a;white-space:pre-wrap;">${escapeHtml(payload.subject)}</div>
           </div>
 
-          <div style="margin-top:24px;text-align:center;">
-            <a href="${replyLink}" style="display:inline-block;border-radius:999px;background:#2563eb;padding:14px 24px;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;">
-              השב ללקוח
-            </a>
-            <div style="margin-top:10px;font-size:13px;color:#64748b;">
-              לחיצה על הכפתור תפתח reply ישיר אל ${escapeHtml(payload.email)}
-            </div>
+          <div style="margin-top:24px;border-top:1px solid #e2e8f0;padding-top:24px;text-align:center;">
+            <div style="margin-bottom:12px;font-size:13px;color:#64748b;">אפשר להגיב ישירות ללקוח מתוך המייל או דרך הכפתור הבא.</div>
+            <a href="${replyLink}" style="display:inline-block;border-radius:999px;background:#2563eb;padding:14px 24px;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;">השב ללקוח</a>
+            <div style="margin-top:10px;font-size:13px;color:#64748b;">לחיצה על הכפתור תפתח reply ישיר אל ${escapeHtml(payload.email)}</div>
+          </div>
+
+          <div style="margin-top:22px;border-top:1px dashed #cbd5e1;padding-top:14px;font-size:12px;color:#94a3b8;text-align:center;">
+            NZ WEB contact notification • Lead ID ${escapeHtml(payload.leadId)}
           </div>
         </div>
       </div>
@@ -265,9 +312,46 @@ Deno.serve(async (request) => {
       return jsonResponse(400, {
         message: "Invalid contact email payload.",
         code: "INVALID_PAYLOAD",
-        hint: "Provide leadId, name, email, phone, subject, createdAt, and sendMethod='email'.",
+        hint: "Provide leadId, name, email, phone, subject, createdAt, submittedAt, and sendMethod='email'.",
       });
     }
+
+    if (payload.honeypot) {
+      return jsonResponse(400, {
+        message: "Spam check failed.",
+        code: "SPAM_DETECTED",
+        hint: "Remove unexpected hidden-field values and submit the real contact form.",
+      });
+    }
+
+    const submissionDurationMs = getSubmissionDurationMs(payload);
+    if (submissionDurationMs !== null && submissionDurationMs < MIN_SUBMIT_DURATION_MS) {
+      return jsonResponse(429, {
+        message: "Form submitted too quickly.",
+        code: "RATE_LIMITED",
+        details: "Wait a few seconds before sending the contact form again.",
+      });
+    }
+
+    const now = Date.now();
+    cleanupExpiredCooldowns(now);
+    const rateLimitKey = getRateLimitKey(request, payload);
+    const cooldownExpiresAt = requestCooldowns.get(rateLimitKey);
+
+    if (cooldownExpiresAt && cooldownExpiresAt > now) {
+      const retryAfterSeconds = Math.max(1, Math.ceil((cooldownExpiresAt - now) / 1000));
+      return jsonResponse(
+        429,
+        {
+          message: "Too many contact email attempts. Please wait before trying again.",
+          code: "RATE_LIMITED",
+          details: `Retry after ${retryAfterSeconds} seconds.`,
+        },
+        { "Retry-After": String(retryAfterSeconds) },
+      );
+    }
+
+    requestCooldowns.set(rateLimitKey, now + RATE_LIMIT_WINDOW_MS);
 
     const resendRequestBody: Record<string, unknown> = {
       from: senderEmail,

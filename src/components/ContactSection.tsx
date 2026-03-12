@@ -54,8 +54,10 @@ const ContactSection = () => {
   const [submissionWarning, setSubmissionWarning] = useState<string | null>(null);
   const [sendMethod, setSendMethod] = useState<"whatsapp" | "email">("whatsapp");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [formStartedAt] = useState(() => new Date().toISOString());
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const honeypotRef = useRef<HTMLInputElement>(null);
   const contact = useContactInfo();
 
   useEffect(() => {
@@ -71,6 +73,7 @@ const ContactSection = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
     };
+
     resize();
     window.addEventListener("resize", resize);
 
@@ -159,10 +162,15 @@ const ContactSection = () => {
             subject: lead.subject,
             sendMethod: "email",
             createdAt: lead.createdAt,
+            submittedAt: new Date().toISOString(),
+            honeypot: honeypotRef.current?.value ?? "",
           });
         } catch (error) {
           console.error(error);
-          submissionNotice = "הפנייה נשמרה במערכת, אך שליחת מייל ההתראה נכשלה כרגע.";
+          const errorMessage = error instanceof Error ? error.message : "";
+          submissionNotice = errorMessage.includes("RATE_LIMITED")
+            ? "הפנייה נשמרה במערכת, אך נחסמה שליחת מייל נוספת לזמן קצר כדי למנוע ספאם."
+            : "הפנייה נשמרה במערכת, אך שליחת מייל ההתראה נכשלה כרגע.";
           setSubmissionWarning(submissionNotice);
         }
       }
@@ -221,9 +229,7 @@ const ContactSection = () => {
             <CardContent className="py-12 text-center">
               <CheckCircle className="mx-auto mb-4 h-16 w-16 text-emerald-600" />
               <h3 className="mb-2 text-2xl font-bold text-emerald-800">הפנייה נשלחה בהצלחה!</h3>
-              <p className="text-emerald-700">
-                {submissionWarning ?? "אנחנו ניצור איתך קשר בהקדם האפשרי."}
-              </p>
+              <p className="text-emerald-700">{submissionWarning ?? "אנחנו ניצור איתך קשר בהקדם האפשרי."}</p>
             </CardContent>
           </Card>
         </div>
@@ -257,9 +263,7 @@ const ContactSection = () => {
           <Card className="border-border/50 bg-card/95 shadow-2xl backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-center text-xl">פרטי יצירת קשר</CardTitle>
-              <CardDescription className="text-center">
-                מלא את הטופס ואנחנו ניצור איתך קשר
-              </CardDescription>
+              <CardDescription className="text-center">מלא את הטופס ואנחנו ניצור איתך קשר</CardDescription>
             </CardHeader>
             <CardContent>
               <motion.div
@@ -293,6 +297,9 @@ const ContactSection = () => {
               </motion.div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <input ref={honeypotRef} type="text" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" defaultValue="" />
+                <input type="hidden" name="formStartedAt" value={formStartedAt} readOnly />
+
                 <motion.div
                   className="grid grid-cols-1 gap-6 md:grid-cols-2"
                   initial={{ opacity: 0, y: 20 }}
@@ -409,12 +416,7 @@ const ContactSection = () => {
                   viewport={{ once: false }}
                   transition={{ duration: 0.5, delay: 0.65 }}
                 >
-                  <Checkbox
-                    id="terms"
-                    checked={acceptedTerms}
-                    onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
-                    className="mt-0.5"
-                  />
+                  <Checkbox id="terms" checked={acceptedTerms} onCheckedChange={(checked) => setAcceptedTerms(checked === true)} className="mt-0.5" />
                   <Label htmlFor="terms" className="cursor-pointer leading-relaxed text-muted-foreground text-sm">
                     קראתי ואני מאשר/ת את{" "}
                     <Link to="/terms" className="font-medium text-primary hover:underline" target="_blank">

@@ -10,6 +10,8 @@ export interface ContactEmailPayload {
   subject: string;
   sendMethod: "email";
   createdAt: string;
+  submittedAt: string;
+  honeypot?: string;
 }
 
 export class ContactEmailDeliveryError extends Error {
