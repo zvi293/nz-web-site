@@ -1,4 +1,5 @@
 import { getSupabaseClient } from "@/lib/supabase";
+import { formatRepositoryError } from "@/lib/repository-error";
 import type { Database } from "@/lib/supabase-types";
 
 export interface FaqItem {
@@ -39,11 +40,7 @@ class FaqRepositoryError extends Error {
 }
 
 function wrapFaqError(action: string, error: unknown): never {
-  if (error instanceof Error) {
-    throw new FaqRepositoryError(action, error.message);
-  }
-
-  throw new FaqRepositoryError(action, "Unknown error");
+  throw new FaqRepositoryError(action, formatRepositoryError(error));
 }
 
 function cloneFaqItems(items: FaqItem[]): FaqItem[] {

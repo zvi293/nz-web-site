@@ -1,4 +1,5 @@
 import { getSupabaseClient, reportPublicSupabaseFallback } from "@/lib/supabase";
+import { formatRepositoryError } from "@/lib/repository-error";
 import type { Database } from "@/lib/supabase-types";
 
 export interface Project {
@@ -53,34 +54,8 @@ class ProjectRepositoryError extends Error {
   }
 }
 
-function formatProjectError(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  if (typeof error === "object" && error !== null) {
-    const details = [];
-
-    const message = "message" in error && typeof error.message === "string" ? error.message : null;
-    const code = "code" in error && typeof error.code === "string" ? error.code : null;
-    const hint = "hint" in error && typeof error.hint === "string" ? error.hint : null;
-    const detail = "details" in error && typeof error.details === "string" ? error.details : null;
-
-    if (message) details.push(message);
-    if (code) details.push(`code: ${code}`);
-    if (detail) details.push(`details: ${detail}`);
-    if (hint) details.push(`hint: ${hint}`);
-
-    if (details.length > 0) {
-      return details.join(" | ");
-    }
-  }
-
-  return "Unknown error";
-}
-
 function wrapProjectError(action: string, error: unknown): never {
-  throw new ProjectRepositoryError(action, formatProjectError(error));
+  throw new ProjectRepositoryError(action, formatRepositoryError(error));
 }
 
 function mapProjectRow(row: ProjectRow): Project {

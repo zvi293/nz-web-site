@@ -1,4 +1,5 @@
 import { createLabeledImageDataUri, normalizeLogoImageUrl } from "@/lib/runtime-safety";
+import { formatRepositoryError } from "@/lib/repository-error";
 import { getSupabaseClient, reportPublicSupabaseFallback } from "@/lib/supabase";
 import type { Database } from "@/lib/supabase-types";
 
@@ -35,11 +36,7 @@ class ClientLogoRepositoryError extends Error {
 }
 
 function wrapLogoError(action: string, error: unknown): never {
-  if (error instanceof Error) {
-    throw new ClientLogoRepositoryError(action, error.message);
-  }
-
-  throw new ClientLogoRepositoryError(action, "Unknown error");
+  throw new ClientLogoRepositoryError(action, formatRepositoryError(error));
 }
 
 function mapLogoRow(row: ClientLogoRow): ClientLogo {

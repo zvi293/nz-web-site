@@ -1,4 +1,5 @@
 import { getSupabaseClient, reportPublicSupabaseFallback } from "@/lib/supabase";
+import { formatRepositoryError } from "@/lib/repository-error";
 import type { Database } from "@/lib/supabase-types";
 
 export interface ServiceRow {
@@ -142,11 +143,7 @@ class ServiceRepositoryError extends Error {
 }
 
 function wrapServiceError(action: string, error: unknown): never {
-  if (error instanceof Error) {
-    throw new ServiceRepositoryError(action, error.message);
-  }
-
-  throw new ServiceRepositoryError(action, "Unknown error");
+  throw new ServiceRepositoryError(action, formatRepositoryError(error));
 }
 
 function normalizeText(value?: string): string | null {

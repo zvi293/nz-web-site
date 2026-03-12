@@ -1,4 +1,5 @@
 import { getSupabaseClient } from "@/lib/supabase";
+import { formatRepositoryError } from "@/lib/repository-error";
 import type { Database } from "@/lib/supabase-types";
 
 export interface AboutAccordionItem {
@@ -96,11 +97,7 @@ class AboutRepositoryError extends Error {
 }
 
 function wrapAboutError(action: string, error: unknown): never {
-  if (error instanceof Error) {
-    throw new AboutRepositoryError(action, error.message);
-  }
-
-  throw new AboutRepositoryError(action, "Unknown error");
+  throw new AboutRepositoryError(action, formatRepositoryError(error));
 }
 
 function cloneAboutData(data: AboutPageData): AboutPageData {
