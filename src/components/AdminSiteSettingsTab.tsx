@@ -22,6 +22,12 @@ import {
   type SiteSettings,
   type LegalPageSection,
 } from "@/lib/site-settings-api";
+import {
+  getCanonicalUrl,
+  getResolvedOgImageUrl,
+  getResolvedSiteUrl,
+  isAllowedOgImageUrl,
+} from "@/lib/site-url";
 
 const AdminSiteSettingsTab = () => {
   const { settings: storedSettings, isLoading, error } = useSiteSettings();
@@ -31,6 +37,7 @@ const AdminSiteSettingsTab = () => {
   const [seoPreviewDevice, setSeoPreviewDevice] = useState<"desktop" | "mobile">("desktop");
   const [lastSaved, setLastSaved] = useState<string | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
+  const [seoAssets, setSeoAssets] = useState({ robots: false, sitemap: false });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -44,6 +51,25 @@ const AdminSiteSettingsTab = () => {
       toast.error("לא ניתן היה לטעון את הגדרות האתר מ-Supabase.");
     }
   }, [error]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    void Promise.all([
+      fetch("/robots.txt", { method: "HEAD" }).then((response) => response.ok).catch(() => false),
+      fetch("/sitemap.xml", { method: "HEAD" }).then((response) => response.ok).catch(() => false),
+    ]).then(([robots, sitemap]) => {
+      if (!isActive) {
+        return;
+      }
+
+      setSeoAssets({ robots, sitemap });
+    });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   const updateSettings = (updater: (prev: SiteSettings) => SiteSettings) => {
     setSettings(prev => {
@@ -80,6 +106,11 @@ const AdminSiteSettingsTab = () => {
     setTimeout(() => setCopied(null), 2000);
     toast.success("הועתק ללוח!");
   };
+
+  const resolvedSiteUrl = getResolvedSiteUrl(settings.siteUrl);
+  const resolvedCanonicalUrl = getCanonicalUrl("/", settings.siteUrl);
+  const resolvedOgImageUrl = getResolvedOgImageUrl(settings.siteUrl, settings.seo.ogImage);
+  const ogImageInputValid = !settings.seo.ogImage.trim() || isAllowedOgImageUrl(settings.seo.ogImage);
 
   // Export settings as JSON
   const handleExport = () => {
@@ -154,30 +185,36 @@ const AdminSiteSettingsTab = () => {
 
   // SEO score calculator
   const getSeoScore = () => {
-    let score = 0;
-    const checks: { label: string; pass: boolean }[] = [];
+    const titleLen = settings.seo.siteTitle.trim().length;
+    const descLen = settings.seo.siteDescription.trim().length;
+    const documentScripts = Array.from(document.querySelectorAll<HTMLScriptElement>('script[type="application/ld+json"]'))
+      .map((script) => script.textContent ?? "")
+      .join("\n");
+    const internalLinksCount = document.querySelectorAll('a[href^="/"], a[href^="#"]').length;
 
-    const titleLen = settings.seo.siteTitle.length;
-    const titleOk = titleLen >= 30 && titleLen <= 60;
-    checks.push({ label: `כותרת (${titleLen}/60)`, pass: titleOk });
-    if (titleOk) score += 20;
+    const checks = [
+      { label: `כותרת (${titleLen}/60)`, pass: titleLen >= 30 && titleLen <= 60 },
+      { label: `תיאור מטא (${descLen}/160)`, pass: descLen >= 120 && descLen <= 160 },
+      { label: "Canonical קיים", pass: Boolean(resolvedCanonicalUrl) },
+      { label: "Canonical תואם לדומיין", pass: resolvedCanonicalUrl.startsWith(resolvedSiteUrl) },
+      { label: "OG title", pass: Boolean(settings.seo.siteTitle.trim()) },
+      { label: "OG description", pass: Boolean(settings.seo.siteDescription.trim()) },
+      { label: "OG image", pass: ogImageInputValid && Boolean(resolvedOgImageUrl) },
+      { label: "OG url", pass: Boolean(resolvedSiteUrl) },
+      { label: "Twitter card", pass: true },
+      { label: "Twitter title", pass: Boolean(settings.seo.siteTitle.trim()) },
+      { label: "Twitter description", pass: Boolean(settings.seo.siteDescription.trim()) },
+      { label: "Twitter image", pass: ogImageInputValid && Boolean(resolvedOgImageUrl) },
+      { label: "JSON-LD ProfessionalService", pass: documentScripts.includes('"@type": "ProfessionalService"') || documentScripts.includes('"@type":"ProfessionalService"') },
+      { label: "JSON-LD WebSite", pass: documentScripts.includes('"@type": "WebSite"') || documentScripts.includes('"@type":"WebSite"') },
+      { label: "JSON-LD BreadcrumbList", pass: documentScripts.includes('"@type": "BreadcrumbList"') || documentScripts.includes('"@type":"BreadcrumbList"') },
+      { label: "robots.txt קיים", pass: seoAssets.robots },
+      { label: "sitemap.xml קיים", pass: seoAssets.sitemap },
+      { label: "קישורים פנימיים מזוהים", pass: internalLinksCount >= 5 },
+    ];
 
-    const descLen = settings.seo.siteDescription.length;
-    const descOk = descLen >= 100 && descLen <= 160;
-    checks.push({ label: `תיאור (${descLen}/160)`, pass: descOk });
-    if (descOk) score += 20;
-
-    const hasKeywords = settings.seo.keywords.split(",").filter(k => k.trim()).length >= 3;
-    checks.push({ label: "לפחות 3 מילות מפתח", pass: hasKeywords });
-    if (hasKeywords) score += 20;
-
-    const hasOg = !!settings.seo.ogImage;
-    checks.push({ label: "תמונת OG", pass: hasOg });
-    if (hasOg) score += 20;
-
-    const hasSocial = Object.values(settings.social).some(v => v.trim() !== "");
-    checks.push({ label: "לפחות רשת חברתית אחת", pass: hasSocial });
-    if (hasSocial) score += 20;
+    const passedChecks = checks.filter((check) => check.pass).length;
+    const score = Math.round((passedChecks / checks.length) * 100);
 
     return { score, checks };
   };
@@ -360,6 +397,17 @@ const AdminSiteSettingsTab = () => {
               <CardDescription>פרטים אלו מופיעים בכל האתר — פוטר, דף צור קשר ועוד</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>כתובת האתר (Site URL)</Label>
+                <Input
+                  value={settings.siteUrl}
+                  onChange={e => updateSettings(prev => ({ ...prev, siteUrl: e.target.value }))}
+                  placeholder="https://nz-web.com"
+                  dir="ltr"
+                  className="text-left"
+                />
+                <p className="text-xs text-muted-foreground">משמש ל-canonical, כתובות OG, schema ו-preview.</p>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>שם בעל העסק</Label>
@@ -501,12 +549,13 @@ const AdminSiteSettingsTab = () => {
                   <Image className="h-3.5 w-3.5" />
                   תמונת OG (לשיתוף ברשתות)
                 </Label>
-                <Input value={settings.seo.ogImage} onChange={e => updateSettings(prev => ({ ...prev, seo: { ...prev.seo, ogImage: e.target.value } }))} placeholder="https://..." dir="ltr" className="text-left" />
-                {settings.seo.ogImage && (
-                  <div className="rounded-lg border border-border overflow-hidden mt-2">
-                    <img src={settings.seo.ogImage} alt="OG Preview" className="w-full h-32 object-cover" onError={(e) => (e.currentTarget.style.display = "none")} />
-                  </div>
-                )}
+                <Input value={settings.seo.ogImage} onChange={e => updateSettings(prev => ({ ...prev, seo: { ...prev.seo, ogImage: e.target.value } }))} placeholder="https://nz-web.com/og-image.png" dir="ltr" className="text-left" />
+                <p className={`text-xs ${ogImageInputValid ? "text-muted-foreground" : "text-destructive"}`}>
+                  נתמך: PNG, JPG, WEBP. אם השדה ריק, תתבצע נפילה אוטומטית ל-{resolvedSiteUrl}/og-image.png
+                </p>
+                <div className="rounded-lg border border-border overflow-hidden mt-2">
+                  <img src={resolvedOgImageUrl} alt="OG Preview" className="w-full h-32 object-cover" onError={(e) => (e.currentTarget.style.display = "none")} />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -531,13 +580,35 @@ const AdminSiteSettingsTab = () => {
             </CardHeader>
             <CardContent>
               <div className={`rounded-xl border border-border bg-white p-4 ${seoPreviewDevice === "mobile" ? "max-w-[360px]" : ""}`} dir="ltr">
-                <p className="text-xs text-green-700 mb-0.5 truncate">{window.location.origin}</p>
+                <p className="text-xs text-green-700 mb-0.5 truncate">{resolvedSiteUrl}</p>
                 <p className="text-lg text-blue-700 font-medium leading-tight truncate hover:underline cursor-pointer">
                   {settings.seo.siteTitle || "כותרת האתר"}
                 </p>
                 <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                   {settings.seo.siteDescription || "תיאור האתר..."}
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Image className="h-4 w-4 text-primary" />
+                תצוגה מקדימה לשיתוף ברשתות
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="max-w-xl overflow-hidden rounded-xl border border-border bg-card">
+                <img src={resolvedOgImageUrl} alt="Social preview" className="h-52 w-full object-cover" />
+                <div className="space-y-2 p-4" dir="ltr">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{resolvedSiteUrl.replace(/^https?:\/\//, "")}</p>
+                  <p className="line-clamp-2 text-lg font-semibold text-foreground">{settings.seo.siteTitle || "NZ-WEB"}</p>
+                  <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                    {settings.seo.siteDescription || "תיאור האתר יוצג כאן."}
+                  </p>
+                  <p className="text-sm text-primary">{resolvedCanonicalUrl}</p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -655,7 +726,7 @@ const AdminSiteSettingsTab = () => {
                   { label: "טלפון", value: settings.contact.phone, key: "phone" },
                   { label: "אימייל", value: settings.contact.email, key: "email" },
                   { label: "WhatsApp", value: `https://wa.me/${settings.contact.whatsappNumber}`, key: "wa" },
-                  { label: "כתובת אתר", value: window.location.origin, key: "url" },
+                  { label: "כתובת אתר", value: resolvedSiteUrl, key: "url" },
                   { label: "כותרת SEO", value: settings.seo.siteTitle, key: "title" },
                 ].map(({ label, value, key }) => (
                   <div key={key} className="flex items-center justify-between rounded-lg bg-secondary/30 px-3 py-2.5">
@@ -711,7 +782,7 @@ const AdminSiteSettingsTab = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {[
-                  { label: "כתובת האתר", value: window.location.origin },
+                  { label: "כתובת האתר", value: resolvedSiteUrl },
                   { label: "תאריך נוכחי", value: new Date().toLocaleDateString("he-IL") },
                   { label: "סעיפי נגישות", value: `${settings.accessibility.sections.length} סעיפים` },
                   { label: "סעיפי פרטיות", value: `${settings.privacy.sections.length} סעיפים` },

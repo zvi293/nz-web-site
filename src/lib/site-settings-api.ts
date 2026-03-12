@@ -2,6 +2,7 @@ import { useEffect, useSyncExternalStore } from "react";
 
 import { getSupabaseClient } from "@/lib/supabase";
 import type { Database } from "@/lib/supabase-types";
+import { getEnvSiteUrl, getResolvedOgImageUrl, getResolvedSiteUrl } from "@/lib/site-url";
 
 export interface ContactInfo {
   ownerName: string;
@@ -67,6 +68,7 @@ export interface TermsSettings {
 }
 
 export interface SiteSettings {
+  siteUrl: string;
   contact: ContactInfo;
   seo: SeoSettings;
   footer: FooterSettings;
@@ -89,6 +91,7 @@ type SiteSettingsInsert = Database["public"]["Tables"]["site_settings"]["Insert"
 const SITE_SETTINGS_ROW_ID = "default";
 
 const defaultSettings: SiteSettings = {
+  siteUrl: getEnvSiteUrl(),
   contact: {
     ownerName: "צבי משה",
     phone: "058-7292029",
@@ -100,7 +103,7 @@ const defaultSettings: SiteSettings = {
     siteTitle: "NZ-WEB | פיתוח ועיצוב אתרים מקצועי",
     siteDescription: "סטודיו לפיתוח אתרים, עיצוב UI/UX ופתרונות דיגיטליים מתקדמים. Perfect in every Pixel.",
     keywords: "פיתוח אתרים, עיצוב אתרים, UI UX, React, Full Stack, בניית אתרים",
-    ogImage: "",
+    ogImage: getResolvedOgImageUrl(getEnvSiteUrl(), ""),
   },
   footer: {
     tagline: "Perfect in every Pixel",
@@ -221,6 +224,7 @@ function mergeSiteSettings(input: unknown): SiteSettings {
   const terms = isRecord(source.terms) ? source.terms : {};
 
   return {
+    siteUrl: typeof source.siteUrl === "string" ? source.siteUrl : defaultSettings.siteUrl,
     contact: {
       ...defaultSettings.contact,
       ownerName: typeof contact.ownerName === "string" ? contact.ownerName : defaultSettings.contact.ownerName,
@@ -323,13 +327,33 @@ function mapSiteSettingsRow(row: SiteSettingsRow | null): SiteSettings {
     return cloneSettings(defaultSettings);
   }
 
-  return mergeSiteSettings(row.settings);
+  const merged = mergeSiteSettings(row.settings);
+
+  return {
+    ...merged,
+    siteUrl: merged.siteUrl,
+    seo: {
+      ...merged.seo,
+      ogImage: getResolvedOgImageUrl(merged.siteUrl, merged.seo.ogImage),
+    },
+  };
 }
 
 function mapSiteSettingsInsert(settings: SiteSettings): SiteSettingsInsert {
+  const normalizedSettings = mergeSiteSettings(settings);
+  const normalizedSiteUrl = getResolvedSiteUrl(normalizedSettings.siteUrl);
+  const normalizedOgImage = getResolvedOgImageUrl(normalizedSiteUrl, normalizedSettings.seo.ogImage);
+
   return {
     id: SITE_SETTINGS_ROW_ID,
-    settings: settings as unknown as Database["public"]["Tables"]["site_settings"]["Insert"]["settings"],
+    settings: {
+      ...normalizedSettings,
+      siteUrl: normalizedSiteUrl,
+      seo: {
+        ...normalizedSettings.seo,
+        ogImage: normalizedOgImage,
+      },
+    } as unknown as Database["public"]["Tables"]["site_settings"]["Insert"]["settings"],
   };
 }
 
