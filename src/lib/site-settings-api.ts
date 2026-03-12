@@ -92,7 +92,7 @@ const defaultSettings: SiteSettings = {
   contact: {
     ownerName: "צבי משה",
     phone: "058-7292029",
-    email: "zvi293293@gmail.com",
+    email: "nzweb295@gmail.com",
     whatsappNumber: "972587292029",
     whatsappMessage: "היי, הגעתי מהאתר של NZ-WEB ואשמח לשמוע פרטים נוספים על שירותי פיתוח ועיצוב 🚀",
   },
@@ -126,7 +126,7 @@ const defaultSettings: SiteSettings = {
   accessibility: {
     coordinatorName: "צבי משה",
     coordinatorPhone: "058-7292029",
-    coordinatorEmail: "zvi293293@gmail.com",
+    coordinatorEmail: "nzweb295@gmail.com",
     lastUpdated: "9 במרץ 2026",
     sections: [
       { id: "1", title: "מבוא", content: "אנו ב-NZ-web רואים חשיבות עליונה בהנגשת השירותים הדיגיטליים שלנו לכלל האוכלוסייה, ובכלל זה לאנשים עם מוגבלויות." },
