@@ -9,6 +9,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { getMailtoHref, getTelHref, useContactInfo } from "@/lib/contact-utils";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
+import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const floatingParticles = Array.from({ length: 8 }, (_, i) => ({
   id: i,
@@ -28,6 +29,7 @@ const Contact = () => {
     description:
       "צרו קשר עם NZ-web לקבלת הצעת מחיר לפיתוח אתר, עיצוב UI/UX או אוטומציות AI. נשמח לשמוע על הפרויקט שלכם ולחזור אליכם עם הצעה מותאמת אישית.",
   });
+  useBreadcrumb({ name: "צרו קשר", path: "/contact" });
   const infoCards = [
     {
       icon: Phone,

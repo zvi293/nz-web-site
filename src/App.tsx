@@ -16,6 +16,10 @@ import Privacy from "./pages/Privacy";
 import FAQ from "./pages/FAQ";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
+import WebDevelopment from "./pages/services/WebDevelopment";
+import ReactDevelopment from "./pages/services/ReactDevelopment";
+import LandingPages from "./pages/services/LandingPages";
+import WebsitePerformance from "./pages/services/WebsitePerformance";
 import CustomCursor from "./components/CustomCursor";
 import ScrollToTop from "./components/ScrollToTop";
 import CookieConsent from "./components/CookieConsent";
@@ -40,6 +44,10 @@ const App = () => (
             <Route path="/faq" element={<FAQ />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/services/web-development" element={<WebDevelopment />} />
+            <Route path="/services/react-development" element={<ReactDevelopment />} />
+            <Route path="/services/landing-pages" element={<LandingPages />} />
+            <Route path="/services/website-performance" element={<WebsitePerformance />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route element={<AdminRouteGuard />}>
               <Route path="/admin/portfolio" element={<AdminPortfolio />} />

@@ -8,6 +8,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { getMailtoHref, getTelHref, useContactInfo } from "@/lib/contact-utils";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
+import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const Terms = () => {
   const contact = useContactInfo();
@@ -17,6 +18,7 @@ const Terms = () => {
     description:
       "תנאי השימוש של אתר NZ-web – זכויות, אחריות ומדיניות השימוש בשירותי הפיתוח, עיצוב ה-UI/UX ופתרונות ה-AI שלנו.",
   });
+  useBreadcrumb({ name: "תנאי שימוש", path: "/terms" });
 
   return (
     <main className="relative bg-background pt-[72px]" dir="rtl">

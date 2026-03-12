@@ -16,5 +16,4 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-# IMPORTANT: Replace https://nz-web.co.il with the actual production domain before launch.
-Sitemap: https://nz-web.co.il/sitemap.xml
+Sitemap: https://nz-web.com/sitemap.xml

@@ -372,6 +372,20 @@ const Footer = () => {
           {/* Bottom Bar */}
           <div className="mt-3 border-t border-white/20 pt-3">
             <div className="flex flex-col items-center gap-1.5 text-center">
+              <p className="font-heebo text-xs text-white/40">
+                <span className="text-white/30">שירותים נוספים: </span>
+                {[
+                  { label: "בניית אתרים", href: "/services/web-development" },
+                  { label: "פיתוח React", href: "/services/react-development" },
+                  { label: "דפי נחיתה", href: "/services/landing-pages" },
+                  { label: "שיפור מהירות", href: "/services/website-performance" },
+                ].map((s, i, arr) => (
+                  <span key={s.href}>
+                    <Link to={s.href} className="hover:text-white/70 transition-colors">{s.label}</Link>
+                    {i < arr.length - 1 && <span className="mx-1 text-white/20">·</span>}
+                  </span>
+                ))}
+              </p>
               <p className="font-heebo text-base text-white/70">
                 © {new Date().getFullYear()} {footerSettings.copyrightText}
               </p>

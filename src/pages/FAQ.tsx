@@ -15,6 +15,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { fetchFaqItems, getDefaultFaqItems, type FaqItem } from "@/lib/faq-api";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
+import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const FAQ = () => {
   const [faqItems, setFaqItems] = useState<FaqItem[]>(() => getDefaultFaqItems().filter((item) => item.visible));
@@ -24,6 +25,7 @@ const FAQ = () => {
     description:
       "תשובות לשאלות הנפוצות ביותר על שירותי הפיתוח, העיצוב ואוטומציות ה-AI של NZ-web. תהליך העבודה, טכנולוגיות, מחירים ועוד.",
   });
+  useBreadcrumb({ name: "שאלות נפוצות", path: "/faq" });
 
   useEffect(() => {
     void fetchFaqItems()
@@ -137,6 +139,12 @@ const FAQ = () => {
               <ArrowRight className="h-4 w-4" />
               צרו קשר
             </Link>
+            <p className="text-sm text-muted-foreground pt-2">
+              רוצים לדעת יותר על שירותי הפיתוח שלנו?{" "}
+              <Link to="/services/web-development" className="text-primary hover:underline">
+                בניית אתרים מקצועיים
+              </Link>
+            </p>
           </motion.div>
         </div>
       </section>

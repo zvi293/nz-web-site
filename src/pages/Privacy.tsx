@@ -8,6 +8,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { getMailtoHref, getTelHref, useContactInfo } from "@/lib/contact-utils";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
+import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const Privacy = () => {
   const contact = useContactInfo();
@@ -17,6 +18,7 @@ const Privacy = () => {
     description:
       "מדיניות הפרטיות של NZ-web – כיצד אנו אוספים, מנהלים ומגינים על המידע שלכם בהתאם לחוק הגנת הפרטיות הישראלי.",
   });
+  useBreadcrumb({ name: "מדיניות פרטיות", path: "/privacy" });
 
   return (
     <main className="relative bg-background pt-[72px]" dir="rtl">

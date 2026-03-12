@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
 import gsap from "gsap";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
+import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const AllProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -17,6 +18,7 @@ const AllProjects = () => {
     description:
       "צפו בפורטפוליו של NZ-web – אתרים, אפליקציות ומערכות שבנינו ללקוחות. כל פרויקט בנוי עם React, Tailwind, Supabase ועיצוב UI/UX מרהיב.",
   });
+  useBreadcrumb({ name: "פרויקטים", path: "/projects" });
 
   useEffect(() => {
     fetchProjects().then(setProjects);
@@ -101,6 +103,23 @@ const AllProjects = () => {
         {projects.length === 0 &&
         <p className="text-center text-muted-foreground py-20">אין פרויקטים עדיין.</p>
         }
+
+        {/* CTA */}
+        <div className="mt-16 md:mt-24 text-center">
+          <p className="text-muted-foreground text-lg mb-4">רוצים פרויקט כזה? בואו נדבר.</p>
+          <Link
+            to="/contact"
+            className="inline-block bg-primary text-primary-foreground font-bold text-base px-8 py-4 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+          >
+            צרו קשר
+          </Link>
+          <p className="mt-4 text-sm text-muted-foreground">
+            מתעניינים בפיתוח React?{" "}
+            <Link to="/services/react-development" className="text-primary hover:underline">
+              קראו על שירות פיתוח React שלנו
+            </Link>
+          </p>
+        </div>
       </div>
       <Footer />
     </div>);

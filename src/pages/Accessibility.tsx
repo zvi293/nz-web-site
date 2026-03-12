@@ -9,6 +9,7 @@ import { Phone, Mail, MessageCircle, User } from "lucide-react";
 import { useSiteSettings } from "@/lib/site-settings-api";
 import { getMailtoHref, getTelHref, getWhatsAppHref } from "@/lib/contact-utils";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
+import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const Accessibility = () => {
   const { settings: siteSettings } = useSiteSettings();
@@ -20,6 +21,7 @@ const Accessibility = () => {
     description:
       "הצהרת הנגישות של NZ-web – עמידה בתקן WCAG 2.1 ברמת AA ובת\"י 5568, תפריט נגישות מובנה ותמיכה מלאה בכלל המשתמשים.",
   });
+  useBreadcrumb({ name: "הצהרת נגישות", path: "/accessibility" });
 
   return (
     <main className="relative bg-background pt-[72px]" dir="rtl">

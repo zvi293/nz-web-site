@@ -7,8 +7,10 @@ import AmbientShapes from "@/components/AmbientShapes";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { fetchAboutData, getDefaultAboutData, type AboutPageData } from "@/lib/about-api";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
+import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 interface AccordionColumnProps {
   title: string;
@@ -79,6 +81,7 @@ const About = () => {
     description:
       "גלו את NZ-web – סטודיו של צבי משה לפיתוח Full-Stack, עיצוב UI/UX ואוטומציית AI. מאמינים בפרפקציוניזם דיגיטלי עם הסלוגן: Perfect in every Pixel.",
   });
+  useBreadcrumb({ name: "מי אנחנו", path: "/about" });
 
   useEffect(() => {
     let isActive = true;
@@ -169,6 +172,11 @@ const About = () => {
               <AccordionColumn key={i} title={col.title} items={col.items} delayOffset={i * 0.12} />
             ))}
           </div>
+          <div className="mt-10 text-center">
+            <Link to="/services/web-development" className="font-heebo text-sm text-primary hover:text-primary/80 transition-colors underline underline-offset-4">
+              לפרטים על שירות בניית אתרים מקצועיים ←
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -199,6 +207,11 @@ const About = () => {
                   ) : p}
                 </p>
               ))}
+            </div>
+            <div className="mt-8 text-right">
+              <Link to="/projects" className="text-primary font-semibold hover:underline">
+                ראו את הפרויקטים שלנו ←
+              </Link>
             </div>
           </motion.div>
         </div>
