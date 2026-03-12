@@ -140,9 +140,9 @@ const FAQ = () => {
               צרו קשר
             </Link>
             <p className="text-sm text-muted-foreground pt-2">
-              רוצים לדעת יותר על שירותי הפיתוח שלנו?{" "}
-              <Link to="/services/web-development" className="text-primary hover:underline">
-                בניית אתרים מקצועיים
+              אם אתם בודקים דף ממוקד לקמפיין או להשארת פרטים,{" "}
+              <Link to="/services/landing-page-development" className="text-primary hover:underline">
+                קראו על שירות בניית דפי הנחיתה שלנו
               </Link>
             </p>
           </motion.div>

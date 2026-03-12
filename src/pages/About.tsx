@@ -173,8 +173,8 @@ const About = () => {
             ))}
           </div>
           <div className="mt-10 text-center">
-            <Link to="/services/web-development" className="font-heebo text-sm text-primary hover:text-primary/80 transition-colors underline underline-offset-4">
-              לפרטים על שירות בניית אתרים מקצועיים ←
+            <Link to="/services/business-website" className="font-heebo text-sm text-primary hover:text-primary/80 transition-colors underline underline-offset-4">
+              לפרטים על שירות בניית אתר תדמית לעסקים ←
             </Link>
           </div>
         </div>

@@ -376,9 +376,10 @@ const Footer = () => {
                 <span className="text-white/30">שירותים נוספים: </span>
                 {[
                   { label: "בניית אתרים", href: "/services/web-development" },
-                  { label: "פיתוח React", href: "/services/react-development" },
-                  { label: "דפי נחיתה", href: "/services/landing-pages" },
-                  { label: "שיפור מהירות", href: "/services/website-performance" },
+                  { label: "פיתוח אתרים", href: "/services/website-development" },
+                  { label: "בניית אתר תדמית", href: "/services/business-website" },
+                  { label: "מערכת ניהול תורים", href: "/services/appointment-system" },
+                  { label: "דפי נחיתה", href: "/services/landing-page-development" },
                 ].map((s, i, arr) => (
                   <span key={s.href}>
                     <Link to={s.href} className="hover:text-white/70 transition-colors">{s.label}</Link>

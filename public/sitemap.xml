@@ -97,4 +97,36 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Service: Website Development -->
+  <url>
+    <loc>https://nz-web.com/services/website-development</loc>
+    <lastmod>2026-03-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Service: Business Website -->
+  <url>
+    <loc>https://nz-web.com/services/business-website</loc>
+    <lastmod>2026-03-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Service: Appointment System -->
+  <url>
+    <loc>https://nz-web.com/services/appointment-system</loc>
+    <lastmod>2026-03-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Service: Landing Page Development -->
+  <url>
+    <loc>https://nz-web.com/services/landing-page-development</loc>
+    <lastmod>2026-03-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>

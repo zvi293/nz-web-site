@@ -114,9 +114,9 @@ const AllProjects = () => {
             צרו קשר
           </Link>
           <p className="mt-4 text-sm text-muted-foreground">
-            מתעניינים בפיתוח React?{" "}
-            <Link to="/services/react-development" className="text-primary hover:underline">
-              קראו על שירות פיתוח React שלנו
+            מחפשים תהליך פיתוח מסודר לאתר חדש?{" "}
+            <Link to="/services/website-development" className="text-primary hover:underline">
+              קראו על שירות פיתוח האתרים שלנו
             </Link>
           </p>
         </div>

@@ -20,6 +20,10 @@ import WebDevelopment from "./pages/services/WebDevelopment";
 import ReactDevelopment from "./pages/services/ReactDevelopment";
 import LandingPages from "./pages/services/LandingPages";
 import WebsitePerformance from "./pages/services/WebsitePerformance";
+import WebsiteDevelopment from "./pages/services/WebsiteDevelopment";
+import BusinessWebsite from "./pages/services/BusinessWebsite";
+import AppointmentSystem from "./pages/services/AppointmentSystem";
+import LandingPageDevelopment from "./pages/services/LandingPageDevelopment";
 import CustomCursor from "./components/CustomCursor";
 import ScrollToTop from "./components/ScrollToTop";
 import CookieConsent from "./components/CookieConsent";
@@ -48,6 +52,10 @@ const App = () => (
             <Route path="/services/react-development" element={<ReactDevelopment />} />
             <Route path="/services/landing-pages" element={<LandingPages />} />
             <Route path="/services/website-performance" element={<WebsitePerformance />} />
+            <Route path="/services/website-development" element={<WebsiteDevelopment />} />
+            <Route path="/services/business-website" element={<BusinessWebsite />} />
+            <Route path="/services/appointment-system" element={<AppointmentSystem />} />
+            <Route path="/services/landing-page-development" element={<LandingPageDevelopment />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route element={<AdminRouteGuard />}>
               <Route path="/admin/portfolio" element={<AdminPortfolio />} />
