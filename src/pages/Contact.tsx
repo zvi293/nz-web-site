@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { getMailtoHref, getTelHref, useContactInfo } from "@/lib/contact-utils";
+import { useSeoMeta } from "@/hooks/useSeoMeta";
 
 const floatingParticles = Array.from({ length: 8 }, (_, i) => ({
   id: i,
@@ -21,6 +22,12 @@ const floatingParticles = Array.from({ length: 8 }, (_, i) => ({
 const Contact = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const contact = useContactInfo();
+
+  useSeoMeta({
+    title: "צרו קשר | NZ-web – בואו נבנה משהו מדהים יחד",
+    description:
+      "צרו קשר עם NZ-web לקבלת הצעת מחיר לפיתוח אתר, עיצוב UI/UX או אוטומציות AI. נשמח לשמוע על הפרויקט שלכם ולחזור אליכם עם הצעה מותאמת אישית.",
+  });
   const infoCards = [
     {
       icon: Phone,

@@ -8,11 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useSeoMeta } from "@/hooks/useSeoMeta";
 
 export default function AdminLogin() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+
+  useSeoMeta({ title: "Admin Login | NZ-web", noindex: true });
   const { isConfigured, isLoading, isAdmin, signInAdmin } = useAdminAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

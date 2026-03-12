@@ -6,10 +6,17 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
 import gsap from "gsap";
+import { useSeoMeta } from "@/hooks/useSeoMeta";
 
 const AllProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const gridRef = useRef<HTMLDivElement>(null);
+
+  useSeoMeta({
+    title: "הפרויקטים שלנו | NZ-web – פורטפוליו עיצוב ופיתוח",
+    description:
+      "צפו בפורטפוליו של NZ-web – אתרים, אפליקציות ומערכות שבנינו ללקוחות. כל פרויקט בנוי עם React, Tailwind, Supabase ועיצוב UI/UX מרהיב.",
+  });
 
   useEffect(() => {
     fetchProjects().then(setProjects);
@@ -36,9 +43,9 @@ const AllProjects = () => {
           
 
           
-          <h2 className="text-3xl font-black leading-tight text-foreground md:text-4xl lg:text-5xl">
+          <h1 className="text-3xl font-black leading-tight text-foreground md:text-4xl lg:text-5xl">
             הפרויקטים שלנו
-          </h2>
+          </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
             הפרויקטים שבנינו עם אהבה, מקצועיות וחדשנות
           </p>

@@ -5,69 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Primary Meta -->
-    <title>NZ-web | Full Stack, UI/UX, and AI Studio</title>
+    <!-- IMPORTANT: Replace https://nz-web.co.il with the actual production domain before launch. -->
+    <title>NZ-web | פיתוח אתרים, UI/UX ואוטומציות AI</title>
     <meta
       name="description"
-      content="NZ-web studio for websites, landing pages, full-stack development, UI/UX, and AI automations."
+      content="NZ-web – סטודיו לפיתוח Full-Stack, עיצוב UI/UX ואוטומציות AI. בונים אתרי תדמית, חנויות איקומרס ומערכות דיגיטליות מרהיבות עם ביצועים חסרי פשרות. Perfect in every Pixel."
     />
     <meta
       name="keywords"
-      content="NZ-web, full stack, UI UX, AI automation, websites, landing pages, React, TypeScript"
+      content="פיתוח אתרים, עיצוב אתרים, UI UX, אוטומציה AI, בניית אתרים, Full Stack, React, TypeScript, NZ-web"
     />
-    <meta name="author" content="NZ-web" />
+    <meta name="author" content="NZ-web – Zvi Moshe" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <!-- TODO: Set the final production domain before launch. -->
+    <meta name="theme-color" content="#3b82f6" />
+
+    <!-- Canonical (homepage default; per-route canonicals set dynamically by useSeoMeta) -->
+    <link rel="canonical" href="https://nz-web.co.il/" />
 
     <!-- Open Graph / Facebook / LinkedIn -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="NZ-web" />
     <meta property="og:locale" content="he_IL" />
-    <meta property="og:title" content="NZ-web | Full Stack, UI/UX, and AI Studio" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:url" content="https://nz-web.co.il/" />
+    <meta property="og:title" content="NZ-web | פיתוח אתרים, UI/UX ואוטומציות AI" />
     <meta
       property="og:description"
-      content="NZ-web studio for websites, landing pages, full-stack development, UI/UX, and AI automations."
+      content="NZ-web – סטודיו לפיתוח Full-Stack, עיצוב UI/UX ואוטומציות AI. בונים אתרי תדמית, חנויות איקומרס ומערכות דיגיטליות מרהיבות."
     />
+    <!-- og:image: place a 1200x630 branded image at /public/og-image.png and uncomment:
+    <meta property="og:image" content="https://nz-web.co.il/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="NZ-web – פיתוח אתרים ועיצוב UI/UX" />
+    -->
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="NZ-web | Full Stack, UI/UX, and AI Studio" />
+    <meta name="twitter:title" content="NZ-web | פיתוח אתרים, UI/UX ואוטומציות AI" />
     <meta
       name="twitter:description"
-      content="NZ-web studio for websites, landing pages, full-stack development, UI/UX, and AI automations."
+      content="NZ-web – סטודיו לפיתוח Full-Stack, עיצוב UI/UX ואוטומציות AI. Perfect in every Pixel."
     />
+    <!-- twitter:image: uncomment when og-image.png is created:
+    <meta name="twitter:image" content="https://nz-web.co.il/og-image.png" />
+    -->
 
-    <!-- Favicon -->
+    <!-- Favicon & Manifest -->
     <link rel="icon" type="image/svg+xml" href="/placeholder.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://wa.me" />
 
-    <!-- JSON-LD Structured Data -->
+    <!-- JSON-LD: ProfessionalService -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
         "name": "NZ-web",
         "alternateName": "NZ-WEB",
-        "description": "Studio for websites, full-stack development, UI/UX, and AI automations.",
+        "url": "https://nz-web.co.il/",
+        "description": "סטודיו לפיתוח Full-Stack, עיצוב UI/UX ואוטומציות AI. בונים אתרי תדמית, חנויות איקומרס ומערכות דיגיטליות.",
+        "slogan": "Perfect in every Pixel",
         "founder": {
           "@type": "Person",
           "name": "Zvi Moshe",
-          "jobTitle": "Full Stack Developer and UI/UX Expert"
+          "jobTitle": "Full Stack Developer & UI/UX Expert"
         },
         "areaServed": {
           "@type": "Country",
           "name": "Israel"
         },
         "serviceType": [
-          "Websites",
-          "Applications",
-          "UI/UX",
+          "Web Development",
+          "UI/UX Design",
           "AI Automation",
-          "Full Stack",
-          "Landing Pages"
+          "Full Stack Development",
+          "Landing Pages",
+          "E-commerce"
         ],
         "knowsAbout": [
           "React",
@@ -78,20 +96,26 @@
           "UI/UX Design",
           "AI Automation"
         ],
-        "slogan": "Perfect in every Pixel",
         "inLanguage": ["he", "en"],
-        "sameAs": []
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+972-58-7292029",
+          "email": "nzweb295@gmail.com",
+          "contactType": "customer service",
+          "availableLanguage": ["Hebrew", "English"]
+        }
       }
     </script>
 
-    <!-- WebSite schema for search box -->
+    <!-- JSON-LD: WebSite -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "NZ-web",
+        "url": "https://nz-web.co.il/",
         "inLanguage": "he",
-        "description": "NZ-web studio for websites, full-stack development, UI/UX, and AI automations."
+        "description": "סטודיו לפיתוח Full-Stack, עיצוב UI/UX ואוטומציות AI. Perfect in every Pixel."
       }
     </script>
   </head>

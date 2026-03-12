@@ -1,8 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+
 User-agent: Googlebot
 Allow: /
+Disallow: /admin/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin/
 
 User-agent: Twitterbot
 Allow: /
@@ -10,7 +16,5 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
-
-# TODO: Add the final production sitemap URL when the public domain is known.
+# IMPORTANT: Replace https://nz-web.co.il with the actual production domain before launch.
+Sitemap: https://nz-web.co.il/sitemap.xml

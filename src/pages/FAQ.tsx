@@ -14,15 +14,48 @@ import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { fetchFaqItems, getDefaultFaqItems, type FaqItem } from "@/lib/faq-api";
+import { useSeoMeta } from "@/hooks/useSeoMeta";
 
 const FAQ = () => {
   const [faqItems, setFaqItems] = useState<FaqItem[]>(() => getDefaultFaqItems().filter((item) => item.visible));
+
+  useSeoMeta({
+    title: "שאלות נפוצות | NZ-web – פיתוח אתרים ועיצוב",
+    description:
+      "תשובות לשאלות הנפוצות ביותר על שירותי הפיתוח, העיצוב ואוטומציות ה-AI של NZ-web. תהליך העבודה, טכנולוגיות, מחירים ועוד.",
+  });
 
   useEffect(() => {
     void fetchFaqItems()
       .then((items) => setFaqItems(items.filter((item) => item.visible)))
       .catch(() => undefined);
   }, []);
+
+  // Inject FAQPage JSON-LD structured data for Google rich results
+  useEffect(() => {
+    if (faqItems.length === 0) return;
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.id = "faq-page-schema";
+    script.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    });
+    const existing = document.getElementById("faq-page-schema");
+    if (existing) existing.remove();
+    document.head.appendChild(script);
+    return () => {
+      document.getElementById("faq-page-schema")?.remove();
+    };
+  }, [faqItems]);
 
   return (
     <main className="relative bg-background pt-[72px]" dir="rtl">

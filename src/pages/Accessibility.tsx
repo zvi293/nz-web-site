@@ -8,11 +8,18 @@ import { Link } from "react-router-dom";
 import { Phone, Mail, MessageCircle, User } from "lucide-react";
 import { useSiteSettings } from "@/lib/site-settings-api";
 import { getMailtoHref, getTelHref, getWhatsAppHref } from "@/lib/contact-utils";
+import { useSeoMeta } from "@/hooks/useSeoMeta";
 
 const Accessibility = () => {
   const { settings: siteSettings } = useSiteSettings();
   const { accessibility, contact } = siteSettings;
   const lastUpdated = accessibility.lastUpdated;
+
+  useSeoMeta({
+    title: "הצהרת נגישות | NZ-web",
+    description:
+      "הצהרת הנגישות של NZ-web – עמידה בתקן WCAG 2.1 ברמת AA ובת\"י 5568, תפריט נגישות מובנה ותמיכה מלאה בכלל המשתמשים.",
+  });
 
   return (
     <main className="relative bg-background pt-[72px]" dir="rtl">

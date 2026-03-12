@@ -7,9 +7,16 @@ import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { getMailtoHref, getTelHref, useContactInfo } from "@/lib/contact-utils";
+import { useSeoMeta } from "@/hooks/useSeoMeta";
 
 const Terms = () => {
   const contact = useContactInfo();
+
+  useSeoMeta({
+    title: "תנאי שימוש | NZ-web",
+    description:
+      "תנאי השימוש של אתר NZ-web – זכויות, אחריות ומדיניות השימוש בשירותי הפיתוח, עיצוב ה-UI/UX ופתרונות ה-AI שלנו.",
+  });
 
   return (
     <main className="relative bg-background pt-[72px]" dir="rtl">

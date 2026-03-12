@@ -7,9 +7,16 @@ import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { getMailtoHref, getTelHref, useContactInfo } from "@/lib/contact-utils";
+import { useSeoMeta } from "@/hooks/useSeoMeta";
 
 const Privacy = () => {
   const contact = useContactInfo();
+
+  useSeoMeta({
+    title: "מדיניות פרטיות | NZ-web",
+    description:
+      "מדיניות הפרטיות של NZ-web – כיצד אנו אוספים, מנהלים ומגינים על המידע שלכם בהתאם לחוק הגנת הפרטיות הישראלי.",
+  });
 
   return (
     <main className="relative bg-background pt-[72px]" dir="rtl">

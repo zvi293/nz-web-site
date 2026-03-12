@@ -50,6 +50,8 @@ import AdminAboutTab from "@/components/AdminAboutTab";
 import AdminSiteSettingsTab from "@/components/AdminSiteSettingsTab";
 import AdminFaqTab from "@/components/AdminFaqTab";
 import { isBlockedLogoUrl, isRenderableAssetUrl } from "@/lib/runtime-safety";
+import { useSeoMeta } from "@/hooks/useSeoMeta";
+
 const emptyForm = {
   title: "",
   description: "",
@@ -64,6 +66,8 @@ const emptyForm = {
 const AdminPortfolio = () => {
   const { signOut, user } = useAdminAuth();
   const { toast } = useToast();
+
+  useSeoMeta({ title: "Admin Portfolio | NZ-web", noindex: true });
   const [projects, setProjects] = useState<Project[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);

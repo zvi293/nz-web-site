@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { fetchAboutData, getDefaultAboutData, type AboutPageData } from "@/lib/about-api";
+import { useSeoMeta } from "@/hooks/useSeoMeta";
 
 interface AccordionColumnProps {
   title: string;
@@ -72,6 +73,12 @@ const AccordionColumn = ({ title, items, delayOffset = 0 }: AccordionColumnProps
 
 const About = () => {
   const [data, setData] = useState<AboutPageData>(getDefaultAboutData());
+
+  useSeoMeta({
+    title: "מי אנחנו | NZ-web – סטודיו לפיתוח ועיצוב אתרים",
+    description:
+      "גלו את NZ-web – סטודיו של צבי משה לפיתוח Full-Stack, עיצוב UI/UX ואוטומציית AI. מאמינים בפרפקציוניזם דיגיטלי עם הסלוגן: Perfect in every Pixel.",
+  });
 
   useEffect(() => {
     let isActive = true;

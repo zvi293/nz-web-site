@@ -10,9 +10,16 @@ import ContactCTA from "@/components/ContactCTA";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
+import { useSeoMeta } from "@/hooks/useSeoMeta";
 
 const Index = () => {
   const location = useLocation();
+
+  useSeoMeta({
+    title: "NZ-web | פיתוח אתרים, UI/UX ואוטומציות AI",
+    description:
+      "NZ-web – סטודיו לפיתוח Full-Stack, עיצוב UI/UX ואוטומציות AI. בונים אתרי תדמית, חנויות איקומרס ומערכות דיגיטליות מרהיבות עם ביצועים חסרי פשרות. Perfect in every Pixel.",
+  });
 
   useEffect(() => {
     if (location.hash) {
