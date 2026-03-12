@@ -13,6 +13,7 @@ type ContactEmailPayload = {
   subject: string;
   sendMethod: "email";
   createdAt: string;
+  formStartedAt: string;
   submittedAt: string;
   honeypot?: string;
 };
@@ -21,8 +22,8 @@ type JsonRecord = Record<string, unknown>;
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const displayEmailPattern = /^(?:.+<)?([^<>@\s]+@[^<>@\s]+\.[^<>@\s]+)>?$/;
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const MIN_SUBMIT_DURATION_MS = 2_500;
+const RATE_LIMIT_WINDOW_MS = 30_000;
+const MIN_SUBMIT_DURATION_MS = 1_200;
 const requestCooldowns = new Map<string, number>();
 
 function jsonResponse(status: number, body: JsonRecord, headers?: HeadersInit) {
@@ -98,6 +99,7 @@ function parsePayload(payload: unknown): ContactEmailPayload | null {
     !isNonEmptyString(candidate.phone) ||
     !isNonEmptyString(candidate.subject) ||
     !isNonEmptyString(candidate.createdAt) ||
+    !isNonEmptyString(candidate.formStartedAt) ||
     !isNonEmptyString(candidate.submittedAt) ||
     candidate.sendMethod !== "email"
   ) {
@@ -118,6 +120,7 @@ function parsePayload(payload: unknown): ContactEmailPayload | null {
     subject: candidate.subject.trim(),
     sendMethod: "email",
     createdAt: candidate.createdAt.trim(),
+    formStartedAt: candidate.formStartedAt.trim(),
     submittedAt: candidate.submittedAt.trim(),
     honeypot: isNonEmptyString(candidate.honeypot) ? candidate.honeypot.trim() : undefined,
   };
@@ -147,14 +150,14 @@ function formatTimestamp(value: string): string {
 }
 
 function getSubmissionDurationMs(payload: ContactEmailPayload): number | null {
-  const createdAt = new Date(payload.createdAt).getTime();
+  const formStartedAt = new Date(payload.formStartedAt).getTime();
   const submittedAt = new Date(payload.submittedAt).getTime();
 
-  if (Number.isNaN(createdAt) || Number.isNaN(submittedAt)) {
+  if (Number.isNaN(formStartedAt) || Number.isNaN(submittedAt)) {
     return null;
   }
 
-  return submittedAt - createdAt;
+  return submittedAt - formStartedAt;
 }
 
 function buildFieldRow(label: string, value: string): string {
@@ -312,7 +315,7 @@ Deno.serve(async (request) => {
       return jsonResponse(400, {
         message: "Invalid contact email payload.",
         code: "INVALID_PAYLOAD",
-        hint: "Provide leadId, name, email, phone, subject, createdAt, submittedAt, and sendMethod='email'.",
+        hint: "Provide leadId, name, email, phone, subject, createdAt, formStartedAt, submittedAt, and sendMethod='email'.",
       });
     }
 

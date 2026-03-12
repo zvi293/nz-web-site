@@ -162,6 +162,7 @@ const ContactSection = () => {
             subject: lead.subject,
             sendMethod: "email",
             createdAt: lead.createdAt,
+            formStartedAt,
             submittedAt: new Date().toISOString(),
             honeypot: honeypotRef.current?.value ?? "",
           });

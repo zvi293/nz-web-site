@@ -10,6 +10,7 @@ export interface ContactEmailPayload {
   subject: string;
   sendMethod: "email";
   createdAt: string;
+  formStartedAt: string;
   submittedAt: string;
   honeypot?: string;
 }
