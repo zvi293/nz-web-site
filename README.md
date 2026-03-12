@@ -1,6 +1,6 @@
 # NZ-web
 
-React + Vite + TypeScript frontend for the NZ-web studio site..
+React + Vite + TypeScript frontend for the NZ-web studio site.
 
 ## Local development
 
