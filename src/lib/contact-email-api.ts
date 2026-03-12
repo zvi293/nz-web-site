@@ -19,6 +19,36 @@ export class ContactEmailDeliveryError extends Error {
   }
 }
 
+async function formatContactEmailError(error: unknown): Promise<string> {
+  if (typeof error === "object" && error !== null && "context" in error && error.context instanceof Response) {
+    const response = error.context.clone();
+
+    try {
+      const body = (await response.json()) as Record<string, unknown>;
+      const details: string[] = [];
+
+      if (typeof body.message === "string") details.push(body.message);
+      if (typeof body.code === "string") details.push(`code: ${body.code}`);
+      if (typeof body.details === "string") details.push(`details: ${body.details}`);
+      if (typeof body.hint === "string") details.push(`hint: ${body.hint}`);
+      if (details.length > 0) {
+        return details.join(" | ");
+      }
+    } catch {
+      try {
+        const text = await response.text();
+        if (text.trim().length > 0) {
+          return text;
+        }
+      } catch {
+        // Fall through to generic formatting.
+      }
+    }
+  }
+
+  return formatRepositoryError(error);
+}
+
 export async function sendContactEmailNotification(payload: ContactEmailPayload): Promise<void> {
   try {
     const supabase = getSupabaseClient();
@@ -30,6 +60,6 @@ export async function sendContactEmailNotification(payload: ContactEmailPayload)
       throw error;
     }
   } catch (error) {
-    throw new ContactEmailDeliveryError(formatRepositoryError(error));
+    throw new ContactEmailDeliveryError(await formatContactEmailError(error));
   }
 }

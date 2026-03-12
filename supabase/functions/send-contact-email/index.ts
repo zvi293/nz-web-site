@@ -18,6 +18,7 @@ type ContactEmailPayload = {
 type JsonRecord = Record<string, unknown>;
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const displayEmailPattern = /^(?:.+<)?([^<>@\s]+@[^<>@\s]+\.[^<>@\s]+)>?$/;
 
 function jsonResponse(status: number, body: JsonRecord) {
   return new Response(JSON.stringify(body), {
@@ -35,6 +36,20 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isValidEmail(value: string): boolean {
   return emailPattern.test(value);
+}
+
+function extractEmailAddress(value: string): string | null {
+  const trimmed = value.trim();
+  if (isValidEmail(trimmed)) {
+    return trimmed;
+  }
+
+  const match = trimmed.match(displayEmailPattern);
+  if (!match) {
+    return null;
+  }
+
+  return isValidEmail(match[1]) ? match[1] : null;
 }
 
 function parsePayload(payload: unknown): ContactEmailPayload | null {
@@ -183,81 +198,122 @@ function buildTextEmail(payload: ContactEmailPayload): string {
 }
 
 Deno.serve(async (request) => {
-  if (request.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
-
-  if (request.method !== "POST") {
-    return jsonResponse(405, {
-      message: "Method not allowed",
-      code: "METHOD_NOT_ALLOWED",
-      hint: "Use POST when invoking send-contact-email.",
-    });
-  }
-
-  const resendApiKey = Deno.env.get("RESEND_API_KEY")?.trim();
-  const recipientEmail = Deno.env.get("CONTACT_NOTIFICATION_EMAIL")?.trim() || "nzweb295@gmail.com";
-  const senderEmail = Deno.env.get("CONTACT_EMAIL_FROM")?.trim() || "NZ WEB <onboarding@resend.dev>";
-
-  if (!resendApiKey) {
-    return jsonResponse(500, {
-      message: "Email delivery is not configured.",
-      code: "EMAIL_NOT_CONFIGURED",
-      details: "Missing RESEND_API_KEY secret for the send-contact-email function.",
-    });
-  }
-
-  let rawPayload: unknown;
-
   try {
-    rawPayload = await request.json();
-  } catch {
-    return jsonResponse(400, {
-      message: "Invalid JSON payload.",
-      code: "INVALID_JSON",
-      hint: "Submit a valid JSON body when invoking send-contact-email.",
+    if (request.method === "OPTIONS") {
+      return new Response("ok", { headers: corsHeaders });
+    }
+
+    if (request.method !== "POST") {
+      return jsonResponse(405, {
+        message: "Method not allowed",
+        code: "METHOD_NOT_ALLOWED",
+        hint: "Use POST when invoking send-contact-email.",
+      });
+    }
+
+    const resendApiKey = Deno.env.get("RESEND_API_KEY")?.trim();
+    const recipientEmail = Deno.env.get("CONTACT_NOTIFICATION_EMAIL")?.trim() || "nzweb295@gmail.com";
+    const senderEmail = Deno.env.get("CONTACT_EMAIL_FROM")?.trim();
+
+    if (!resendApiKey) {
+      return jsonResponse(500, {
+        message: "Email delivery is not configured.",
+        code: "EMAIL_NOT_CONFIGURED",
+        details: "Missing RESEND_API_KEY secret for the send-contact-email function.",
+      });
+    }
+
+    if (!senderEmail) {
+      return jsonResponse(500, {
+        message: "Email delivery sender is not configured.",
+        code: "EMAIL_FROM_NOT_CONFIGURED",
+        details: "Set CONTACT_EMAIL_FROM to a verified Resend sender, for example 'NZ WEB <noreply@your-domain.com>'.",
+      });
+    }
+
+    if (!extractEmailAddress(senderEmail)) {
+      return jsonResponse(500, {
+        message: "Email delivery sender is invalid.",
+        code: "EMAIL_FROM_INVALID",
+        details: "CONTACT_EMAIL_FROM must be a valid email or display-name format accepted by Resend.",
+      });
+    }
+
+    if (!isValidEmail(recipientEmail)) {
+      return jsonResponse(500, {
+        message: "Notification recipient email is invalid.",
+        code: "CONTACT_NOTIFICATION_EMAIL_INVALID",
+        details: "CONTACT_NOTIFICATION_EMAIL must be a valid email address.",
+      });
+    }
+
+    let rawPayload: unknown;
+
+    try {
+      rawPayload = await request.json();
+    } catch {
+      return jsonResponse(400, {
+        message: "Invalid JSON payload.",
+        code: "INVALID_JSON",
+        hint: "Submit a valid JSON body when invoking send-contact-email.",
+      });
+    }
+
+    const payload = parsePayload(rawPayload);
+
+    if (!payload) {
+      return jsonResponse(400, {
+        message: "Invalid contact email payload.",
+        code: "INVALID_PAYLOAD",
+        hint: "Provide leadId, name, email, phone, subject, createdAt, and sendMethod='email'.",
+      });
+    }
+
+    const resendRequestBody: Record<string, unknown> = {
+      from: senderEmail,
+      to: [recipientEmail],
+      subject: `פניית צור קשר חדשה | ${payload.name} | ${payload.subject}`,
+      html: buildHtmlEmail(payload),
+      text: buildTextEmail(payload),
+    };
+
+    if (isValidEmail(payload.email)) {
+      resendRequestBody.reply_to = payload.email;
+    }
+
+    const resendResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(resendRequestBody),
+    });
+
+    if (!resendResponse.ok) {
+      const resendBody = await resendResponse.text();
+      const providerErrorCode =
+        resendResponse.status === 401 || resendResponse.status === 403
+          ? "EMAIL_PROVIDER_AUTH_ERROR"
+          : resendResponse.status === 400 || resendResponse.status === 422
+            ? "EMAIL_PROVIDER_REJECTED"
+            : "EMAIL_PROVIDER_ERROR";
+
+      return jsonResponse(resendResponse.status >= 500 ? 502 : 500, {
+        message: "Email provider request failed.",
+        code: providerErrorCode,
+        details: resendBody,
+      });
+    }
+
+    return jsonResponse(200, { ok: true });
+  } catch (error) {
+    const details = error instanceof Error ? error.message : "Unknown error";
+
+    return jsonResponse(500, {
+      message: "Unexpected internal error while sending contact email.",
+      code: "EMAIL_INTERNAL_ERROR",
+      details,
     });
   }
-
-  const payload = parsePayload(rawPayload);
-
-  if (!payload) {
-    return jsonResponse(400, {
-      message: "Invalid contact email payload.",
-      code: "INVALID_PAYLOAD",
-      hint: "Provide leadId, name, email, phone, subject, createdAt, and sendMethod='email'.",
-    });
-  }
-
-  const resendRequestBody: Record<string, unknown> = {
-    from: senderEmail,
-    to: [recipientEmail],
-    subject: `פניית צור קשר חדשה | ${payload.name} | ${payload.subject}`,
-    html: buildHtmlEmail(payload),
-    text: buildTextEmail(payload),
-  };
-
-  if (isValidEmail(payload.email)) {
-    resendRequestBody.reply_to = payload.email;
-  }
-
-  const resendResponse = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(resendRequestBody),
-  });
-
-  if (!resendResponse.ok) {
-    const resendBody = await resendResponse.text();
-    return jsonResponse(502, {
-      message: "Email provider request failed.",
-      code: "EMAIL_PROVIDER_ERROR",
-      details: resendBody,
-    });
-  }
-
-  return jsonResponse(200, { ok: true });
 });
