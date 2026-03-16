@@ -118,6 +118,7 @@ const ClientLogosSection = () => {
       return;
     }
 
+    const mm = gsap.matchMedia();
     const ctx = gsap.context(() => {
       gsap.fromTo(
         inner,
@@ -130,24 +131,47 @@ const ClientLogosSection = () => {
         },
       );
 
-      gsap.fromTo(
-        sectionRef.current,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 85%",
-            toggleActions: "play none none reset",
+      mm.add("(max-width: 767px)", () => {
+        gsap.fromTo(
+          sectionRef.current,
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 92%",
+              once: true,
+              invalidateOnRefresh: true,
+            },
+            clearProps: "transform,opacity",
           },
-        },
-      );
+        );
+      });
+
+      mm.add("(min-width: 768px)", () => {
+        gsap.fromTo(
+          sectionRef.current,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 85%",
+              toggleActions: "play none none reset",
+            },
+          },
+        );
+      });
     }, sectionRef);
 
     return () => {
+      mm.revert();
       ctx.revert();
       Array.from(inner.querySelectorAll("[data-clone]")).forEach((el) => el.remove());
     };

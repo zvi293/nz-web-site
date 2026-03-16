@@ -9,14 +9,21 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
-    
-    // Refresh all ScrollTrigger instances after route change
-    const timer = setTimeout(() => {
-      ScrollTrigger.refresh(true);
-    }, 200);
+    window.scrollTo({ top: 0, behavior: "auto" });
 
-    return () => clearTimeout(timer);
+    let rafId = 0;
+    let nestedRafId = 0;
+
+    rafId = window.requestAnimationFrame(() => {
+      nestedRafId = window.requestAnimationFrame(() => {
+        ScrollTrigger.refresh(true);
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.cancelAnimationFrame(nestedRafId);
+    };
   }, [pathname]);
 
   return null;

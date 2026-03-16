@@ -289,23 +289,26 @@ const ServicesSection = () => {
 
   useEffect(() => {
     if (services.length === 0) return;
-    
+
+    rowRefs.current = rowRefs.current.slice(0, services.length);
+    blockRefs.current = blockRefs.current.slice(0, services.length);
+
+    const mm = gsap.matchMedia();
     const ctx = gsap.context(() => {
-      const mm = gsap.matchMedia();
 
       mm.add("(max-width: 767px)", () => {
         if (headerRef.current) {
           gsap.fromTo(
             headerRef.current,
-            { y: 36, opacity: 0 },
+            { y: 44, opacity: 0 },
             {
               y: 0,
               opacity: 1,
-              duration: 0.7,
-              ease: "power2.out",
+              duration: 0.85,
+              ease: "power3.out",
               scrollTrigger: {
                 trigger: headerRef.current,
-                start: "top 92%",
+                start: "top 94%",
                 once: true,
                 invalidateOnRefresh: true,
               },
@@ -313,41 +316,64 @@ const ServicesSection = () => {
           );
         }
 
-        blockRefs.current.forEach((block, i) => {
+        blockRefs.current.forEach((block) => {
           if (!block) return;
 
           const bgEl = block.querySelector("[data-block-bg]") as HTMLElement | null;
           const textBlock = block.querySelector("[data-text]") as HTMLElement | null;
           const imageBlock = block.querySelector("[data-image]") as HTMLElement | null;
-          const targets = [textBlock, imageBlock].filter((target): target is HTMLElement => Boolean(target));
 
           if (bgEl) {
             gsap.set(bgEl, { opacity: 1, scale: 1, clearProps: "transform" });
           }
 
-          if (targets.length === 0) return;
-
-          gsap.fromTo(
-            targets,
-            {
-              y: 28,
-              opacity: 0,
-            },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.65,
-              stagger: 0.1,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: block,
-                start: "top 90%",
-                once: true,
-                invalidateOnRefresh: true,
+          if (textBlock) {
+            gsap.fromTo(
+              textBlock,
+              {
+                y: 34,
+                opacity: 0,
               },
-              clearProps: "transform",
-            }
-          );
+              {
+                y: 0,
+                opacity: 1,
+                duration: 0.78,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: block,
+                  start: "top 93%",
+                  once: true,
+                  invalidateOnRefresh: true,
+                },
+                clearProps: "transform,opacity",
+              }
+            );
+          }
+
+          if (imageBlock) {
+            gsap.fromTo(
+              imageBlock,
+              {
+                y: 26,
+                opacity: 0,
+                scale: 0.965,
+              },
+              {
+                y: 0,
+                opacity: 1,
+                scale: 1,
+                duration: 0.9,
+                ease: "power2.out",
+                scrollTrigger: {
+                  trigger: block,
+                  start: "top 91%",
+                  once: true,
+                  invalidateOnRefresh: true,
+                },
+                clearProps: "transform,opacity",
+              }
+            );
+          }
         });
       });
 
@@ -437,11 +463,12 @@ const ServicesSection = () => {
           }
         });
       });
-
-      return () => mm.revert();
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      mm.revert();
+      ctx.revert();
+    };
   }, [services]);
 
   if (services.length === 0) {
