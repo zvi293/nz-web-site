@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { getCanonicalUrl } from "@/lib/site-url";
+import { getCanonicalUrl, getResolvedOgImageUrl } from "@/lib/site-url";
 import { useSiteSettings } from "@/lib/site-settings-api";
 
 export interface SeoMetaOptions {
@@ -21,7 +21,7 @@ export function useSeoMeta({ title, description, noindex = false }: SeoMetaOptio
 
   useEffect(() => {
     const canonicalUrl = getCanonicalUrl(window.location.pathname, settings.siteUrl);
-    const ogImageUrl = settings.seo.ogImage;
+    const ogImageUrl = getResolvedOgImageUrl(settings.siteUrl, settings.seo.ogImage);
 
     // --- Title ---
     const prevTitle = document.title;
