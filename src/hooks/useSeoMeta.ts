@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { getCanonicalUrl } from "@/lib/site-url";
+import { useSiteSettings } from "@/lib/site-settings-api";
 
 export interface SeoMetaOptions {
   title: string;
@@ -16,7 +17,12 @@ const DEFAULT_ROBOTS =
  * Googlebot renders JavaScript and picks up these dynamic values.
  */
 export function useSeoMeta({ title, description, noindex = false }: SeoMetaOptions): void {
+  const { settings } = useSiteSettings();
+
   useEffect(() => {
+    const canonicalUrl = getCanonicalUrl(window.location.pathname, settings.siteUrl);
+    const ogImageUrl = settings.seo.ogImage;
+
     // --- Title ---
     const prevTitle = document.title;
     document.title = title;
@@ -45,7 +51,32 @@ export function useSeoMeta({ title, description, noindex = false }: SeoMetaOptio
       document.head.appendChild(canonicalEl);
       createdCanonical = true;
     }
-    canonicalEl.setAttribute("href", getCanonicalUrl(window.location.pathname));
+    canonicalEl.setAttribute("href", canonicalUrl);
+
+    const metaRecords = [
+      { selector: 'meta[property="og:title"]', attr: "property", key: "og:title", value: title },
+      { selector: 'meta[property="og:description"]', attr: "property", key: "og:description", value: description ?? prevDesc ?? "" },
+      { selector: 'meta[property="og:url"]', attr: "property", key: "og:url", value: canonicalUrl },
+      { selector: 'meta[property="og:image"]', attr: "property", key: "og:image", value: ogImageUrl },
+      { selector: 'meta[name="twitter:title"]', attr: "name", key: "twitter:title", value: title },
+      { selector: 'meta[name="twitter:description"]', attr: "name", key: "twitter:description", value: description ?? prevDesc ?? "" },
+      { selector: 'meta[name="twitter:image"]', attr: "name", key: "twitter:image", value: ogImageUrl },
+    ].map(({ selector, attr, key, value }) => {
+      let element = document.querySelector<HTMLMetaElement>(selector);
+      let created = false;
+      const previous = element?.getAttribute("content") ?? null;
+
+      if (!element) {
+        element = document.createElement("meta");
+        element.setAttribute(attr, key);
+        document.head.appendChild(element);
+        created = true;
+      }
+
+      element.setAttribute("content", value);
+
+      return { element, created, previous };
+    });
 
     return () => {
       document.title = prevTitle;
@@ -60,6 +91,14 @@ export function useSeoMeta({ title, description, noindex = false }: SeoMetaOptio
       } else if (canonicalEl && prevCanonicalHref !== null) {
         canonicalEl.setAttribute("href", prevCanonicalHref);
       }
+
+      metaRecords.forEach(({ element, created, previous }) => {
+        if (created) {
+          element?.remove();
+        } else if (element && previous !== null) {
+          element.setAttribute("content", previous);
+        }
+      });
     };
-  }, [title, description, noindex]);
+  }, [title, description, noindex, settings.seo.ogImage, settings.siteUrl]);
 }
