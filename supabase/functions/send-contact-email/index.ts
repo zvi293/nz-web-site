@@ -10,6 +10,7 @@ type ContactEmailPayload = {
   email: string;
   phone: string;
   companyName?: string;
+  inquiryType?: string;
   subject: string;
   sendMethod: "email";
   createdAt: string;
@@ -117,6 +118,7 @@ function parsePayload(payload: unknown): ContactEmailPayload | null {
     email,
     phone: candidate.phone.trim(),
     companyName: isNonEmptyString(candidate.companyName) ? candidate.companyName.trim() : undefined,
+    inquiryType: isNonEmptyString(candidate.inquiryType) ? candidate.inquiryType.trim() : undefined,
     subject: candidate.subject.trim(),
     sendMethod: "email",
     createdAt: candidate.createdAt.trim(),
@@ -176,9 +178,11 @@ function buildReplyLink(email: string, subject: string): string {
 function buildHtmlEmail(payload: ContactEmailPayload): string {
   const createdAt = formatTimestamp(payload.createdAt);
   const companyName = payload.companyName ?? "לא נמסר";
+  const inquiryType = payload.inquiryType ?? "-";
   const replyLink = buildReplyLink(payload.email, payload.subject);
 
   const detailRows = [
+    buildFieldRow("סוג פנייה", inquiryType),
     buildFieldRow("שם מלא", payload.name),
     buildFieldRow("אימייל", payload.email),
     buildFieldRow("טלפון", payload.phone),
@@ -231,6 +235,7 @@ function buildHtmlEmail(payload: ContactEmailPayload): string {
 
 function buildTextEmail(payload: ContactEmailPayload): string {
   return [
+    `סוג פנייה: ${payload.inquiryType ?? "-"}`,
     "פניית צור קשר חדשה",
     "",
     `שם מלא: ${payload.name}`,

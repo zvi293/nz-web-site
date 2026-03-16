@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
+import { scrollToSelectorWithRetry } from "@/lib/scroll-navigation";
 import {
   Sheet,
   SheetContent,
@@ -28,6 +29,7 @@ const menuItems = [
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const logoRef = useRef<HTMLAnchorElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -98,14 +100,23 @@ const Header = () => {
                     navigate(link.href);
                     return;
                   }
-                  const isHomePage = window.location.pathname === "/";
-                  if (isHomePage) {
-                    const target = document.querySelector(link.href);
-                    if (target) {
-                      const headerOffset = window.innerWidth < 768 ? 56 : 100;
-                      const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
-                      window.scrollTo({ top, behavior: "smooth" });
+                  if (link.href === "#portfolio") {
+                    if (location.pathname === "/") {
+                      scrollToSelectorWithRetry(link.href);
+                    } else {
+                      navigate("/", {
+                        state: {
+                          scrollTo: "#portfolio",
+                          scrollNonce: Date.now(),
+                        },
+                      });
                     }
+                    return;
+                  }
+
+                  const isHomePage = location.pathname === "/";
+                  if (isHomePage) {
+                    scrollToSelectorWithRetry(link.href);
                   } else {
                     navigate("/" + link.href);
                   }

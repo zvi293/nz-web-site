@@ -60,26 +60,6 @@ const ContactCTA = () => {
         });
       }
 
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: "top 88%",
-        end: "bottom 12%",
-        onEnter: () => playEntrance(),
-        onEnterBack: () => playEntrance(),
-        onLeave: () => resetToHidden(),
-        onLeaveBack: () => resetToHidden(),
-      });
-
-      function resetToHidden() {
-        gsap.set(card, { y: 40, opacity: 0, scale: 0.95 });
-        if (glowLine) gsap.set(glowLine, { x: "-100%" });
-        if (icon) gsap.set(icon, { opacity: 0, scale: 0.5, rotation: -90 });
-        if (titles.length > 0) gsap.set(titles, { y: 30, opacity: 0 });
-        if (desc) gsap.set(desc, { y: 15, opacity: 0, filter: "blur(4px)" });
-        if (btn) gsap.set(btn, { y: 20, opacity: 0, scale: 0.9 });
-        if (sparkles.length > 0) gsap.set(sparkles, { scale: 0, opacity: 0 });
-      }
-
       function playEntrance() {
         const tl = gsap.timeline();
 
@@ -117,6 +97,8 @@ const ContactCTA = () => {
           }, "-=0.4");
         }
       }
+
+      playEntrance();
 
       // Floating + pulsing glow
       gsap.to(card, {

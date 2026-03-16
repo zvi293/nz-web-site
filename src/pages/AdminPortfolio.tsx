@@ -94,7 +94,7 @@ const AdminPortfolio = () => {
   const [deletedLeads, setDeletedLeads] = useState<Lead[]>([]);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ name: "", email: "", phone: "", companyName: "", subject: "", notes: "" });
+  const [editForm, setEditForm] = useState({ name: "", email: "", phone: "", companyName: "", inquiryType: "", subject: "", notes: "" });
 
   const refreshLeads = async () => {
     const [activeLeads, recycledLeads] = await Promise.all([fetchLeads(), fetchDeletedLeads()]);
@@ -1139,6 +1139,9 @@ const AdminPortfolio = () => {
                               <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {lead.phone}</span>
                               {lead.companyName && <span className="flex items-center gap-1.5"><Building2 className="h-3.5 w-3.5" /> {lead.companyName}</span>}
                             </div>
+                            {lead.inquiryType && (
+                              <p className="mb-2 text-xs text-muted-foreground">סוג פנייה: {lead.inquiryType}</p>
+                            )}
                             <p className="text-sm text-foreground/80 line-clamp-2">{lead.subject}</p>
                             <p className="text-xs text-muted-foreground mt-1">
                               {new Date(lead.createdAt).toLocaleDateString("he-IL", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
@@ -1377,6 +1380,13 @@ const AdminPortfolio = () => {
                     </div>
                   )}
 
+                  {selectedLead.inquiryType && (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><FileText className="h-3 w-3" /> סוג פנייה</p>
+                      <p className="text-sm text-foreground">{selectedLead.inquiryType}</p>
+                    </div>
+                  )}
+
                   <div>
                     <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><FileText className="h-3 w-3" /> נושא הפניה</p>
                     <p className="text-sm text-foreground bg-secondary/50 rounded-lg p-3">{selectedLead.subject}</p>
@@ -1404,6 +1414,7 @@ const AdminPortfolio = () => {
                         email: selectedLead.email,
                         phone: selectedLead.phone,
                         companyName: selectedLead.companyName || "",
+                        inquiryType: selectedLead.inquiryType || "",
                         subject: selectedLead.subject,
                         notes: selectedLead.notes || "",
                       });
@@ -1446,6 +1457,10 @@ const AdminPortfolio = () => {
                       <Label className="text-xs">חברה</Label>
                       <Input value={editForm.companyName} onChange={(e) => setEditForm({ ...editForm, companyName: e.target.value })} />
                     </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">סוג פנייה</Label>
+                    <Input value={editForm.inquiryType} onChange={(e) => setEditForm({ ...editForm, inquiryType: e.target.value })} placeholder="אופציונלי" />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">נושא הפניה</Label>

@@ -10,6 +10,7 @@ export interface Lead {
   email: string;
   phone: string;
   companyName?: string;
+  inquiryType?: string;
   subject: string;
   sendMethod: LeadSendMethod;
   status: LeadStatus;
@@ -39,6 +40,7 @@ function mapLeadRow(row: LeadRow): Lead {
     email: row.email,
     phone: row.phone,
     companyName: row.company_name ?? undefined,
+    inquiryType: row.inquiry_type ?? undefined,
     subject: row.subject,
     sendMethod: row.send_method,
     status: row.status === "pending" || row.status === "handled" || row.status === "rejected" ? row.status : "pending",
@@ -64,6 +66,7 @@ function mapLeadInsert(data: Omit<Lead, "id" | "status" | "createdAt" | "updated
     email: data.email.trim(),
     phone: data.phone.trim(),
     company_name: toNullableText(data.companyName),
+    inquiry_type: toNullableText(data.inquiryType),
     subject: data.subject.trim(),
     send_method: data.sendMethod,
     notes: toNullableText(data.notes),
@@ -71,7 +74,7 @@ function mapLeadInsert(data: Omit<Lead, "id" | "status" | "createdAt" | "updated
 }
 
 function mapLeadUpdate(
-  data: Partial<Pick<Lead, "name" | "email" | "phone" | "companyName" | "subject" | "notes" | "status">>,
+  data: Partial<Pick<Lead, "name" | "email" | "phone" | "companyName" | "inquiryType" | "subject" | "notes" | "status">>,
 ): LeadUpdate {
   const update: LeadUpdate = {};
 
@@ -79,6 +82,7 @@ function mapLeadUpdate(
   if (data.email !== undefined) update.email = data.email.trim();
   if (data.phone !== undefined) update.phone = data.phone.trim();
   if (data.companyName !== undefined) update.company_name = toNullableText(data.companyName);
+  if (data.inquiryType !== undefined) update.inquiry_type = toNullableText(data.inquiryType);
   if (data.subject !== undefined) update.subject = data.subject.trim();
   if (data.notes !== undefined) update.notes = toNullableText(data.notes);
   if (data.status !== undefined) update.status = data.status;
@@ -169,7 +173,7 @@ export async function updateLeadNotes(id: string, notes: string): Promise<Lead> 
 
 export async function updateLead(
   id: string,
-  data: Partial<Pick<Lead, "name" | "email" | "phone" | "companyName" | "subject" | "notes" | "status">>,
+  data: Partial<Pick<Lead, "name" | "email" | "phone" | "companyName" | "inquiryType" | "subject" | "notes" | "status">>,
 ): Promise<Lead> {
   try {
     const supabase = getSupabaseClient();

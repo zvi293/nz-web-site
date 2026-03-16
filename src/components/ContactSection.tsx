@@ -3,19 +3,44 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import { CheckCircle, Mail, MessageCircle, User, Phone, Building2, FileText } from "lucide-react";
+import {
+  CheckCircle,
+  Mail,
+  MessageCircle,
+  User,
+  Phone,
+  Building2,
+  FileText,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { addLead } from "@/lib/leads-api";
 import { sendContactEmailNotification } from "@/lib/contact-email-api";
 import { getWhatsAppHref, useContactInfo } from "@/lib/contact-utils";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
+
+const inquiryTypeOptions = [
+  "בניית אתר",
+  "אתר תדמית לעסק",
+  "אתר מכירות / חנות אונליין",
+  "שדרוג אתר קיים",
+  "דף נחיתה",
+  "מערכת ניהול תורים",
+  "קידום / שיווק",
+  "משהו אחר",
+] as const;
 
 const contactSchema = z.object({
   name: z
@@ -33,11 +58,18 @@ const contactSchema = z.object({
     .trim()
     .min(9, { message: "מספר טלפון חייב להכיל לפחות 9 ספרות" })
     .max(15, { message: "מספר טלפון חייב להיות עד 15 ספרות" })
-    .regex(/^[0-9\-+()\s]+$/, { message: "מספר טלפון יכול להכיל רק ספרות ותווים מיוחדים: +()-" }),
+    .regex(/^[0-9\-+()\s]+$/, {
+      message: "מספר טלפון יכול להכיל רק ספרות ותווים מיוחדים: +()-",
+    }),
   companyName: z
     .string()
     .trim()
     .max(100, { message: "שם החברה חייב להיות עד 100 תווים" })
+    .optional(),
+  inquiryType: z
+    .string()
+    .trim()
+    .max(80, { message: "סוג הפנייה חייב להיות עד 80 תווים" })
     .optional(),
   subject: z
     .string()
@@ -51,8 +83,12 @@ type ContactForm = z.infer<typeof contactSchema>;
 const ContactSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submissionWarning, setSubmissionWarning] = useState<string | null>(null);
-  const [sendMethod, setSendMethod] = useState<"whatsapp" | "email">("whatsapp");
+  const [submissionWarning, setSubmissionWarning] = useState<string | null>(
+    null,
+  );
+  const [sendMethod, setSendMethod] = useState<"whatsapp" | "email">(
+    "whatsapp",
+  );
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [formStartedAt] = useState(() => new Date().toISOString());
   const { toast } = useToast();
@@ -91,8 +127,12 @@ const ContactSection = () => {
       ];
 
       for (const blob of blobs) {
-        const cx = canvas.width * blob.x + Math.sin(time * blob.speed + blob.phase) * 120;
-        const cy = canvas.height * blob.y + Math.cos(time * blob.speed * 0.8 + blob.phase) * 90;
+        const cx =
+          canvas.width * blob.x +
+          Math.sin(time * blob.speed + blob.phase) * 120;
+        const cy =
+          canvas.height * blob.y +
+          Math.cos(time * blob.speed * 0.8 + blob.phase) * 90;
         const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, blob.r);
         gradient.addColorStop(0, "hsla(210, 70%, 70%, 0.35)");
         gradient.addColorStop(0.4, "hsla(210, 60%, 75%, 0.18)");
@@ -135,6 +175,7 @@ const ContactSection = () => {
         email: data.email,
         phone: data.phone,
         companyName: data.companyName,
+        inquiryType: data.inquiryType,
         subject: data.subject,
         sendMethod,
       });
@@ -149,7 +190,12 @@ const ContactSection = () => {
 
 אשמח לקבל מידע נוסף על השירותים שלכם.`;
 
-        const whatsappUrl = getWhatsAppHref(contact, message);
+        const whatsappUrl = getWhatsAppHref(
+          contact,
+          data.inquiryType
+            ? `${message}\nסוג פנייה: ${data.inquiryType}`
+            : message,
+        );
         window.open(whatsappUrl, "_blank");
       } else {
         try {
@@ -159,6 +205,7 @@ const ContactSection = () => {
             email: lead.email,
             phone: lead.phone,
             companyName: lead.companyName,
+            inquiryType: lead.inquiryType,
             subject: lead.subject,
             sendMethod: "email",
             createdAt: lead.createdAt,
@@ -202,7 +249,9 @@ const ContactSection = () => {
       }, 300);
 
       toast({
-        title: submissionNotice ? "הפנייה נשמרה במערכת" : "הפנייה נשלחה בהצלחה!",
+        title: submissionNotice
+          ? "הפנייה נשמרה במערכת"
+          : "הפנייה נשלחה בהצלחה!",
         description: submissionNotice ?? "אנחנו ניצור איתך קשר בהקדם האפשרי.",
         variant: submissionNotice ? "destructive" : "default",
       });
@@ -224,13 +273,22 @@ const ContactSection = () => {
 
   if (isSubmitted) {
     return (
-      <section id="contact" aria-label="צור קשר" className="py-16 px-4" dir="rtl">
+      <section
+        id="contact"
+        aria-label="צור קשר"
+        className="py-16 px-4"
+        dir="rtl"
+      >
         <div className="container mx-auto max-w-4xl">
           <Card className="border-emerald-200 bg-emerald-50 shadow-lg">
             <CardContent className="py-12 text-center">
               <CheckCircle className="mx-auto mb-4 h-16 w-16 text-emerald-600" />
-              <h3 className="mb-2 text-2xl font-bold text-emerald-800">הפנייה נשלחה בהצלחה!</h3>
-              <p className="text-emerald-700">{submissionWarning ?? "אנחנו ניצור איתך קשר בהקדם האפשרי."}</p>
+              <h3 className="mb-2 text-2xl font-bold text-emerald-800">
+                הפנייה נשלחה בהצלחה!
+              </h3>
+              <p className="text-emerald-700">
+                {submissionWarning ?? "אנחנו ניצור איתך קשר בהקדם האפשרי."}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -239,8 +297,17 @@ const ContactSection = () => {
   }
 
   return (
-    <section id="contact" aria-label="צור קשר" className="relative overflow-hidden bg-secondary/20 px-4 py-16" dir="rtl">
-      <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 z-0 h-full w-full" aria-hidden="true" />
+    <section
+      id="contact"
+      aria-label="צור קשר"
+      className="relative overflow-hidden bg-secondary/20 px-4 py-16"
+      dir="rtl"
+    >
+      <canvas
+        ref={canvasRef}
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full"
+        aria-hidden="true"
+      />
       <div className="container relative z-10 mx-auto max-w-4xl">
         <motion.div
           className="mb-12 text-center"
@@ -249,7 +316,9 @@ const ContactSection = () => {
           viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="mb-4 text-3xl font-bold text-foreground lg:text-4xl">צור קשר</h2>
+          <h2 className="mb-4 text-3xl font-bold text-foreground lg:text-4xl">
+            צור קשר
+          </h2>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
             מעוניין בשירותים שלנו? השאר פרטים ואנחנו ניצור איתך קשר
           </p>
@@ -263,8 +332,12 @@ const ContactSection = () => {
         >
           <Card className="border-border/50 bg-card/95 shadow-2xl backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-center text-xl">פרטי יצירת קשר</CardTitle>
-              <CardDescription className="text-center">מלא את הטופס ואנחנו ניצור איתך קשר</CardDescription>
+              <CardTitle className="text-center text-xl">
+                פרטי יצירת קשר
+              </CardTitle>
+              <CardDescription className="text-center">
+                מלא את הטופס ואנחנו ניצור איתך קשר
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <motion.div
@@ -274,7 +347,9 @@ const ContactSection = () => {
                 viewport={{ once: false }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
-                <Label className="mb-3 block text-sm font-medium">בחר אופן קבלת הפנייה:</Label>
+                <Label className="mb-3 block text-sm font-medium">
+                  בחר אופן קבלת הפנייה:
+                </Label>
                 <div className="flex gap-2">
                   <Button
                     type="button"
@@ -298,8 +373,21 @@ const ContactSection = () => {
               </motion.div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <input ref={honeypotRef} type="text" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" defaultValue="" />
-                <input type="hidden" name="formStartedAt" value={formStartedAt} readOnly />
+                <input
+                  ref={honeypotRef}
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  className="hidden"
+                  aria-hidden="true"
+                  defaultValue=""
+                />
+                <input
+                  type="hidden"
+                  name="formStartedAt"
+                  value={formStartedAt}
+                  readOnly
+                />
 
                 <motion.div
                   className="grid grid-cols-1 gap-6 md:grid-cols-2"
@@ -309,7 +397,10 @@ const ContactSection = () => {
                   transition={{ duration: 0.5, delay: 0.4 }}
                 >
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="flex items-center gap-2 text-sm font-medium">
+                    <Label
+                      htmlFor="name"
+                      className="flex items-center gap-2 text-sm font-medium"
+                    >
                       <User className="h-4 w-4 text-primary" />
                       שם מלא <span className="text-destructive">*</span>
                     </Label>
@@ -322,11 +413,18 @@ const ContactSection = () => {
                       />
                       <User className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
                     </div>
-                    {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+                    {errors.name && (
+                      <p className="text-sm text-destructive">
+                        {errors.name.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-2 text-sm font-medium">
+                    <Label
+                      htmlFor="email"
+                      className="flex items-center gap-2 text-sm font-medium"
+                    >
                       <Mail className="h-4 w-4 text-primary" />
                       אימייל <span className="text-destructive">*</span>
                     </Label>
@@ -340,7 +438,11 @@ const ContactSection = () => {
                       />
                       <Mail className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
                     </div>
-                    {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+                    {errors.email && (
+                      <p className="text-sm text-destructive">
+                        {errors.email.message}
+                      </p>
+                    )}
                   </div>
                 </motion.div>
 
@@ -352,7 +454,10 @@ const ContactSection = () => {
                   transition={{ duration: 0.5, delay: 0.5 }}
                 >
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="flex items-center gap-2 text-sm font-medium">
+                    <Label
+                      htmlFor="phone"
+                      className="flex items-center gap-2 text-sm font-medium"
+                    >
                       <Phone className="h-4 w-4 text-primary" />
                       טלפון <span className="text-destructive">*</span>
                     </Label>
@@ -365,11 +470,18 @@ const ContactSection = () => {
                       />
                       <Phone className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
                     </div>
-                    {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
+                    {errors.phone && (
+                      <p className="text-sm text-destructive">
+                        {errors.phone.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="companyName" className="flex items-center gap-2 text-sm font-medium">
+                    <Label
+                      htmlFor="companyName"
+                      className="flex items-center gap-2 text-sm font-medium"
+                    >
                       <Building2 className="h-4 w-4 text-primary" />
                       שם החברה / עסק
                     </Label>
@@ -382,8 +494,49 @@ const ContactSection = () => {
                       />
                       <Building2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
                     </div>
-                    {errors.companyName && <p className="text-sm text-destructive">{errors.companyName.message}</p>}
+                    {errors.companyName && (
+                      <p className="text-sm text-destructive">
+                        {errors.companyName.message}
+                      </p>
+                    )}
                   </div>
+                </motion.div>
+
+                <motion.div
+                  className="space-y-2"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false }}
+                  transition={{ duration: 0.5, delay: 0.55 }}
+                >
+                  <Label
+                    htmlFor="inquiryType"
+                    className="flex items-center gap-2 text-sm font-medium"
+                  >
+                    <FileText className="h-4 w-4 text-primary" />
+                    אני מעוניין ב־
+                  </Label>
+                  <div className="relative">
+                    <select
+                      id="inquiryType"
+                      {...register("inquiryType")}
+                      defaultValue=""
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm ring-offset-background transition-shadow duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus:shadow-md focus:shadow-primary/10"
+                    >
+                      <option value="">בחרו אם רלוונטי</option>
+                      {inquiryTypeOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                    <FileText className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
+                  </div>
+                  {errors.inquiryType && (
+                    <p className="text-sm text-destructive">
+                      {errors.inquiryType.message}
+                    </p>
+                  )}
                 </motion.div>
 
                 <motion.div
@@ -393,7 +546,10 @@ const ContactSection = () => {
                   viewport={{ once: false }}
                   transition={{ duration: 0.5, delay: 0.6 }}
                 >
-                  <Label htmlFor="subject" className="flex items-center gap-2 text-sm font-medium">
+                  <Label
+                    htmlFor="subject"
+                    className="flex items-center gap-2 text-sm font-medium"
+                  >
                     <FileText className="h-4 w-4 text-primary" />
                     נושא הפנייה <span className="text-destructive">*</span>
                   </Label>
@@ -407,7 +563,11 @@ const ContactSection = () => {
                     />
                     <FileText className="absolute right-3 top-3 h-4 w-4 text-muted-foreground/50" />
                   </div>
-                  {errors.subject && <p className="text-sm text-destructive">{errors.subject.message}</p>}
+                  {errors.subject && (
+                    <p className="text-sm text-destructive">
+                      {errors.subject.message}
+                    </p>
+                  )}
                 </motion.div>
 
                 <motion.div
@@ -417,10 +577,24 @@ const ContactSection = () => {
                   viewport={{ once: false }}
                   transition={{ duration: 0.5, delay: 0.65 }}
                 >
-                  <Checkbox id="terms" checked={acceptedTerms} onCheckedChange={(checked) => setAcceptedTerms(checked === true)} className="mt-0.5" />
-                  <Label htmlFor="terms" className="cursor-pointer leading-relaxed text-muted-foreground text-sm">
+                  <Checkbox
+                    id="terms"
+                    checked={acceptedTerms}
+                    onCheckedChange={(checked) =>
+                      setAcceptedTerms(checked === true)
+                    }
+                    className="mt-0.5"
+                  />
+                  <Label
+                    htmlFor="terms"
+                    className="cursor-pointer leading-relaxed text-muted-foreground text-sm"
+                  >
                     קראתי ואני מאשר/ת את{" "}
-                    <Link to="/terms" className="font-medium text-primary hover:underline" target="_blank">
+                    <Link
+                      to="/terms"
+                      className="font-medium text-primary hover:underline"
+                      target="_blank"
+                    >
                       תנאי השימוש
                     </Link>
                   </Label>
@@ -438,8 +612,14 @@ const ContactSection = () => {
                     className="w-full gap-2 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
                     disabled={!isValid || isSubmitting || !acceptedTerms}
                   >
-                    {sendMethod === "whatsapp" ? <MessageCircle className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
-                    {isSubmitting ? "שולח..." : `שלח פנייה ${sendMethod === "whatsapp" ? "בוואטסאפ" : "באימייל"}`}
+                    {sendMethod === "whatsapp" ? (
+                      <MessageCircle className="h-4 w-4" />
+                    ) : (
+                      <Mail className="h-4 w-4" />
+                    )}
+                    {isSubmitting
+                      ? "שולח..."
+                      : `שלח פנייה ${sendMethod === "whatsapp" ? "בוואטסאפ" : "באימייל"}`}
                   </Button>
 
                   <p className="mt-4 text-center text-xs text-muted-foreground">

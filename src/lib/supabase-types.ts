@@ -266,6 +266,7 @@ export interface Database {
           email: string;
           phone: string;
           company_name: string | null;
+          inquiry_type: string | null;
           subject: string;
           send_method: LeadSendMethodValue;
           status: LeadStatusValue;
@@ -280,6 +281,7 @@ export interface Database {
           email: string;
           phone: string;
           company_name?: string | null;
+          inquiry_type?: string | null;
           subject: string;
           send_method: LeadSendMethodValue;
           status?: LeadStatusValue;
@@ -294,6 +296,7 @@ export interface Database {
           email?: string;
           phone?: string;
           company_name?: string | null;
+          inquiry_type?: string | null;
           subject?: string;
           send_method?: LeadSendMethodValue;
           status?: LeadStatusValue;

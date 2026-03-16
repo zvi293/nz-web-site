@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import AmbientShapes from "@/components/AmbientShapes";
@@ -11,9 +11,11 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
+import { scrollToSelectorWithRetry } from "@/lib/scroll-navigation";
 
 const Index = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   useSeoMeta({
     title: "NZ-web | פיתוח אתרים, UI/UX ואוטומציות AI",
@@ -23,22 +25,29 @@ const Index = () => {
 
   useEffect(() => {
     if (location.hash) {
-      setTimeout(() => {
-        const el = document.querySelector(location.hash);
-        if (el) {
-          const headerOffset = window.innerWidth < 768 ? 56 : 100;
-          const top = el.getBoundingClientRect().top + window.scrollY - headerOffset;
-          window.scrollTo({ top, behavior: "smooth" });
-        }
-      }, 100);
+      return scrollToSelectorWithRetry(location.hash);
     }
-  }, [location]);
+  }, [location.hash]);
+
+  useEffect(() => {
+    if (location.state && typeof location.state === "object" && "scrollTo" in location.state) {
+      const scrollTo = location.state.scrollTo;
+      if (typeof scrollTo === "string") {
+        return scrollToSelectorWithRetry(scrollTo, {
+          onSuccess: () => {
+            navigate(location.pathname + location.hash, { replace: true, state: null });
+          },
+        });
+      }
+    }
+  }, [location.hash, location.pathname, location.state, navigate]);
   return (
     <main key={location.key} className="relative bg-background pt-[72px]">
       <AmbientShapes />
       <Header />
       <HeroSection />
       <ServicesSection />
+      <div id="portfolio" aria-hidden="true" />
       <PortfolioSection />
       <ClientLogosSection />
       <ContactCTA />

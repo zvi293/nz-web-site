@@ -89,7 +89,6 @@ const PortfolioSection = () => {
   return (
     <section
       ref={sectionRef}
-      id="portfolio"
       dir="rtl"
       className="bg-background py-20 md:py-28 lg:py-36"
     >

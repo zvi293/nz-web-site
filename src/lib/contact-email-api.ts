@@ -7,6 +7,7 @@ export interface ContactEmailPayload {
   email: string;
   phone: string;
   companyName?: string;
+  inquiryType?: string;
   subject: string;
   sendMethod: "email";
   createdAt: string;
