@@ -42,6 +42,10 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
 function isValidEmail(value: string): boolean {
   return emailPattern.test(value);
 }
@@ -98,7 +102,7 @@ function parsePayload(payload: unknown): ContactEmailPayload | null {
     !isNonEmptyString(candidate.name) ||
     !isNonEmptyString(candidate.email) ||
     !isNonEmptyString(candidate.phone) ||
-    !isNonEmptyString(candidate.subject) ||
+    !isString(candidate.subject) ||
     !isNonEmptyString(candidate.createdAt) ||
     !isNonEmptyString(candidate.formStartedAt) ||
     !isNonEmptyString(candidate.submittedAt) ||
@@ -171,7 +175,7 @@ function buildFieldRow(label: string, value: string): string {
 }
 
 function buildReplyLink(email: string, subject: string): string {
-  const replySubject = encodeURIComponent(`Re: ${subject}`);
+  const replySubject = encodeURIComponent(`Re: ${subject || "פנייה מהאתר"}`);
   return `mailto:${encodeURIComponent(email)}?subject=${replySubject}`;
 }
 
@@ -179,6 +183,7 @@ function buildHtmlEmail(payload: ContactEmailPayload): string {
   const createdAt = formatTimestamp(payload.createdAt);
   const companyName = payload.companyName ?? "לא נמסר";
   const inquiryType = payload.inquiryType ?? "-";
+  const subject = payload.subject || "-";
   const replyLink = buildReplyLink(payload.email, payload.subject);
 
   const detailRows = [
@@ -204,7 +209,7 @@ function buildHtmlEmail(payload: ContactEmailPayload): string {
         <div style="padding:24px;background:#ffffff;">
           <div style="margin-bottom:20px;border:1px solid #dbeafe;background:linear-gradient(180deg,#eff6ff 0%,#f8fbff 100%);border-radius:16px;padding:18px;">
             <div style="font-size:12px;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:0.08em;">נושא הפנייה</div>
-            <div style="margin-top:8px;font-size:22px;font-weight:700;line-height:1.5;color:#0f172a;">${escapeHtml(payload.subject)}</div>
+            <div style="margin-top:8px;font-size:22px;font-weight:700;line-height:1.5;color:#0f172a;">${escapeHtml(subject)}</div>
           </div>
 
           <div style="margin-bottom:20px;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
@@ -216,7 +221,7 @@ function buildHtmlEmail(payload: ContactEmailPayload): string {
 
           <div style="margin-bottom:20px;border:1px solid #e2e8f0;border-radius:16px;padding:20px;background:#f8fafc;">
             <div style="margin-bottom:10px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.08em;">תוכן הפנייה</div>
-            <div style="font-size:16px;line-height:1.9;color:#0f172a;white-space:pre-wrap;">${escapeHtml(payload.subject)}</div>
+            <div style="font-size:16px;line-height:1.9;color:#0f172a;white-space:pre-wrap;">${escapeHtml(subject)}</div>
           </div>
 
           <div style="margin-top:24px;border-top:1px solid #e2e8f0;padding-top:24px;text-align:center;">
@@ -242,8 +247,8 @@ function buildTextEmail(payload: ContactEmailPayload): string {
     `אימייל: ${payload.email}`,
     `טלפון: ${payload.phone}`,
     `שם חברה / עסק: ${payload.companyName ?? "לא נמסר"}`,
-    `נושא הפנייה: ${payload.subject}`,
-    `תוכן הפנייה: ${payload.subject}`,
+    `נושא הפנייה: ${payload.subject || "-"}`,
+    `תוכן הפנייה: ${payload.subject || "-"}`,
     "אופן פנייה: אימייל",
     `נשלח בתאריך: ${formatTimestamp(payload.createdAt)}`,
     `Lead ID: ${payload.leadId}`,
@@ -320,7 +325,7 @@ Deno.serve(async (request) => {
       return jsonResponse(400, {
         message: "Invalid contact email payload.",
         code: "INVALID_PAYLOAD",
-        hint: "Provide leadId, name, email, phone, subject, createdAt, formStartedAt, submittedAt, and sendMethod='email'.",
+        hint: "Provide leadId, name, email, phone, subject (empty allowed), createdAt, formStartedAt, submittedAt, and sendMethod='email'.",
       });
     }
 
@@ -364,7 +369,7 @@ Deno.serve(async (request) => {
     const resendRequestBody: Record<string, unknown> = {
       from: senderEmail,
       to: [recipientEmail],
-      subject: `פניית צור קשר חדשה | ${payload.name} | ${payload.subject}`,
+      subject: `פניית צור קשר חדשה | ${payload.name} | ${payload.subject || "ללא נושא"}`,
       html: buildHtmlEmail(payload),
       text: buildTextEmail(payload),
     };

@@ -79,7 +79,6 @@ const contactSchema = z
     subject: z
       .string()
       .trim()
-      .min(5, { message: "נושא הפנייה חייב להכיל לפחות 5 תווים" })
       .max(200, { message: "נושא הפנייה חייב להיות עד 200 תווים" }),
   })
   .superRefine((data, ctx) => {
@@ -229,6 +228,7 @@ const ContactSection = () => {
         effectiveSendMethod === "email"
           ? data.email?.trim() ?? ""
           : undefined;
+      const subject = data.subject.trim();
 
       const lead = await addLead({
         name: data.name,
@@ -236,16 +236,15 @@ const ContactSection = () => {
         phone: data.phone,
         companyName: data.companyName,
         inquiryType: data.inquiryType,
-        subject: data.subject,
+        subject,
         sendMethod: effectiveSendMethod,
       });
 
       if (effectiveSendMethod === "whatsapp") {
+        const subjectLine = subject ? `\n\nנושא הפנייה: ${subject}` : "";
         const message = `שלום! אני ${data.name}${data.companyName ? ` מחברת ${data.companyName}` : ""}.
 
-טלפון: ${data.phone}
-
-נושא הפנייה: ${data.subject}
+טלפון: ${data.phone}${subjectLine}
 
 אשמח לקבל מידע נוסף על השירותים שלכם.`;
 
@@ -265,7 +264,7 @@ const ContactSection = () => {
             phone: lead.phone,
             companyName: lead.companyName,
             inquiryType: lead.inquiryType,
-            subject: lead.subject,
+            subject: lead.subject || "",
             sendMethod: "email",
             createdAt: lead.createdAt,
             formStartedAt,
@@ -622,7 +621,7 @@ const ContactSection = () => {
                     className="flex items-center gap-2 text-sm font-medium"
                   >
                     <FileText className="h-4 w-4 text-primary" />
-                    נושא הפנייה <span className="text-destructive">*</span>
+                    נושא הפנייה
                   </Label>
                   <div className="relative">
                     <Textarea
