@@ -107,6 +107,25 @@ function mapLeadInsert(data: Omit<Lead, "id" | "status" | "createdAt" | "updated
   };
 }
 
+function createLocalLead(data: Omit<Lead, "id" | "status" | "createdAt" | "updatedAt">): Lead {
+  const now = new Date().toISOString();
+
+  return {
+    id: crypto.randomUUID(),
+    name: data.name.trim(),
+    email: toNullableText(data.email) ?? undefined,
+    phone: data.phone.trim(),
+    companyName: toNullableText(data.companyName) ?? undefined,
+    inquiryType: toNullableText(data.inquiryType) ?? undefined,
+    subject: data.subject.trim() || "ללא נושא",
+    sendMethod: data.sendMethod,
+    status: "pending",
+    createdAt: now,
+    updatedAt: now,
+    notes: toNullableText(data.notes) ?? undefined,
+  };
+}
+
 function mapLeadUpdate(
   data: Partial<Pick<Lead, "name" | "email" | "phone" | "companyName" | "inquiryType" | "subject" | "notes" | "status">>,
 ): LeadUpdate {
@@ -178,12 +197,17 @@ export async function fetchDeletedLeads(): Promise<Lead[]> {
 export async function addLead(data: Omit<Lead, "id" | "status" | "createdAt" | "updatedAt">): Promise<Lead> {
   try {
     const supabase = getSupabaseClient();
-    const insertPayload = mapLeadInsert(data);
-    const { data: row, error } = await supabase
+    const lead = createLocalLead(data);
+    const insertPayload: LeadInsert = {
+      ...mapLeadInsert(data),
+      id: lead.id,
+      created_at: lead.createdAt,
+      updated_at: lead.updatedAt,
+      status: lead.status,
+    };
+    const { error } = await supabase
       .from("leads")
       .insert(insertPayload)
-      .select("*")
-      .single();
 
     if (error) {
       logLeadRepositoryError("create a lead", error, {
@@ -192,7 +216,7 @@ export async function addLead(data: Omit<Lead, "id" | "status" | "createdAt" | "
       throw error;
     }
 
-    return mapLeadRow(row);
+    return lead;
   } catch (error) {
     return wrapLeadError("create a lead", error);
   }
