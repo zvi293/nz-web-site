@@ -42,41 +42,69 @@ const inquiryTypeOptions = [
   "משהו אחר",
 ] as const;
 
-const contactSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, { message: "השם חייב להכיל לפחות 2 תווים" })
-    .max(50, { message: "השם חייב להיות עד 50 תווים" }),
-  email: z
-    .string()
-    .trim()
-    .email({ message: "כתובת אימייל לא תקינה" })
-    .max(100, { message: "כתובת האימייל חייבת להיות עד 100 תווים" }),
-  phone: z
-    .string()
-    .trim()
-    .min(9, { message: "מספר טלפון חייב להכיל לפחות 9 ספרות" })
-    .max(15, { message: "מספר טלפון חייב להיות עד 15 ספרות" })
-    .regex(/^[0-9\-+()\s]+$/, {
-      message: "מספר טלפון יכול להכיל רק ספרות ותווים מיוחדים: +()-",
-    }),
-  companyName: z
-    .string()
-    .trim()
-    .max(100, { message: "שם החברה חייב להיות עד 100 תווים" })
-    .optional(),
-  inquiryType: z
-    .string()
-    .trim()
-    .max(80, { message: "סוג הפנייה חייב להיות עד 80 תווים" })
-    .optional(),
-  subject: z
-    .string()
-    .trim()
-    .min(5, { message: "נושא הפנייה חייב להכיל לפחות 5 תווים" })
-    .max(200, { message: "נושא הפנייה חייב להיות עד 200 תווים" }),
-});
+const emailFieldSchema = z
+  .string()
+  .trim()
+  .max(100, { message: "כתובת האימייל חייבת להיות עד 100 תווים" })
+  .optional()
+  .or(z.literal(""));
+
+const contactSchema = z
+  .object({
+    sendMethod: z.enum(["whatsapp", "email"]),
+    name: z
+      .string()
+      .trim()
+      .min(2, { message: "השם חייב להכיל לפחות 2 תווים" })
+      .max(50, { message: "השם חייב להיות עד 50 תווים" }),
+    email: emailFieldSchema,
+    phone: z
+      .string()
+      .trim()
+      .min(9, { message: "מספר טלפון חייב להכיל לפחות 9 ספרות" })
+      .max(15, { message: "מספר טלפון חייב להיות עד 15 ספרות" })
+      .regex(/^[0-9\-+()\s]+$/, {
+        message: "מספר טלפון יכול להכיל רק ספרות ותווים מיוחדים: +()-",
+      }),
+    companyName: z
+      .string()
+      .trim()
+      .max(100, { message: "שם החברה חייב להיות עד 100 תווים" })
+      .optional(),
+    inquiryType: z
+      .string()
+      .trim()
+      .max(80, { message: "סוג הפנייה חייב להיות עד 80 תווים" })
+      .optional(),
+    subject: z
+      .string()
+      .trim()
+      .min(5, { message: "נושא הפנייה חייב להכיל לפחות 5 תווים" })
+      .max(200, { message: "נושא הפנייה חייב להיות עד 200 תווים" }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.sendMethod !== "email") {
+      return;
+    }
+
+    const email = data.email?.trim() ?? "";
+    if (!email) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["email"],
+        message: "כתובת אימייל חייבת",
+      });
+      return;
+    }
+
+    if (!z.string().email().safeParse(email).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["email"],
+        message: "כתובת אימייל לא תקינה",
+      });
+    }
+  });
 
 type ContactForm = z.infer<typeof contactSchema>;
 
@@ -157,11 +185,38 @@ const ContactSection = () => {
     register,
     handleSubmit,
     reset,
+    setValue,
+    clearErrors,
     formState: { errors, isValid },
   } = useForm<ContactForm>({
     resolver: zodResolver(contactSchema),
     mode: "onChange",
+    shouldUnregister: true,
+    defaultValues: {
+      sendMethod: "whatsapp",
+      name: "",
+      email: "",
+      phone: "",
+      companyName: "",
+      inquiryType: "",
+      subject: "",
+    },
   });
+
+  useEffect(() => {
+    setValue("sendMethod", sendMethod, {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+
+    if (sendMethod === "whatsapp") {
+      setValue("email", "", {
+        shouldDirty: false,
+        shouldValidate: false,
+      });
+      clearErrors("email");
+    }
+  }, [clearErrors, sendMethod, setValue]);
 
   const onSubmit = async (data: ContactForm) => {
     setIsSubmitting(true);
@@ -169,21 +224,25 @@ const ContactSection = () => {
 
     try {
       let submissionNotice: string | null = null;
+      const effectiveSendMethod = data.sendMethod;
+      const leadEmail =
+        effectiveSendMethod === "email"
+          ? data.email?.trim() ?? ""
+          : undefined;
 
       const lead = await addLead({
         name: data.name,
-        email: data.email,
+        email: leadEmail,
         phone: data.phone,
         companyName: data.companyName,
         inquiryType: data.inquiryType,
         subject: data.subject,
-        sendMethod,
+        sendMethod: effectiveSendMethod,
       });
 
-      if (sendMethod === "whatsapp") {
+      if (effectiveSendMethod === "whatsapp") {
         const message = `שלום! אני ${data.name}${data.companyName ? ` מחברת ${data.companyName}` : ""}.
 
-אימייל: ${data.email}
 טלפון: ${data.phone}
 
 נושא הפנייה: ${data.subject}
@@ -224,7 +283,16 @@ const ContactSection = () => {
       }
 
       setIsSubmitted(true);
-      reset();
+      reset({
+        sendMethod: "whatsapp",
+        name: "",
+        email: "",
+        phone: "",
+        companyName: "",
+        inquiryType: "",
+        subject: "",
+      });
+      setSendMethod("whatsapp");
 
       confetti({
         particleCount: 120,
@@ -388,9 +456,10 @@ const ContactSection = () => {
                   value={formStartedAt}
                   readOnly
                 />
+                <input type="hidden" {...register("sendMethod")} />
 
                 <motion.div
-                  className="grid grid-cols-1 gap-6 md:grid-cols-2"
+                  className={`grid grid-cols-1 gap-6 ${sendMethod === "email" ? "md:grid-cols-2" : ""}`}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
@@ -420,30 +489,32 @@ const ContactSection = () => {
                     )}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="email"
-                      className="flex items-center gap-2 text-sm font-medium"
-                    >
-                      <Mail className="h-4 w-4 text-primary" />
-                      אימייל <span className="text-destructive">*</span>
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="email"
-                        type="email"
-                        {...register("email")}
-                        placeholder="your@email.com"
-                        className={`pr-10 transition-shadow duration-300 focus:shadow-md focus:shadow-primary/10 ${errors.email ? "border-destructive" : ""}`}
-                      />
-                      <Mail className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
+                  {sendMethod === "email" && (
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="email"
+                        className="flex items-center gap-2 text-sm font-medium"
+                      >
+                        <Mail className="h-4 w-4 text-primary" />
+                        אימייל <span className="text-destructive">*</span>
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="email"
+                          type="email"
+                          {...register("email")}
+                          placeholder="your@email.com"
+                          className={`pr-10 transition-shadow duration-300 focus:shadow-md focus:shadow-primary/10 ${errors.email ? "border-destructive" : ""}`}
+                        />
+                        <Mail className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
+                      </div>
+                      {errors.email && (
+                        <p className="text-sm text-destructive">
+                          {errors.email.message}
+                        </p>
+                      )}
                     </div>
-                    {errors.email && (
-                      <p className="text-sm text-destructive">
-                        {errors.email.message}
-                      </p>
-                    )}
-                  </div>
+                  )}
                 </motion.div>
 
                 <motion.div

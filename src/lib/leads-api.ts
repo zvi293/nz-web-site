@@ -7,7 +7,7 @@ export type LeadSendMethod = Database["public"]["Tables"]["leads"]["Row"]["send_
 export interface Lead {
   id: string;
   name: string;
-  email: string;
+  email?: string;
   phone: string;
   companyName?: string;
   inquiryType?: string;
@@ -37,7 +37,7 @@ function mapLeadRow(row: LeadRow): Lead {
   return {
     id: row.id,
     name: row.name,
-    email: row.email,
+    email: row.email ?? undefined,
     phone: row.phone,
     companyName: row.company_name ?? undefined,
     inquiryType: row.inquiry_type ?? undefined,
@@ -63,7 +63,7 @@ function toNullableText(value?: string): string | null {
 function mapLeadInsert(data: Omit<Lead, "id" | "status" | "createdAt" | "updatedAt">): LeadInsert {
   return {
     name: data.name.trim(),
-    email: data.email.trim(),
+    email: toNullableText(data.email),
     phone: data.phone.trim(),
     company_name: toNullableText(data.companyName),
     inquiry_type: toNullableText(data.inquiryType),
@@ -79,7 +79,7 @@ function mapLeadUpdate(
   const update: LeadUpdate = {};
 
   if (data.name !== undefined) update.name = data.name.trim();
-  if (data.email !== undefined) update.email = data.email.trim();
+  if (data.email !== undefined) update.email = toNullableText(data.email);
   if (data.phone !== undefined) update.phone = data.phone.trim();
   if (data.companyName !== undefined) update.company_name = toNullableText(data.companyName);
   if (data.inquiryType !== undefined) update.inquiry_type = toNullableText(data.inquiryType);

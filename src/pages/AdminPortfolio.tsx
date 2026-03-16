@@ -1135,7 +1135,7 @@ const AdminPortfolio = () => {
                               )}
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 text-sm text-muted-foreground mb-2">
-                              <span className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> {lead.email}</span>
+                              <span className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> {lead.email || "-"}</span>
                               <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {lead.phone}</span>
                               {lead.companyName && <span className="flex items-center gap-1.5"><Building2 className="h-3.5 w-3.5" /> {lead.companyName}</span>}
                             </div>
@@ -1270,7 +1270,7 @@ const AdminPortfolio = () => {
                             <div className="flex items-center gap-2 flex-wrap mb-1">
                               <h3 className="font-semibold text-foreground">{lead.name}</h3>
                               <span className="text-xs text-muted-foreground">
-                                {lead.email} ֲ· {lead.phone}
+                                {lead.email || "-"} ֲ· {lead.phone}
                               </span>
                             </div>
                             <p className="text-sm text-muted-foreground line-clamp-1">{lead.subject}</p>
@@ -1365,7 +1365,7 @@ const AdminPortfolio = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Mail className="h-3 w-3" /> אימייל</p>
-                      <p className="text-sm text-foreground">{selectedLead.email}</p>
+                      <p className="text-sm text-foreground">{selectedLead.email || "-"}</p>
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Phone className="h-3 w-3" /> טלפון</p>
@@ -1411,7 +1411,7 @@ const AdminPortfolio = () => {
                       setIsEditing(true);
                       setEditForm({
                         name: selectedLead.name,
-                        email: selectedLead.email,
+                        email: selectedLead.email || "",
                         phone: selectedLead.phone,
                         companyName: selectedLead.companyName || "",
                         inquiryType: selectedLead.inquiryType || "",

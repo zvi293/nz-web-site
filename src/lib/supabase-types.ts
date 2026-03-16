@@ -263,7 +263,7 @@ export interface Database {
           updated_at: string;
           deleted_at: string | null;
           name: string;
-          email: string;
+          email: string | null;
           phone: string;
           company_name: string | null;
           inquiry_type: string | null;
@@ -278,7 +278,7 @@ export interface Database {
           updated_at?: string;
           deleted_at?: string | null;
           name: string;
-          email: string;
+          email?: string | null;
           phone: string;
           company_name?: string | null;
           inquiry_type?: string | null;
@@ -293,7 +293,7 @@ export interface Database {
           updated_at?: string;
           deleted_at?: string | null;
           name?: string;
-          email?: string;
+          email?: string | null;
           phone?: string;
           company_name?: string | null;
           inquiry_type?: string | null;
