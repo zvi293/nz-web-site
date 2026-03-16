@@ -54,6 +54,7 @@ const ServiceVisual = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const floatTweenRef = useRef<gsap.core.Tween | null>(null);
   const shouldPlayRef = useRef(false);
   const [videoFailed, setVideoFailed] = useState(false);
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
@@ -107,7 +108,8 @@ const ServiceVisual = ({
     if (!containerRef.current) return;
     const mainEl = containerRef.current.querySelector("[data-main-img]");
     if (mainEl) {
-      gsap.to(mainEl, {
+      floatTweenRef.current?.kill();
+      floatTweenRef.current = gsap.to(mainEl, {
         y: -16,
         rotation: 1.2,
         duration: 3.2 + index * 0.3,
@@ -116,55 +118,107 @@ const ServiceVisual = ({
         ease: "sine.inOut"
       });
     }
+
+    return () => {
+      floatTweenRef.current?.kill();
+      floatTweenRef.current = null;
+    };
   }, [index]);
 
-  // Video playback with delay
+  // Video playback with mobile-safe visibility rules
   useEffect(() => {
     if (!hasVideo || !videoRef.current || !containerRef.current) return;
     const video = videoRef.current;
+    const mm = gsap.matchMedia();
 
-    const st = ScrollTrigger.create({
-      trigger: containerRef.current,
-      start: "top 90%",
-      end: "bottom 10%",
-      onEnter: () => {
-        shouldPlayRef.current = true;
-        if (!videoSrc && service.video) {
-          setVideoSrc(service.video);
-        }
-        if (video.readyState >= 2) {
-          revealAndPlay();
-        } else {
-          video.style.opacity = "0";
-          video.load();
-        }
-      },
-      onLeave: () => {
-        shouldPlayRef.current = false;
-        resetVideo();
-      },
-      onEnterBack: () => {
-        shouldPlayRef.current = true;
-        if (!videoSrc && service.video) {
-          setVideoSrc(service.video);
-        }
-        if (video.readyState >= 2) {
-          revealAndPlay();
-        } else {
-          video.style.opacity = "0";
-          video.load();
-        }
-      },
-      onLeaveBack: () => {
-        shouldPlayRef.current = false;
-        resetVideo();
+    const ensureVideoSource = () => {
+      if (!videoSrc && service.video) {
+        setVideoSrc(service.video);
       }
+    };
+
+    mm.add("(max-width: 767px)", () => {
+      const trigger = ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top 92%",
+        end: "bottom -10%",
+        invalidateOnRefresh: true,
+        onEnter: () => {
+          shouldPlayRef.current = true;
+          ensureVideoSource();
+          if (video.readyState >= 2) {
+            revealAndPlay();
+          } else {
+            video.load();
+          }
+        },
+        onEnterBack: () => {
+          shouldPlayRef.current = true;
+          ensureVideoSource();
+          if (video.readyState >= 2) {
+            revealAndPlay();
+          } else {
+            video.load();
+          }
+        },
+        onLeave: () => {
+          shouldPlayRef.current = false;
+          clearPlayTimer();
+          video.pause();
+        },
+        onLeaveBack: () => {
+          shouldPlayRef.current = false;
+          clearPlayTimer();
+          video.pause();
+        },
+      });
+
+      return () => trigger.kill();
+    });
+
+    mm.add("(min-width: 768px)", () => {
+      const trigger = ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top 90%",
+        end: "bottom 10%",
+        invalidateOnRefresh: true,
+        onEnter: () => {
+          shouldPlayRef.current = true;
+          ensureVideoSource();
+          if (video.readyState >= 2) {
+            revealAndPlay();
+          } else {
+            video.style.opacity = "0";
+            video.load();
+          }
+        },
+        onLeave: () => {
+          shouldPlayRef.current = false;
+          resetVideo();
+        },
+        onEnterBack: () => {
+          shouldPlayRef.current = true;
+          ensureVideoSource();
+          if (video.readyState >= 2) {
+            revealAndPlay();
+          } else {
+            video.style.opacity = "0";
+            video.load();
+          }
+        },
+        onLeaveBack: () => {
+          shouldPlayRef.current = false;
+          resetVideo();
+        },
+      });
+
+      return () => trigger.kill();
     });
 
     return () => {
       shouldPlayRef.current = false;
       clearPlayTimer();
-      st.kill();
+      mm.revert();
     };
   }, [hasVideo, service.video, videoSrc]);
 
@@ -237,25 +291,85 @@ const ServicesSection = () => {
     if (services.length === 0) return;
     
     const ctx = gsap.context(() => {
-      // Header entrance
-      if (headerRef.current) {
-        gsap.from(headerRef.current, {
-          y: 60,
-          opacity: 0,
-          duration: 1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: "top 85%"
-          }
-        });
-      }
+      const mm = gsap.matchMedia();
 
-      // Per-block background color transitions
-      blockRefs.current.forEach((block, i) => {
-        if (!block) return;
-        const bgEl = block.querySelector("[data-block-bg]") as HTMLElement;
-        if (bgEl) {
+      mm.add("(max-width: 767px)", () => {
+        if (headerRef.current) {
+          gsap.fromTo(
+            headerRef.current,
+            { y: 36, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.7,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: headerRef.current,
+                start: "top 92%",
+                once: true,
+                invalidateOnRefresh: true,
+              },
+            }
+          );
+        }
+
+        blockRefs.current.forEach((block, i) => {
+          if (!block) return;
+
+          const bgEl = block.querySelector("[data-block-bg]") as HTMLElement | null;
+          const textBlock = block.querySelector("[data-text]") as HTMLElement | null;
+          const imageBlock = block.querySelector("[data-image]") as HTMLElement | null;
+          const targets = [textBlock, imageBlock].filter((target): target is HTMLElement => Boolean(target));
+
+          if (bgEl) {
+            gsap.set(bgEl, { opacity: 1, scale: 1, clearProps: "transform" });
+          }
+
+          if (targets.length === 0) return;
+
+          gsap.fromTo(
+            targets,
+            {
+              y: 28,
+              opacity: 0,
+            },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.65,
+              stagger: 0.1,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: block,
+                start: "top 90%",
+                once: true,
+                invalidateOnRefresh: true,
+              },
+              clearProps: "transform",
+            }
+          );
+        });
+      });
+
+      mm.add("(min-width: 768px)", () => {
+        if (headerRef.current) {
+          gsap.from(headerRef.current, {
+            y: 60,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: "top 85%",
+            },
+          });
+        }
+
+        blockRefs.current.forEach((block) => {
+          if (!block) return;
+          const bgEl = block.querySelector("[data-block-bg]") as HTMLElement | null;
+          if (!bgEl) return;
+
           gsap.fromTo(
             bgEl,
             { opacity: 0, scale: 0.97 },
@@ -267,63 +381,64 @@ const ServicesSection = () => {
               scrollTrigger: {
                 trigger: block,
                 start: "top 80%",
-                toggleActions: "play reverse play reverse"
-              }
+                toggleActions: "play reverse play reverse",
+              },
             }
           );
-        }
+        });
+
+        rowRefs.current.forEach((row, i) => {
+          if (!row) return;
+
+          const textBlock = row.querySelector("[data-text]");
+          const imageBlock = row.querySelector("[data-image]");
+
+          if (textBlock) {
+            gsap.fromTo(
+              textBlock,
+              {
+                x: services[i].reverse ? -40 : 40,
+                y: 30,
+                opacity: 0,
+              },
+              {
+                x: 0,
+                y: 0,
+                opacity: 1,
+                duration: 0.7,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: row,
+                  start: "top 85%",
+                  toggleActions: "play reverse play reverse",
+                },
+              }
+            );
+          }
+
+          if (imageBlock) {
+            gsap.fromTo(
+              imageBlock,
+              { x: -30, opacity: 0, scale: 0.97 },
+              {
+                x: 0,
+                opacity: 1,
+                scale: 1,
+                duration: 0.8,
+                ease: "power2.out",
+                scrollTrigger: {
+                  trigger: row,
+                  start: "top 88%",
+                  end: "bottom 15%",
+                  toggleActions: "play reverse play reverse",
+                },
+              }
+            );
+          }
+        });
       });
 
-      // Row entrance animations — images always visible, slide in gently
-      rowRefs.current.forEach((row, i) => {
-        if (!row) return;
-
-        const textBlock = row.querySelector("[data-text]");
-        const imageBlock = row.querySelector("[data-image]");
-
-        if (textBlock) {
-          gsap.fromTo(
-            textBlock,
-            {
-              x: services[i].reverse ? -40 : 40,
-              y: 30,
-              opacity: 0
-            },
-            {
-              x: 0,
-              y: 0,
-              opacity: 1,
-              duration: 0.7,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: row,
-                start: "top 85%",
-                toggleActions: "play reverse play reverse"
-              }
-            }
-          );
-        }
-
-        if (imageBlock) {
-          gsap.fromTo(
-            imageBlock,
-            { x: -30, opacity: 0, scale: 0.97 },
-            {
-              x: 0,
-              opacity: 1,
-              scale: 1,
-              duration: 0.8,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: row,
-                start: "top 88%",
-                end: "bottom 15%",
-                toggleActions: "play reverse play reverse"
-              }
-            }
-          );
-        }
-      });
+      return () => mm.revert();
     }, sectionRef);
 
     return () => ctx.revert();
