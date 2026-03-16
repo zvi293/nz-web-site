@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NZ-web favicon">
-  <rect width="64" height="64" rx="14" fill="#ffffff" />
-  <path d="M12 48V16h8l12 20V16h8v32h-8L20 28v20z" fill="#0d3d68" />
-  <path d="M42 16h14v6L46 42h10v6H40v-6l10-20H42z" fill="#4b4b4b" />
-  <circle cx="10" cy="31" r="2.5" fill="#0d3d68" />
-  <path d="M12.5 31H18" stroke="#0d3d68" stroke-width="2.5" stroke-linecap="round" />
-  <circle cx="53" cy="17" r="2" fill="#b9b9b9" />
-  <circle cx="53" cy="47" r="2" fill="#b9b9b9" />
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#081A2B" />
+      <stop offset="100%" stop-color="#0F2F4F" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)" />
+  <path d="M15 49V16h6.5l10.2 18.3V16h6.6v33h-6.6L21.6 30.7V49z" fill="#ffffff" />
+  <path d="M41 16h14v4.8L45.8 43H55V49H41v-5.1l9.1-22H41z" fill="#7DD3FC" />
 </svg>
