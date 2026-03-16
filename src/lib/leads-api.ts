@@ -33,6 +33,38 @@ class LeadRepositoryError extends Error {
   }
 }
 
+function getLeadErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === "object" && error !== null) {
+    const message = "message" in error && typeof error.message === "string" ? error.message : null;
+    const details = "details" in error && typeof error.details === "string" ? error.details : null;
+    const hint = "hint" in error && typeof error.hint === "string" ? error.hint : null;
+    const code = "code" in error && typeof error.code === "string" ? error.code : null;
+
+    return [message, details, hint, code ? `code=${code}` : null].filter(Boolean).join(" | ") || "Unknown error";
+  }
+
+  return "Unknown error";
+}
+
+function logLeadRepositoryError(action: string, error: unknown, context?: Record<string, unknown>) {
+  if (typeof console === "undefined") {
+    return;
+  }
+
+  const payload = {
+    action,
+    message: getLeadErrorMessage(error),
+    raw: error,
+    ...(context ? { context } : {}),
+  };
+
+  console.error("Lead repository error", payload);
+}
+
 function mapLeadRow(row: LeadRow): Lead {
   return {
     id: row.id,
@@ -61,13 +93,15 @@ function toNullableText(value?: string): string | null {
 }
 
 function mapLeadInsert(data: Omit<Lead, "id" | "status" | "createdAt" | "updatedAt">): LeadInsert {
+  const normalizedSubject = data.subject.trim() || "ללא נושא";
+
   return {
     name: data.name.trim(),
     email: toNullableText(data.email),
     phone: data.phone.trim(),
     company_name: toNullableText(data.companyName),
     inquiry_type: toNullableText(data.inquiryType),
-    subject: data.subject.trim(),
+    subject: normalizedSubject,
     send_method: data.sendMethod,
     notes: toNullableText(data.notes),
   };
@@ -97,11 +131,8 @@ function getRecycleBinCutoffIso(): string {
 }
 
 function wrapLeadError(action: string, error: unknown): never {
-  if (error instanceof Error) {
-    throw new LeadRepositoryError(action, error.message);
-  }
-
-  throw new LeadRepositoryError(action, "Unknown error");
+  logLeadRepositoryError(action, error);
+  throw new LeadRepositoryError(action, getLeadErrorMessage(error));
 }
 
 export async function fetchLeads(): Promise<Lead[]> {
@@ -147,13 +178,17 @@ export async function fetchDeletedLeads(): Promise<Lead[]> {
 export async function addLead(data: Omit<Lead, "id" | "status" | "createdAt" | "updatedAt">): Promise<Lead> {
   try {
     const supabase = getSupabaseClient();
+    const insertPayload = mapLeadInsert(data);
     const { data: row, error } = await supabase
       .from("leads")
-      .insert(mapLeadInsert(data))
+      .insert(insertPayload)
       .select("*")
       .single();
 
     if (error) {
+      logLeadRepositoryError("create a lead", error, {
+        payload: insertPayload,
+      });
       throw error;
     }
 

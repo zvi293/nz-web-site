@@ -115,6 +115,7 @@ const ContactSection = () => {
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const honeypotRef = useRef<HTMLInputElement>(null);
+  const termsRef = useRef<HTMLDivElement>(null);
   const contact = useContactInfo();
 
   useEffect(() => {
@@ -194,6 +195,44 @@ const ContactSection = () => {
       subject: "",
     },
   });
+
+  const scrollToTarget = (element: HTMLElement) => {
+    const headerOffset = window.innerWidth >= 768 ? 104 : 72;
+    const top = element.getBoundingClientRect().top + window.scrollY - headerOffset;
+
+    window.scrollTo({
+      top: Math.max(top, 0),
+      behavior: "smooth",
+    });
+
+    requestAnimationFrame(() => {
+      if (
+        element instanceof HTMLInputElement ||
+        element instanceof HTMLTextAreaElement ||
+        element instanceof HTMLSelectElement ||
+        element instanceof HTMLButtonElement
+      ) {
+        element.focus({ preventScroll: true });
+      }
+    });
+  };
+
+  const scrollToFirstError = (errorKeys: string[]) => {
+    const fieldOrder = ["name", "email", "phone", "inquiryType", "subject"];
+
+    const firstField = fieldOrder.find((field) => errorKeys.includes(field));
+    if (firstField) {
+      const element = document.getElementById(firstField);
+      if (element instanceof HTMLElement) {
+        scrollToTarget(element);
+        return;
+      }
+    }
+
+    if (errorKeys.includes("terms") && termsRef.current) {
+      scrollToTarget(termsRef.current);
+    }
+  };
 
   useEffect(() => {
     setValue("sendMethod", sendMethod, {
@@ -328,6 +367,19 @@ const ContactSection = () => {
     }
   };
 
+  const onInvalid = (errors: Record<string, unknown>) => {
+    scrollToFirstError(Object.keys(errors));
+  };
+
+  const handleFormSubmitCapture = (event: React.FormEvent<HTMLFormElement>) => {
+    if (acceptedTerms || !termsRef.current) {
+      return;
+    }
+
+    event.preventDefault();
+    scrollToTarget(termsRef.current);
+  };
+
   if (isSubmitted) {
     return (
       <section
@@ -437,7 +489,11 @@ const ContactSection = () => {
                 </div>
               </motion.div>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmitCapture={handleFormSubmitCapture}
+                onSubmit={handleSubmit(onSubmit, onInvalid)}
+                className="space-y-6"
+              >
                 <input
                   ref={honeypotRef}
                   type="text"
@@ -615,6 +671,7 @@ const ContactSection = () => {
                 </motion.div>
 
                 <motion.div
+                  ref={termsRef}
                   className="flex items-start gap-3"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
