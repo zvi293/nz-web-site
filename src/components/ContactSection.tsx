@@ -422,7 +422,11 @@ const ContactSection = () => {
                     type="button"
                     variant={sendMethod === "whatsapp" ? "default" : "outline"}
                     onClick={() => setSendMethod("whatsapp")}
-                    className={`flex-1 gap-2 ${sendMethod === "whatsapp" ? "bg-[hsl(142,70%,45%)] text-white hover:bg-[hsl(142,70%,40%)]" : ""}`}
+                    className={`flex-1 gap-2 ${
+                      sendMethod === "whatsapp"
+                        ? "border-[#25D366] bg-[#25D366] text-white hover:border-[#25D366] hover:bg-[#25D366] hover:text-white"
+                        : "border-[#BFEFD1] bg-[#DDF8E8] text-[#1E7A46] hover:border-[#2ECC71] hover:bg-[#2ECC71] hover:text-white"
+                    }`}
                   >
                     <MessageCircle className="h-4 w-4" />
                     וואטסאפ
@@ -431,7 +435,11 @@ const ContactSection = () => {
                     type="button"
                     variant={sendMethod === "email" ? "default" : "outline"}
                     onClick={() => setSendMethod("email")}
-                    className="flex-1 gap-2"
+                    className={`flex-1 gap-2 ${
+                      sendMethod === "email"
+                        ? "border-[#5DADE2] bg-[#5DADE2] text-white hover:border-[#5DADE2] hover:bg-[#5DADE2] hover:text-white"
+                        : "border border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-800"
+                    }`}
                   >
                     <Mail className="h-4 w-4" />
                     אימייל
