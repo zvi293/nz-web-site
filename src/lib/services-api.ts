@@ -1,4 +1,7 @@
-import { getSupabaseClient, reportPublicSupabaseFallback } from "@/lib/supabase";
+import {
+  getSupabaseClient,
+  reportPublicSupabaseFallback,
+} from "@/lib/supabase";
 import { formatRepositoryError } from "@/lib/repository-error";
 import type { Database } from "@/lib/supabase-types";
 
@@ -32,7 +35,7 @@ const defaultServices: ServiceRow[] = [
   {
     id: "fallback-service-1",
     badge: "אפיון חכם",
-    title: "מתכננים להצלחה",
+    title: "מתכוננים להצלחה",
     body: "הכל מתחיל באפיון מדויק. אנחנו צוללים לעומק העסק שלכם, מבינים את קהל היעד ומתכננים מסע משתמש חכם שמוביל לפעולה. בלי ניחושים, רק אסטרטגיה מבוססת נתונים שמכינה את הקרקע להמרות.",
     image: "",
     video: "/videos/service-planning.mp4",
@@ -40,7 +43,8 @@ const defaultServices: ServiceRow[] = [
     iconLucideName: "Target",
     reverse: false,
     tags: ["אסטרטגיה", "מחקר שוק", "מסע משתמש"],
-    bgGradient: "linear-gradient(135deg, hsl(45 80% 60% / 0.08), hsl(40 85% 60% / 0.12), hsl(45 70% 94%))",
+    bgGradient:
+      "linear-gradient(135deg, hsl(45 80% 60% / 0.08), hsl(40 85% 60% / 0.12), hsl(45 70% 94%))",
     textColor: "hsl(40 50% 18%)",
     mutedTextColor: "hsl(40 30% 38%)",
     badgeBg: "hsl(45 80% 55% / 0.15)",
@@ -63,7 +67,8 @@ const defaultServices: ServiceRow[] = [
     iconLucideName: "Palette",
     reverse: true,
     tags: ["עיצוב", "חווית משתמש", "יוקרה"],
-    bgGradient: "linear-gradient(135deg, hsl(270 60% 96%), hsl(300 50% 94% / 0.8), hsl(330 60% 95% / 0.6))",
+    bgGradient:
+      "linear-gradient(135deg, hsl(270 60% 96%), hsl(300 50% 94% / 0.8), hsl(330 60% 95% / 0.6))",
     textColor: "hsl(270 40% 20%)",
     mutedTextColor: "hsl(270 25% 42%)",
     badgeBg: "hsl(270 60% 60% / 0.15)",
@@ -86,7 +91,8 @@ const defaultServices: ServiceRow[] = [
     iconLucideName: "Code2",
     reverse: false,
     tags: ["פיתוח", "ביצועים", "סקיילינג"],
-    bgGradient: "linear-gradient(135deg, hsl(160 50% 95%), hsl(170 60% 92% / 0.8), hsl(190 50% 93% / 0.6))",
+    bgGradient:
+      "linear-gradient(135deg, hsl(160 50% 95%), hsl(170 60% 92% / 0.8), hsl(190 50% 93% / 0.6))",
     textColor: "hsl(170 40% 16%)",
     mutedTextColor: "hsl(170 25% 38%)",
     badgeBg: "hsl(170 60% 45% / 0.15)",
@@ -109,7 +115,8 @@ const defaultServices: ServiceRow[] = [
     iconLucideName: "Search",
     reverse: true,
     tags: ["SEO", "קידום אורגני", "מילות מפתח"],
-    bgGradient: "linear-gradient(135deg, hsl(210 90% 94%), hsl(200 85% 90% / 0.8), hsl(220 70% 95% / 0.6))",
+    bgGradient:
+      "linear-gradient(135deg, hsl(210 90% 94%), hsl(200 85% 90% / 0.8), hsl(220 70% 95% / 0.6))",
     textColor: "hsl(210 50% 18%)",
     mutedTextColor: "hsl(210 30% 40%)",
     badgeBg: "hsl(210 80% 55% / 0.15)",
@@ -198,7 +205,10 @@ function mapDeletedServiceRow(row: ServiceDbRow): DeletedServiceRow {
   };
 }
 
-function mapServiceInsert(service: Omit<ServiceRow, "id">, displayOrder: number): ServiceInsert {
+function mapServiceInsert(
+  service: Omit<ServiceRow, "id">,
+  displayOrder: number,
+): ServiceInsert {
   return {
     badge: service.badge.trim(),
     title: service.title.trim(),
@@ -234,14 +244,17 @@ function mapServiceUpdate(data: Partial<ServiceRow>): ServiceUpdate {
   if (data.image !== undefined) update.image_url = normalizeText(data.image);
   if (data.video !== undefined) update.video_url = normalizeText(data.video);
   if (data.iconType !== undefined) update.icon_type = data.iconType;
-  if (data.iconLucideName !== undefined) update.icon_lucide_name = normalizeText(data.iconLucideName);
+  if (data.iconLucideName !== undefined)
+    update.icon_lucide_name = normalizeText(data.iconLucideName);
   if (data.iconSvg !== undefined) update.icon_svg = normalizeText(data.iconSvg);
-  if (data.iconImage !== undefined) update.icon_image_url = normalizeText(data.iconImage);
+  if (data.iconImage !== undefined)
+    update.icon_image_url = normalizeText(data.iconImage);
   if (data.reverse !== undefined) update.reverse_layout = data.reverse;
   if (data.tags !== undefined) update.tags = normalizeTags(data.tags);
   if (data.bgGradient !== undefined) update.bg_gradient = data.bgGradient;
   if (data.textColor !== undefined) update.text_color = data.textColor;
-  if (data.mutedTextColor !== undefined) update.muted_text_color = data.mutedTextColor;
+  if (data.mutedTextColor !== undefined)
+    update.muted_text_color = data.mutedTextColor;
   if (data.badgeBg !== undefined) update.badge_bg = data.badgeBg;
   if (data.badgeText !== undefined) update.badge_text = data.badgeText;
   if (data.iconBg !== undefined) update.icon_bg = data.iconBg;
@@ -270,7 +283,9 @@ async function getNextServiceOrder(): Promise<number> {
   return (data?.display_order ?? 0) + 1;
 }
 
-export async function fetchServices(options: FetchServicesOptions = {}): Promise<ServiceRow[]> {
+export async function fetchServices(
+  options: FetchServicesOptions = {},
+): Promise<ServiceRow[]> {
   try {
     const supabase = getSupabaseClient();
     let query = supabase
@@ -320,10 +335,13 @@ export async function fetchDeletedServices(): Promise<DeletedServiceRow[]> {
   }
 }
 
-export async function createService(service: Omit<ServiceRow, "id">): Promise<ServiceRow> {
+export async function createService(
+  service: Omit<ServiceRow, "id">,
+): Promise<ServiceRow> {
   try {
     const supabase = getSupabaseClient();
-    const displayOrder = service.order > 0 ? service.order : await getNextServiceOrder();
+    const displayOrder =
+      service.order > 0 ? service.order : await getNextServiceOrder();
     const { data, error } = await supabase
       .from("services")
       .insert(mapServiceInsert(service, displayOrder))
@@ -340,7 +358,10 @@ export async function createService(service: Omit<ServiceRow, "id">): Promise<Se
   }
 }
 
-export async function updateService(id: string, data: Partial<ServiceRow>): Promise<ServiceRow> {
+export async function updateService(
+  id: string,
+  data: Partial<ServiceRow>,
+): Promise<ServiceRow> {
   try {
     const supabase = getSupabaseClient();
     const { data: row, error } = await supabase

@@ -1,12 +1,44 @@
 import { useState, useEffect, useRef } from "react";
-import { Plus, Pencil, Trash2, X, Upload, GripVertical, ChevronDown, ChevronUp, Image, Code2, FileCode, Archive, RotateCcw } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  X,
+  Upload,
+  GripVertical,
+  ChevronDown,
+  ChevronUp,
+  Image,
+  Code2,
+  FileCode,
+  Archive,
+  RotateCcw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -24,14 +56,38 @@ import { isSafeInlineSvg } from "@/lib/runtime-safety";
 import { toast } from "sonner";
 
 const lucideIconNames = [
-  "Target", "Palette", "Code2", "Search", "Zap", "Shield", "Rocket", 
-  "Globe", "Smartphone", "Monitor", "Layout", "PenTool", "Megaphone",
-  "BarChart", "TrendingUp", "Users", "Heart", "Star", "Award", "Lightbulb",
-  "Settings", "Database", "Cloud", "Lock", "Eye", "Mail", "MessageCircle"
+  "Target",
+  "Palette",
+  "Code2",
+  "Search",
+  "Zap",
+  "Shield",
+  "Rocket",
+  "Globe",
+  "Smartphone",
+  "Monitor",
+  "Layout",
+  "PenTool",
+  "Megaphone",
+  "BarChart",
+  "TrendingUp",
+  "Users",
+  "Heart",
+  "Star",
+  "Award",
+  "Lightbulb",
+  "Settings",
+  "Database",
+  "Cloud",
+  "Lock",
+  "Eye",
+  "Mail",
+  "MessageCircle",
 ];
 
 const defaultColors = {
-  bgGradient: "linear-gradient(135deg, hsl(45 80% 60% / 0.08), hsl(40 85% 60% / 0.12), hsl(45 70% 94%))",
+  bgGradient:
+    "linear-gradient(135deg, hsl(45 80% 60% / 0.08), hsl(40 85% 60% / 0.12), hsl(45 70% 94%))",
   textColor: "hsl(40 50% 18%)",
   mutedTextColor: "hsl(40 30% 38%)",
   badgeBg: "hsl(45 80% 55% / 0.15)",
@@ -39,7 +95,7 @@ const defaultColors = {
   iconBg: "hsl(45 80% 50%)",
   iconShadow: "0 8px 30px -4px hsl(45 80% 50% / 0.4)",
   tagBg: "hsl(45 60% 92%)",
-  tagText: "hsl(40 50% 30%)"
+  tagText: "hsl(40 50% 30%)",
 };
 
 const colorPresets = [
@@ -62,7 +118,7 @@ function generateColorsFromHue(hue: number, sat: number) {
     iconBg: `hsl(${hue} ${sat}% 50%)`,
     iconShadow: `0 8px 30px -4px hsl(${hue} ${sat}% 50% / 0.4)`,
     tagBg: `hsl(${hue} ${sat - 20}% 92%)`,
-    tagText: `hsl(${hue - 5} 50% 30%)`
+    tagText: `hsl(${hue - 5} 50% 30%)`,
   };
 }
 
@@ -85,7 +141,9 @@ const emptyForm: Omit<ServiceRow, "id"> = {
 
 const AdminServicesTab = () => {
   const [services, setServices] = useState<ServiceRow[]>([]);
-  const [deletedServices, setDeletedServices] = useState<DeletedServiceRow[]>([]);
+  const [deletedServices, setDeletedServices] = useState<DeletedServiceRow[]>(
+    [],
+  );
   const [showRecycleBin, setShowRecycleBin] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -110,7 +168,10 @@ const AdminServicesTab = () => {
     void load();
   }, []);
 
-  const runServiceTask = async <T,>(task: () => Promise<T>, errorMessage: string): Promise<T | null> => {
+  const runServiceTask = async <T,>(
+    task: () => Promise<T>,
+    errorMessage: string,
+  ): Promise<T | null> => {
     try {
       return await task();
     } catch (error) {
@@ -137,11 +198,15 @@ const AdminServicesTab = () => {
   const validateServiceForm = () => {
     if (!form.badge.trim()) return "יש להזין תגית לשירות.";
     if (!form.title.trim()) return "יש להזין כותרת לשירות.";
-    if (!form.body.trim() || form.body.trim().length < 10) return "יש להזין תיאור משמעותי של השירות.";
-    if (form.iconType === "image" && !form.iconImage?.trim()) return "יש להזין תמונת אייקון או להעלות קובץ.";
-    if (form.iconType === "svg" && !form.iconSvg?.trim()) return "יש להזין קוד SVG תקין.";
+    if (!form.body.trim() || form.body.trim().length < 10)
+      return "יש להזין תיאור משמעותי של השירות.";
+    if (form.iconType === "image" && !form.iconImage?.trim())
+      return "יש להזין תמונת אייקון או להעלות קובץ.";
+    if (form.iconType === "svg" && !form.iconSvg?.trim())
+      return "יש להזין קוד SVG תקין.";
 
-    if (form.iconType === "svg" && !isSafeInlineSvg(form.iconSvg)) return "קוד ה-SVG אינו תקין או כולל נתיב שבור.";
+    if (form.iconType === "svg" && !isSafeInlineSvg(form.iconSvg))
+      return "קוד ה-SVG אינו תקין או כולל נתיב שבור.";
 
     for (const [value, label] of [
       [form.image, "קישור תמונת השירות"],
@@ -171,7 +236,10 @@ const AdminServicesTab = () => {
     try {
       const payload = {
         ...form,
-        tags: tagsInput.split(",").map(t => t.trim()).filter(Boolean),
+        tags: tagsInput
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
       };
 
       const saved = await runServiceTask(async () => {
@@ -236,36 +304,47 @@ const AdminServicesTab = () => {
     const newServices = [...services];
     const swapIdx = direction === "up" ? index - 1 : index + 1;
     if (swapIdx < 0 || swapIdx >= newServices.length) return;
-    
+
     const tempOrder = newServices[index].order;
     newServices[index].order = newServices[swapIdx].order;
     newServices[swapIdx].order = tempOrder;
-    
+
     await runServiceTask(async () => {
-      await updateService(newServices[index].id, { order: newServices[index].order });
-      await updateService(newServices[swapIdx].id, { order: newServices[swapIdx].order });
+      await updateService(newServices[index].id, {
+        order: newServices[index].order,
+      });
+      await updateService(newServices[swapIdx].id, {
+        order: newServices[swapIdx].order,
+      });
       await load();
       return true;
     }, "לא ניתן היה לעדכן את סדר השירותים כרגע.");
   };
 
-  const handleFileUpload = (field: "image" | "video" | "iconImage", file: File) => {
+  const handleFileUpload = (
+    field: "image" | "video" | "iconImage",
+    file: File,
+  ) => {
     if (field === "video") {
       const reader = new FileReader();
       reader.onload = (ev) => {
-        setForm(prev => ({ ...prev, video: ev.target?.result as string }));
+        setForm((prev) => ({ ...prev, video: ev.target?.result as string }));
       };
       reader.readAsDataURL(file);
     } else if (field === "iconImage") {
       const reader = new FileReader();
       reader.onload = (ev) => {
-        setForm(prev => ({ ...prev, iconImage: ev.target?.result as string, iconType: "image" }));
+        setForm((prev) => ({
+          ...prev,
+          iconImage: ev.target?.result as string,
+          iconType: "image",
+        }));
       };
       reader.readAsDataURL(file);
     } else {
       const reader = new FileReader();
       reader.onload = (ev) => {
-        setForm(prev => ({ ...prev, image: ev.target?.result as string }));
+        setForm((prev) => ({ ...prev, image: ev.target?.result as string }));
       };
       reader.readAsDataURL(file);
     }
@@ -273,10 +352,13 @@ const AdminServicesTab = () => {
 
   const applyColorPreset = (hue: number, sat: number) => {
     const colors = generateColorsFromHue(hue, sat);
-    setForm(prev => ({ ...prev, ...colors }));
+    setForm((prev) => ({ ...prev, ...colors }));
   };
 
-  const svgPreviewMarkup = form.iconType === "svg" && isSafeInlineSvg(form.iconSvg) ? form.iconSvg : null;
+  const svgPreviewMarkup =
+    form.iconType === "svg" && isSafeInlineSvg(form.iconSvg)
+      ? form.iconSvg
+      : null;
 
   return (
     <div className="space-y-6">
@@ -285,10 +367,16 @@ const AdminServicesTab = () => {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>ניהול שירותים</CardTitle>
-              <CardDescription>ערוך, הוסף והסר כרטיסי שירות מהאתר</CardDescription>
+              <CardDescription>
+                ערוך, הוסף והסר כרטיסי שירות מהאתר
+              </CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setShowRecycleBin(true)} className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowRecycleBin(true)}
+                className="gap-2"
+              >
                 <Archive className="h-4 w-4" />
                 סל מחזור
                 {deletedServices.length > 0 && (
@@ -306,7 +394,9 @@ const AdminServicesTab = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           {services.length === 0 && (
-            <p className="text-muted-foreground text-sm text-center py-8">אין שירותים עדיין.</p>
+            <p className="text-muted-foreground text-sm text-center py-8">
+              אין שירותים עדיין.
+            </p>
           )}
           {services.map((service, i) => (
             <div
@@ -353,26 +443,36 @@ const AdminServicesTab = () => {
               )}
 
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-foreground text-sm truncate">{service.title}</h3>
+                <h3 className="font-semibold text-foreground text-sm truncate">
+                  {service.title}
+                </h3>
                 <div className="flex items-center gap-2 mt-1">
                   <span
                     className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                    style={{ backgroundColor: service.badgeBg, color: service.badgeText }}
+                    style={{
+                      backgroundColor: service.badgeBg,
+                      color: service.badgeText,
+                    }}
                   >
                     {service.badge}
                   </span>
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${service.published ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"}`}>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${service.published ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"}`}
+                  >
                     {service.published ? "מפורסם" : "מוסתר"}
                   </span>
                   <span className="text-[10px] text-muted-foreground">
-                    {service.reverse ? "הפוך" : "רגיל"} · {service.tags.length} תגיות
+                    {service.reverse ? "הפוך" : "רגיל"} · {service.tags.length}{" "}
+                    תגיות
                   </span>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 flex-shrink-0">
                 <div className="flex items-center gap-1">
-                  <span className="text-[10px] text-muted-foreground">{service.published ? "גלוי" : "מוסתר"}</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {service.published ? "גלוי" : "מוסתר"}
+                  </span>
                   <Switch
                     checked={service.published}
                     disabled={loading}
@@ -384,12 +484,20 @@ const AdminServicesTab = () => {
                       }, "לא ניתן היה לעדכן את מצב הפרסום כרגע.");
 
                       if (updated) {
-                        toast.success(checked ? "השירות פורסם" : "השירות הוסתר");
+                        toast.success(
+                          checked ? "השירות פורסם" : "השירות הוסתר",
+                        );
                       }
                     }}
                   />
                 </div>
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => openEdit(service)} disabled={loading}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => openEdit(service)}
+                  disabled={loading}
+                >
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
                 <Button
@@ -409,22 +517,35 @@ const AdminServicesTab = () => {
 
       {/* Recycle Bin Dialog */}
       <Dialog open={showRecycleBin} onOpenChange={setShowRecycleBin}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto" dir="rtl">
+        <DialogContent
+          className="max-w-lg max-h-[80vh] overflow-y-auto"
+          dir="rtl"
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Archive className="h-5 w-5" />
               סל מחזור – שירותים
             </DialogTitle>
-            <DialogDescription>פריטים שנמחקו נשמרים כאן 30 יום לפני מחיקה סופית</DialogDescription>
+            <DialogDescription>
+              פריטים שנמחקו נשמרים כאן 30 יום לפני מחיקה סופית
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             {deletedServices.length === 0 ? (
-              <p className="text-muted-foreground text-sm text-center py-8">סל המחזור ריק</p>
+              <p className="text-muted-foreground text-sm text-center py-8">
+                סל המחזור ריק
+              </p>
             ) : (
-              deletedServices.map(ds => {
-                const daysLeft = Math.ceil((ds.deletedAt + 30 * 24 * 60 * 60 * 1000 - Date.now()) / (24 * 60 * 60 * 1000));
+              deletedServices.map((ds) => {
+                const daysLeft = Math.ceil(
+                  (ds.deletedAt + 30 * 24 * 60 * 60 * 1000 - Date.now()) /
+                    (24 * 60 * 60 * 1000),
+                );
                 return (
-                  <div key={ds.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
+                  <div
+                    key={ds.id}
+                    className="flex items-center gap-3 rounded-xl border border-border p-3"
+                  >
                     <div
                       className="h-10 w-10 rounded-lg flex-shrink-0 flex items-center justify-center text-white text-sm font-bold"
                       style={{ backgroundColor: ds.iconBg }}
@@ -432,11 +553,20 @@ const AdminServicesTab = () => {
                       ✕
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-foreground text-sm truncate">{ds.title}</p>
-                      <p className="text-[10px] text-muted-foreground">{ds.badge} · יימחק בעוד {daysLeft} ימים</p>
+                      <p className="font-semibold text-foreground text-sm truncate">
+                        {ds.title}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {ds.badge} · יימחק בעוד {daysLeft} ימים
+                      </p>
                     </div>
                     <div className="flex gap-1.5">
-                      <Button variant="outline" size="sm" onClick={() => handleRestore(ds.id)} className="gap-1 h-7 text-xs">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleRestore(ds.id)}
+                        className="gap-1 h-7 text-xs"
+                      >
                         <RotateCcw className="h-3 w-3" />
                         שחזר
                       </Button>
@@ -459,17 +589,30 @@ const AdminServicesTab = () => {
 
       {/* Edit/Add Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" dir="rtl">
+        <DialogContent
+          className="max-w-3xl max-h-[90vh] overflow-y-auto"
+          dir="rtl"
+        >
           <DialogHeader>
-            <DialogTitle>{editingId ? "עריכת שירות" : "הוספת שירות חדש"}</DialogTitle>
-            <DialogDescription>מלא את כל הפרטים של כרטיס השירות</DialogDescription>
+            <DialogTitle>
+              {editingId ? "עריכת שירות" : "הוספת שירות חדש"}
+            </DialogTitle>
+            <DialogDescription>
+              מלא את כל הפרטים של כרטיס השירות
+            </DialogDescription>
           </DialogHeader>
 
           <Tabs defaultValue="content" className="space-y-4">
             <TabsList className="grid w-full grid-cols-3 h-10">
-              <TabsTrigger value="content" className="text-xs">תוכן</TabsTrigger>
-              <TabsTrigger value="media" className="text-xs">מדיה ואייקון</TabsTrigger>
-              <TabsTrigger value="style" className="text-xs">צבעים ועיצוב</TabsTrigger>
+              <TabsTrigger value="content" className="text-xs">
+                תוכן
+              </TabsTrigger>
+              <TabsTrigger value="media" className="text-xs">
+                מדיה ואייקון
+              </TabsTrigger>
+              <TabsTrigger value="style" className="text-xs">
+                צבעים ועיצוב
+              </TabsTrigger>
             </TabsList>
 
             {/* Content Tab */}
@@ -479,7 +622,9 @@ const AdminServicesTab = () => {
                   <Label>תגית (Badge)</Label>
                   <Input
                     value={form.badge}
-                    onChange={(e) => setForm(prev => ({ ...prev, badge: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, badge: e.target.value }))
+                    }
                     placeholder="לדוגמה: אפיון חכם"
                   />
                 </div>
@@ -487,8 +632,10 @@ const AdminServicesTab = () => {
                   <Label>כותרת</Label>
                   <Input
                     value={form.title}
-                    onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="לדוגמה: מתכננים להצלחה"
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, title: e.target.value }))
+                    }
+                    placeholder="לדוגמה: מתכוננים להצלחה"
                   />
                 </div>
               </div>
@@ -497,7 +644,9 @@ const AdminServicesTab = () => {
                 <Label>תיאור</Label>
                 <Textarea
                   value={form.body}
-                  onChange={(e) => setForm(prev => ({ ...prev, body: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, body: e.target.value }))
+                  }
                   rows={4}
                   placeholder="תיאור מפורט של השירות..."
                 />
@@ -515,14 +664,18 @@ const AdminServicesTab = () => {
               <div className="flex items-center gap-3">
                 <Switch
                   checked={form.reverse}
-                  onCheckedChange={(v) => setForm(prev => ({ ...prev, reverse: v }))}
+                  onCheckedChange={(v) =>
+                    setForm((prev) => ({ ...prev, reverse: v }))
+                  }
                 />
                 <Label>לייאוט הפוך (תמונה בצד שמאל)</Label>
               </div>
               <div className="flex items-center gap-3">
                 <Switch
                   checked={form.published}
-                  onCheckedChange={(v) => setForm(prev => ({ ...prev, published: v }))}
+                  onCheckedChange={(v) =>
+                    setForm((prev) => ({ ...prev, published: v }))
+                  }
                 />
                 <Label>הצג את השירות באתר</Label>
               </div>
@@ -552,15 +705,23 @@ const AdminServicesTab = () => {
                 </div>
                 <Input
                   value={form.image?.startsWith("data:") ? "" : form.image}
-                  onChange={(e) => setForm(prev => ({ ...prev, image: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, image: e.target.value }))
+                  }
                   placeholder="או הדבק קישור לתמונה..."
                 />
                 {form.image && (
                   <div className="relative w-full h-32 rounded-lg overflow-hidden border border-border">
-                    <img src={form.image} alt="תצוגה מקדימה" className="h-full w-full object-cover" />
+                    <img
+                      src={form.image}
+                      alt="תצוגה מקדימה"
+                      className="h-full w-full object-cover"
+                    />
                     <button
                       type="button"
-                      onClick={() => setForm(prev => ({ ...prev, image: "" }))}
+                      onClick={() =>
+                        setForm((prev) => ({ ...prev, image: "" }))
+                      }
                       className="absolute top-2 left-2 rounded-full bg-foreground/70 p-1 text-background hover:bg-foreground"
                     >
                       <X className="h-4 w-4" />
@@ -571,7 +732,9 @@ const AdminServicesTab = () => {
 
               {/* Video */}
               <div className="space-y-2">
-                <Label className="text-sm font-semibold">סרטון (אופציונלי)</Label>
+                <Label className="text-sm font-semibold">
+                  סרטון (אופציונלי)
+                </Label>
                 <div className="flex gap-3">
                   <label className="flex-1 flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-secondary/30 px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-primary hover:bg-primary/5">
                     <Upload className="h-5 w-5" />
@@ -590,18 +753,26 @@ const AdminServicesTab = () => {
                   </label>
                 </div>
                 <Input
-                  value={form.video?.startsWith("data:") ? "" : (form.video || "")}
-                  onChange={(e) => setForm(prev => ({ ...prev, video: e.target.value }))}
+                  value={
+                    form.video?.startsWith("data:") ? "" : form.video || ""
+                  }
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, video: e.target.value }))
+                  }
                   placeholder="או הדבק קישור לסרטון..."
                 />
                 {form.video && (
                   <div className="relative flex items-center gap-2 rounded-lg border border-border p-2">
                     <span className="text-xs text-muted-foreground truncate flex-1">
-                      {form.video.startsWith("data:") ? "סרטון הועלה ✓" : form.video}
+                      {form.video.startsWith("data:")
+                        ? "סרטון הועלה ✓"
+                        : form.video}
                     </span>
                     <button
                       type="button"
-                      onClick={() => setForm(prev => ({ ...prev, video: "" }))}
+                      onClick={() =>
+                        setForm((prev) => ({ ...prev, video: "" }))
+                      }
                       className="rounded-full bg-foreground/70 p-1 text-background hover:bg-foreground"
                     >
                       <X className="h-3 w-3" />
@@ -617,7 +788,9 @@ const AdminServicesTab = () => {
                   <Button
                     variant={form.iconType === "lucide" ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setForm(prev => ({ ...prev, iconType: "lucide" }))}
+                    onClick={() =>
+                      setForm((prev) => ({ ...prev, iconType: "lucide" }))
+                    }
                     className="gap-1.5"
                   >
                     <Code2 className="h-3.5 w-3.5" />
@@ -626,7 +799,9 @@ const AdminServicesTab = () => {
                   <Button
                     variant={form.iconType === "image" ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setForm(prev => ({ ...prev, iconType: "image" }))}
+                    onClick={() =>
+                      setForm((prev) => ({ ...prev, iconType: "image" }))
+                    }
                     className="gap-1.5"
                   >
                     <Image className="h-3.5 w-3.5" />
@@ -635,7 +810,9 @@ const AdminServicesTab = () => {
                   <Button
                     variant={form.iconType === "svg" ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setForm(prev => ({ ...prev, iconType: "svg" }))}
+                    onClick={() =>
+                      setForm((prev) => ({ ...prev, iconType: "svg" }))
+                    }
                     className="gap-1.5"
                   >
                     <FileCode className="h-3.5 w-3.5" />
@@ -646,14 +823,18 @@ const AdminServicesTab = () => {
                 {form.iconType === "lucide" && (
                   <Select
                     value={form.iconLucideName || "Target"}
-                    onValueChange={(v) => setForm(prev => ({ ...prev, iconLucideName: v }))}
+                    onValueChange={(v) =>
+                      setForm((prev) => ({ ...prev, iconLucideName: v }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {lucideIconNames.map(name => (
-                        <SelectItem key={name} value={name}>{name}</SelectItem>
+                      {lucideIconNames.map((name) => (
+                        <SelectItem key={name} value={name}>
+                          {name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -677,16 +858,31 @@ const AdminServicesTab = () => {
                       />
                     </label>
                     <Input
-                      value={form.iconImage?.startsWith("data:") ? "" : (form.iconImage || "")}
-                      onChange={(e) => setForm(prev => ({ ...prev, iconImage: e.target.value }))}
+                      value={
+                        form.iconImage?.startsWith("data:")
+                          ? ""
+                          : form.iconImage || ""
+                      }
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          iconImage: e.target.value,
+                        }))
+                      }
                       placeholder="או הדבק קישור לתמונת אייקון..."
                     />
                     {form.iconImage && (
                       <div className="flex items-center gap-2">
-                        <img src={form.iconImage} alt="icon preview" className="h-10 w-10 object-contain rounded-lg border border-border p-1" />
+                        <img
+                          src={form.iconImage}
+                          alt="icon preview"
+                          className="h-10 w-10 object-contain rounded-lg border border-border p-1"
+                        />
                         <button
                           type="button"
-                          onClick={() => setForm(prev => ({ ...prev, iconImage: "" }))}
+                          onClick={() =>
+                            setForm((prev) => ({ ...prev, iconImage: "" }))
+                          }
                           className="text-destructive text-xs hover:underline"
                         >
                           הסר
@@ -700,15 +896,33 @@ const AdminServicesTab = () => {
                   <div className="space-y-2">
                     <Textarea
                       value={form.iconSvg || ""}
-                      onChange={(e) => setForm(prev => ({ ...prev, iconSvg: e.target.value }))}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          iconSvg: e.target.value,
+                        }))
+                      }
                       placeholder='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">...</svg>'
                       rows={4}
                       className="font-mono text-xs"
                     />
                     {form.iconSvg && (
                       <div className="flex items-center gap-2">
-                        {svgPreviewMarkup ? <div className="h-10 w-10 rounded-lg border border-border p-1 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: svgPreviewMarkup }} /> : <div className="h-10 w-10 rounded-lg border border-destructive/40 bg-destructive/5 p-1 flex items-center justify-center text-destructive"><FileCode className="h-4 w-4" /></div>}
-                        <span className="text-xs text-muted-foreground">תצוגה מקדימה</span>
+                        {svgPreviewMarkup ? (
+                          <div
+                            className="h-10 w-10 rounded-lg border border-border p-1 flex items-center justify-center"
+                            dangerouslySetInnerHTML={{
+                              __html: svgPreviewMarkup,
+                            }}
+                          />
+                        ) : (
+                          <div className="h-10 w-10 rounded-lg border border-destructive/40 bg-destructive/5 p-1 flex items-center justify-center text-destructive">
+                            <FileCode className="h-4 w-4" />
+                          </div>
+                        )}
+                        <span className="text-xs text-muted-foreground">
+                          תצוגה מקדימה
+                        </span>
                       </div>
                     )}
                   </div>
@@ -720,9 +934,11 @@ const AdminServicesTab = () => {
             <TabsContent value="style" className="space-y-4">
               {/* Quick Presets */}
               <div className="space-y-2">
-                <Label className="text-sm font-semibold">ערכות צבע מוכנות</Label>
+                <Label className="text-sm font-semibold">
+                  ערכות צבע מוכנות
+                </Label>
                 <div className="flex flex-wrap gap-2">
-                  {colorPresets.map(preset => (
+                  {colorPresets.map((preset) => (
                     <button
                       key={preset.name}
                       type="button"
@@ -731,7 +947,9 @@ const AdminServicesTab = () => {
                     >
                       <div
                         className="h-3 w-3 rounded-full"
-                        style={{ backgroundColor: `hsl(${preset.hue} ${preset.sat}% 50%)` }}
+                        style={{
+                          backgroundColor: `hsl(${preset.hue} ${preset.sat}% 50%)`,
+                        }}
                       />
                       {preset.name}
                     </button>
@@ -745,7 +963,12 @@ const AdminServicesTab = () => {
                   <Label className="text-xs">רקע (Gradient)</Label>
                   <Input
                     value={form.bgGradient}
-                    onChange={(e) => setForm(prev => ({ ...prev, bgGradient: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        bgGradient: e.target.value,
+                      }))
+                    }
                     className="font-mono text-[10px]"
                   />
                 </div>
@@ -753,7 +976,12 @@ const AdminServicesTab = () => {
                   <Label className="text-xs">צבע טקסט ראשי</Label>
                   <Input
                     value={form.textColor}
-                    onChange={(e) => setForm(prev => ({ ...prev, textColor: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        textColor: e.target.value,
+                      }))
+                    }
                     className="font-mono text-[10px]"
                   />
                 </div>
@@ -761,7 +989,12 @@ const AdminServicesTab = () => {
                   <Label className="text-xs">צבע טקסט משני</Label>
                   <Input
                     value={form.mutedTextColor}
-                    onChange={(e) => setForm(prev => ({ ...prev, mutedTextColor: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        mutedTextColor: e.target.value,
+                      }))
+                    }
                     className="font-mono text-[10px]"
                   />
                 </div>
@@ -769,7 +1002,9 @@ const AdminServicesTab = () => {
                   <Label className="text-xs">רקע אייקון</Label>
                   <Input
                     value={form.iconBg}
-                    onChange={(e) => setForm(prev => ({ ...prev, iconBg: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, iconBg: e.target.value }))
+                    }
                     className="font-mono text-[10px]"
                   />
                 </div>
@@ -777,7 +1012,9 @@ const AdminServicesTab = () => {
                   <Label className="text-xs">רקע Badge</Label>
                   <Input
                     value={form.badgeBg}
-                    onChange={(e) => setForm(prev => ({ ...prev, badgeBg: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, badgeBg: e.target.value }))
+                    }
                     className="font-mono text-[10px]"
                   />
                 </div>
@@ -785,7 +1022,12 @@ const AdminServicesTab = () => {
                   <Label className="text-xs">צבע Badge</Label>
                   <Input
                     value={form.badgeText}
-                    onChange={(e) => setForm(prev => ({ ...prev, badgeText: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        badgeText: e.target.value,
+                      }))
+                    }
                     className="font-mono text-[10px]"
                   />
                 </div>
@@ -793,7 +1035,9 @@ const AdminServicesTab = () => {
                   <Label className="text-xs">רקע תגיות</Label>
                   <Input
                     value={form.tagBg}
-                    onChange={(e) => setForm(prev => ({ ...prev, tagBg: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, tagBg: e.target.value }))
+                    }
                     className="font-mono text-[10px]"
                   />
                 </div>
@@ -801,7 +1045,9 @@ const AdminServicesTab = () => {
                   <Label className="text-xs">צבע תגיות</Label>
                   <Input
                     value={form.tagText}
-                    onChange={(e) => setForm(prev => ({ ...prev, tagText: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, tagText: e.target.value }))
+                    }
                     className="font-mono text-[10px]"
                   />
                 </div>
@@ -817,29 +1063,44 @@ const AdminServicesTab = () => {
                   <div className="flex items-center gap-3 mb-3">
                     <div
                       className="h-10 w-10 rounded-xl flex items-center justify-center text-white"
-                      style={{ backgroundColor: form.iconBg, boxShadow: form.iconShadow }}
+                      style={{
+                        backgroundColor: form.iconBg,
+                        boxShadow: form.iconShadow,
+                      }}
                     >
                       ★
                     </div>
                     <span
                       className="rounded-full px-3 py-1 text-xs font-bold"
-                      style={{ backgroundColor: form.badgeBg, color: form.badgeText }}
+                      style={{
+                        backgroundColor: form.badgeBg,
+                        color: form.badgeText,
+                      }}
                     >
                       {form.badge || "תגית"}
                     </span>
                   </div>
-                  <h4 className="text-lg font-black mb-1" style={{ color: form.textColor }}>
+                  <h4
+                    className="text-lg font-black mb-1"
+                    style={{ color: form.textColor }}
+                  >
                     {form.title || "כותרת השירות"}
                   </h4>
                   <p className="text-sm" style={{ color: form.mutedTextColor }}>
                     טקסט לדוגמה לתצוגה מקדימה של הצבעים...
                   </p>
                   <div className="flex gap-1.5 mt-3">
-                    {(tagsInput ? tagsInput.split(",").slice(0, 3) : ["תגית 1", "תגית 2"]).map((tag, i) => (
+                    {(tagsInput
+                      ? tagsInput.split(",").slice(0, 3)
+                      : ["תגית 1", "תגית 2"]
+                    ).map((tag, i) => (
                       <span
                         key={i}
                         className="rounded-full px-3 py-1 text-[10px] font-medium"
-                        style={{ backgroundColor: form.tagBg, color: form.tagText }}
+                        style={{
+                          backgroundColor: form.tagBg,
+                          color: form.tagText,
+                        }}
                       >
                         {tag.trim()}
                       </span>
@@ -851,10 +1112,16 @@ const AdminServicesTab = () => {
           </Tabs>
 
           <div className="flex gap-2 pt-2">
-            <Button onClick={handleSubmit} disabled={loading || !form.title || !form.badge} className="flex-1">
+            <Button
+              onClick={handleSubmit}
+              disabled={loading || !form.title || !form.badge}
+              className="flex-1"
+            >
               {loading ? "שומר..." : editingId ? "עדכן שירות" : "הוסף שירות"}
             </Button>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>ביטול</Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              ביטול
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
