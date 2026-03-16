@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Link } from "react-router-dom";
 import heroVisual from "@/assets/hero-visual.png";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -20,6 +21,7 @@ const HeroSection = () => {
   const line2Ref = useRef<HTMLSpanElement>(null);
   const subtextRef = useRef<HTMLParagraphElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
+  const visualIntroRef = useRef<HTMLDivElement>(null);
   const visualParallaxRef = useRef<HTMLDivElement>(null);
   const visualFloatRef = useRef<HTMLDivElement>(null);
   const floatTweenRef = useRef<gsap.core.Tween | null>(null);
@@ -30,6 +32,7 @@ const HeroSection = () => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const ctx = gsap.context(() => {
+      const visualIntro = visualIntroRef.current;
       const visualParallax = visualParallaxRef.current;
       const visualFloat = visualFloatRef.current;
       const line1 = line1Ref.current;
@@ -38,7 +41,7 @@ const HeroSection = () => {
       const buttons = buttonsRef.current;
 
       if (prefersReducedMotion) {
-        gsap.set([visualParallax, visualFloat, line1, line2, subtext, buttons], {
+        gsap.set([visualIntro, visualParallax, visualFloat, line1, line2, subtext, buttons], {
           clearProps: "all",
           opacity: 1,
           x: 0,
@@ -49,14 +52,15 @@ const HeroSection = () => {
         return;
       }
 
-      gsap.set(visualParallax, {
+      gsap.set(visualIntro, {
         opacity: 0,
-        x: -42,
-        y: 20,
-        scale: 0.9,
-        rotate: -1.5,
+        x: -58,
+        y: 28,
+        scale: 0.86,
+        rotate: -2.2,
         transformOrigin: "50% 50%",
       });
+      gsap.set(visualParallax, { y: 0 });
       gsap.set([line1, line2, subtext, buttons], { opacity: 0 });
       gsap.set(line1, { x: 34, y: 14 });
       gsap.set(line2, { x: 40, y: 18 });
@@ -64,30 +68,30 @@ const HeroSection = () => {
       gsap.set(buttons, { y: 20, scale: 0.97, transformOrigin: "50% 50%" });
       gsap.set(visualFloat, { y: 0 });
 
+      if (sectionRef.current && visualParallax) {
+        parallaxTweenRef.current = gsap.to(visualParallax, {
+          y: -26,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.45,
+            invalidateOnRefresh: true,
+          },
+        });
+      }
+
       introTimelineRef.current = gsap.timeline({
         defaults: { ease: "power3.out" },
         onComplete: () => {
           if (visualFloat) {
             floatTweenRef.current = gsap.to(visualFloat, {
               y: -8,
-              duration: 4.6,
+              duration: 5.4,
               ease: "sine.inOut",
               yoyo: true,
               repeat: -1,
-            });
-          }
-
-          if (sectionRef.current && visualParallax) {
-            parallaxTweenRef.current = gsap.to(visualParallax, {
-              y: -26,
-              ease: "none",
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: 0.45,
-                invalidateOnRefresh: true,
-              },
             });
           }
         },
@@ -95,14 +99,25 @@ const HeroSection = () => {
 
       const tl = introTimelineRef.current;
 
-      if (visualParallax) {
-        tl.to(visualParallax, {
+      if (visualIntro) {
+        tl.to(visualIntro, {
+          opacity: 0.82,
+          x: -10,
+          y: 6,
+          scale: 0.965,
+          rotate: -0.45,
+          duration: 0.96,
+          ease: "power2.out",
+        });
+
+        tl.to(visualIntro, {
           opacity: 1,
           x: 0,
           y: 0,
           scale: 1,
           rotate: 0,
-          duration: 1.08,
+          duration: 0.84,
+          ease: "power2.out",
         });
       }
 
@@ -115,7 +130,7 @@ const HeroSection = () => {
             y: 0,
             duration: 0.82,
           },
-          "-=0.6",
+          "-=0.54",
         );
       }
 
@@ -200,11 +215,11 @@ const HeroSection = () => {
 
           {/* Buttons */}
           <div ref={buttonsRef} className="flex flex-wrap gap-4 pt-2">
-            <a
-              href="/contact"
+            <Link
+              to="/contact"
               className="btn-glow rounded-xl bg-primary px-10 py-4 text-base font-bold text-primary-foreground transition-all duration-200 hover:scale-[1.04] hover:brightness-110 active:scale-[0.97]">
               {contactLabel}
-            </a>
+            </Link>
             <a
               href="#services"
               onClick={(e) => {
@@ -224,12 +239,14 @@ const HeroSection = () => {
         {/* Left Side - Visual */}
         <div className="flex flex-1 items-center justify-center">
           <div ref={visualParallaxRef} className="relative will-change-transform">
-            <div ref={visualFloatRef} className="will-change-transform">
-              <img
-                src={heroVisual}
-                alt={heroImageAlt}
-                className="soft-shadow-lg w-full max-w-lg rounded-2xl lg:max-w-xl"
-              />
+            <div ref={visualIntroRef} className="will-change-transform">
+              <div ref={visualFloatRef} className="will-change-transform">
+                <img
+                  src={heroVisual}
+                  alt={heroImageAlt}
+                  className="soft-shadow-lg w-full max-w-lg rounded-2xl lg:max-w-xl"
+                />
+              </div>
             </div>
           </div>
         </div>
