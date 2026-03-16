@@ -9,7 +9,6 @@ import {
   MessageCircle,
   User,
   Phone,
-  Building2,
   FileText,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -66,11 +65,6 @@ const contactSchema = z
       .regex(/^[0-9\-+()\s]+$/, {
         message: "מספר טלפון יכול להכיל רק ספרות ותווים מיוחדים: +()-",
       }),
-    companyName: z
-      .string()
-      .trim()
-      .max(100, { message: "שם החברה חייב להיות עד 100 תווים" })
-      .optional(),
     inquiryType: z
       .string()
       .trim()
@@ -196,7 +190,6 @@ const ContactSection = () => {
       name: "",
       email: "",
       phone: "",
-      companyName: "",
       inquiryType: "",
       subject: "",
     },
@@ -234,7 +227,6 @@ const ContactSection = () => {
         name: data.name,
         email: leadEmail,
         phone: data.phone,
-        companyName: data.companyName,
         inquiryType: data.inquiryType,
         subject,
         sendMethod: effectiveSendMethod,
@@ -242,7 +234,7 @@ const ContactSection = () => {
 
       if (effectiveSendMethod === "whatsapp") {
         const subjectLine = subject ? `\n\nנושא הפנייה: ${subject}` : "";
-        const message = `שלום! אני ${data.name}${data.companyName ? ` מחברת ${data.companyName}` : ""}.
+        const message = `שלום! אני ${data.name}.
 
 טלפון: ${data.phone}${subjectLine}
 
@@ -262,7 +254,6 @@ const ContactSection = () => {
             name: lead.name,
             email: lead.email,
             phone: lead.phone,
-            companyName: lead.companyName,
             inquiryType: lead.inquiryType,
             subject: lead.subject || "",
             sendMethod: "email",
@@ -287,7 +278,6 @@ const ContactSection = () => {
         name: "",
         email: "",
         phone: "",
-        companyName: "",
         inquiryType: "",
         subject: "",
       });
@@ -525,7 +515,7 @@ const ContactSection = () => {
                 </motion.div>
 
                 <motion.div
-                  className="grid grid-cols-1 gap-6 md:grid-cols-2"
+                  className="grid grid-cols-1 gap-6"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
@@ -548,33 +538,9 @@ const ContactSection = () => {
                       />
                       <Phone className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
                     </div>
-                    {errors.phone && (
+                  {errors.phone && (
                       <p className="text-sm text-destructive">
                         {errors.phone.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="companyName"
-                      className="flex items-center gap-2 text-sm font-medium"
-                    >
-                      <Building2 className="h-4 w-4 text-primary" />
-                      שם החברה / עסק
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="companyName"
-                        {...register("companyName")}
-                        placeholder="שם החברה או העסק (אופציונלי)"
-                        className={`pr-10 transition-shadow duration-300 focus:shadow-md focus:shadow-primary/10 ${errors.companyName ? "border-destructive" : ""}`}
-                      />
-                      <Building2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
-                    </div>
-                    {errors.companyName && (
-                      <p className="text-sm text-destructive">
-                        {errors.companyName.message}
                       </p>
                     )}
                   </div>
@@ -674,6 +640,14 @@ const ContactSection = () => {
                       target="_blank"
                     >
                       תנאי השימוש
+                    </Link>{" "}
+                    /{" "}
+                    <Link
+                      to="/privacy"
+                      className="font-medium text-primary hover:underline"
+                      target="_blank"
+                    >
+                      מדיניות ופרטיות
                     </Link>
                   </Label>
                 </motion.div>
