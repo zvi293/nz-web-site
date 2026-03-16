@@ -31,14 +31,17 @@ const ContactCTA = () => {
     const desc = descRef.current;
     const btn = btnRef.current;
     const sparkles = sparklesRef.current.filter(Boolean);
+    let entranceTl: gsap.core.Timeline | null = null;
+    let floatTween: gsap.core.Tween | null = null;
+    let trigger: ScrollTrigger | null = null;
 
     const ctx = gsap.context(() => {
       gsap.set(card, { y: 40, opacity: 0, scale: 0.95 });
       if (glowLine) gsap.set(glowLine, { x: "-100%" });
-      if (icon) gsap.set(icon, { opacity: 0, scale: 0.5, rotation: -90 });
-      if (titles.length > 0) gsap.set(titles, { y: 30, opacity: 0 });
-      if (desc) gsap.set(desc, { y: 15, opacity: 0, filter: "blur(4px)" });
-      if (btn) gsap.set(btn, { y: 20, opacity: 0, scale: 0.9 });
+      if (icon) gsap.set(icon, { y: 34, opacity: 0 });
+      if (titles.length > 0) gsap.set(titles, { y: 42, opacity: 0 });
+      if (desc) gsap.set(desc, { y: 28, opacity: 0 });
+      if (btn) gsap.set(btn, { y: 24, opacity: 0, scale: 0.96 });
       if (sparkles.length > 0) gsap.set(sparkles, { scale: 0, opacity: 0 });
 
       if (orb1Ref.current) {
@@ -60,59 +63,128 @@ const ContactCTA = () => {
         });
       }
 
-      function playEntrance() {
-        const tl = gsap.timeline();
+      entranceTl = gsap.timeline({
+        paused: true,
+        defaults: { ease: "power3.out" },
+        onComplete: () => {
+          floatTween = gsap.to(card, {
+            y: -5,
+            boxShadow: "0 8px 80px -12px hsl(217 91% 60% / 0.2)",
+            duration: 4,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: -1,
+          });
+        },
+      });
 
-        tl.to(card, {
-          y: 0, opacity: 1, scale: 1, duration: 1.4, ease: "power3.out",
-        })
-        if (glowLine) {
-          tl.to(glowLine, {
-            x: "200%", duration: 1.6, ease: "power2.inOut",
-          }, "-=0.8");
-        }
-        if (icon) {
-          tl.to(icon, {
-            opacity: 1, scale: 1, rotation: 0, duration: 1, ease: "power2.out",
-          }, "-=1");
-        }
-        if (titles.length > 0) {
-          tl.to(titles, {
-            y: 0, opacity: 1, duration: 0.9, stagger: 0.18, ease: "power2.out",
-          }, "-=0.6");
-        }
-        if (desc) {
-          tl.to(desc, {
-            y: 0, opacity: 1, filter: "blur(0px)", duration: 0.8, ease: "power2.out",
-          }, "-=0.4");
-        }
-        if (btn) {
-          tl.to(btn, {
-            y: 0, opacity: 1, scale: 1, duration: 0.9, ease: "power2.out",
-          }, "-=0.3");
-        }
-        if (sparkles.length > 0) {
-          tl.to(sparkles, {
-            scale: 1, opacity: 1, duration: 0.6, stagger: { each: 0.08, from: "center" }, ease: "power2.out",
-          }, "-=0.4");
-        }
+      entranceTl.to(card, {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 1.05,
+        clearProps: "transform,opacity",
+      });
+
+      if (glowLine) {
+        entranceTl.to(
+          glowLine,
+          {
+            x: "200%",
+            duration: 1.4,
+            ease: "power2.inOut",
+            clearProps: "transform",
+          },
+          "-=0.72",
+        );
       }
 
-      playEntrance();
+      if (icon) {
+        entranceTl.to(
+          icon,
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.72,
+            clearProps: "transform,opacity",
+          },
+          "-=0.82",
+        );
+      }
 
-      // Floating + pulsing glow
-      gsap.to(card, {
-        y: -5,
-        boxShadow: "0 8px 80px -12px hsl(217 91% 60% / 0.2)",
-        duration: 4,
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: -1,
-        delay: 2,
+      if (titles.length > 0) {
+        entranceTl.to(
+          titles,
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.82,
+            stagger: 0.16,
+            clearProps: "transform,opacity",
+          },
+          "-=0.48",
+        );
+      }
+
+      if (desc) {
+        entranceTl.to(
+          desc,
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.72,
+            clearProps: "transform,opacity",
+          },
+          "-=0.36",
+        );
+      }
+
+      if (btn) {
+        entranceTl.to(
+          btn,
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.76,
+            clearProps: "transform,opacity",
+          },
+          "-=0.28",
+        );
+      }
+
+      if (sparkles.length > 0) {
+        entranceTl.to(
+          sparkles,
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 0.5,
+            stagger: { each: 0.06, from: "center" },
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+          },
+          "-=0.4",
+        );
+      }
+
+      trigger = ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: "top 90%",
+        once: true,
+        invalidateOnRefresh: true,
+        onEnter: () => {
+          entranceTl?.play(0);
+        },
       });
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      trigger?.kill();
+      floatTween?.kill();
+      entranceTl?.kill();
+      ctx.revert();
+    };
   }, []);
 
   const setSparkleRef = (i: number) => (el: HTMLDivElement | null) => {
