@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { getCanonicalUrl } from "@/lib/site-url";
 
 export interface SeoMetaOptions {
   title: string;
@@ -44,7 +45,7 @@ export function useSeoMeta({ title, description, noindex = false }: SeoMetaOptio
       document.head.appendChild(canonicalEl);
       createdCanonical = true;
     }
-    canonicalEl.setAttribute("href", `${window.location.origin}${window.location.pathname}`);
+    canonicalEl.setAttribute("href", getCanonicalUrl(window.location.pathname));
 
     return () => {
       document.title = prevTitle;
