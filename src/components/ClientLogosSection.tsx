@@ -134,15 +134,16 @@ const ClientLogosSection = () => {
       mm.add("(max-width: 767px)", () => {
         gsap.fromTo(
           sectionRef.current,
-          { opacity: 0, y: 28 },
+          { opacity: 0, y: 42, scale: 0.985 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.8,
+            scale: 1,
+            duration: 0.9,
             ease: "power3.out",
             scrollTrigger: {
               trigger: sectionRef.current,
-              start: "top 92%",
+              start: "top 95%",
               once: true,
               invalidateOnRefresh: true,
             },

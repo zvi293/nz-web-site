@@ -300,18 +300,19 @@ const ServicesSection = () => {
         if (headerRef.current) {
           gsap.fromTo(
             headerRef.current,
-            { y: 44, opacity: 0 },
+            { y: 56, opacity: 0 },
             {
               y: 0,
               opacity: 1,
-              duration: 0.85,
+              duration: 0.9,
               ease: "power3.out",
               scrollTrigger: {
                 trigger: headerRef.current,
-                start: "top 94%",
+                start: "top 96%",
                 once: true,
                 invalidateOnRefresh: true,
               },
+              clearProps: "transform,opacity",
             }
           );
         }
@@ -324,54 +325,70 @@ const ServicesSection = () => {
           const imageBlock = block.querySelector("[data-image]") as HTMLElement | null;
 
           if (bgEl) {
-            gsap.set(bgEl, { opacity: 1, scale: 1, clearProps: "transform" });
+            gsap.set(bgEl, { opacity: 1, scale: 1, clearProps: "transform,opacity" });
+          }
+
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: block,
+              start: "top 95%",
+              once: true,
+              invalidateOnRefresh: true,
+            },
+          });
+
+          if (bgEl) {
+            tl.fromTo(
+              bgEl,
+              {
+                opacity: 0.72,
+                scale: 0.985,
+              },
+              {
+                opacity: 1,
+                scale: 1,
+                duration: 0.55,
+                ease: "power2.out",
+                clearProps: "transform,opacity",
+              },
+            );
           }
 
           if (textBlock) {
-            gsap.fromTo(
+            tl.fromTo(
               textBlock,
               {
-                y: 34,
+                y: 42,
                 opacity: 0,
               },
               {
                 y: 0,
                 opacity: 1,
-                duration: 0.78,
+                duration: 0.84,
                 ease: "power3.out",
-                scrollTrigger: {
-                  trigger: block,
-                  start: "top 93%",
-                  once: true,
-                  invalidateOnRefresh: true,
-                },
                 clearProps: "transform,opacity",
-              }
+              },
+              bgEl ? "-=0.24" : 0,
             );
           }
 
           if (imageBlock) {
-            gsap.fromTo(
+            tl.fromTo(
               imageBlock,
               {
-                y: 26,
+                y: 34,
                 opacity: 0,
-                scale: 0.965,
+                scale: 0.945,
               },
               {
                 y: 0,
                 opacity: 1,
                 scale: 1,
-                duration: 0.9,
+                duration: 0.96,
                 ease: "power2.out",
-                scrollTrigger: {
-                  trigger: block,
-                  start: "top 91%",
-                  once: true,
-                  invalidateOnRefresh: true,
-                },
                 clearProps: "transform,opacity",
-              }
+              },
+              textBlock ? "-=0.58" : bgEl ? "-=0.18" : 0,
             );
           }
         });
