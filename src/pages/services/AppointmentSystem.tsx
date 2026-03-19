@@ -14,7 +14,7 @@ const SCHEMA_ID = "service-schema-appointment-system";
 
 const AppointmentSystem = () => {
   useSeoMeta({
-    title: "מערכת ניהול תורים לעסקים | NZ-WEB",
+    title: "מערכת ניהול תורים לעסקים | NZ-web",
     description: "פיתוח מערכת ניהול תורים חכמה לעסקים שרוצים לנהל פגישות בצורה מסודרת, להפחית עומס ידני ולשפר את חוויית הלקוח.",
   });
   useBreadcrumb({ name: "מערכת ניהול תורים לעסקים", path: "/services/appointment-system" });
@@ -29,7 +29,7 @@ const AppointmentSystem = () => {
       serviceType: "Appointment Management System",
       provider: {
         "@type": "Organization",
-        name: "NZ-WEB",
+        name: "NZ-web",
         url: "https://nz-web.com",
       },
     });

@@ -199,10 +199,10 @@ const About = () => {
             <div className="space-y-6 text-base md:text-lg text-muted-foreground leading-relaxed">
               {data.visionParagraphs.map((p, i) => (
                 <p key={i}>
-                  {i === 1 && p.startsWith("ובשביל זה NZ WEB כאן.") ? (
+                  {i === 1 && p.startsWith("ובשביל זה NZ-web כאן.") ? (
                     <>
-                      <span className="text-primary font-bold">ובשביל זה NZ WEB כאן.</span>
-                      {p.slice("ובשביל זה NZ WEB כאן.".length)}
+                      <span className="text-primary font-bold">ובשביל זה NZ-web כאן.</span>
+                      {p.slice("ובשביל זה NZ-web כאן.".length)}
                     </>
                   ) : p}
                 </p>

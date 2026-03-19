@@ -333,7 +333,7 @@ const Footer = () => {
                   
                   NZ
                   <span className="text-yellow-300">-</span>
-                  WEB
+                  web
                 </motion.div>
               </Link>
               <p className="font-heebo text-sm text-white/60 italic">

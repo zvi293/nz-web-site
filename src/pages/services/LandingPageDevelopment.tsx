@@ -14,7 +14,7 @@ const SCHEMA_ID = "service-schema-landing-page-development";
 
 const LandingPageDevelopment = () => {
   useSeoMeta({
-    title: "בניית דפי נחיתה מקצועיים | NZ-WEB",
+    title: "בניית דפי נחיתה מקצועיים | NZ-web",
     description: "בניית דפי נחיתה מקצועיים לעסקים שרוצים לייצר פניות בצורה ברורה, מהירה ומדויקת לקמפיינים שיווקיים.",
   });
   useBreadcrumb({ name: "בניית דפי נחיתה מקצועיים", path: "/services/landing-page-development" });
@@ -29,7 +29,7 @@ const LandingPageDevelopment = () => {
       serviceType: "Landing Page Development",
       provider: {
         "@type": "Organization",
-        name: "NZ-WEB",
+        name: "NZ-web",
         url: "https://nz-web.com",
       },
     });

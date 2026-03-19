@@ -14,7 +14,7 @@ const SCHEMA_ID = "service-schema-website-development";
 
 const WebsiteDevelopment = () => {
   useSeoMeta({
-    title: "פיתוח אתרים מקצועי | NZ-WEB",
+    title: "פיתוח אתרים מקצועי | NZ-web",
     description: "פיתוח אתרים מודרניים לעסקים שרוצים נוכחות דיגיטלית יציבה, מהירה ומקצועית.",
   });
   useBreadcrumb({ name: "פיתוח אתרים מקצועי", path: "/services/website-development" });
@@ -29,7 +29,7 @@ const WebsiteDevelopment = () => {
       serviceType: "Website Development",
       provider: {
         "@type": "Organization",
-        name: "NZ-WEB",
+        name: "NZ-web",
         url: "https://nz-web.com",
       },
     });

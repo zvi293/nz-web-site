@@ -79,7 +79,7 @@ export function normalizeLogoImageUrl(name: string, value?: string | null) {
 }
 
 export function createLabeledImageDataUri(label: string, options: DataUriOptions = {}) {
-  const safeLabel = label.trim() || "NZ-WEB";
+  const safeLabel = label.trim() || "NZ-web";
   const escapedLabel = escapeXml(safeLabel);
   const background = options.background ?? "#f5f7fb";
   const foreground = options.foreground ?? "#0f172a";

@@ -85,7 +85,7 @@ const Header = () => {
             className="text-xl md:text-2xl font-black tracking-tight text-foreground cursor-pointer"
             style={{ fontFamily: "'Heebo', sans-serif", letterSpacing: "-0.02em" }}
           >
-            NZ<span className="text-gradient-brand">-WEB</span>
+            NZ<span className="text-gradient-brand">-web</span>
           </a>
 
           {/* Nav */}

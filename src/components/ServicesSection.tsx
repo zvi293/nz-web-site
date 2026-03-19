@@ -512,7 +512,7 @@ const ServicesSection = () => {
         <div ref={headerRef} className="mx-auto mb-20 max-w-3xl text-center md:mb-28">
           <p className="mb-4 text-sm font-semibold tracking-widest text-primary uppercase">השירותים שלנו</p>
           <h2 className="mb-6 text-3xl font-black leading-tight text-foreground md:text-4xl lg:text-5xl xl:text-[3.25rem]">
-            איך אנחנו ב-<span className="text-gradient-brand">NZ-WEB</span> עושים את זה?
+            איך אנחנו ב-<span className="text-gradient-brand">NZ-web</span> עושים את זה?
           </h2>
           <p className="mx-auto max-w-2xl text-base leading-[1.9] text-muted-foreground md:text-lg">
             אנחנו לא סתם בונים אתרים, אנחנו יוצרים נכסים דיגיטליים שמייצרים רווחים.

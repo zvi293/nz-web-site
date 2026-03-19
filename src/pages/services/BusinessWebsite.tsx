@@ -14,7 +14,7 @@ const SCHEMA_ID = "service-schema-business-website";
 
 const BusinessWebsite = () => {
   useSeoMeta({
-    title: "בניית אתר תדמית לעסקים | NZ-WEB",
+    title: "בניית אתר תדמית לעסקים | NZ-web",
     description: "בניית אתר תדמית מקצועי לעסקים שרוצים להציג שירותים בצורה ברורה, לבנות אמון ולהיראות נכון בגוגל.",
   });
   useBreadcrumb({ name: "בניית אתר תדמית לעסקים", path: "/services/business-website" });
@@ -29,7 +29,7 @@ const BusinessWebsite = () => {
       serviceType: "Business Website",
       provider: {
         "@type": "Organization",
-        name: "NZ-WEB",
+        name: "NZ-web",
         url: "https://nz-web.com",
       },
     });

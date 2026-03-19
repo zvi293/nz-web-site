@@ -104,17 +104,17 @@ const defaultSettings: SiteSettings = {
     phone: "058-7292029",
     email: "nzweb295@gmail.com",
     whatsappNumber: "972587292029",
-    whatsappMessage: "היי, הגעתי מהאתר של NZ-WEB ואשמח לשמוע פרטים נוספים על שירותי פיתוח ועיצוב 🚀",
+    whatsappMessage: "היי, הגעתי מהאתר של NZ-web ואשמח לשמוע פרטים נוספים על שירותי פיתוח ועיצוב 🚀",
   },
   seo: {
-    siteTitle: "NZ-WEB | פיתוח ועיצוב אתרים מקצועי",
+    siteTitle: "NZ-web | פיתוח ועיצוב אתרים מקצועי",
     siteDescription: "סטודיו לפיתוח אתרים, עיצוב UI/UX ופתרונות דיגיטליים מתקדמים. Perfect in every Pixel.",
     keywords: "פיתוח אתרים, עיצוב אתרים, UI UX, React, Full Stack, בניית אתרים",
     ogImage: getResolvedOgImageUrl(getEnvSiteUrl(), ""),
   },
   footer: {
     tagline: "Perfect in every Pixel",
-    copyrightText: "NZ WEB. כל הזכויות שמורות.",
+    copyrightText: "NZ-web. כל הזכויות שמורות.",
     showAdminLink: true,
   },
   social: {

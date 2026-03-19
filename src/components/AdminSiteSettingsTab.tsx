@@ -603,7 +603,7 @@ const AdminSiteSettingsTab = () => {
                 <img src={resolvedOgImageUrl} alt="Social preview" className="h-52 w-full object-cover" />
                 <div className="space-y-2 p-4" dir="ltr">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">{resolvedSiteUrl.replace(/^https?:\/\//, "")}</p>
-                  <p className="line-clamp-2 text-lg font-semibold text-foreground">{settings.seo.siteTitle || "NZ-WEB"}</p>
+                  <p className="line-clamp-2 text-lg font-semibold text-foreground">{settings.seo.siteTitle || "NZ-web"}</p>
                   <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
                     {settings.seo.siteDescription || "תיאור האתר יוצג כאן."}
                   </p>
