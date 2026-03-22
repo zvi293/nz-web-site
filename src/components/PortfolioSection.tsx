@@ -5,7 +5,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowLeft } from "lucide-react";
 
 import { fetchProjects, type Project } from "@/lib/projects-api";
-import { createLabeledImageDataUri, isRenderableAssetUrl } from "@/lib/runtime-safety";
+import {
+  createLabeledImageDataUri,
+  isRenderableAssetUrl,
+} from "@/lib/runtime-safety";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,7 +18,9 @@ const ProjectCardImage = ({ project }: { project: Project }) => {
     foreground: "#1e293b",
     fontSize: 22,
   });
-  const [src, setSrc] = useState(isRenderableAssetUrl(project.image) ? project.image : fallbackSrc);
+  const [src, setSrc] = useState(
+    isRenderableAssetUrl(project.image) ? project.image : fallbackSrc,
+  );
 
   useEffect(() => {
     setSrc(isRenderableAssetUrl(project.image) ? project.image : fallbackSrc);
@@ -94,7 +99,9 @@ const PortfolioSection = () => {
     >
       <div className="container mx-auto px-4 md:px-6">
         <div ref={headerRef} className="mb-14 text-center md:mb-20">
-          <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">פרויקטים נבחרים</p>
+          <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">
+            פרויקטים אחרונים
+          </p>
           <h2 className="text-2xl font-black leading-tight text-foreground md:text-4xl lg:text-5xl">
             הופכים חזון למציאות דיגיטלית
           </h2>
@@ -125,7 +132,9 @@ const PortfolioSection = () => {
                   ))}
                 </div>
 
-                <h3 className="text-sm font-bold leading-snug text-foreground md:text-xl">{project.title}</h3>
+                <h3 className="text-sm font-bold leading-snug text-foreground md:text-xl">
+                  {project.title}
+                </h3>
                 <p className="line-clamp-3 text-[11px] leading-relaxed text-muted-foreground md:line-clamp-none md:text-sm">
                   {project.description}
                 </p>
