@@ -1,14 +1,49 @@
 [build]
-command = "npm run build"
-publish = "dist"
+  command = "npm run build"
+  publish = "dist"
 
+# ── Canonical redirect: www → non-www ──
 [[redirects]]
-from = "https://www.nz-web.com/*"
-to = "https://nz-web.com/:splat"
-status = 301
-force = true
+  from = "https://www.nz-web.com/*"
+  to   = "https://nz-web.com/:splat"
+  status = 301
+  force  = true
 
+# ── SPA fallback: serve pre-rendered HTML if exists, else index.html ──
 [[redirects]]
-from = "/*"
-to = "/index.html"
-status = 200
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# ── Security + SEO headers for all pages ──
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection       = "1; mode=block"
+    Referrer-Policy        = "strict-origin-when-cross-origin"
+    Permissions-Policy     = "camera=(), microphone=(), geolocation=()"
+
+# ── Long cache for assets ──
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ── Static files cache ──
+[[headers]]
+  for = "/*.webmanifest"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control   = "public, max-age=86400"
+    Content-Type    = "application/xml; charset=utf-8"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"

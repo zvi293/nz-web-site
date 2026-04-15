@@ -7,7 +7,7 @@ const config: ServicePageConfig = {
     description: "בניית אתר תדמית מקצועי לעסקים בישראל. עיצוב ייחודי, תוכן ממיר ו-SEO מובנה. האתר שגורם ללקוחות לבחור בכם. ניסיון ב-40+ אתרי תדמית.",
     keywords: "בניית אתר תדמית, אתר תדמית לעסקים, בניית אתר לעסק, עיצוב אתר תדמית, אתר תדמית מקצועי, בניית אתר לחברה, אתר עסקי",
   } as const,
-  breadcrumb: { name: "אתר תדמית לעסקים", path: "/services/business-website" },
+  breadcrumb: { name: "אתר תדמית לעסקים", path: "/services/business-website", parent: { name: "שירותים", path: "/services" } },
   schemaId: "service-schema-business-website",
   schemaServiceType: "Business Website Development",
   schemaUrl: "https://nz-web.com/services/business-website",

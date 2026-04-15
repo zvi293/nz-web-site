@@ -7,7 +7,7 @@ const config: ServicePageConfig = {
     description: "בניית אתרים מהירים, מודרניים ומרהיבים לעסקים בישראל. Full-Stack עם React, TypeScript ועיצוב UI/UX. ניקוד 90+ ב-PageSpeed, SEO מובנה ותמיכה מלאה.",
     keywords: "בניית אתרים, בניית אתר אינטרנט, בניית אתרים מקצועיים, פיתוח אתרים, בניית אתר לעסק, עיצוב אתרים, React TypeScript, Full Stack Israel",
   } as const,
-  breadcrumb: { name: "בניית אתרים מקצועיים", path: "/services/web-development" },
+  breadcrumb: { name: "בניית אתרים מקצועיים", path: "/services/web-development", parent: { name: "שירותים", path: "/services" } },
   schemaId: "service-schema-web-development",
   schemaServiceType: "Web Development",
   schemaUrl: "https://nz-web.com/services/web-development",

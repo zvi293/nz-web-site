@@ -7,7 +7,7 @@ const config: ServicePageConfig = {
     description: "בניית דפי נחיתה מקצועיים לקמפיינים ממומנים ואורגניים. עיצוב ממוקד המרה, טעינה מתחת ל-2 שניות, A/B testing. מכפיל את ה-ROI של הפרסום שלכם.",
     keywords: "בניית דפי נחיתה, דף נחיתה, landing page, בניית לנדינג פייג', עמוד נחיתה ממיר, דף נחיתה לגוגל, דף נחיתה לפייסבוק, קמפיין ממומן",
   } as const,
-  breadcrumb: { name: "בניית דפי נחיתה", path: "/services/landing-page-development" },
+  breadcrumb: { name: "בניית דפי נחיתה", path: "/services/landing-page-development", parent: { name: "שירותים", path: "/services" } },
   schemaId: "service-schema-landing-page",
   schemaServiceType: "Landing Page Development",
   schemaUrl: "https://nz-web.com/services/landing-page-development",

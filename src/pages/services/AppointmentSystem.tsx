@@ -7,7 +7,7 @@ const config: ServicePageConfig = {
     description: "מערכת ניהול תורים חכמה לעסקים בישראל. הזמנות אונליין 24/6, תזכורות SMS אוטומטיות, לוח שנה וניתוח נתונים. מפחיתה no-shows ב-70%.",
     keywords: "מערכת ניהול תורים, מערכת קביעת תורים, הזמנת תורים אונליין, תוכנה לניהול תורים, מערכת תורים לרופא, מערכת תורים לספא, בניית מערכת ניהול תורים",
   } as const,
-  breadcrumb: { name: "מערכת ניהול תורים", path: "/services/appointment-system" },
+  breadcrumb: { name: "מערכת ניהול תורים", path: "/services/appointment-system", parent: { name: "שירותים", path: "/services" } },
   schemaId: "service-schema-appointment-system",
   schemaServiceType: "Appointment Management System",
   schemaUrl: "https://nz-web.com/services/appointment-system",

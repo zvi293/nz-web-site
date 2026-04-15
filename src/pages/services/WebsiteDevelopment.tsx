@@ -7,7 +7,7 @@ const config: ServicePageConfig = {
     description: "פיתוח אתרים מתקדם עם ארכיטקטורה שמחזיקה לשנים. React, TypeScript, Supabase. מסד נתונים, API, ממשק ניהול. פיתוח מערכות לעסקים בישראל.",
     keywords: "פיתוח אתרים, פיתוח אתרים מקצועי, פיתוח מערכות לעסקים, פיתוח Full Stack, React Developer Israel, TypeScript, Supabase, בניית מערכת ניהול",
   } as const,
-  breadcrumb: { name: "פיתוח אתרים", path: "/services/website-development" },
+  breadcrumb: { name: "פיתוח אתרים", path: "/services/website-development", parent: { name: "שירותים", path: "/services" } },
   schemaId: "service-schema-website-development",
   schemaServiceType: "Website Development",
   schemaUrl: "https://nz-web.com/services/website-development",

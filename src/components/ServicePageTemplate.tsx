@@ -387,6 +387,38 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
         </div>
       </section>
 
+      {/* ── Internal links — related services ── */}
+      <section className="border-t border-border/30 py-10 md:py-14">
+        <div className="container mx-auto max-w-4xl px-6">
+          <p className="mb-6 text-center text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            שירותים נוספים שיכולים לעניין אתכם
+          </p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:gap-4">
+            {[
+              { label: "בניית אתרים מקצועיים", href: "/services/web-development" },
+              { label: "אתר תדמית לעסקים", href: "/services/business-website" },
+              { label: "מערכת ניהול תורים", href: "/services/appointment-system" },
+              { label: "דפי נחיתה ממירים", href: "/services/landing-page-development" },
+              { label: "פיתוח אתרים", href: "/services/website-development" },
+              { label: "React Development", href: "/services/react-development" },
+              { label: "כל השירותים", href: "/services" },
+              { label: "צרו קשר", href: "/contact" },
+            ]
+              .filter((s) => s.href !== config.schemaUrl.replace("https://nz-web.com", ""))
+              .slice(0, 6)
+              .map((s) => (
+                <Link
+                  key={s.href}
+                  to={s.href}
+                  className="rounded-xl border border-border/40 bg-card px-4 py-3 text-center text-sm font-medium text-muted-foreground transition-all hover:border-primary/30 hover:bg-primary/[0.05] hover:text-primary"
+                >
+                  {s.label}
+                </Link>
+              ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA ── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-emerald-950 py-20 md:py-28">
         <div className="pointer-events-none absolute inset-0">

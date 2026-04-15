@@ -9,6 +9,7 @@ import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
 import { fetchBlogPost, fetchBlogPosts, formatDate, type BlogPost as Post } from "@/lib/blog-api";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
+import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 /* Simple Markdown-to-HTML renderer (no external dep) */
 function renderMarkdown(md: string): string {
@@ -30,9 +31,49 @@ const BlogPost = () => {
   const [related, setRelated] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const articleSchema = post ? {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.excerpt,
+    "image": post.cover_image || "https://nz-web.com/og-image.png",
+    "url": `https://nz-web.com/blog/${post.slug}`,
+    "datePublished": post.published_at,
+    "dateModified": post.published_at,
+    "inLanguage": "he",
+    "author": {
+      "@type": "Person",
+      "name": post.author || "צבי משה",
+      "url": "https://nz-web.com/about"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "NZ-web",
+      "url": "https://nz-web.com",
+      "logo": { "@type": "ImageObject", "url": "https://nz-web.com/nz-web-logo.png" }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://nz-web.com/blog/${post.slug}`
+    },
+    "articleSection": post.category,
+    "wordCount": post.content ? post.content.split(/\s+/).length : undefined,
+    "timeRequired": `PT${post.read_time}M`,
+    "keywords": post.category,
+    "isPartOf": { "@id": "https://nz-web.com/blog" }
+  } : undefined;
+
   useSeoMeta({
     title: post ? `${post.title} | NZ-web בלוג` : "מאמר | NZ-web",
     description: post?.excerpt ?? "",
+    keywords: post ? `${post.category}, ${post.title}, NZ-web בלוג` : undefined,
+    schema: articleSchema,
+  });
+
+  useBreadcrumb({
+    name: post?.title ?? "מאמר",
+    path: post ? `/blog/${post.slug}` : "/blog",
+    parent: { name: "בלוג", path: "/blog" },
   });
 
   useEffect(() => {
