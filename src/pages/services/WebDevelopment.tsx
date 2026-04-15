@@ -40,7 +40,7 @@ const config: ServicePageConfig = {
     { icon: Search, title: "SEO טכני מובנה", description: "מבנה URL נכון, structured data, meta tags, sitemap — כל הבסיס לדירוג גבוה בגוגל כבר בשלב הפיתוח.", accent: "#10b981" },
     { icon: Shield, title: "אבטחה ואמינות", description: "HTTPS, הגנות מפני XSS ו-CSRF, backup אוטומטי. האתר שלכם עובד גם כשהתנועה עולה פתאום.", accent: "#f97316" },
     { icon: LayoutDashboard, title: "ממשק ניהול", description: "מערכת ניהול תוכן (CMS) שמאפשרת לכם לעדכן תוכן, פרויקטים ועמודים בלי לגעת בקוד.", accent: "#ec4899" },
-    { icon: RefreshCw, title: "תחזוקה ועדכונים", description: "30 יום תמיכה אחרי השקה. עדכוני אבטחה, בדיקות ביצועים ותיקונים — אנחנו לא נעלמים.", accent: "#14b8a6" },
+    { icon: RefreshCw, title: "תחזוקה ועדכונים", description: "מעלים לאוויר, מבצעים בדיקות מקיפות ונשארים לצדכם גם לאחר ההשקה.", accent: "#14b8a6" },
   ],
 
   process: [

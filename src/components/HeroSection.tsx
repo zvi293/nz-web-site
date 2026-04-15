@@ -35,7 +35,7 @@ const heroLine2 = "\u05E2\u05D9\u05E6\u05D5\u05D1 \u05E9\u05D5\u05D1\u05E8 \u05E
 const heroParagraph =
   "\u05D0\u05E0\u05D7\u05E0\u05D5 \u05D1-NZ-web \u05DE\u05E4\u05EA\u05D7\u05D9\u05DD \u05D7\u05D5\u05D5\u05D9\u05D5\u05EA \u05D3\u05D9\u05D2\u05D9\u05D8\u05DC\u05D9\u05D5\u05EA \u05DE\u05E8\u05D4\u05D9\u05D1\u05D5\u05EA, \u05D4\u05D7\u05DC \u05DE\u05D0\u05EA\u05E8\u05D9 \u05EA\u05D3\u05DE\u05D9\u05EA \u05D9\u05D5\u05E7\u05E8\u05EA\u05D9\u05D9\u05DD \u05D5\u05E2\u05D3 \u05D7\u05E0\u05D5\u05D9\u05D5\u05EA \u05D0\u05D9\u05E7\u05D5\u05DE\u05E8\u05E1 \u05DE\u05D5\u05E8\u05DB\u05D1\u05D5\u05EA, \u05E2\u05DD \u05D1\u05D9\u05E6\u05D5\u05E2\u05D9\u05DD \u05D7\u05E1\u05E8\u05D9 \u05E4\u05E9\u05E8\u05D5\u05EA.";
 const contactLabel = "\u05D3\u05D1\u05E8\u05D5 \u05D0\u05D9\u05EA\u05E0\u05D5";
-const aboutLabel = "\u05E7\u05E6\u05EA \u05E2\u05DC\u05D9\u05E0\u05D5";
+const aboutLabel = "\u05D4\u05E9\u05D9\u05E8\u05D5\u05EA\u05D9\u05DD \u05E9\u05DC\u05E0\u05D5";
 const heroImageAlt = "NZ-web \u2013 \u05E2\u05D9\u05E6\u05D5\u05D1 \u05D5\u05E4\u05D9\u05EA\u05D5\u05D7 \u05D0\u05EA\u05E8\u05D9\u05DD \u05DE\u05EA\u05E7\u05D3\u05DD";
 
 const StatsBar = () => {
@@ -270,19 +270,11 @@ const HeroSection = () => {
               className="btn-glow rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground transition-all duration-200 hover:scale-[1.04] hover:brightness-110 active:scale-[0.97] sm:px-10 sm:py-4 sm:text-base">
               {contactLabel}
             </Link>
-            <a
-              href="#services"
-              onClick={(e) => {
-                e.preventDefault();
-                const target = document.querySelector("#services");
-                if (target) {
-                  const top = target.getBoundingClientRect().top + window.scrollY - 80;
-                  window.scrollTo({ top, behavior: "smooth" });
-                }
-              }}
+            <Link
+              to="/services"
               className="rounded-xl border border-border/80 bg-background px-8 py-3.5 text-sm font-medium text-foreground transition-all duration-200 hover:scale-[1.04] hover:border-primary/30 hover:bg-primary/[0.04] active:scale-[0.97] sm:px-10 sm:py-4 sm:text-base">
               {aboutLabel}
-            </a>
+            </Link>
           </div>
 
           {/* Stats bar */}
