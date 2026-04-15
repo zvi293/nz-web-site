@@ -24,6 +24,9 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Contact = lazy(() => import("./pages/Contact"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const ThankYou = lazy(() => import("./pages/ThankYou"));
 const ServicesIndex = lazy(() => import("./pages/services/ServicesIndex"));
 const WebDevelopment = lazy(() => import("./pages/services/WebDevelopment"));
 const ReactDevelopment = lazy(() => import("./pages/services/ReactDevelopment"));
@@ -63,6 +66,9 @@ const AnimatedRoutes = () => {
           <Route path="/faq" element={wrap(<FAQ />)} />
           <Route path="/terms" element={wrap(<Terms />)} />
           <Route path="/contact" element={wrap(<Contact />)} />
+          <Route path="/thank-you" element={wrap(<ThankYou />)} />
+          <Route path="/blog" element={wrap(<Blog />)} />
+          <Route path="/blog/:slug" element={wrap(<BlogPost />)} />
           <Route path="/services" element={wrap(<ServicesIndex />)} />
           <Route path="/services/web-development" element={wrap(<WebDevelopment />)} />
           <Route path="/services/react-development" element={wrap(<ReactDevelopment />)} />

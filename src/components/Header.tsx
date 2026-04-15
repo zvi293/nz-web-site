@@ -35,13 +35,14 @@ const menuItems = [
   { label: "מי אנחנו", href: "/about", type: "route" },
   { label: "פרויקטים", href: "/projects", type: "route" },
   { label: "שאלות נפוצות", href: "/faq", type: "route" },
+  { label: "בלוג", href: "/blog", type: "route" },
   { label: "צור קשר", href: "/contact", type: "route" },
 ];
 
 const mobileNavLinks = [
   { label: "שירותים", href: "/services", type: "route" },
-  { label: "פרויקטים", href: "#portfolio", type: "hash" },
-  { label: "מי אנחנו", href: "/about", type: "route" },
+  { label: "פרויקטים", href: "/projects", type: "route" },
+  { label: "אודות", href: "/about", type: "route" },
 ];
 
 /* ── Services Dropdown ── */
@@ -261,19 +262,17 @@ const Header = () => {
             NZ<span className="text-gradient-brand">-web</span>
           </a>
 
-          {/* Mobile nav links (always visible) */}
-          <nav className="flex items-center gap-1 flex-1 justify-center overflow-hidden">
+          {/* Mobile nav links (always visible — short labels, no overflow) */}
+          <nav className="flex min-w-0 flex-1 items-center justify-center gap-0.5">
             {mobileNavLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
                 onClick={(e) => {
                   e.preventDefault();
-                  if (link.type === "route") { navigate(link.href); return; }
-                  if (location.pathname === "/") { scrollToSelectorWithRetry(link.href); }
-                  else { navigate("/"); }
+                  navigate(link.href);
                 }}
-                className="shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-primary/[0.07] hover:text-foreground"
+                className="shrink-0 whitespace-nowrap rounded-lg px-2 py-1.5 text-[10.5px] font-semibold text-muted-foreground transition-colors hover:bg-primary/[0.07] hover:text-foreground"
               >
                 {link.label}
               </a>

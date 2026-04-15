@@ -15,6 +15,13 @@ import {
 import { useSiteSettings } from "@/lib/site-settings-api";
 import { getMailtoHref, getTelHref, getWhatsAppHref } from "@/lib/contact-utils";
 
+// ── CSS-animated wave shapes (reliable cross-browser, no framer-motion SVG path issues) ──
+const WAVE1 = "M0,60 C120,100 240,40 480,80 C720,120 960,30 1200,70 C1320,90 1380,60 1440,80 L1440,200 L0,200 Z";
+const WAVE2 = "M0,100 C180,60 360,130 600,80 C840,30 1020,110 1200,70 C1320,50 1400,90 1440,100 L1440,200 L0,200 Z";
+const WAVE3 = "M0,130 C200,100 400,160 650,120 C900,80 1050,150 1250,110 C1350,90 1400,130 1440,130 L1440,200 L0,200 Z";
+const WAVE4 = "M0,155 C160,130 320,170 520,145 C720,120 880,165 1080,140 C1240,120 1360,155 1440,150 L1440,200 L0,200 Z";
+
+// ── Legacy type kept to avoid removing unused vars ──
 type WavePathFrames = [string, ...string[]];
 
 const backWavePaths: WavePathFrames = [
@@ -62,6 +69,7 @@ const Footer = () => {
     { label: "פרויקטים", href: "/projects" },
     { label: "שירותים", href: "/#services" },
     { label: "שאלות נפוצות", href: "/faq" },
+    { label: "בלוג", href: "/blog" },
     { label: "צור קשר", href: "/contact" },
   ];
 
@@ -77,41 +85,57 @@ const Footer = () => {
 
   return (
     <footer className="relative w-full overflow-hidden" dir="rtl">
-      {/* Wave transition from page background */}
+      {/* Wave transition — CSS keyframe animation (reliable, no framer-motion SVG path morphing) */}
       <div className="relative h-28 bg-background md:h-40">
         <svg
           className="absolute bottom-0 left-0 h-full w-full"
           viewBox="0 0 1440 200"
           preserveAspectRatio="none"
           xmlns="http://www.w3.org/2000/svg"
+          style={{ display: "block" }}
         >
           <defs>
             <linearGradient id="footerWave1" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="hsl(222, 47%, 12%)" />
-              <stop offset="50%" stopColor="hsl(217, 45%, 15%)" />
-              <stop offset="100%" stopColor="hsl(222, 47%, 12%)" />
+              <stop offset="0%" stopColor="hsl(222,47%,12%)" />
+              <stop offset="50%" stopColor="hsl(217,45%,15%)" />
+              <stop offset="100%" stopColor="hsl(222,47%,12%)" />
             </linearGradient>
             <linearGradient id="footerWave2" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="hsl(220, 50%, 10%)" />
-              <stop offset="100%" stopColor="hsl(222, 47%, 12%)" />
+              <stop offset="0%" stopColor="hsl(220,48%,11%)" />
+              <stop offset="100%" stopColor="hsl(222,47%,12%)" />
             </linearGradient>
+            <linearGradient id="footerWave3" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="hsl(220,50%,10%)" />
+              <stop offset="100%" stopColor="hsl(222,47%,10%)" />
+            </linearGradient>
+            <style>{`
+              @keyframes footerWave1Anim {
+                0%,100% { d: path("${WAVE1}"); }
+                50% { d: path("M0,90 C120,40 360,110 540,60 C720,10 900,100 1100,50 C1300,0 1380,80 1440,60 L1440,200 L0,200 Z"); }
+              }
+              @keyframes footerWave2Anim {
+                0%,100% { d: path("${WAVE2}"); }
+                50% { d: path("M0,80 C180,130 380,50 580,110 C780,170 980,60 1180,110 C1330,140 1400,80 1440,80 L1440,200 L0,200 Z"); }
+              }
+              @keyframes footerWave3Anim {
+                0%,100% { d: path("${WAVE3}"); }
+                50% { d: path("M0,120 C200,160 380,90 600,145 C820,200 1000,110 1200,145 C1350,165 1400,120 1440,130 L1440,200 L0,200 Z"); }
+              }
+              @keyframes footerWave4Anim {
+                0%,100% { d: path("${WAVE4}"); }
+                50% { d: path("M0,145 C160,175 340,130 520,160 C700,190 880,135 1080,163 C1240,183 1360,143 1440,148 L1440,200 L0,200 Z"); }
+              }
+              .footer-wave-1 { animation: footerWave1Anim 8s ease-in-out infinite; }
+              .footer-wave-2 { animation: footerWave2Anim 6s ease-in-out infinite; }
+              .footer-wave-3 { animation: footerWave3Anim 4.5s ease-in-out infinite; }
+              .footer-wave-4 { animation: footerWave4Anim 3.5s ease-in-out infinite; }
+            `}</style>
           </defs>
 
-          <motion.path
-            d={backWave.d}
-            fill="url(#footerWave1)"
-            fillOpacity="0.5"
-            initial={backWave.initial}
-            animate={backWave.animate}
-            transition={{ duration: 8, ease: "easeInOut", repeat: Infinity }}
-          />
-          <motion.path
-            d={frontWave.d}
-            fill="url(#footerWave2)"
-            initial={frontWave.initial}
-            animate={frontWave.animate}
-            transition={{ duration: 5, ease: "easeInOut", repeat: Infinity }}
-          />
+          <path className="footer-wave-1" d={WAVE1} fill="url(#footerWave1)" fillOpacity="0.35" />
+          <path className="footer-wave-2" d={WAVE2} fill="url(#footerWave1)" fillOpacity="0.5" />
+          <path className="footer-wave-3" d={WAVE3} fill="url(#footerWave2)" fillOpacity="0.7" />
+          <path className="footer-wave-4" d={WAVE4} fill="url(#footerWave3)" />
         </svg>
 
         {/* Floating particles */}
@@ -122,12 +146,7 @@ const Footer = () => {
               className="absolute h-1.5 w-1.5 rounded-full bg-primary/40"
               style={{ left: `${12 + i * 14}%`, bottom: `${25 + (i % 3) * 18}%` }}
               animate={{ y: [0, -22, 0], opacity: [0.2, 0.6, 0.2], scale: [1, 1.4, 1] }}
-              transition={{
-                duration: 2.4 + i * 0.35,
-                ease: "easeInOut",
-                repeat: Infinity,
-                delay: i * 0.3,
-              }}
+              transition={{ duration: 2.4 + i * 0.35, ease: "easeInOut", repeat: Infinity, delay: i * 0.3 }}
             />
           ))}
         </div>

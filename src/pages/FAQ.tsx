@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, HelpCircle } from "lucide-react";
+import { ArrowRight, HelpCircle, Search, X } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -19,6 +19,7 @@ import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const FAQ = () => {
   const [faqItems, setFaqItems] = useState<FaqItem[]>(() => getDefaultFaqItems().filter((item) => item.visible));
+  const [searchQuery, setSearchQuery] = useState("");
 
   useSeoMeta({
     title: "שאלות נפוצות | NZ-web – פיתוח אתרים ועיצוב",
@@ -32,6 +33,12 @@ const FAQ = () => {
       .then((items) => setFaqItems(items.filter((item) => item.visible)))
       .catch(() => undefined);
   }, []);
+
+  const filteredItems = faqItems.filter(
+    (item) =>
+      item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Inject FAQPage JSON-LD structured data for Google rich results
   useEffect(() => {
@@ -90,11 +97,44 @@ const FAQ = () => {
         </div>
       </section>
 
-      {/* FAQ Accordion */}
+      {/* FAQ Section with Search */}
       <section className="py-12 md:py-16">
         <div className="mx-auto max-w-3xl px-6">
+          {/* Search Input */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <div className="relative">
+              <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
+              <input
+                type="text"
+                placeholder="חפשו שאלה..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-2xl border border-border/40 bg-card px-4 pr-12 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+            {searchQuery && filteredItems.length === 0 && (
+              <p className="text-center text-muted-foreground text-sm mt-4">
+                לא נמצאו תוצאות עבור "{searchQuery}". נסו חפוש אחר.
+              </p>
+            )}
+          </motion.div>
+
+          {/* FAQ Accordion */}
           <Accordion type="single" collapsible className="space-y-3">
-            {faqItems.map((item, i) => (
+            {filteredItems.map((item, i) => (
               <motion.div
                 key={item.id}
                 initial={{ opacity: 0, y: 15 }}
@@ -104,11 +144,14 @@ const FAQ = () => {
               >
                 <AccordionItem
                   value={`faq-${item.id}`}
-                  className="border border-border rounded-2xl px-6 overflow-hidden bg-card shadow-sm hover:shadow-md transition-shadow duration-200"
+                  className="relative border border-border/40 rounded-2xl px-6 overflow-hidden bg-card shadow-sm hover:shadow-md transition-shadow duration-200 group"
                 >
+                  {/* Left Accent Bar */}
+                  <div className="absolute right-0 top-0 h-full w-1 rounded-r-2xl bg-gradient-to-b from-primary/60 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
                   <AccordionTrigger className="font-heebo text-right text-base font-semibold text-foreground py-5 hover:no-underline gap-4">
                     <span className="flex items-center gap-3">
-                      <span className="flex shrink-0 items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold">
+                      <span className="flex shrink-0 items-center justify-center h-7 w-7 rounded-full bg-primary/10 text-primary text-xs font-black group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                         {i + 1}
                       </span>
                       {item.question}

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   CheckCircle,
   Mail,
@@ -102,6 +102,7 @@ const contactSchema = z
 type ContactForm = z.infer<typeof contactSchema>;
 
 const ContactSection = () => {
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submissionWarning, setSubmissionWarning] = useState<string | null>(
@@ -321,6 +322,8 @@ const ContactSection = () => {
         subject: "",
       });
       setSendMethod("whatsapp");
+      // Navigate to thank-you page after short delay (let confetti play)
+      setTimeout(() => { navigate("/thank-you"); }, 1800);
 
       confetti({
         particleCount: 120,

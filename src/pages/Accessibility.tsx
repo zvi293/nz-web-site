@@ -5,7 +5,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Phone, Mail, MessageCircle, User } from "lucide-react";
+import { Phone, Mail, MessageCircle, User, AccessibilityIcon } from "lucide-react";
 import { useSiteSettings } from "@/lib/site-settings-api";
 import { getMailtoHref, getTelHref, getWhatsAppHref } from "@/lib/contact-utils";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
@@ -28,19 +28,47 @@ const Accessibility = () => {
       <Header />
       <BackToHome />
 
-      <section className="py-16 md:py-24">
+      {/* Hero */}
+      <section className="relative py-16 md:py-24 bg-gradient-to-br from-[hsl(222,47%,10%)] via-[hsl(218,42%,16%)] to-[hsl(215,38%,22%)] overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/30 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl"></div>
+        </div>
+        <div className="mx-auto max-w-4xl px-6 relative z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-primary/20 border border-primary/40 mb-6 mx-auto"
+            >
+              <MessageCircle className="h-6 w-6 text-primary" />
+            </motion.div>
+            <h1
+              className="text-3xl md:text-5xl font-black text-white mb-4"
+              style={{ fontFamily: "'Heebo', sans-serif" }}
+            >
+              הצהרת נגישות
+            </h1>
+            <p className="text-white/80 text-lg">
+              נתחייבות לנגישות מלאה לכל המשתמשים
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Content */}
+      <section className="py-12 md:py-16">
         <div className="container mx-auto px-6 max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1
-              className="text-3xl md:text-5xl font-black text-foreground mb-8"
-              style={{ fontFamily: "'Heebo', sans-serif" }}
-            >
-              הצהרת נגישות - NZ-web
-            </h1>
 
             <div className="prose prose-lg max-w-none text-foreground space-y-8" style={{ fontFamily: "'Heebo', sans-serif" }}>
               <div className="bg-primary/5 rounded-3xl p-6 md:p-8 border border-primary/10">
@@ -66,22 +94,27 @@ const Accessibility = () => {
                 </p>
                 <div className="grid gap-4">
                   <FeatureCard
+                    icon="⌨️"
                     title="ניווט מקלדת"
                     description="תמיכה מלאה בשימוש במקשי Tab ו-Enter למעבר בין רכיבים."
                   />
                   <FeatureCard
+                    icon="🎨"
                     title="התאמות תצוגה"
                     description="שינוי ניגודיות, מעבר לגווני אפור, והגדלת סמן העכבר."
                   />
                   <FeatureCard
+                    icon="📖"
                     title="טקסט וקריאות"
                     description="הגדלת גופנים, מעבר לגופן קריא והדגשת קישורים וכותרות בצורה בולטת."
                   />
                   <FeatureCard
+                    icon="🧭"
                     title="עזרי ניווט"
                     description="הדגשת פוקוס, עצירת אנימציות ושיפור השימוש ברכיבים נעים."
                   />
                   <FeatureCard
+                    icon="🔌"
                     title="תאימות טכנולוגית"
                     description="האתר מותאם לדפדפנים מודרניים ולשימוש בתוכנות קורא מסך באמצעות מבנה סמנטי ותגיות ARIA."
                   />
@@ -186,11 +219,32 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
   </div>
 );
 
-const FeatureCard = ({ title, description }: { title: string; description: string }) => (
-  <div className="bg-secondary/30 rounded-xl p-4 border border-border/30">
-    <h3 className="font-bold text-foreground mb-1">{title}</h3>
-    <p className="text-muted-foreground text-sm">{description}</p>
-  </div>
+const FeatureCard = ({
+  icon,
+  title,
+  description,
+}: {
+  icon?: string;
+  title: string;
+  description: string;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5 }}
+    className="relative rounded-2xl border border-border/40 bg-card p-6 group hover:shadow-lg transition-shadow duration-300"
+  >
+    {/* Top Accent Bar */}
+    <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-primary/60 to-primary/20"></div>
+    <div className="flex gap-4">
+      {icon && <span className="text-3xl shrink-0">{icon}</span>}
+      <div className="flex-1">
+        <h3 className="font-bold text-foreground mb-2 text-base">{title}</h3>
+        <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
+      </div>
+    </div>
+  </motion.div>
 );
 
 export default Accessibility;
