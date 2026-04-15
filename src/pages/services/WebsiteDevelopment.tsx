@@ -1,188 +1,64 @@
-import { useEffect } from "react";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { Code2, LayoutTemplate, Layers3, Smartphone, Users, CheckCircle2 } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import BackToHome from "@/components/BackToHome";
-import WhatsAppButton from "@/components/WhatsAppButton";
-import AccessibilityWidget from "@/components/AccessibilityWidget";
-import { useSeoMeta } from "@/hooks/useSeoMeta";
-import { useBreadcrumb } from "@/hooks/useBreadcrumb";
+import { Globe, Code2, Database, Layers, RefreshCw, Zap, Shield, LayoutDashboard, Users } from "lucide-react";
+import ServicePageTemplate, { type ServicePageConfig } from "@/components/ServicePageTemplate";
 
-const SCHEMA_ID = "service-schema-website-development";
-
-const WebsiteDevelopment = () => {
-  useSeoMeta({
+const config: ServicePageConfig = {
+  seo: {
     title: "פיתוח אתרים מקצועי | NZ-web",
-    description: "פיתוח אתרים מודרניים לעסקים שרוצים נוכחות דיגיטלית יציבה, מהירה ומקצועית.",
-  });
-  useBreadcrumb({ name: "פיתוח אתרים מקצועי", path: "/services/website-development" });
-
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.type = "application/ld+json";
-    script.id = SCHEMA_ID;
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Service",
-      serviceType: "Website Development",
-      provider: {
-        "@type": "Organization",
-        name: "NZ-web",
-        url: "https://nz-web.com",
-      },
-    });
-    document.getElementById(SCHEMA_ID)?.remove();
-    document.head.appendChild(script);
-    return () => {
-      document.getElementById(SCHEMA_ID)?.remove();
-    };
-  }, []);
-
-  return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
-      <Header />
-      <BackToHome />
-
-      <section className="relative bg-gradient-to-b from-secondary to-background py-16 md:py-24">
-        <div className="mx-auto max-w-4xl px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-primary">
-              <Code2 className="h-4 w-4" />
-              <span className="text-sm font-medium">שירות פיתוח אתרים</span>
-            </div>
-            <h1 className="mb-4 font-heebo text-3xl font-bold leading-tight text-foreground md:text-5xl">
-              פיתוח אתרים בהתאמה מלאה לעסק
-            </h1>
-            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              כשעסק צריך אתר חדש, השאלה היא לא רק איך הוא ייראה אלא איך הוא יעבוד ביום יום.
-              פיתוח אתר טוב נשען על תשתית נכונה, חיבורים מדויקים למערכות שצריך, וחשיבה קדימה
-              כדי שהאתר יישאר יציב, נוח לתחזוקה, ורלוונטי גם בהמשך.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="py-12 md:py-16">
-        <div className="mx-auto max-w-4xl space-y-16 px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="space-y-4">
-            <div className="mb-2 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <LayoutTemplate className="h-5 w-5" />
-              </div>
-              <h2 className="font-heebo text-2xl font-bold text-foreground md:text-3xl">מה נכנס לפיתוח של אתר טוב</h2>
-            </div>
-            <div className="space-y-3 text-base leading-relaxed text-muted-foreground">
-              <p>
-                בפועל, פיתוח אתר כולל הרבה מעבר להרכבת עמודים. הוא מתחיל בהבנה של הצרכים העסקיים,
-                ממשיך בבניית מסכים וזרימות עבודה, ומגיע עד לחיבורים לטפסים, אזורי ניהול, שירותים חיצוניים
-                ובדיקות לפני עלייה לאוויר.
-              </p>
-              <p>
-                המטרה היא לבנות נכס דיגיטלי שאפשר לעבוד איתו באמת. כזה שמציג את העסק בצורה טובה,
-                אבל גם תומך בתפעול, בעדכונים עתידיים, וביכולת לגדול בלי להישען כל פעם על פתרונות זמניים.
-              </p>
-            </div>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="space-y-4">
-            <div className="mb-2 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Layers3 className="h-5 w-5" />
-              </div>
-              <h2 className="font-heebo text-2xl font-bold text-foreground md:text-3xl">למה ארכיטקטורת אתר חשובה כל כך</h2>
-            </div>
-            <div className="space-y-3 text-base leading-relaxed text-muted-foreground">
-              <p>
-                הרבה פעמים ההבדל בין אתר שנעים לעבוד איתו לבין אתר שמתחיל להכביד אחרי כמה חודשים,
-                נמצא בשכבה שלא רואים מיד. ארכיטקטורה טובה משפיעה על הניווט, על התחזוקה, על היכולת
-                להוסיף פיצ׳רים, וגם על הדרך שבה מנועי חיפוש מבינים את האתר.
-              </p>
-              <p>
-                כשהבסיס בנוי נכון, השינויים בעתיד נעשים טבעיים יותר. לא צריך לפרק כל פעם מחדש,
-                ולא נוצר עומס מיותר של תיקונים קטנים רק כי החלטות היסוד לא נלקחו בזמן.
-              </p>
-            </div>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="space-y-4 rounded-2xl bg-secondary/30 p-6 md:p-8">
-            <div className="mb-2 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <h2 className="font-heebo text-2xl font-bold text-foreground md:text-3xl">שילוב מערכות ואוטומציות</h2>
-            </div>
-            <div className="space-y-3 text-base leading-relaxed text-muted-foreground">
-              <p>
-                אתר לא אמור לעמוד לבד. בהרבה מקרים הוא צריך להתחבר לטפסים, CRM, מערכת תורים,
-                דיוור, WhatsApp או אזור ניהול פנימי. החיבורים האלה הם לא תוספת צדדית, אלא חלק
-                ממה שהופך את האתר לכלי עבודה אמיתי.
-              </p>
-              <p>
-                כשזה נבנה נכון מההתחלה, האתר לא רק נראה טוב כלפי חוץ, אלא גם חוסך עבודה ידנית,
-                מסדר פניות, ותומך בצורה שקטה בתהליך העבודה של העסק.
-              </p>
-            </div>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="space-y-4">
-            <div className="mb-2 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Smartphone className="h-5 w-5" />
-              </div>
-              <h2 className="font-heebo text-2xl font-bold text-foreground md:text-3xl">התאמה למובייל ולביצועים גבוהים</h2>
-            </div>
-            <div className="space-y-3 text-base leading-relaxed text-muted-foreground">
-              <p>
-                כשלקוח נכנס לאתר מהנייד, אין הרבה זמן להסביר. האתר צריך להיטען מהר, להיות נוח לקריאה,
-                לאפשר פעולה פשוטה, ולעבוד חלק גם על מסכים קטנים. זה חשוב בעיקר כשחלק גדול מהכניסות
-                מגיעות ממובייל.
-              </p>
-              <p>
-                מהירות וביצועים טובים משפיעים גם על התחושה הכללית וגם על התוצאה העסקית. אתר מהיר
-                שומר טוב יותר על תשומת הלב של המשתמש ומקטין נטישה מיותרת בדרך לפנייה או לפעולה.
-              </p>
-            </div>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="space-y-4">
-            <div className="mb-2 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Users className="h-5 w-5" />
-              </div>
-              <h2 className="font-heebo text-2xl font-bold text-foreground md:text-3xl">למי השירות מתאים</h2>
-            </div>
-            <div className="space-y-3 text-base leading-relaxed text-muted-foreground">
-              <p>
-                השירות מתאים לעסקים שצריכים בסיס דיגיטלי יציב, לחברות שרוצות לשדרג אתר או מערכת קיימת,
-                ולמי שמחפש פתרון רחב יותר מאתר תדמית פשוט. הוא מתאים במיוחד כשיש צורך לחבר בין נראות,
-                תפעול וצרכים עסקיים אמיתיים.
-              </p>
-              <p>
-                אם חשוב לכם שהאתר לא יהיה רק עמוד יפה אלא חלק ממערכת עבודה רחבה יותר,
-                זה בדיוק המקום שבו פיתוח נכון עושה את ההבדל.
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="bg-gradient-to-br from-slate-900 via-blue-950 to-emerald-950 py-16 md:py-24">
-        <div className="mx-auto max-w-2xl px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <h2 className="mb-4 font-heebo text-3xl font-bold text-white md:text-4xl">רוצים לבנות אתר על בסיס נכון?</h2>
-            <p className="mb-8 text-lg text-white/70">אפשר להתחיל משיחה עניינית על מה שהאתר שלכם צריך לעשות בפועל.</p>
-            <Link to="/contact" className="inline-block rounded-full bg-primary px-10 py-4 text-base font-bold text-primary-foreground shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">צרו קשר</Link>
-          </motion.div>
-        </div>
-      </section>
-
-      <Footer />
-      <WhatsAppButton />
-      <AccessibilityWidget />
-    </main>
-  );
+    description: "פיתוח אתרים מתקדם עם React, TypeScript ו-Supabase. ארכיטקטורה נכונה, ביצועים גבוהים ומערכות שגדלות עם העסק שלכם.",
+  },
+  breadcrumb: { name: "פיתוח אתרים", path: "/services/website-development" },
+  schemaId: "service-schema-website-development",
+  schemaServiceType: "Website Development",
+  schemaUrl: "https://nz-web.com/services/website-development",
+  hero: {
+    badge: "פיתוח אתרים מתקדם",
+    badgeIcon: Code2,
+    title: "אתרים עם ארכיטקטורה שמחזיקה לאורך שנים",
+    highlight: "שמחזיקה לאורך שנים",
+    subtitle: "הרבה עסקים בונים אתר ואחרי שנה צריכים לבנות מחדש. אנחנו בונים עם ארכיטקטורה נכונה שמאפשרת גדילה, שינויים ואינטגרציות — בלי לשבור הכל בכל פעם.",
+    stats: [{ value: "50+", label: "אתרים בפיתוח" }, { value: "0", label: "אתרים ששוחזרו" }, { value: "99%", label: "uptime ממוצע" }],
+    ctaText: "רוצה לדבר על הפרויקט",
+  },
+  intro: {
+    title: "למה ארכיטקטורה חשובה יותר מעיצוב?",
+    paragraphs: [
+      "עסקים רבים מתמקדים בשאלה 'איך האתר ייראה' — ולא 'איך הוא יעבוד'. עיצוב יפה על ארכיטקטורה גרועה הוא בית שנבנה על חול: נראה טוב בהתחלה, ומתפרק כשיש עומס.",
+      "פיתוח אתרים מקצועי מתחיל בבחירת הטכנולוגיה הנכונה לפרויקט, בניית מסד נתונים נכון, קוד שניתן לתחזק ולהרחיב ו-API ארכיטקטורה שעובדת גם כשיש אלפי משתמשים בו-זמנית.",
+      "אנחנו לא בונים רק 'אתרים' — אנחנו בונים מוצרים דיגיטליים שצומחים עם העסק שלכם.",
+    ],
+  },
+  features: [
+    { icon: Layers, title: "ארכיטקטורה נכונה", description: "Component architecture, state management, API design — הכל בנוי לצמיחה ולא לפרויקט הנוכחי בלבד.", accent: "#3b82f6" },
+    { icon: Database, title: "מסד נתונים מתוכנן", description: "Schema design, RLS policies, indexes — מסד נתונים שמהיר, מאובטח ולא יתפרק תחת עומס.", accent: "#8b5cf6" },
+    { icon: Zap, title: "ביצועים מדידים", description: "Core Web Vitals, lazy loading, code splitting, caching — אנחנו מודדים לפני ואחרי כל שינוי.", accent: "#10b981" },
+    { icon: Shield, title: "אבטחה מובנית", description: "Authentication, authorization, input validation, CSRF protection — אבטחה אינה תוספת, היא חלק מהפיתוח.", accent: "#f97316" },
+    { icon: LayoutDashboard, title: "ממשק ניהול מלא", description: "Dashboard לניהול תוכן, משתמשים, הזמנות, פרויקטים — כל מה שהעסק שלכם צריך לנהל.", accent: "#ec4899" },
+    { icon: RefreshCw, title: "CI/CD ועדכונים", description: "תהליך deployment אוטומטי, rollback מהיר במקרה בעיה ומעקב אחר שינויים.", accent: "#14b8a6" },
+  ],
+  process: [
+    { number: "01", title: "ניתוח דרישות טכניות", description: "מה המערכת צריכה לעשות, כמה משתמשים, אילו אינטגרציות ומה ה-scale הצפוי — לפני שמתחילים." },
+    { number: "02", title: "תכנון ארכיטקטורה", description: "ERD למסד הנתונים, API design, component hierarchy — הכל מתועד ומאושר לפני שורת קוד." },
+    { number: "03", title: "פיתוח איטרטיבי", description: "ספרינטים קצרים עם deliverables ברורים. אתם רואים התקדמות כל שבוע, לא רק בסוף." },
+    { number: "04", title: "בדיקות והשקה", description: "בדיקות יחידה, בדיקות אינטגרציה, load testing — לא עולים לאוויר בלי וידוא שהכל עובד." },
+  ],
+  techStack: ["React 18", "TypeScript", "Tailwind CSS", "Supabase", "PostgreSQL", "Vite", "Node.js", "Framer Motion", "GSAP", "React Query"],
+  results: [
+    { value: "99%+", label: "uptime", sub: "לאתרים שאנחנו בונים ומארחים" },
+    { value: "0", label: "אתרים שנבנו מחדש", sub: "בגלל ארכיטקטורה שגויה — אנחנו בונים נכון מהתחלה" },
+    { value: "3×", label: "מהר יותר", sub: "מהממוצע בתעשיה בזמן פיתוח" },
+  ],
+  faqs: [
+    { q: "מה ההבדל בין פיתוח אתרים לבניית אתרים?", a: "בניית אתרים מתייחסת לרוב לאתרים פשוטים יחסית. פיתוח אתרים כולל מערכות מורכבות יותר — עם מסד נתונים, לוגיקה עסקית, API, ממשקי ניהול ואינטגרציות עם שירותים חיצוניים." },
+    { q: "האם אני יכול להתחיל קטן ולגדול?", a: "בהחלט. אנחנו בונים עם ארכיטקטורה שמאפשרת הוספת features בלי לשבור מה שקיים. תתחילו עם MVP ותרחיבו לפי הצורך." },
+    { q: "מה עם תחזוקה אחרי השקה?", a: "יש חבילות תחזוקה חודשיות הכוללות עדכוני אבטחה, גיבויים, monitoring ותמיכה טכנית. אנחנו לא בונים ונעלמים." },
+    { q: "האם תוכלו לעבוד עם קוד קיים?", a: "כן — אנחנו גם מבצעים code review ושדרוג של קוד קיים, migration בין טכנולוגיות ורפקטורינג של מערכות קיימות." },
+  ],
+  cta: {
+    title: "בואו נבנה משהו שיחזיק לאורך שנים",
+    subtitle: "שיחת ייעוץ טכנית ללא עלות — נגדיר יחד מה הפרויקט שלכם צריך.",
+    buttonText: "קבלו ייעוץ טכני",
+  },
 };
 
+const WebsiteDevelopment = () => <ServicePageTemplate config={config} />;
 export default WebsiteDevelopment;

@@ -3,7 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { AuthProvider } from "./components/auth/AuthProvider";
 import AdminRouteGuard from "./components/auth/AdminRouteGuard";
 import Index from "./pages/Index";
@@ -11,8 +12,11 @@ import NotFound from "./pages/NotFound";
 import CustomCursor from "./components/CustomCursor";
 import ScrollToTop from "./components/ScrollToTop";
 import CookieConsent from "./components/CookieConsent";
+import ScrollProgressBar from "./components/ScrollProgressBar";
+import PageTransition from "./components/PageTransition";
 
 const queryClient = new QueryClient();
+
 const About = lazy(() => import("./pages/About"));
 const AllProjects = lazy(() => import("./pages/AllProjects"));
 const Accessibility = lazy(() => import("./pages/Accessibility"));
@@ -20,6 +24,7 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Contact = lazy(() => import("./pages/Contact"));
+const ServicesIndex = lazy(() => import("./pages/services/ServicesIndex"));
 const WebDevelopment = lazy(() => import("./pages/services/WebDevelopment"));
 const ReactDevelopment = lazy(() => import("./pages/services/ReactDevelopment"));
 const LandingPages = lazy(() => import("./pages/services/LandingPages"));
@@ -31,9 +36,52 @@ const LandingPageDevelopment = lazy(() => import("./pages/services/LandingPageDe
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminPortfolio = lazy(() => import("./pages/AdminPortfolio"));
 
-const RouteFallback = () => <div className="min-h-screen bg-background" aria-hidden="true" />;
+const RouteFallback = () => (
+  <div className="min-h-screen bg-background" aria-hidden="true" />
+);
 
-const withRouteSuspense = (node: ReactNode) => <Suspense fallback={<RouteFallback />}>{node}</Suspense>;
+const wrap = (node: ReactNode) => (
+  <Suspense fallback={<RouteFallback />}>
+    <PageTransition>{node}</PageTransition>
+  </Suspense>
+);
+
+/* ── Animated routes — must live inside BrowserRouter to use useLocation ── */
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <>
+      <ScrollProgressBar />
+      <AnimatePresence mode="wait" initial={false}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+          <Route path="/about" element={wrap(<About />)} />
+          <Route path="/projects" element={wrap(<AllProjects />)} />
+          <Route path="/accessibility" element={wrap(<Accessibility />)} />
+          <Route path="/privacy" element={wrap(<Privacy />)} />
+          <Route path="/faq" element={wrap(<FAQ />)} />
+          <Route path="/terms" element={wrap(<Terms />)} />
+          <Route path="/contact" element={wrap(<Contact />)} />
+          <Route path="/services" element={wrap(<ServicesIndex />)} />
+          <Route path="/services/web-development" element={wrap(<WebDevelopment />)} />
+          <Route path="/services/react-development" element={wrap(<ReactDevelopment />)} />
+          <Route path="/services/landing-pages" element={wrap(<LandingPages />)} />
+          <Route path="/services/website-performance" element={wrap(<WebsitePerformance />)} />
+          <Route path="/services/website-development" element={wrap(<WebsiteDevelopment />)} />
+          <Route path="/services/business-website" element={wrap(<BusinessWebsite />)} />
+          <Route path="/services/appointment-system" element={wrap(<AppointmentSystem />)} />
+          <Route path="/services/landing-page-development" element={wrap(<LandingPageDevelopment />)} />
+          <Route path="/admin/login" element={wrap(<AdminLogin />)} />
+          <Route element={<AdminRouteGuard />}>
+            <Route path="/admin/portfolio" element={wrap(<AdminPortfolio />)} />
+          </Route>
+          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+        </Routes>
+      </AnimatePresence>
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -44,30 +92,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={withRouteSuspense(<About />)} />
-            <Route path="/projects" element={withRouteSuspense(<AllProjects />)} />
-            <Route path="/accessibility" element={withRouteSuspense(<Accessibility />)} />
-            <Route path="/privacy" element={withRouteSuspense(<Privacy />)} />
-            <Route path="/faq" element={withRouteSuspense(<FAQ />)} />
-            <Route path="/terms" element={withRouteSuspense(<Terms />)} />
-            <Route path="/contact" element={withRouteSuspense(<Contact />)} />
-            <Route path="/services/web-development" element={withRouteSuspense(<WebDevelopment />)} />
-            <Route path="/services/react-development" element={withRouteSuspense(<ReactDevelopment />)} />
-            <Route path="/services/landing-pages" element={withRouteSuspense(<LandingPages />)} />
-            <Route path="/services/website-performance" element={withRouteSuspense(<WebsitePerformance />)} />
-            <Route path="/services/website-development" element={withRouteSuspense(<WebsiteDevelopment />)} />
-            <Route path="/services/business-website" element={withRouteSuspense(<BusinessWebsite />)} />
-            <Route path="/services/appointment-system" element={withRouteSuspense(<AppointmentSystem />)} />
-            <Route path="/services/landing-page-development" element={withRouteSuspense(<LandingPageDevelopment />)} />
-            <Route path="/admin/login" element={withRouteSuspense(<AdminLogin />)} />
-            <Route element={<AdminRouteGuard />}>
-              <Route path="/admin/portfolio" element={withRouteSuspense(<AdminPortfolio />)} />
-            </Route>
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AnimatedRoutes />
           <CookieConsent />
         </BrowserRouter>
       </AuthProvider>

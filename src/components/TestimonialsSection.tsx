@@ -1,0 +1,257 @@
+import { useRef, useState } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { ChevronRight, ChevronLeft, Quote, Star } from "lucide-react";
+
+const testimonials = [
+  {
+    name: "דני לוי",
+    role: "בעלים, DL Real Estate",
+    initials: "DL",
+    color: "from-blue-500 to-blue-600",
+    stars: 5,
+    text: "NZ-web בנו לי אתר שהוא פשוט יצירת מופת. הם הקשיבו לכל פרט קטן, עמדו בלוחות זמנים ומסרו מוצר שהפתיע אותי. ממליץ בחום לכל עסק שמחפש רמה אחרת.",
+  },
+  {
+    name: "שרה כהן",
+    role: "מנכ\"לית, Bloom Boutique",
+    initials: "SK",
+    color: "from-violet-500 to-violet-600",
+    stars: 5,
+    text: "פנייתי לNZ-web הייתה אחד הדברים הטובים שעשיתי לעסק שלי. האתר שקיבלתי עולה על כל ציפיות — מהיר, יפה ומביא לידים בכמויות שלא ראיתי קודם.",
+  },
+  {
+    name: "אלון מזרחי",
+    role: "מייסד, TechStart IL",
+    initials: "AM",
+    color: "from-emerald-500 to-emerald-600",
+    stars: 5,
+    text: "בתחום הטכנולוגיה אנחנו רגילים לסטנדרטים גבוהים. NZ-web עמדו בהם בקלות — קוד נקי, UI פנטסטי ותקשורת שוטפת לאורך כל הדרך. שותפות לטווח ארוך.",
+  },
+  {
+    name: "מיכל אברהם",
+    role: "יוצרת תוכן & קואצ'ית",
+    initials: "MA",
+    color: "from-orange-500 to-orange-600",
+    stars: 5,
+    text: "הם יצרו לי לנדינג פייג' שממיר ב-30% יותר מהאחד הקודם. אנשים מגיבים שהאתר פשוט 'מדבר' אליהם. זה בדיוק מה שחיפשתי — עיצוב שמרגיש אישי ואמיתי.",
+  },
+  {
+    name: "יוסי גולן",
+    role: "מנהל שיווק, Global Trade",
+    initials: "YG",
+    color: "from-rose-500 to-rose-600",
+    stars: 5,
+    text: "קיבלנו אתר מלא עם מערכת ניהול תורים שחוסכת לנו שעות בשבוע. NZ-web לא עשו רק 'אתר' — הם בנו לנו כלי עסקי אמיתי שמייצר תוצאות.",
+  },
+];
+
+const StarRating = ({ count }: { count: number }) => (
+  <div className="flex gap-0.5">
+    {Array.from({ length: count }).map((_, i) => (
+      <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+    ))}
+  </div>
+);
+
+const TestimonialsSection = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
+  const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(0);
+
+  const prev = () => {
+    setDirection(-1);
+    setCurrent((c) => (c - 1 + testimonials.length) % testimonials.length);
+  };
+
+  const next = () => {
+    setDirection(1);
+    setCurrent((c) => (c + 1) % testimonials.length);
+  };
+
+  const variants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? 80 : -80,
+      opacity: 0,
+      scale: 0.97,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+    },
+    exit: (dir: number) => ({
+      x: dir > 0 ? -80 : 80,
+      opacity: 0,
+      scale: 0.97,
+      transition: { duration: 0.35, ease: [0.4, 0, 1, 1] },
+    }),
+  };
+
+  const t = testimonials[current];
+
+  return (
+    <section
+      ref={sectionRef}
+      dir="rtl"
+      className="relative overflow-hidden py-24 md:py-32 lg:py-40"
+      aria-label="המלצות לקוחות"
+    >
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-secondary/50 via-background to-secondary/30" />
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-primary/[0.04] blur-[140px]" />
+        <div className="absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full bg-accent/[0.04] blur-[120px]" />
+      </div>
+
+      <div className="container relative z-10 mx-auto px-5 md:px-6">
+        {/* Header */}
+        <motion.div
+          className="mx-auto mb-14 max-w-2xl text-center md:mb-20"
+          initial={{ opacity: 0, y: 28 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">
+            מה הלקוחות אומרים
+          </p>
+          <h2 className="mb-5 text-3xl font-black leading-tight text-foreground md:text-4xl lg:text-5xl">
+            לקוחות מרוצים,{" "}
+            <span className="text-gradient-brand">תוצאות מדידות</span>
+          </h2>
+          <p className="mx-auto max-w-xl text-base leading-[1.9] text-muted-foreground md:text-lg">
+            האמון של הלקוחות שלנו הוא הנכס היקר ביותר שיש לנו.
+          </p>
+        </motion.div>
+
+        {/* Main testimonial card */}
+        <motion.div
+          className="mx-auto max-w-3xl"
+          initial={{ opacity: 0, y: 40 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="relative overflow-hidden rounded-[2rem] border border-border/40 bg-card/90 p-8 shadow-[0_8px_48px_-12px_hsl(var(--foreground)/0.08)] backdrop-blur-xl md:p-12">
+            {/* Quote icon */}
+            <div className="absolute left-8 top-8 opacity-10 md:left-10 md:top-10">
+              <Quote className="h-16 w-16 rotate-180 text-primary" />
+            </div>
+
+            {/* Inner glow */}
+            <div className="pointer-events-none absolute inset-[1px] rounded-[2rem] bg-gradient-to-br from-primary/[0.04] via-transparent to-accent/[0.04]" />
+
+            <div className="relative z-10 flex flex-col gap-8">
+              {/* Stars */}
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={current}
+                  custom={direction}
+                  variants={variants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  className="flex flex-col gap-6"
+                >
+                  <StarRating count={t.stars} />
+
+                  {/* Text */}
+                  <p className="text-lg leading-[1.9] text-foreground/90 md:text-xl md:leading-[2]">
+                    "{t.text}"
+                  </p>
+
+                  {/* Author */}
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-sm font-bold text-white shadow-lg ${t.color}`}
+                    >
+                      {t.initials}
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-foreground">{t.name}</p>
+                      <p className="text-sm text-muted-foreground">{t.role}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="mt-8 flex items-center justify-between gap-4">
+            {/* Dots */}
+            <div className="flex gap-2">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setDirection(i > current ? 1 : -1);
+                    setCurrent(i);
+                  }}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    i === current
+                      ? "w-8 bg-primary"
+                      : "w-2 bg-border hover:bg-primary/50"
+                  }`}
+                  aria-label={`עבור לביקורת ${i + 1}`}
+                />
+              ))}
+            </div>
+
+            {/* Arrows */}
+            <div className="flex gap-3">
+              <button
+                onClick={next}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground transition-all duration-200 hover:border-primary/30 hover:bg-primary/[0.06] hover:text-primary"
+                aria-label="הבא"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={prev}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground transition-all duration-200 hover:border-primary/30 hover:bg-primary/[0.06] hover:text-primary"
+                aria-label="הקודם"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Mini cards row */}
+        <motion.div
+          className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5"
+          initial={{ opacity: 0, y: 24 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          {testimonials.map((item, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                setDirection(i > current ? 1 : -1);
+                setCurrent(i);
+              }}
+              className={`flex flex-col items-center gap-2 rounded-2xl border p-3 text-center transition-all duration-300 md:p-4 ${
+                i === current
+                  ? "border-primary/30 bg-primary/[0.06] shadow-md"
+                  : "border-border/40 bg-card/60 hover:border-primary/20 hover:bg-card"
+              }`}
+            >
+              <div
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br text-xs font-bold text-white ${item.color}`}
+              >
+                {item.initials}
+              </div>
+              <p className="text-[11px] font-semibold leading-tight text-foreground md:text-xs">
+                {item.name}
+              </p>
+            </button>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+export default TestimonialsSection;

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as LucideIcons from "lucide-react";
+import { SkeletonServiceBlock } from "@/components/SkeletonCard";
 
 import { fetchServices, type ServiceRow } from "@/lib/services-api";
 import { isRenderableAssetUrl, isSafeInlineSvg } from "@/lib/runtime-safety";
@@ -489,7 +490,19 @@ const ServicesSection = () => {
   }, [services]);
 
   if (services.length === 0) {
-    return null;
+    return (
+      <section id="services" dir="rtl" className="relative overflow-hidden py-10 md:py-14" style={{ backgroundColor: "hsl(0 0% 100%)" }}>
+        <div className="container mx-auto px-5 md:px-6">
+          <div className="mx-auto mb-12 max-w-3xl text-center">
+            <div className="mx-auto mb-4 h-3 w-28 rounded-full bg-secondary/80" />
+            <div className="mx-auto h-10 w-80 rounded-xl bg-secondary/80" />
+          </div>
+          <div className="mx-auto flex max-w-6xl flex-col gap-8">
+            {[1, 2, 3].map((i) => <SkeletonServiceBlock key={i} />)}
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -498,7 +511,7 @@ const ServicesSection = () => {
       id="services"
       dir="rtl"
       aria-label="השירותים שלנו"
-      className="relative overflow-hidden py-24 md:py-32 lg:py-40"
+      className="relative overflow-hidden py-10 md:py-14 lg:py-16"
       style={{ backgroundColor: "hsl(0 0% 100%)" }}>
       
       {/* Background ambient shapes */}
@@ -509,7 +522,7 @@ const ServicesSection = () => {
 
       <div className="container relative z-10 mx-auto px-5 md:px-6">
         {/* Section Header */}
-        <div ref={headerRef} className="mx-auto mb-20 max-w-3xl text-center md:mb-28">
+        <div ref={headerRef} className="mx-auto mb-10 max-w-3xl text-center md:mb-14">
           <p className="mb-4 text-sm font-semibold tracking-widest text-primary uppercase">השירותים שלנו</p>
           <h2 className="mb-6 text-3xl font-black leading-tight text-foreground md:text-4xl lg:text-5xl xl:text-[3.25rem]">
             איך אנחנו ב-<span className="text-gradient-brand">NZ-web</span> עושים את זה?

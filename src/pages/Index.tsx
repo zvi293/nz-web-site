@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import AmbientShapes from "@/components/AmbientShapes";
 import ServicesSection from "@/components/ServicesSection";
+import ProcessSection from "@/components/ProcessSection";
 import PortfolioSection from "@/components/PortfolioSection";
 import ClientLogosSection from "@/components/ClientLogosSection";
 import ContactCTA from "@/components/ContactCTA";
@@ -30,23 +31,32 @@ const Index = () => {
   }, [location.hash]);
 
   useEffect(() => {
-    if (location.state && typeof location.state === "object" && "scrollTo" in location.state) {
+    if (
+      location.state &&
+      typeof location.state === "object" &&
+      "scrollTo" in location.state
+    ) {
       const scrollTo = location.state.scrollTo;
       if (typeof scrollTo === "string") {
         return scrollToSelectorWithRetry(scrollTo, {
           onSuccess: () => {
-            navigate(location.pathname + location.hash, { replace: true, state: null });
+            navigate(location.pathname + location.hash, {
+              replace: true,
+              state: null,
+            });
           },
         });
       }
     }
   }, [location.hash, location.pathname, location.state, navigate]);
+
   return (
     <main key={location.key} className="relative bg-background pt-[72px]">
       <AmbientShapes />
       <Header />
       <HeroSection />
       <ServicesSection />
+      <ProcessSection />
       <div id="portfolio" aria-hidden="true" />
       <PortfolioSection />
       <ClientLogosSection />

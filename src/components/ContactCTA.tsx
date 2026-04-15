@@ -194,7 +194,7 @@ const ContactCTA = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden py-28 md:py-40"
+      className="relative overflow-hidden py-14 md:py-20"
       dir="rtl"
     >
       {/* Background */}
