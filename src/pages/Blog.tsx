@@ -89,8 +89,9 @@ const Blog = () => {
   const [loading, setLoading] = useState(true);
 
   useSeoMeta({
-    title: "בלוג | NZ-web – מדריכים וטיפים לפיתוח אתרים",
-    description: "מאמרים, מדריכים וטיפים מקצועיים על פיתוח אתרים, עיצוב UI/UX, קידום SEO ואוטומציות AI. תוכן שמביא ערך אמיתי.",
+    title: "בלוג בניית אתרים | מדריכים ו-SEO | NZ-web",
+    description: "מדריכים, טיפים ותובנות מקצועיות על בניית אתרים, פיתוח אתרים, עיצוב UI/UX וקידום SEO בישראל. תוכן מניסיון אמיתי מהשטח.",
+    keywords: "בלוג בניית אתרים, מדריך פיתוח אתרים, טיפים SEO, מאמרים עיצוב אתרים, כמה עולה אתר, React WordPress השוואה",
   });
   useBreadcrumb({ name: "בלוג", path: "/blog" });
 

@@ -3,9 +3,10 @@ import ServicePageTemplate, { type ServicePageConfig } from "@/components/Servic
 
 const config: ServicePageConfig = {
   seo: {
-    title: "מערכת ניהול תורים לעסקים | NZ-web",
-    description: "מערכת ניהול תורים חכמה לעסקים — הזמנות אונליין, תזכורות אוטומטיות, ניהול לוח שנה ואינטגרציות. חוסכת שעות בשבוע.",
-  },
+    title: "מערכת ניהול תורים לעסקים | מערכת קביעת תורים | NZ-web",
+    description: "מערכת ניהול תורים חכמה לעסקים בישראל. הזמנות אונליין 24/6, תזכורות SMS אוטומטיות, לוח שנה וניתוח נתונים. מפחיתה no-shows ב-70%.",
+    keywords: "מערכת ניהול תורים, מערכת קביעת תורים, הזמנת תורים אונליין, תוכנה לניהול תורים, מערכת תורים לרופא, מערכת תורים לספא, בניית מערכת ניהול תורים",
+  } as const,
   breadcrumb: { name: "מערכת ניהול תורים", path: "/services/appointment-system" },
   schemaId: "service-schema-appointment-system",
   schemaServiceType: "Appointment Management System",

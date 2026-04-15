@@ -3,9 +3,10 @@ import ServicePageTemplate, { type ServicePageConfig } from "@/components/Servic
 
 const config: ServicePageConfig = {
   seo: {
-    title: "בניית דפי נחיתה | NZ-web",
-    description: "דפי נחיתה ממירים לקמפיינים ממומנים וקידום אורגני. עיצוב ממוקד המרה, טעינה מהירה ו-A/B testing.",
-  },
+    title: "בניית דפי נחיתה ממירים לעסקים בישראל | NZ-web",
+    description: "בניית דפי נחיתה מקצועיים לקמפיינים ממומנים ואורגניים. עיצוב ממוקד המרה, טעינה מתחת ל-2 שניות, A/B testing. מכפיל את ה-ROI של הפרסום שלכם.",
+    keywords: "בניית דפי נחיתה, דף נחיתה, landing page, בניית לנדינג פייג', עמוד נחיתה ממיר, דף נחיתה לגוגל, דף נחיתה לפייסבוק, קמפיין ממומן",
+  } as const,
   breadcrumb: { name: "בניית דפי נחיתה", path: "/services/landing-page-development" },
   schemaId: "service-schema-landing-page",
   schemaServiceType: "Landing Page Development",

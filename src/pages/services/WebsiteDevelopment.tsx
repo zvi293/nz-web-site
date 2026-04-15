@@ -3,9 +3,10 @@ import ServicePageTemplate, { type ServicePageConfig } from "@/components/Servic
 
 const config: ServicePageConfig = {
   seo: {
-    title: "פיתוח אתרים מקצועי | NZ-web",
-    description: "פיתוח אתרים מתקדם עם React, TypeScript ו-Supabase. ארכיטקטורה נכונה, ביצועים גבוהים ומערכות שגדלות עם העסק שלכם.",
-  },
+    title: "פיתוח אתרים מקצועי בישראל | React TypeScript | NZ-web",
+    description: "פיתוח אתרים מתקדם עם ארכיטקטורה שמחזיקה לשנים. React, TypeScript, Supabase. מסד נתונים, API, ממשק ניהול. פיתוח מערכות לעסקים בישראל.",
+    keywords: "פיתוח אתרים, פיתוח אתרים מקצועי, פיתוח מערכות לעסקים, פיתוח Full Stack, React Developer Israel, TypeScript, Supabase, בניית מערכת ניהול",
+  } as const,
   breadcrumb: { name: "פיתוח אתרים", path: "/services/website-development" },
   schemaId: "service-schema-website-development",
   schemaServiceType: "Website Development",

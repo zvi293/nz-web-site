@@ -3,9 +3,10 @@ import ServicePageTemplate, { type ServicePageConfig } from "@/components/Servic
 
 const config: ServicePageConfig = {
   seo: {
-    title: "בניית אתר תדמית לעסקים | NZ-web",
-    description: "אתר תדמית מקצועי שמייצג את העסק שלכם בצורה הטובה ביותר. עיצוב UI/UX מרהיב, מהירות גבוהה ותוכן שממיר גולשים ללקוחות.",
-  },
+    title: "בניית אתר תדמית לעסקים | NZ-web – ישראל",
+    description: "בניית אתר תדמית מקצועי לעסקים בישראל. עיצוב ייחודי, תוכן ממיר ו-SEO מובנה. האתר שגורם ללקוחות לבחור בכם. ניסיון ב-40+ אתרי תדמית.",
+    keywords: "בניית אתר תדמית, אתר תדמית לעסקים, בניית אתר לעסק, עיצוב אתר תדמית, אתר תדמית מקצועי, בניית אתר לחברה, אתר עסקי",
+  } as const,
   breadcrumb: { name: "אתר תדמית לעסקים", path: "/services/business-website" },
   schemaId: "service-schema-business-website",
   schemaServiceType: "Business Website Development",

@@ -101,9 +101,10 @@ const About = () => {
   const statsInView = useInView(statsRef, { once: true, margin: "-60px" });
 
   useSeoMeta({
-    title: "מי אנחנו | NZ-web – סטודיו לפיתוח ועיצוב אתרים",
+    title: "מי אנחנו | NZ-web – סטודיו לבניית אתרים ופיתוח אתרים בישראל",
     description:
-      "גלו את NZ-web – סטודיו של צבי משה לפיתוח Full-Stack, עיצוב UI/UX ואוטומציית AI. מאמינים בפרפקציוניזם דיגיטלי עם הסלוגן: Perfect in every Pixel.",
+      "NZ-web – סטודיו מוביל לבניית אתרים ופיתוח אתרים בישראל בניהול צבי משה. 50+ פרויקטים, 5+ שנות ניסיון, 100% שביעות רצון. Perfect in every Pixel.",
+    keywords: "NZ-web מי אנחנו, סטודיו לבניית אתרים, צבי משה, פיתוח אתרים ישראל, סטודיו לעיצוב אתרים",
   });
   useBreadcrumb({ name: "מי אנחנו", path: "/about" });
 
