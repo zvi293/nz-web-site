@@ -151,10 +151,26 @@ async function run() {
   });
   const origin = server.resolvedUrls.local[0].replace(/\/$/, "");
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
+  let browser;
+  try {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+  } catch (err) {
+    /* Could not launch headless Chrome (e.g. not installed on the build host).
+       Pre-rendering is an SEO layer on top of a fully-working SPA, so skip it
+       with a loud warning instead of failing the whole deploy. */
+    console.warn(
+      "\n  ⚠  Skipping pre-render — could not launch headless Chrome:\n" +
+        "     " + err.message + "\n" +
+        "     The site still deploys as a normal SPA.\n"
+    );
+    writeSitemap(routes);
+    console.log("  ✓  sitemap.xml — " + routes.length + " URLs\n");
+    await server.httpServer.close();
+    return;
+  }
 
   let success = 0;
   let fail = 0;
@@ -210,10 +226,14 @@ async function run() {
   console.log(`\n  ✓  sitemap.xml — ${routes.length} URLs`);
   console.log(`\n✅  Done: ${success} pages pre-rendered${fail ? `, ${fail} failed` : ""}\n`);
 
-  if (fail > 0) process.exit(1);
+  /* A partial pre-render failure must never block the deploy — the SPA works
+     without it. Log loudly; the Netlify build log makes it visible. */
+  if (fail > 0) {
+    console.warn("  ⚠  " + fail + " page(s) did not pre-render — deploy continues anyway.");
+  }
 }
 
 run().catch((err) => {
-  console.error("❌  Pre-render failed:", err);
-  process.exit(1);
+  /* Never fail the build over pre-rendering — the SPA works without it. */
+  console.warn("⚠  Pre-render step errored — deploy continues as a normal SPA:", err.message);
 });
