@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import CustomCursor from "./components/CustomCursor";
 import ScrollToTop from "./components/ScrollToTop";
+import Analytics from "./components/Analytics";
 import CookieConsent from "./components/CookieConsent";
 import ScrollProgressBar from "./components/ScrollProgressBar";
 import PageTransition from "./components/PageTransition";
@@ -98,7 +99,26 @@ const App = () => (
         <Sonner />
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ScrollToTop />
-          <AnimatedRoutes />
+          <Analytics />
+          {/* Skip-to-content link — WCAG 2.4.1 "Bypass Blocks". Hidden until focused via keyboard. */}
+          <a
+            href="#main-content"
+            onClick={(e) => {
+              e.preventDefault();
+              const main = document.getElementById("main-content");
+              if (main) {
+                main.setAttribute("tabindex", "-1");
+                main.focus();
+                main.scrollIntoView();
+              }
+            }}
+            className="sr-only focus:not-sr-only focus:fixed focus:right-4 focus:top-4 focus:z-[10050] focus:rounded-lg focus:bg-primary focus:px-5 focus:py-2.5 focus:text-sm focus:font-bold focus:text-primary-foreground focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
+          >
+            דלג לתוכן הראשי
+          </a>
+          <div id="main-content">
+            <AnimatedRoutes />
+          </div>
           <CookieConsent />
         </BrowserRouter>
       </AuthProvider>

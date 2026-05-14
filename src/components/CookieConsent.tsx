@@ -33,6 +33,8 @@ const CookieConsent = () => {
       JSON.stringify({ essential: true, analytics: true, marketing: true })
     );
     setShowBanner(false);
+    // Notify analytics/pixel trackers that consent was just granted, so they can load now.
+    window.dispatchEvent(new Event("nz-consent-updated"));
   };
 
   return (
