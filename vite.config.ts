@@ -17,34 +17,13 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  build: {
-    /**
-     * Split heavy vendor libraries into their own cached chunks instead of one
-     * giant main bundle. This parallelises the initial download and lets the
-     * browser cache vendor code across deploys — app updates no longer force a
-     * re-download of React / animation / Supabase code.
-     */
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (!id.includes("node_modules")) return undefined;
-          if (
-            id.includes("react-dom") ||
-            id.includes("react-router") ||
-            id.includes("/react/") ||
-            id.includes("scheduler")
-          ) {
-            return "react-vendor";
-          }
-          if (id.includes("framer-motion") || id.includes("gsap")) return "animation-vendor";
-          if (id.includes("@supabase")) return "supabase-vendor";
-          if (id.includes("recharts") || id.includes("/d3-") || id.includes("victory")) {
-            return "charts-vendor";
-          }
-          if (id.includes("@radix-ui")) return "radix-vendor";
-          return "vendor";
-        },
-      },
-    },
-  },
+  /**
+   * NOTE: a custom `build.rollupOptions.output.manualChunks` was removed here.
+   * It split React into a separate chunk from libraries that call
+   * `React.forwardRef` at module-init time, so in the production build those
+   * libraries ran before React was defined → "Cannot read properties of
+   * undefined (reading 'forwardRef')" → the whole app failed to mount, which
+   * broke the SEO pre-render step and every Netlify deploy. Vite's default
+   * chunking is safe; bundle-size tuning can be revisited carefully later.
+   */
 }));
