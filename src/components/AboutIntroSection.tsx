@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Ear, HeartHandshake, Sparkles } from "lucide-react";
+import { ArrowLeft, Ear, Sparkles } from "lucide-react";
 
 /**
  * Warm "getting to know us" intro section for the homepage.
@@ -18,14 +18,9 @@ const VALUES = [
   {
     icon: Ear,
     title: "הקשבה לפני הכול",
-    description: "כל פרויקט מתחיל בלהבין את העסק, הקהל והמטרה — לא בפתיחת קובץ עיצוב.",
+    description:
+      "כל פרויקט מתחיל בלהבין את העסק, הקהל והמטרה — לא בפתיחת קובץ עיצוב. אנחנו נשארים לצידכם גם אחרי ההשקה.",
     accent: "#3b82f6",
-  },
-  {
-    icon: HeartHandshake,
-    title: "שותפים, לא ספקים",
-    description: "אנחנו נשארים לצידכם גם אחרי ההשקה. הקשר לא נגמר כשהאתר עולה לאוויר.",
-    accent: "#10b981",
   },
   {
     icon: Sparkles,
@@ -83,7 +78,7 @@ const AboutIntroSection = () => {
             </div>
 
             {/* Values */}
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {VALUES.map((value, i) => {
                 const Icon = value.icon;
                 return (
