@@ -57,10 +57,10 @@ const Index = () => {
       <AmbientShapes />
       <Header />
       <HeroSection />
-      <ServicesSection />
       <ProcessSection />
       <div id="portfolio" aria-hidden="true" />
       <PortfolioSection />
+      <ServicesSection />
       <ClientLogosSection />
       <ContactCTA />
       <Footer />
