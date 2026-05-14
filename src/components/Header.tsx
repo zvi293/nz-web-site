@@ -10,6 +10,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
 
@@ -328,6 +329,9 @@ const Header = () => {
                   <SheetTitle className="text-right font-heebo text-xl font-black text-white">
                     NZ<span className="text-yellow-300">-web</span>
                   </SheetTitle>
+                  <SheetDescription className="text-right text-sm text-white/55">
+                    תפריט ניווט — כל העמודים והשירותים של NZ-web
+                  </SheetDescription>
                 </SheetHeader>
 
                 <nav className="mt-4 flex flex-col gap-1" dir="rtl">

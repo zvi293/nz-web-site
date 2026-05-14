@@ -7,7 +7,7 @@ const ScrollProgressBar = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const unsub = scrollYProgress.onChange((v) => setVisible(v > 0.01));
+    const unsub = scrollYProgress.on("change", (v) => setVisible(v > 0.01));
     return unsub;
   }, [scrollYProgress]);
 

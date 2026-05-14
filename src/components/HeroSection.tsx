@@ -29,14 +29,14 @@ const AnimatedNumber = ({ value, suffix, isInView }: { value: number; suffix: st
 
 gsap.registerPlugin(ScrollTrigger);
 
-const heroAriaLabel = "\u05E8\u05D0\u05E9\u05D9 \u2013 NZ-web \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05DC\u05E4\u05D9\u05EA\u05D5\u05D7 \u05D5\u05E2\u05D9\u05E6\u05D5\u05D1 \u05D0\u05EA\u05E8\u05D9\u05DD";
-const heroLine1 = "\u05E7\u05D5\u05D3 \u05E0\u05E7\u05D9.";
-const heroLine2 = "\u05E2\u05D9\u05E6\u05D5\u05D1 \u05E9\u05D5\u05D1\u05E8 \u05E9\u05D2\u05E8\u05D4.";
+const heroAriaLabel = "ראשי – NZ-web סטודיו לפיתוח ועיצוב אתרים";
+const heroLine1 = "קוד נקי.";
+const heroLine2 = "עיצוב שובר שגרה.";
 const heroParagraph =
-  "\u05D0\u05E0\u05D7\u05E0\u05D5 \u05D1-NZ-web \u05DE\u05E4\u05EA\u05D7\u05D9\u05DD \u05D7\u05D5\u05D5\u05D9\u05D5\u05EA \u05D3\u05D9\u05D2\u05D9\u05D8\u05DC\u05D9\u05D5\u05EA \u05DE\u05E8\u05D4\u05D9\u05D1\u05D5\u05EA, \u05D4\u05D7\u05DC \u05DE\u05D0\u05EA\u05E8\u05D9 \u05EA\u05D3\u05DE\u05D9\u05EA \u05D9\u05D5\u05E7\u05E8\u05EA\u05D9\u05D9\u05DD \u05D5\u05E2\u05D3 \u05D7\u05E0\u05D5\u05D9\u05D5\u05EA \u05D0\u05D9\u05E7\u05D5\u05DE\u05E8\u05E1 \u05DE\u05D5\u05E8\u05DB\u05D1\u05D5\u05EA, \u05E2\u05DD \u05D1\u05D9\u05E6\u05D5\u05E2\u05D9\u05DD \u05D7\u05E1\u05E8\u05D9 \u05E4\u05E9\u05E8\u05D5\u05EA.";
-const contactLabel = "\u05D3\u05D1\u05E8\u05D5 \u05D0\u05D9\u05EA\u05E0\u05D5";
-const aboutLabel = "\u05D4\u05E9\u05D9\u05E8\u05D5\u05EA\u05D9\u05DD \u05E9\u05DC\u05E0\u05D5";
-const heroImageAlt = "NZ-web \u2013 \u05E2\u05D9\u05E6\u05D5\u05D1 \u05D5\u05E4\u05D9\u05EA\u05D5\u05D7 \u05D0\u05EA\u05E8\u05D9\u05DD \u05DE\u05EA\u05E7\u05D3\u05DD";
+  "אנחנו ב-NZ-web מפתחים חוויות דיגיטליות מרהיבות, החל מאתרי תדמית יוקרתיים ועד חנויות איקומרס מורכבות, עם ביצועים חסרי פשרות.";
+const contactLabel = "דברו איתנו";
+const aboutLabel = "השירותים שלנו";
+const heroImageAlt = "NZ-web – עיצוב ופיתוח אתרים מתקדם";
 
 const StatsBar = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -77,7 +77,6 @@ const HeroSection = () => {
   const visualParallaxRef = useRef<HTMLDivElement>(null);
   const visualFloatRef = useRef<HTMLDivElement>(null);
   const tiltRef = useRef<HTMLDivElement>(null);
-  const floatTweenRef = useRef<gsap.core.Tween | null>(null);
   const parallaxTweenRef = useRef<gsap.core.Tween | null>(null);
   const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
 
@@ -119,7 +118,6 @@ const HeroSection = () => {
       gsap.set(line2, { x: 40, y: 18 });
       gsap.set(subtext, { y: 18 });
       gsap.set(buttons, { y: 20, scale: 0.97, transformOrigin: "50% 50%" });
-      gsap.set(visualFloat, { y: 0 });
 
       if (sectionRef.current && visualParallax) {
         parallaxTweenRef.current = gsap.to(visualParallax, {
@@ -137,17 +135,6 @@ const HeroSection = () => {
 
       introTimelineRef.current = gsap.timeline({
         defaults: { ease: "power3.out" },
-        onComplete: () => {
-          if (visualFloat) {
-            floatTweenRef.current = gsap.to(visualFloat, {
-              y: -14,
-              duration: 5.4,
-              ease: "sine.inOut",
-              yoyo: true,
-              repeat: -1,
-            });
-          }
-        },
       });
 
       const tl = introTimelineRef.current;
@@ -227,8 +214,6 @@ const HeroSection = () => {
     }, sectionRef);
 
     return () => {
-      floatTweenRef.current?.kill();
-      floatTweenRef.current = null;
       parallaxTweenRef.current?.kill();
       parallaxTweenRef.current = null;
       introTimelineRef.current?.kill();
@@ -292,7 +277,7 @@ const HeroSection = () => {
       lastY = y;
       if (Math.abs(delta) < 1) return;
       const dir = delta > 0 ? 1 : -1; // down → +, up → −
-      gsap.to(tilt, { rotateX: dir * 9, duration: 0.4, ease: "power2.out" });
+      gsap.to(tilt, { rotateX: dir * 13, duration: 0.4, ease: "power2.out" });
       clearTimeout(resetTimer);
       resetTimer = setTimeout(() => {
         gsap.to(tilt, { rotateX: 0, duration: 0.7, ease: "power3.out" });
@@ -357,7 +342,7 @@ const HeroSection = () => {
           <div ref={visualParallaxRef} className="relative w-full will-change-transform">
             <div ref={visualIntroRef} className="will-change-transform">
               {/* perspective parent — enables the 3D mouse-tilt on the child */}
-              <div ref={visualFloatRef} className="will-change-transform" style={{ perspective: "1100px" }}>
+              <div ref={visualFloatRef} className="nz-hero-float will-change-transform" style={{ perspective: "1100px" }}>
                 <div ref={tiltRef} className="will-change-transform">
                   <img
                     src={heroVisual}
