@@ -110,13 +110,22 @@ const AboutIntroSection = () => {
               })}
             </div>
 
-            <Link
-              to="/about"
-              className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-primary transition-all hover:gap-3"
-            >
-              להכיר אותנו קצת יותר
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Link
+                to="/contact"
+                className="inline-flex items-center gap-2 rounded-2xl bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.03] hover:brightness-110"
+              >
+                דברו איתנו
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/about"
+                className="inline-flex items-center gap-2 text-sm font-bold text-primary transition-all hover:gap-3"
+              >
+                להכיר אותנו קצת יותר
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+            </div>
           </motion.div>
 
           {/* ── Animated "website being built" graphic — desktop only (decorative) ── */}
