@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import AmbientShapes from "@/components/AmbientShapes";
+import AboutIntroSection from "@/components/AboutIntroSection";
 import ServicesSection from "@/components/ServicesSection";
 import ProcessSection from "@/components/ProcessSection";
 import PortfolioSection from "@/components/PortfolioSection";
@@ -57,6 +58,7 @@ const Index = () => {
       <AmbientShapes />
       <Header />
       <HeroSection />
+      <AboutIntroSection />
       <ProcessSection />
       <div id="portfolio" aria-hidden="true" />
       <PortfolioSection />
