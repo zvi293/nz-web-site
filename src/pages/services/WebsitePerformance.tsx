@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Gauge, Zap, ImageIcon, Timer } from "lucide-react";
+import { Gauge, Zap, ImageIcon, Timer, Search, Server, HelpCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
@@ -12,13 +12,42 @@ import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const SCHEMA_ID = "service-schema-website-performance";
 
+const FAQS = [
+  {
+    q: "איך אדע אם האתר שלי איטי מדי?",
+    a: "הכלי הפשוט ביותר הוא Google PageSpeed Insights — מזינים את כתובת האתר ומקבלים ציון וניתוח. ציון מתחת ל-50 בנייד הוא בעיה אמיתית. גם תחושת בטן עובדת: אם האתר לוקח יותר מ-3 שניות להיטען, כבר הפסדתם חלק מהגולשים.",
+  },
+  {
+    q: "כמה זמן לוקח לשפר את מהירות האתר?",
+    a: "audit ראשוני וזיהוי הבעיות — כמה ימים. היישום עצמו תלוי בהיקף: אופטימיזציה של תמונות וקאשינג בסיסי — שבוע. אתר עם בעיות ארכיטקטורה עמוקות — שבועיים עד שלושה. תמיד נציג לכם הערכת זמן מדויקת אחרי ה-audit.",
+  },
+  {
+    q: "מה זה Core Web Vitals ולמה זה חשוב?",
+    a: "אלה שלושה מדדים שגוגל משתמשת בהם כגורם דירוג רשמי: LCP (מהירות טעינת התוכן הראשי), INP (מהירות התגובה לאינטראקציה) ו-CLS (יציבות ויזואלית — שדברים לא 'קופצים'). אתר שעובר את שלושתם מקבל יתרון בדירוג.",
+  },
+  {
+    q: "אתם יכולים לשפר אתר שלא אתם בניתם?",
+    a: "כן. שיפור ביצועים הוא שירות שאנחנו מבצעים גם על אתרים קיימים — וורדפרס, Wix, אתרים מותאמים אישית ועוד. אנחנו מבצעים audit, מזהים את צווארי הבקבוק ומתקנים, גם בלי לבנות את האתר מחדש.",
+  },
+  {
+    q: "האם שיפור מהירות באמת משפיע על מכירות?",
+    a: "כן, ישירות. מחקרים מראים שכל שנייה של עיכוב מורידה את אחוז ההמרה בכ-7%, ו-53% מהגולשים נוטשים אתר שלוקח מעל 3 שניות להיטען. אתר מהיר יותר = יותר גולשים שנשארים = יותר פניות ומכירות.",
+  },
+  {
+    q: "מה אני מקבל בסוף התהליך?",
+    a: "אתר מהיר יותר — וגם דוח 'לפני ואחרי' מסודר עם ציוני Lighthouse, PageSpeed Insights ו-GTmetrix, כך שתראו בדיוק מה השתפר ובכמה. השיפור מדיד ושקוף, לא הבטחה כללית.",
+  },
+];
+
 const WebsitePerformance = () => {
   useSeoMeta({
-    title: "שיפור מהירות אתרים | NZ-web",
+    title: "שיפור מהירות אתרים | אופטימיזציית Core Web Vitals | NZ-web",
     description:
-      "שיפור ביצועי אתרים וציוני Core Web Vitals. אופטימיזציה לתמונות, קיצור זמני טעינה ושיפור דירוג בגוגל.",
+      "שיפור ביצועי אתרים וציוני Core Web Vitals. אופטימיזציה לתמונות, קיצור זמני טעינה ושיפור דירוג בגוגל. audit מלא עם דוח לפני ואחרי.",
+    keywords:
+      "שיפור מהירות אתר, אתר איטי, Core Web Vitals, אופטימיזציית אתרים, PageSpeed, שיפור ביצועי אתר, זמן טעינה, אופטימיזציה לגוגל",
   });
-  useBreadcrumb({ name: "שיפור מהירות אתרים", path: "/services/website-performance" });
+  useBreadcrumb({ name: "שיפור מהירות אתרים", path: "/services/website-performance", parent: { name: "שירותים", path: "/services" } });
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -44,8 +73,26 @@ const WebsitePerformance = () => {
     });
     document.getElementById(SCHEMA_ID)?.remove();
     document.head.appendChild(script);
+
+    /* FAQPage schema — eligible for rich results in Google */
+    const faqScript = document.createElement("script");
+    faqScript.type = "application/ld+json";
+    faqScript.id = `${SCHEMA_ID}-faq`;
+    faqScript.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: FAQS.map((faq) => ({
+        "@type": "Question",
+        name: faq.q,
+        acceptedAnswer: { "@type": "Answer", text: faq.a },
+      })),
+    });
+    document.getElementById(`${SCHEMA_ID}-faq`)?.remove();
+    document.head.appendChild(faqScript);
+
     return () => {
       document.getElementById(SCHEMA_ID)?.remove();
+      document.getElementById(`${SCHEMA_ID}-faq`)?.remove();
     };
   }, []);
 
@@ -192,6 +239,112 @@ const WebsitePerformance = () => {
             </div>
           </motion.div>
 
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="space-y-4"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Server className="h-5 w-5" />
+              </div>
+              <h2 className="font-heebo text-2xl md:text-3xl font-bold text-foreground">
+                תשתית, אחסון ו-CDN
+              </h2>
+            </div>
+            <div className="text-muted-foreground text-base leading-relaxed space-y-3">
+              <p>
+                לפעמים הבעיה היא לא בקוד — היא בתשתית. אחסון איטי, שרת רחוק גאוגרפית מהגולשים, או היעדר CDN יכולים להוסיף שניות יקרות לזמן הטעינה, ולא משנה כמה האתר עצמו מותאם.
+              </p>
+              <p>
+                אנחנו בודקים את כל השרשרת: זמן התגובה של השרת, הגדרות ה-CDN, דחיסה (gzip/brotli) ו-caching headers. לפעמים מעבר אחסון פשוט הוא השיפור הכי משמעותי שאפשר לעשות.
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="space-y-4"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Search className="h-5 w-5" />
+              </div>
+              <h2 className="font-heebo text-2xl md:text-3xl font-bold text-foreground">
+                איך מהירות משפיעה על הדירוג בגוגל
+              </h2>
+            </div>
+            <div className="text-muted-foreground text-base leading-relaxed space-y-3">
+              <p>
+                מהירות היא חלק רשמי מאלגוריתם הדירוג של גוגל דרך מדדי Core Web Vitals. שני אתרים עם תוכן דומה — המהיר יותר ידורג גבוה יותר. בשוק תחרותי כמו ישראל, זה ההבדל בין עמוד ראשון לעמוד שני.
+              </p>
+              <p>
+                מעבר לדירוג עצמו — אתר מהיר נסרק טוב יותר על ידי גוגל, הגולשים נשארים בו יותר זמן, ושיעור הנטישה יורד. כל אלה סיגנלים שגוגל מתרגמת בסופו של דבר ליותר חשיפה.
+              </p>
+            </div>
+          </motion.div>
+
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-12 md:py-16 bg-secondary/20" dir="rtl">
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <HelpCircle className="h-5 w-5" />
+            </div>
+            <h2 className="font-heebo text-2xl md:text-3xl font-bold text-foreground">
+              שאלות נפוצות על שיפור מהירות אתרים
+            </h2>
+          </div>
+          <div className="space-y-5">
+            {FAQS.map((faq, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05, duration: 0.45 }}
+                className="rounded-2xl border border-border/40 bg-card p-5 md:p-6"
+              >
+                <h3 className="font-heebo text-base md:text-lg font-bold text-foreground mb-2">{faq.q}</h3>
+                <p className="text-sm md:text-base leading-relaxed text-muted-foreground">{faq.a}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Related services */}
+      <section className="border-t border-border/30 py-10 md:py-14" dir="rtl">
+        <div className="mx-auto max-w-4xl px-6">
+          <p className="mb-6 text-center text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            שירותים נוספים שיכולים לעניין אתכם
+          </p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4">
+            {[
+              { label: "בניית אתרים מקצועיים", href: "/services/web-development" },
+              { label: "פיתוח אתרים מתקדם", href: "/services/website-development" },
+              { label: "אתר תדמית לעסקים", href: "/services/business-website" },
+              { label: "פיתוח React", href: "/services/react-development" },
+              { label: "בניית דפי נחיתה", href: "/services/landing-page-development" },
+              { label: "כל השירותים", href: "/services" },
+            ].map((s) => (
+              <Link
+                key={s.href}
+                to={s.href}
+                className="rounded-xl border border-border/40 bg-card px-4 py-3 text-center text-sm font-medium text-muted-foreground transition-all hover:border-primary/30 hover:bg-primary/[0.05] hover:text-primary"
+              >
+                {s.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

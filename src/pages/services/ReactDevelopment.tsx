@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Layers, Code2, Cpu, Repeat, ArrowLeftRight } from "lucide-react";
+import { Layers, Code2, Cpu, Repeat, ArrowLeftRight, Smartphone, ShieldCheck, HelpCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
@@ -12,13 +12,42 @@ import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const SCHEMA_ID = "service-schema-react-development";
 
+const FAQS = [
+  {
+    q: "מה ההבדל בין אתר רגיל לאתר שנבנה ב-React?",
+    a: "אתר רגיל (למשל על WordPress עם תבנית) מתאים לתוכן סטטי. React מתאים כשיש אינטראקטיביות, לוגיקה עסקית, אזורים אישיים או מסכים שמתעדכנים בזמן אמת — האתר מרגיש מהיר וחלק כמו אפליקציה, בלי טעינות עמוד מחדש.",
+  },
+  {
+    q: "האם אתר React טוב ל-SEO?",
+    a: "כן — כשהוא נבנה נכון. אנחנו בונים כל פרויקט React עם pre-rendering מלא, כך שגוגל מקבל HTML מלא עם כל התוכן מיד, בלי תלות בהרצת JavaScript. ככה נהנים גם מחוויית ה-React המהירה וגם מקריאוּת מלאה לגוגל.",
+  },
+  {
+    q: "אפשר לחבר אתר React למערכת קיימת שיש לי?",
+    a: "בהחלט. אנחנו מתחברים ל-REST APIs, GraphQL, Supabase, Webhooks ומערכות backend קיימות. אם יש לכם כבר מערכת — נשלב איתה. אם לא — נבנה גם את הצד האחורי.",
+  },
+  {
+    q: "כמה זמן לוקח לפתח אתר או אפליקציית React?",
+    a: "פרויקט React פשוט — 3 עד 5 שבועות. מערכת מורכבת עם אזור אישי, הרשאות ואינטגרציות — 6 עד 12 שבועות. נגדיר לוח זמנים מדויק אחרי אפיון הדרישות.",
+  },
+  {
+    q: "האם אקבל קוד שאפשר לתחזק ולהרחיב?",
+    a: "כן. אנחנו כותבים ב-TypeScript עם ארכיטקטורת רכיבים נקייה, הפרדה ברורה בין UI, state ו-API, ותיעוד. הקוד שלכם — וניתן להעביר אותו לכל מפתח React בעתיד.",
+  },
+  {
+    q: "React מתאים גם לאתר תדמית פשוט?",
+    a: "אפשר, אבל לא תמיד צריך. לאתר תדמית סטטי לגמרי גם פתרונות אחרים מספיקים. React מצדיק את עצמו כשיש אינטראקטיביות, מערכת ניהול עשירה או תוכנית להרחיב את האתר למערכת בעתיד. בשיחת ייעוץ נעזור לכם להחליט מה נכון.",
+  },
+];
+
 const ReactDevelopment = () => {
   useSeoMeta({
-    title: "פיתוח React מתקדם | NZ-web",
+    title: "פיתוח React מתקדם | אפליקציות ואתרים מהירים | NZ-web",
     description:
-      "פיתוח אפליקציות ואתרים מבוססי React עם TypeScript. ביצועים גבוהים, ארכיטקטורה נקייה, ושילוב עם מערכות backend.",
+      "פיתוח אפליקציות ואתרים מבוססי React עם TypeScript. ביצועים גבוהים, ארכיטקטורה נקייה, SEO מובנה ושילוב עם מערכות backend. פיתוח React מקצועי בישראל.",
+    keywords:
+      "פיתוח React, React Developer Israel, אפליקציות React, פיתוח אפליקציות web, React TypeScript, SPA, פיתוח ממשקים, פיתוח Front End",
   });
-  useBreadcrumb({ name: "פיתוח React", path: "/services/react-development" });
+  useBreadcrumb({ name: "פיתוח React", path: "/services/react-development", parent: { name: "שירותים", path: "/services" } });
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -44,8 +73,26 @@ const ReactDevelopment = () => {
     });
     document.getElementById(SCHEMA_ID)?.remove();
     document.head.appendChild(script);
+
+    /* FAQPage schema — eligible for rich results in Google */
+    const faqScript = document.createElement("script");
+    faqScript.type = "application/ld+json";
+    faqScript.id = `${SCHEMA_ID}-faq`;
+    faqScript.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: FAQS.map((faq) => ({
+        "@type": "Question",
+        name: faq.q,
+        acceptedAnswer: { "@type": "Answer", text: faq.a },
+      })),
+    });
+    document.getElementById(`${SCHEMA_ID}-faq`)?.remove();
+    document.head.appendChild(faqScript);
+
     return () => {
       document.getElementById(SCHEMA_ID)?.remove();
+      document.getElementById(`${SCHEMA_ID}-faq`)?.remove();
     };
   }, []);
 
@@ -180,6 +227,112 @@ const ReactDevelopment = () => {
             </div>
           </motion.div>
 
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="space-y-4"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Smartphone className="h-5 w-5" />
+              </div>
+              <h2 className="font-heebo text-2xl md:text-3xl font-bold text-foreground">
+                Mobile-First בלי פשרות
+              </h2>
+            </div>
+            <div className="text-muted-foreground text-base leading-relaxed space-y-3">
+              <p>
+                יותר מ-70% מהגלישה בישראל היא מהנייד, ולכן אנחנו מתכננים כל ממשק React קודם למסך הקטן ורק אז מתרחבים. זה לא "להקטין את הדסקטופ" — זו חשיבה אחרת מההתחלה: כפתורים בגודל שנוח לאגודל, טפסים קצרים, וניווט שעובד במגע.
+              </p>
+              <p>
+                React מאפשרת לנו לבנות רכיבים שמסתגלים חכם לכל רוחב מסך — כך שאותו קוד נותן חוויה מצוינת גם בנייד, גם בטאבלט וגם במסך גדול, בלי לתחזק שלוש גרסאות.
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="space-y-4"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <h2 className="font-heebo text-2xl md:text-3xl font-bold text-foreground">
+                אבטחה, יציבות ו-SEO מובנים
+              </h2>
+            </div>
+            <div className="text-muted-foreground text-base leading-relaxed space-y-3">
+              <p>
+                פרויקט React טוב הוא לא רק מהיר — הוא גם בטוח ויציב. אנחנו מיישמים ניהול הרשאות נכון, ולידציה של קלט, הגנות מפני XSS ו-CSRF, ו-error handling שלא מפיל את הממשק כשמשהו משתבש בצד השרת.
+              </p>
+              <p>
+                ולגבי גוגל — אנחנו בונים כל אתר React עם pre-rendering מלא: גוגל מקבל את כל התוכן כ-HTML מוכן, מיד, בלי תלות בהרצת JavaScript. כך אתם נהנים מחוויית ה-SPA המהירה מבלי לשלם על זה בחשיפה אורגנית.
+              </p>
+            </div>
+          </motion.div>
+
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-12 md:py-16 bg-secondary/20" dir="rtl">
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <HelpCircle className="h-5 w-5" />
+            </div>
+            <h2 className="font-heebo text-2xl md:text-3xl font-bold text-foreground">
+              שאלות נפוצות על פיתוח React
+            </h2>
+          </div>
+          <div className="space-y-5">
+            {FAQS.map((faq, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05, duration: 0.45 }}
+                className="rounded-2xl border border-border/40 bg-card p-5 md:p-6"
+              >
+                <h3 className="font-heebo text-base md:text-lg font-bold text-foreground mb-2">{faq.q}</h3>
+                <p className="text-sm md:text-base leading-relaxed text-muted-foreground">{faq.a}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Related services */}
+      <section className="border-t border-border/30 py-10 md:py-14" dir="rtl">
+        <div className="mx-auto max-w-4xl px-6">
+          <p className="mb-6 text-center text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            שירותים נוספים שיכולים לעניין אתכם
+          </p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4">
+            {[
+              { label: "פיתוח אתרים מתקדם", href: "/services/website-development" },
+              { label: "בניית אתרים מקצועיים", href: "/services/web-development" },
+              { label: "אתר תדמית לעסקים", href: "/services/business-website" },
+              { label: "מערכת ניהול תורים", href: "/services/appointment-system" },
+              { label: "שיפור מהירות אתרים", href: "/services/website-performance" },
+              { label: "כל השירותים", href: "/services" },
+            ].map((s) => (
+              <Link
+                key={s.href}
+                to={s.href}
+                className="rounded-xl border border-border/40 bg-card px-4 py-3 text-center text-sm font-medium text-muted-foreground transition-all hover:border-primary/30 hover:bg-primary/[0.05] hover:text-primary"
+              >
+                {s.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
