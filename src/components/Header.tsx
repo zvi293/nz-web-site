@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import { scrollToSelectorWithRetry } from "@/lib/scroll-navigation";
-import { MessageCircle, ChevronDown, Monitor, Briefcase, CalendarDays, Target, Code2, Globe } from "lucide-react";
+import { MessageCircle, ChevronDown, Monitor, Briefcase, CalendarDays, Target, Code2, Globe, Menu } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -243,6 +243,14 @@ const Header = () => {
               בואו נדבר
             </a>
             <ThemeToggle />
+            {/* Full-menu trigger — opens the same Sheet as mobile (blog, about, all pages) */}
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="פתח תפריט מלא"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-gradient-to-br from-primary/10 to-accent/10 text-foreground transition-all duration-200 hover:scale-105 hover:border-primary/30 hover:text-primary"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
           </div>
         </div>
 

@@ -76,6 +76,7 @@ const HeroSection = () => {
   const visualIntroRef = useRef<HTMLDivElement>(null);
   const visualParallaxRef = useRef<HTMLDivElement>(null);
   const visualFloatRef = useRef<HTMLDivElement>(null);
+  const tiltRef = useRef<HTMLDivElement>(null);
   const floatTweenRef = useRef<gsap.core.Tween | null>(null);
   const parallaxTweenRef = useRef<gsap.core.Tween | null>(null);
   const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
@@ -139,7 +140,7 @@ const HeroSection = () => {
         onComplete: () => {
           if (visualFloat) {
             floatTweenRef.current = gsap.to(visualFloat, {
-              y: -8,
+              y: -14,
               duration: 5.4,
               ease: "sine.inOut",
               yoyo: true,
@@ -236,6 +237,76 @@ const HeroSection = () => {
     };
   }, []);
 
+  /* Subtle 3D mouse-tilt on the hero visual — desktop / hover-capable devices only. */
+  useEffect(() => {
+    const tilt = tiltRef.current;
+    const section = sectionRef.current;
+    if (!tilt || !section) return;
+
+    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!canHover || reduced) return;
+
+    const MAX_DEG = 15; // tilt amount (degrees)
+    const MAX_SHIFT = 12; // positional drift toward the cursor (px) — adds depth
+    const onMove = (e: MouseEvent) => {
+      const rect = section.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 .. 0.5
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      gsap.to(tilt, {
+        rotateY: px * MAX_DEG,
+        rotateX: -py * MAX_DEG,
+        x: px * MAX_SHIFT,
+        y: py * MAX_SHIFT,
+        duration: 0.6,
+        ease: "power2.out",
+      });
+    };
+    const onLeave = () => {
+      gsap.to(tilt, { rotateX: 0, rotateY: 0, x: 0, y: 0, duration: 0.9, ease: "power3.out" });
+    };
+
+    section.addEventListener("mousemove", onMove);
+    section.addEventListener("mouseleave", onLeave);
+    return () => {
+      section.removeEventListener("mousemove", onMove);
+      section.removeEventListener("mouseleave", onLeave);
+      gsap.killTweensOf(tilt);
+    };
+  }, []);
+
+  /* Mobile / touch: tilt the hero visual slightly toward the scroll direction. */
+  useEffect(() => {
+    const tilt = tiltRef.current;
+    if (!tilt) return;
+
+    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (canHover || reduced) return; // desktop already has the mouse-tilt
+
+    let lastY = window.scrollY;
+    let resetTimer: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+      lastY = y;
+      if (Math.abs(delta) < 1) return;
+      const dir = delta > 0 ? 1 : -1; // down → +, up → −
+      gsap.to(tilt, { rotateX: dir * 9, duration: 0.4, ease: "power2.out" });
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => {
+        gsap.to(tilt, { rotateX: 0, duration: 0.7, ease: "power3.out" });
+      }, 170);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      clearTimeout(resetTimer);
+      gsap.killTweensOf(tilt);
+    };
+  }, []);
+
   return (
     <section ref={sectionRef} dir="rtl" aria-label={heroAriaLabel} className="relative overflow-hidden bg-background">
       {/* Subtle ambient shapes */}
@@ -285,12 +356,15 @@ const HeroSection = () => {
         <div className="flex w-full flex-1 items-center justify-center">
           <div ref={visualParallaxRef} className="relative w-full will-change-transform">
             <div ref={visualIntroRef} className="will-change-transform">
-              <div ref={visualFloatRef} className="will-change-transform">
-                <img
-                  src={heroVisual}
-                  alt={heroImageAlt}
-                  className="soft-shadow-lg mx-auto w-full max-w-sm rounded-2xl sm:max-w-md lg:max-w-xl"
-                />
+              {/* perspective parent — enables the 3D mouse-tilt on the child */}
+              <div ref={visualFloatRef} className="will-change-transform" style={{ perspective: "1100px" }}>
+                <div ref={tiltRef} className="will-change-transform">
+                  <img
+                    src={heroVisual}
+                    alt={heroImageAlt}
+                    className="soft-shadow-lg mx-auto w-full max-w-sm rounded-2xl sm:max-w-md lg:max-w-xl"
+                  />
+                </div>
               </div>
             </div>
           </div>

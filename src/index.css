@@ -217,9 +217,25 @@ html {
 .nz-float-b { animation: nz-float-b 6s ease-in-out infinite; }
 .nz-float-c { animation: nz-float-c 7s ease-in-out infinite; }
 .nz-build-shimmer { animation: nz-build-shimmer 7s ease-in-out infinite; }
+
+/* Hero visual — gentle continuous float + subtle "breathing", on every device */
+@keyframes nz-hero-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-14px) scale(1.018); }
+}
+/* Mobile floats a bit more pronounced */
+@keyframes nz-hero-float-mobile {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-24px) scale(1.025); }
+}
+.nz-hero-float { animation: nz-hero-float 5.5s ease-in-out infinite; animation-delay: 2.5s; }
+@media (max-width: 767px) {
+  .nz-hero-float { animation: nz-hero-float-mobile 5s ease-in-out infinite; animation-delay: 1.5s; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .nz-build-block { animation: none; opacity: 1; transform: none; }
-  .nz-float-a, .nz-float-b, .nz-float-c, .nz-build-shimmer { animation: none; }
+  .nz-float-a, .nz-float-b, .nz-float-c, .nz-build-shimmer, .nz-hero-float { animation: none; }
 }
 
 /* Button ripple on active */
