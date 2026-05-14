@@ -97,7 +97,7 @@ const CustomCursor = () => {
       {/* Inner dot - bigger, bluer */}
       <div
         ref={cursorRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9999] hidden lg:block"
+        className="pointer-events-none fixed top-0 left-0 z-[10001] hidden lg:block"
         style={{
           width: 16,
           height: 16,
@@ -111,7 +111,7 @@ const CustomCursor = () => {
       {/* Outer follower ring - larger, softer glow */}
       <div
         ref={followerRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9998] hidden lg:block"
+        className="pointer-events-none fixed top-0 left-0 z-[10000] hidden lg:block"
         style={{
           width: 52,
           height: 52,
