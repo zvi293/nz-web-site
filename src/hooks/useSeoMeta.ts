@@ -7,6 +7,8 @@ export interface SeoMetaOptions {
   description?: string;
   keywords?: string;
   noindex?: boolean;
+  /** Optional per-page Open Graph / Twitter image (absolute URL). Falls back to the site default. */
+  ogImage?: string;
   /** JSON-LD schema object(s) — injected as <script type="application/ld+json"> */
   schema?: object | object[];
 }
@@ -27,13 +29,18 @@ export function useSeoMeta({
   description,
   keywords,
   noindex = false,
+  ogImage,
   schema,
 }: SeoMetaOptions): void {
   const { settings } = useSiteSettings();
 
   useEffect(() => {
     const canonicalUrl = getCanonicalUrl(window.location.pathname, settings.siteUrl);
-    const ogImageUrl = getResolvedOgImageUrl(settings.siteUrl, settings.seo.ogImage);
+    /* Per-page og:image when provided (e.g. a blog post's cover); else the site default. */
+    const ogImageUrl =
+      ogImage && /^https?:\/\//i.test(ogImage)
+        ? ogImage
+        : getResolvedOgImageUrl(settings.siteUrl, settings.seo.ogImage);
     const mergedKeywords = keywords
       ? `${keywords}, ${BASE_KEYWORDS}`
       : BASE_KEYWORDS;
@@ -129,5 +136,5 @@ export function useSeoMeta({
 
       schemaEl?.remove();
     };
-  }, [title, description, keywords, noindex, schema, settings.seo.ogImage, settings.siteUrl]);
+  }, [title, description, keywords, noindex, ogImage, schema, settings.seo.ogImage, settings.siteUrl]);
 }

@@ -24,6 +24,17 @@ function renderMarkdown(md: string): string {
     .replace(/^(?!<[h|u|l])(.+)$/gm, (m) => m.startsWith('<') ? m : `<p class="text-base leading-[1.95] text-muted-foreground my-4">${m}</p>`);
 }
 
+/* Maps each blog category to the most relevant service page for internal linking. */
+const CATEGORY_SERVICE: Record<string, { label: string; href: string }> = {
+  "בניית אתרים": { label: "בניית אתרים מקצועיים", href: "/services/web-development" },
+  "קידום אתרים": { label: "שיפור מהירות וקידום אתרים", href: "/services/website-performance" },
+  "פיתוח": { label: "פיתוח אתרים מתקדם", href: "/services/website-development" },
+  "עיצוב": { label: "בניית אתר תדמית לעסקים", href: "/services/business-website" },
+  "AI & אוטומציה": { label: "מערכת ניהול תורים", href: "/services/appointment-system" },
+  "כללי": { label: "כל השירותים שלנו", href: "/services" },
+};
+const DEFAULT_SERVICE = { label: "כל השירותים שלנו", href: "/services" };
+
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -67,8 +78,11 @@ const BlogPost = () => {
     title: post ? `${post.title} | NZ-web בלוג` : "מאמר | NZ-web",
     description: post?.excerpt ?? "",
     keywords: post ? `${post.category}, ${post.title}, NZ-web בלוג` : undefined,
+    ogImage: post?.cover_image || undefined,
     schema: articleSchema,
   });
+
+  const relatedService = post ? CATEGORY_SERVICE[post.category] ?? DEFAULT_SERVICE : DEFAULT_SERVICE;
 
   useBreadcrumb({
     name: post?.title ?? "מאמר",
@@ -156,9 +170,29 @@ const BlogPost = () => {
           />
         </motion.div>
 
+        {/* Related service — contextual internal link */}
+        <motion.div
+          className="mt-12 flex flex-col gap-3 rounded-3xl border border-border/50 bg-card p-6 text-right sm:flex-row sm:items-center sm:justify-between"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <div>
+            <p className="text-sm font-semibold text-primary">קשור למאמר הזה</p>
+            <p className="text-base font-bold text-foreground">{relatedService.label}</p>
+          </div>
+          <Link
+            to={relatedService.href}
+            className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-primary/30 bg-primary/[0.06] px-6 py-3 text-sm font-bold text-primary transition-all hover:bg-primary/10"
+          >
+            קראו על השירות
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </motion.div>
+
         {/* CTA */}
         <motion.div
-          className="mt-14 rounded-3xl border border-primary/20 bg-primary/[0.04] p-8 text-center"
+          className="mt-6 rounded-3xl border border-primary/20 bg-primary/[0.04] p-8 text-center"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

@@ -22,6 +22,51 @@ const TestimonialsSection = () => {
     fetchTestimonials().then(setTestimonials);
   }, []);
 
+  /**
+   * Injects AggregateRating + Review JSON-LD built from the REAL testimonials.
+   * Shares the business @id with the LocalBusiness schema in index.html, so Google
+   * attaches the rating to the business — making star ratings eligible in search results.
+   * The ratings are also visibly shown on this section (StarRating), as Google requires.
+   */
+  useEffect(() => {
+    const visible = testimonials.filter((item) => item.rating > 0);
+    if (visible.length === 0) return;
+    const avg = visible.reduce((sum, item) => sum + item.rating, 0) / visible.length;
+    const SCHEMA_ID = "testimonials-aggregate-rating";
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.id = SCHEMA_ID;
+    script.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "@id": "https://nz-web.com/#business",
+      name: "NZ-web",
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: avg.toFixed(1),
+        reviewCount: String(visible.length),
+        bestRating: "5",
+        worstRating: "1",
+      },
+      review: visible.map((item) => ({
+        "@type": "Review",
+        author: { "@type": "Person", name: item.name },
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: String(item.rating),
+          bestRating: "5",
+          worstRating: "1",
+        },
+        reviewBody: item.text,
+      })),
+    });
+    document.getElementById(SCHEMA_ID)?.remove();
+    document.head.appendChild(script);
+    return () => {
+      document.getElementById(SCHEMA_ID)?.remove();
+    };
+  }, [testimonials]);
+
   const prev = () => {
     if (!testimonials.length) return;
     setDirection(-1);
