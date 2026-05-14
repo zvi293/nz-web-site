@@ -228,17 +228,20 @@ const HeroSection = () => {
     const section = sectionRef.current;
     if (!tilt || !section) return;
 
-    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    // Primary pointer is a mouse/trackpad. `(pointer: fine)` is reliable where
+    // `(hover:)` lies on Android and `maxTouchPoints` lies on Windows laptops.
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!canHover || reduced) return;
+    if (!finePointer || reduced) return;
 
-    const MAX_DEG = 15; // tilt amount (degrees)
-    const MAX_SHIFT = 12; // positional drift toward the cursor (px) — adds depth
+    const MAX_DEG = 20; // tilt amount (degrees)
+    const MAX_SHIFT = 16; // positional drift toward the cursor (px) — adds depth
     const onMove = (e: MouseEvent) => {
       const rect = section.getBoundingClientRect();
       const px = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 .. 0.5
       const py = (e.clientY - rect.top) / rect.height - 0.5;
       gsap.to(tilt, {
+        transformPerspective: 1100, // 3D depth lives on the element itself — never depends on a parent
         rotateY: px * MAX_DEG,
         rotateX: -py * MAX_DEG,
         x: px * MAX_SHIFT,
@@ -265,9 +268,11 @@ const HeroSection = () => {
     const tilt = tiltRef.current;
     if (!tilt) return;
 
-    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    // Primary pointer is touch (coarse). Reliable where `(hover:)` lies on
+    // Android and `maxTouchPoints` lies on Windows laptops.
+    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (canHover || reduced) return; // desktop already has the mouse-tilt
+    if (!coarsePointer || reduced) return; // desktop already has the mouse-tilt
 
     let lastY = window.scrollY;
     let resetTimer: ReturnType<typeof setTimeout> | undefined;
@@ -275,13 +280,19 @@ const HeroSection = () => {
       const y = window.scrollY;
       const delta = y - lastY;
       lastY = y;
-      if (Math.abs(delta) < 1) return;
+      if (Math.abs(delta) < 0.5) return;
       const dir = delta > 0 ? 1 : -1; // down → +, up → −
-      gsap.to(tilt, { rotateX: dir * 13, duration: 0.4, ease: "power2.out" });
+      gsap.to(tilt, {
+        transformPerspective: 1100, // 3D depth lives on the element itself — never depends on a parent
+        rotateX: dir * 22,
+        y: dir * 10,
+        duration: 0.45,
+        ease: "power2.out",
+      });
       clearTimeout(resetTimer);
       resetTimer = setTimeout(() => {
-        gsap.to(tilt, { rotateX: 0, duration: 0.7, ease: "power3.out" });
-      }, 170);
+        gsap.to(tilt, { rotateX: 0, y: 0, duration: 0.85, ease: "power3.out" });
+      }, 240);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -341,8 +352,10 @@ const HeroSection = () => {
         <div className="flex w-full flex-1 items-center justify-center">
           <div ref={visualParallaxRef} className="relative w-full will-change-transform">
             <div ref={visualIntroRef} className="will-change-transform">
-              {/* perspective parent — enables the 3D mouse-tilt on the child */}
-              <div ref={visualFloatRef} className="nz-hero-float will-change-transform" style={{ perspective: "1100px" }}>
+              {/* float wrapper (CSS keyframe drift) → tilt wrapper (GSAP 3D tilt).
+                  The tilt carries its own transformPerspective, so the 3D effect
+                  never depends on — and can never be flattened by — a parent. */}
+              <div ref={visualFloatRef} className="nz-hero-float will-change-transform">
                 <div ref={tiltRef} className="will-change-transform">
                   <img
                     src={heroVisual}

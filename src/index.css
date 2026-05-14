@@ -223,14 +223,15 @@ html {
   0%, 100% { transform: translateY(0) scale(1); }
   50%      { transform: translateY(-14px) scale(1.018); }
 }
-/* Mobile floats a bit more pronounced */
+/* Mobile float — gentle lift only. No scale/rotate, so it can never grow into
+   or overlap the text above it; the 14px lift stays well inside the 32px gap. */
 @keyframes nz-hero-float-mobile {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50%      { transform: translateY(-24px) scale(1.025); }
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
 }
 .nz-hero-float { animation: nz-hero-float 5.5s ease-in-out infinite; animation-delay: 2.5s; }
 @media (max-width: 767px) {
-  .nz-hero-float { animation: nz-hero-float-mobile 5s ease-in-out infinite; animation-delay: 1.5s; }
+  .nz-hero-float { animation: nz-hero-float-mobile 4.5s ease-in-out infinite; animation-delay: 0.4s; }
 }
 
 @media (prefers-reduced-motion: reduce) {
