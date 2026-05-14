@@ -187,6 +187,41 @@ html {
   animation: shimmer 3s linear infinite;
 }
 
+/* ── "Website being built" graphic (AboutIntroSection) — pure CSS, always runs ── */
+@keyframes nz-build-block {
+  0%   { opacity: 0; transform: translateY(14px) scale(0.95); }
+  10%  { opacity: 1; transform: translateY(0) scale(1); }
+  82%  { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(14px) scale(0.95); }
+}
+@keyframes nz-float-a {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-12px) rotate(8deg); }
+}
+@keyframes nz-float-b {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(12px); }
+}
+@keyframes nz-float-c {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-8px) rotate(90deg); }
+}
+@keyframes nz-build-shimmer {
+  0%, 64%  { transform: translateX(-170%) skewX(-12deg); opacity: 0; }
+  72%      { opacity: 0.7; }
+  86%      { transform: translateX(180%) skewX(-12deg); opacity: 0; }
+  100%     { transform: translateX(180%) skewX(-12deg); opacity: 0; }
+}
+.nz-build-block { animation: nz-build-block 7s ease-in-out infinite both; }
+.nz-float-a { animation: nz-float-a 5s ease-in-out infinite; }
+.nz-float-b { animation: nz-float-b 6s ease-in-out infinite; }
+.nz-float-c { animation: nz-float-c 7s ease-in-out infinite; }
+.nz-build-shimmer { animation: nz-build-shimmer 7s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .nz-build-block { animation: none; opacity: 1; transform: none; }
+  .nz-float-a, .nz-float-b, .nz-float-c, .nz-build-shimmer { animation: none; }
+}
+
 /* Button ripple on active */
 button:active, a:active {
   transform: scale(0.97);

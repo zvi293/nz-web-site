@@ -7,10 +7,11 @@ import { ArrowLeft, Ear, HeartHandshake, Sparkles } from "lucide-react";
  * Studio voice ("אנחנו"), grounded in the real About-page content.
  * Sits right after the hero — connects emotionally before talking services.
  *
- * The right-side visual is a looping ~9s "a website being built" animation:
- * nav → hero text → hero visual → section title → cards → footer assemble
- * in sequence, a polish shimmer sweeps across the finished page, it holds,
- * then rebuilds — a living echo of the studio's craft.
+ * The right-side visual is a looping "a website being built" animation.
+ * It is driven by pure CSS @keyframes (see index.css: nz-build-block / nz-float-*
+ * / nz-build-shimmer) rather than JS — so it always runs, regardless of
+ * framer-motion timing or hydration. Each build block is phase-shifted with a
+ * negative animation-delay, producing a perpetual staggered build.
  */
 
 const VALUES = [
@@ -33,21 +34,6 @@ const VALUES = [
     accent: "#8b5cf6",
   },
 ];
-
-/* One ~9s loop, forever. `times` positions each element's appear/hold/exit. */
-const BUILD_DURATION = 9;
-const buildLoop = (times: number[]) => ({
-  duration: BUILD_DURATION,
-  times,
-  repeat: Infinity,
-  ease: "easeInOut" as const,
-});
-/* Standard appear → hold → exit keyframes for a build block. */
-const blockKeyframes = {
-  opacity: [0, 0, 1, 1, 0],
-  y: [16, 16, 0, 0, 16],
-  scale: [0.95, 0.95, 1, 1, 0.95],
-};
 
 const AboutIntroSection = () => {
   return (
@@ -145,22 +131,10 @@ const AboutIntroSection = () => {
               {/* ambient glow */}
               <div className="absolute inset-0 -z-10 mx-auto h-72 w-72 rounded-full bg-primary/15 blur-[110px]" />
 
-              {/* floating accent shapes */}
-              <motion.div
-                className="absolute -right-3 -top-5 z-20 h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-blue-400 shadow-lg shadow-primary/30"
-                animate={{ y: [0, -12, 0], rotate: [0, 8, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              />
-              <motion.div
-                className="absolute -left-4 bottom-12 z-20 h-9 w-9 rounded-full bg-emerald-400/90 shadow-lg shadow-emerald-500/30"
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-              />
-              <motion.div
-                className="absolute -left-2 top-6 z-20 h-7 w-7 rounded-lg border-2 border-primary/50"
-                animate={{ rotate: [0, 90, 0], y: [0, -8, 0] }}
-                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-              />
+              {/* floating accent shapes (pure-CSS animation) */}
+              <div className="nz-float-a absolute -right-3 -top-5 z-20 h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-blue-400 shadow-lg shadow-primary/30" />
+              <div className="nz-float-b absolute -left-4 bottom-12 z-20 h-9 w-9 rounded-full bg-emerald-400/90 shadow-lg shadow-emerald-500/30" />
+              <div className="nz-float-c absolute -left-2 top-6 z-20 h-7 w-7 rounded-lg border-2 border-primary/50" />
 
               {/* "design canvas" window */}
               <div className="relative overflow-hidden rounded-[2rem] border border-border/40 bg-card/95 shadow-[0_24px_80px_-20px_hsl(var(--foreground)/0.18)] backdrop-blur-sm">
@@ -176,85 +150,66 @@ const AboutIntroSection = () => {
                   </span>
                 </div>
 
-                {/* animated build stage */}
+                {/* animated build stage — pure-CSS keyframes, staggered via animation-delay */}
                 <div className="relative p-5">
                   <div className="relative overflow-hidden">
                     <div className="flex flex-col gap-3">
                       {/* nav bar */}
-                      <motion.div
-                        className="flex items-center gap-2"
-                        animate={blockKeyframes}
-                        transition={buildLoop([0, 0.02, 0.09, 0.95, 1])}
-                      >
+                      <div className="nz-build-block flex items-center gap-2" style={{ animationDelay: "-3s" }}>
                         <div className="h-5 w-14 rounded-md bg-gradient-to-l from-primary to-blue-400" />
                         <div className="ms-auto flex gap-1.5">
                           <div className="h-2 w-7 rounded bg-muted-foreground/25" />
                           <div className="h-2 w-7 rounded bg-muted-foreground/25" />
                           <div className="h-2 w-7 rounded bg-muted-foreground/25" />
                         </div>
-                      </motion.div>
+                      </div>
 
                       {/* hero — text column then visual block build separately */}
                       <div className="flex gap-3">
-                        <motion.div
-                          className="flex w-[52%] flex-col justify-center gap-2"
-                          animate={blockKeyframes}
-                          transition={buildLoop([0, 0.11, 0.18, 0.95, 1])}
+                        <div
+                          className="nz-build-block flex w-[52%] flex-col justify-center gap-2"
+                          style={{ animationDelay: "-2.6s" }}
                         >
                           <div className="h-3 w-full rounded bg-muted-foreground/30" />
                           <div className="h-3 w-3/4 rounded bg-muted-foreground/20" />
                           <div className="mt-1.5 h-6 w-20 rounded-md bg-gradient-to-l from-primary to-blue-400" />
-                        </motion.div>
-                        <motion.div
-                          className="h-[78px] flex-1 rounded-xl bg-gradient-to-br from-primary/75 to-emerald-400/65"
-                          animate={blockKeyframes}
-                          transition={buildLoop([0, 0.18, 0.25, 0.95, 1])}
+                        </div>
+                        <div
+                          className="nz-build-block h-[78px] flex-1 rounded-xl bg-gradient-to-br from-primary/75 to-emerald-400/65"
+                          style={{ animationDelay: "-2.3s" }}
                         />
                       </div>
 
                       {/* section heading */}
-                      <motion.div
-                        className="mx-auto h-2.5 w-28 rounded bg-muted-foreground/25"
-                        animate={blockKeyframes}
-                        transition={buildLoop([0, 0.29, 0.35, 0.95, 1])}
+                      <div
+                        className="nz-build-block mx-auto h-2.5 w-28 rounded bg-muted-foreground/25"
+                        style={{ animationDelay: "-1.9s" }}
                       />
 
                       {/* feature cards — assemble one by one */}
                       <div className="flex gap-2.5">
                         {[0, 1, 2].map((i) => (
-                          <motion.div
+                          <div
                             key={i}
-                            className="flex-1 rounded-xl border border-border/50 bg-secondary/40 p-2.5"
-                            animate={blockKeyframes}
-                            transition={buildLoop([0, 0.4 + i * 0.06, 0.47 + i * 0.06, 0.95, 1])}
+                            className="nz-build-block flex-1 rounded-xl border border-border/50 bg-secondary/40 p-2.5"
+                            style={{ animationDelay: `${-1.5 + i * 0.3}s` }}
                           >
                             <div className="mb-2 h-5 w-5 rounded-md bg-primary/60" />
                             <div className="mb-1 h-1.5 w-full rounded bg-muted-foreground/25" />
                             <div className="h-1.5 w-2/3 rounded bg-muted-foreground/15" />
-                          </motion.div>
+                          </div>
                         ))}
                       </div>
 
                       {/* footer bar */}
-                      <motion.div
-                        className="flex items-center gap-2"
-                        animate={blockKeyframes}
-                        transition={buildLoop([0, 0.62, 0.69, 0.95, 1])}
-                      >
+                      <div className="nz-build-block flex items-center gap-2" style={{ animationDelay: "-0.4s" }}>
                         <div className="h-3 w-10 rounded bg-muted-foreground/20" />
                         <div className="ms-auto h-3 w-16 rounded bg-muted-foreground/15" />
-                      </motion.div>
+                      </div>
                     </div>
 
                     {/* polish shimmer — sweeps across the finished page */}
-                    <motion.div
-                      className="pointer-events-none absolute inset-y-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/45 to-transparent"
-                      animate={{
-                        x: ["-170%", "-170%", "180%", "180%", "-170%"],
-                        opacity: [0, 0, 0.7, 0, 0],
-                      }}
-                      transition={buildLoop([0, 0.72, 0.88, 0.92, 1])}
-                    />
+                    <div className="nz-build-shimmer pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/45 to-transparent" />
                   </div>
 
                   <div className="mt-5 flex items-center justify-between">
