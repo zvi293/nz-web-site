@@ -30,9 +30,19 @@ export interface ServiceFaq {
   a: string;
 }
 
+export interface ServiceAudienceItem {
+  title: string;
+  description: string;
+}
+
+export interface ServiceDeepDiveBlock {
+  heading: string;
+  body: string;
+}
+
 export interface ServicePageConfig {
-  seo: { title: string; description: string };
-  breadcrumb: { name: string; path: string };
+  seo: { title: string; description: string; keywords?: string };
+  breadcrumb: { name: string; path: string; parent?: { name: string; path: string } };
   schemaId: string;
   schemaServiceType: string;
   schemaUrl: string;
@@ -49,7 +59,18 @@ export interface ServicePageConfig {
     title: string;
     paragraphs: string[];
   };
+  /** Long-form, keyword-rich content section (H2 + H3 blocks) — boosts depth & SEO */
+  deepDive?: {
+    title: string;
+    blocks: ServiceDeepDiveBlock[];
+  };
   features: ServiceFeature[];
+  /** "Who is this service for" — vertical/audience targeting */
+  whoFor?: {
+    title: string;
+    subtitle?: string;
+    items: ServiceAudienceItem[];
+  };
   process: ServiceStep[];
   techStack?: string[];
   results: { value: string; label: string; sub: string }[];
@@ -104,6 +125,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
   const resultsInView = useInView(resultsRef, { once: true, margin: "-60px" });
 
   useEffect(() => {
+    /* ── Service schema ── */
     const script = document.createElement("script");
     script.type = "application/ld+json";
     script.id = config.schemaId;
@@ -119,7 +141,31 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
     });
     document.getElementById(config.schemaId)?.remove();
     document.head.appendChild(script);
-    return () => { document.getElementById(config.schemaId)?.remove(); };
+
+    /* ── FAQPage schema — makes the FAQ eligible for rich results in Google ── */
+    const faqSchemaId = `${config.schemaId}-faq`;
+    let faqScript: HTMLScriptElement | null = null;
+    if (config.faqs && config.faqs.length > 0) {
+      faqScript = document.createElement("script");
+      faqScript.type = "application/ld+json";
+      faqScript.id = faqSchemaId;
+      faqScript.textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: config.faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.q,
+          acceptedAnswer: { "@type": "Answer", text: faq.a },
+        })),
+      });
+      document.getElementById(faqSchemaId)?.remove();
+      document.head.appendChild(faqScript);
+    }
+
+    return () => {
+      document.getElementById(config.schemaId)?.remove();
+      document.getElementById(faqSchemaId)?.remove();
+    };
   }, [config]);
 
   const BadgeIcon = config.hero.badgeIcon;
@@ -213,6 +259,39 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
         </div>
       </section>
 
+      {/* ── Deep dive — long-form content ── */}
+      {config.deepDive && config.deepDive.blocks.length > 0 && (
+        <section className="border-t border-border/30 py-14 md:py-20">
+          <div className="container mx-auto max-w-3xl px-6">
+            <motion.h2
+              className="mb-10 text-2xl font-black leading-snug text-foreground md:text-3xl lg:text-4xl"
+              style={{ fontFamily: "'Heebo', sans-serif" }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55 }}
+            >
+              {config.deepDive.title}
+            </motion.h2>
+            <div className="space-y-8">
+              {config.deepDive.blocks.map((block, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05, duration: 0.5 }}
+                  className="text-right"
+                >
+                  <h3 className="mb-3 text-lg font-bold text-foreground md:text-xl">{block.heading}</h3>
+                  <p className="text-base leading-[1.95] text-muted-foreground md:text-lg">{block.body}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── Features grid ── */}
       <section className="bg-secondary/30 py-14 md:py-20">
         <div className="container mx-auto px-5 md:px-6">
@@ -260,6 +339,47 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
           </div>
         </div>
       </section>
+
+      {/* ── Who is this for ── */}
+      {config.whoFor && config.whoFor.items.length > 0 && (
+        <section className="py-14 md:py-20">
+          <div className="container mx-auto max-w-5xl px-6">
+            <motion.div
+              className="mx-auto mb-12 max-w-2xl text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55 }}
+            >
+              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">למי זה מתאים</p>
+              <h2 className="text-2xl font-black text-foreground md:text-3xl lg:text-4xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
+                {config.whoFor.title}
+              </h2>
+              {config.whoFor.subtitle && (
+                <p className="mt-3 text-base leading-relaxed text-muted-foreground md:text-lg">{config.whoFor.subtitle}</p>
+              )}
+            </motion.div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {config.whoFor.items.map((item, i) => (
+                <motion.div
+                  key={i}
+                  className="rounded-2xl border border-border/40 bg-card p-6 text-right"
+                  initial={{ opacity: 0, y: 22 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.06, duration: 0.5 }}
+                >
+                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+                    <Check className="h-4 w-4 text-primary" strokeWidth={2.4} />
+                  </div>
+                  <h3 className="mb-1.5 text-base font-bold text-foreground">{item.title}</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Process ── */}
       <section className="py-14 md:py-20">
