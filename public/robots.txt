@@ -2,7 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /thank-you
-Crawl-delay: 1
 
 User-agent: Googlebot
 Allow: /
