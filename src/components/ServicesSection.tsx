@@ -534,7 +534,7 @@ const ServicesSection = () => {
         </div>
 
         {/* Service Rows */}
-        <div className="mx-auto flex max-w-6xl flex-col gap-12 md:gap-16 lg:gap-20">
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 md:gap-16 lg:gap-20">
           {services.map((service, i) =>
           <div
             key={service.id}
@@ -542,7 +542,7 @@ const ServicesSection = () => {
               rowRefs.current[i] = el;
               blockRefs.current[i] = el;
             }}
-            className="relative rounded-[2rem] p-8 md:p-12 lg:p-16 overflow-hidden">
+            className="relative rounded-[2rem] p-5 md:p-12 lg:p-16 overflow-hidden">
             
               {/* Dynamic background per block */}
               <div
@@ -552,7 +552,7 @@ const ServicesSection = () => {
             
 
               <div
-              className={`relative z-10 flex flex-col items-center gap-12 md:gap-16 lg:flex-row lg:gap-20 ${
+              className={`relative z-10 flex flex-col items-center gap-5 md:gap-16 lg:flex-row lg:gap-20 ${
               service.reverse ? "lg:flex-row-reverse" : ""}`
               }>
               
@@ -610,7 +610,7 @@ const ServicesSection = () => {
                 </div>
 
                 {/* Visual Block */}
-                <div data-image className="flex flex-1 items-center justify-center w-full py-8 px-4 sm:px-0">
+                <div data-image className="flex flex-1 items-center justify-center w-full py-2 px-4 sm:py-8 sm:px-0">
                   <ServiceVisual service={service} index={i} />
                 </div>
               </div>
