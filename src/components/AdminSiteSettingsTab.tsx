@@ -754,12 +754,12 @@ const AdminSiteSettingsTab = () => {
               <CardContent className="space-y-2">
                 {[
                   { label: "דף הבית", href: "/", icon: Globe },
-                  { label: "מי אנחנו", href: "/about", icon: FileText },
-                  { label: "כל הפרויקטים", href: "/projects", icon: FileText },
-                  { label: "שאלות נפוצות", href: "/faq", icon: FileText },
-                  { label: "הצהרת נגישות", href: "/accessibility", icon: Eye },
-                  { label: "מדיניות פרטיות", href: "/privacy", icon: Shield },
-                  { label: "תנאי שימוש", href: "/terms", icon: Scale },
+                  { label: "מי אנחנו", href: "/about/", icon: FileText },
+                  { label: "כל הפרויקטים", href: "/projects/", icon: FileText },
+                  { label: "שאלות נפוצות", href: "/faq/", icon: FileText },
+                  { label: "הצהרת נגישות", href: "/accessibility/", icon: Eye },
+                  { label: "מדיניות פרטיות", href: "/privacy/", icon: Shield },
+                  { label: "תנאי שימוש", href: "/terms/", icon: Scale },
                 ].map(({ label, href, icon: Icon }) => (
                   <a key={href} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between rounded-lg bg-secondary/30 px-3 py-2.5 text-sm font-medium text-foreground hover:bg-secondary/50 transition-colors group">
                     <div className="flex items-center gap-2">

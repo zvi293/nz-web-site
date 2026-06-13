@@ -89,7 +89,7 @@ const FAQ = () => {
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               ריכזנו עבורכם את השאלות הנפוצות ביותר שאנחנו מקבלים מלקוחות. לא מצאתם תשובה?{" "}
-              <Link to="/contact" className="text-primary hover:underline">
+              <Link to="/contact/" className="text-primary hover:underline">
                 דברו איתנו
               </Link>
               .
@@ -177,7 +177,7 @@ const FAQ = () => {
               יש לכם שאלה נוספת? אנחנו תמיד כאן.
             </p>
             <Link
-              to="/contact"
+              to="/contact/"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-bold px-8 py-3 rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
             >
               <ArrowRight className="h-4 w-4" />
@@ -185,7 +185,7 @@ const FAQ = () => {
             </Link>
             <p className="text-sm text-muted-foreground pt-2">
               אם אתם בודקים דף ממוקד לקמפיין או להשארת פרטים,{" "}
-              <Link to="/services/landing-page-development" className="text-primary hover:underline">
+              <Link to="/services/landing-page-development/" className="text-primary hover:underline">
                 קראו על שירות בניית דפי הנחיתה שלנו
               </Link>
             </p>

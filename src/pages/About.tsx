@@ -255,7 +255,7 @@ const About = () => {
           </div>
           <div className="mt-10 text-center">
             <Link
-              to="/services/business-website"
+              to="/services/business-website/"
               className="font-heebo text-sm text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
             >
               לפרטים על שירות בניית אתר תדמית לעסקים ←
@@ -290,7 +290,7 @@ const About = () => {
               ))}
             </div>
             <div className="mt-8">
-              <Link to="/projects" className="inline-flex items-center gap-2 font-semibold text-primary hover:underline">
+              <Link to="/projects/" className="inline-flex items-center gap-2 font-semibold text-primary hover:underline">
                 ראו את הפרויקטים שלנו
                 <ArrowLeft className="h-4 w-4" />
               </Link>

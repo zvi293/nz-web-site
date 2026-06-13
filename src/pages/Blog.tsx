@@ -177,7 +177,7 @@ const Blog = () => {
             יש לכם שאלה שלא ענינו עליה?
           </h2>
           <p className="mb-8 text-muted-foreground">נשמח לדבר — שיחת ייעוץ ראשונית ללא עלות.</p>
-          <Link to="/contact" className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 font-bold text-primary-foreground shadow-lg transition-all hover:brightness-110 hover:scale-[1.04] btn-glow">
+          <Link to="/contact/" className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 font-bold text-primary-foreground shadow-lg transition-all hover:brightness-110 hover:scale-[1.04] btn-glow">
             צרו קשר
             <ArrowLeft className="h-4 w-4" />
           </Link>

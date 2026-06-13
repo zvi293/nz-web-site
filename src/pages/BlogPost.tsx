@@ -26,14 +26,14 @@ function renderMarkdown(md: string): string {
 
 /* Maps each blog category to the most relevant service page for internal linking. */
 const CATEGORY_SERVICE: Record<string, { label: string; href: string }> = {
-  "בניית אתרים": { label: "בניית אתרים מקצועיים", href: "/services/web-development" },
-  "קידום אתרים": { label: "שיפור מהירות וקידום אתרים", href: "/services/website-performance" },
-  "פיתוח": { label: "פיתוח אתרים מתקדם", href: "/services/website-development" },
-  "עיצוב": { label: "בניית אתר תדמית לעסקים", href: "/services/business-website" },
-  "AI & אוטומציה": { label: "מערכת ניהול תורים", href: "/services/appointment-system" },
-  "כללי": { label: "כל השירותים שלנו", href: "/services" },
+  "בניית אתרים": { label: "בניית אתרים מקצועיים", href: "/services/web-development/" },
+  "קידום אתרים": { label: "שיפור מהירות וקידום אתרים", href: "/services/website-performance/" },
+  "פיתוח": { label: "פיתוח אתרים מתקדם", href: "/services/website-development/" },
+  "עיצוב": { label: "בניית אתר תדמית לעסקים", href: "/services/business-website/" },
+  "AI & אוטומציה": { label: "מערכת ניהול תורים", href: "/services/appointment-system/" },
+  "כללי": { label: "כל השירותים שלנו", href: "/services/" },
 };
-const DEFAULT_SERVICE = { label: "כל השירותים שלנו", href: "/services" };
+const DEFAULT_SERVICE = { label: "כל השירותים שלנו", href: "/services/" };
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -75,9 +75,11 @@ const BlogPost = () => {
   } : undefined;
 
   useSeoMeta({
-    title: post ? `${post.title} | NZ-web בלוג` : "מאמר | NZ-web",
+    title: post ? `${post.title} | NZ-web בלוג` : "מאמר לא נמצא | NZ-web",
     description: post?.excerpt ?? "",
-    keywords: post ? `${post.category}, ${post.title}, NZ-web בלוג` : undefined,
+    /* A slug that resolves to no post (e.g. a stale link, or a path served via
+       the /blog/* SPA fallback) must not be indexed as a thin/empty page. */
+    noindex: !loading && !post,
     ogImage: post?.cover_image || undefined,
     schema: articleSchema,
   });
@@ -116,7 +118,7 @@ const BlogPost = () => {
       <div className="flex min-h-screen flex-col items-center justify-center bg-background gap-4 pt-[72px]" dir="rtl">
         <Header />
         <p className="text-xl font-bold text-foreground">המאמר לא נמצא</p>
-        <Link to="/blog" className="text-primary hover:underline">חזרה לבלוג</Link>
+        <Link to="/blog/" className="text-primary hover:underline">חזרה לבלוג</Link>
         <Footer />
       </div>
     );
@@ -129,7 +131,7 @@ const BlogPost = () => {
 
       {/* Back */}
       <div className="container mx-auto px-5 pt-6 md:px-6">
-        <button onClick={() => navigate("/blog")} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+        <button onClick={() => navigate("/blog/")} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
           <ArrowRight className="h-4 w-4" />
           חזרה לבלוג
         </button>
@@ -199,7 +201,7 @@ const BlogPost = () => {
         >
           <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">מוכנים להתחיל?</p>
           <h3 className="mb-4 text-xl font-black text-foreground md:text-2xl">יש לכם פרויקט בראש?</h3>
-          <Link to="/contact" className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-3.5 font-bold text-primary-foreground transition-all hover:brightness-110 hover:scale-[1.04] btn-glow">
+          <Link to="/contact/" className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-3.5 font-bold text-primary-foreground transition-all hover:brightness-110 hover:scale-[1.04] btn-glow">
             בואו נדבר
             <ArrowLeft className="h-4 w-4" />
           </Link>

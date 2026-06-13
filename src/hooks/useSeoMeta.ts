@@ -5,6 +5,11 @@ import { useSiteSettings } from "@/lib/site-settings-api";
 export interface SeoMetaOptions {
   title: string;
   description?: string;
+  /**
+   * @deprecated The `keywords` meta tag is ignored by Google and was removed
+   * site-wide (it was stuffed and duplicated). This prop is accepted but no
+   * longer rendered, so existing call sites keep working as a no-op.
+   */
   keywords?: string;
   noindex?: boolean;
   /** Optional per-page Open Graph / Twitter image (absolute URL). Falls back to the site default. */
@@ -16,18 +21,17 @@ export interface SeoMetaOptions {
 const DEFAULT_ROBOTS =
   "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 
-const BASE_KEYWORDS =
-  "בניית אתרים, פיתוח אתרים, עיצוב אתרים, בניית אתר תדמית, בניית אתר אינטרנט, NZ-web";
-
 /**
- * Sets per-route document title, meta description, keywords, robots directive,
+ * Sets per-route document title, meta description, robots directive,
  * self-canonical link, Open Graph, Twitter card, and optional JSON-LD schema.
  * Googlebot renders JavaScript and picks up these dynamic values.
+ *
+ * Note: the `keywords` meta tag is intentionally NOT set — it is ignored by
+ * search engines and was removed site-wide.
  */
 export function useSeoMeta({
   title,
   description,
-  keywords,
   noindex = false,
   ogImage,
   schema,
@@ -41,9 +45,6 @@ export function useSeoMeta({
       ogImage && /^https?:\/\//i.test(ogImage)
         ? ogImage
         : getResolvedOgImageUrl(settings.siteUrl, settings.seo.ogImage);
-    const mergedKeywords = keywords
-      ? `${keywords}, ${BASE_KEYWORDS}`
-      : BASE_KEYWORDS;
 
     /* ── Title ── */
     const prevTitle = document.title;
@@ -53,18 +54,6 @@ export function useSeoMeta({
     const descMeta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     const prevDesc = descMeta?.getAttribute("content") ?? null;
     if (descMeta && description) descMeta.setAttribute("content", description);
-
-    /* ── Keywords ── */
-    let keywordsMeta = document.querySelector<HTMLMetaElement>('meta[name="keywords"]');
-    let createdKeywords = false;
-    const prevKeywords = keywordsMeta?.getAttribute("content") ?? null;
-    if (!keywordsMeta) {
-      keywordsMeta = document.createElement("meta");
-      keywordsMeta.setAttribute("name", "keywords");
-      document.head.appendChild(keywordsMeta);
-      createdKeywords = true;
-    }
-    keywordsMeta.setAttribute("content", mergedKeywords);
 
     /* ── Robots ── */
     const robotsMeta = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
@@ -123,9 +112,6 @@ export function useSeoMeta({
       if (descMeta && prevDesc !== null) descMeta.setAttribute("content", prevDesc);
       if (robotsMeta) robotsMeta.setAttribute("content", prevRobots ?? DEFAULT_ROBOTS);
 
-      if (createdKeywords) { keywordsMeta?.remove(); }
-      else if (keywordsMeta && prevKeywords !== null) keywordsMeta.setAttribute("content", prevKeywords);
-
       if (createdCanonical) { canonicalEl?.remove(); }
       else if (canonicalEl && prevCanonicalHref !== null) canonicalEl.setAttribute("href", prevCanonicalHref);
 
@@ -136,5 +122,5 @@ export function useSeoMeta({
 
       schemaEl?.remove();
     };
-  }, [title, description, keywords, noindex, ogImage, schema, settings.seo.ogImage, settings.siteUrl]);
+  }, [title, description, noindex, ogImage, schema, settings.seo.ogImage, settings.siteUrl]);
 }

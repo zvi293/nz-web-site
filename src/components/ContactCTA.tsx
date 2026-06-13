@@ -243,7 +243,7 @@ const ContactCTA = () => {
             </p>
 
             <div ref={btnRef}>
-              <Link to="/contact">
+              <Link to="/contact/">
                 <Button
                   size="lg"
                   className="gap-2.5 text-base font-semibold px-12 py-7 rounded-2xl btn-glow hover:scale-[1.04] active:scale-[0.97] transition-transform duration-200"

@@ -65,18 +65,18 @@ const Footer = () => {
 
   const navigationLinks = [
     { label: "ראשי", href: "/" },
-    { label: "מי אנחנו", href: "/about" },
-    { label: "פרויקטים", href: "/projects" },
+    { label: "מי אנחנו", href: "/about/" },
+    { label: "פרויקטים", href: "/projects/" },
     { label: "שירותים", href: "/#services" },
-    { label: "שאלות נפוצות", href: "/faq" },
-    { label: "בלוג", href: "/blog" },
-    { label: "צור קשר", href: "/contact" },
+    { label: "שאלות נפוצות", href: "/faq/" },
+    { label: "בלוג", href: "/blog/" },
+    { label: "צור קשר", href: "/contact/" },
   ];
 
   const legalLinks = [
-    { label: "הצהרת נגישות", href: "/accessibility", highlight: true },
-    { label: "מדיניות פרטיות", href: "/privacy" },
-    { label: "תנאי שימוש", href: "/terms" },
+    { label: "הצהרת נגישות", href: "/accessibility/", highlight: true },
+    { label: "מדיניות פרטיות", href: "/privacy/" },
+    { label: "תנאי שימוש", href: "/terms/" },
   ];
 
   const handleWhatsAppClick = () => {
@@ -328,11 +328,11 @@ const Footer = () => {
               <p className="font-heebo text-xs text-white/25">
                 <span className="text-white/20">שירותים: </span>
                 {[
-                  { label: "בניית אתרים", href: "/services/web-development" },
-                  { label: "פיתוח אתרים", href: "/services/website-development" },
-                  { label: "אתר תדמית", href: "/services/business-website" },
-                  { label: "מערכת תורים", href: "/services/appointment-system" },
-                  { label: "דפי נחיתה", href: "/services/landing-page-development" },
+                  { label: "בניית אתרים", href: "/services/web-development/" },
+                  { label: "פיתוח אתרים", href: "/services/website-development/" },
+                  { label: "אתר תדמית", href: "/services/business-website/" },
+                  { label: "מערכת תורים", href: "/services/appointment-system/" },
+                  { label: "דפי נחיתה", href: "/services/landing-page-development/" },
                 ].map((s, i, arr) => (
                   <span key={s.href}>
                     <Link to={s.href} className="transition-colors hover:text-white/50">

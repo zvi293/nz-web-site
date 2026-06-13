@@ -168,7 +168,7 @@ const PortfolioSection = () => {
         {/* CTA */}
         <div className="mt-8 text-center md:mt-12">
           <Link
-            to="/projects"
+            to="/projects/"
             className="btn-glow inline-flex items-center gap-2.5 rounded-2xl bg-primary px-10 py-4 text-sm font-bold text-primary-foreground shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 hover:shadow-xl md:text-base"
           >
             לכל הפרויקטים

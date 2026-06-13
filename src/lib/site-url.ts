@@ -83,9 +83,26 @@ export function getResolvedOgImageUrl(siteUrl?: string | null, ogImage?: string 
   }
 }
 
+/**
+ * Builds the self-referential canonical URL for a route.
+ *
+ * The site is served with a forced TRAILING SLASH (Netlify redirects
+ * `/services` → `/services/` with a 301). The canonical must therefore always
+ * carry a trailing slash so it points at the exact URL that returns 200 — never
+ * at a URL that redirects. We strip any query string / hash (only the clean
+ * path is canonical) and collapse accidental double slashes.
+ */
 export function getCanonicalUrl(pathname?: string, siteUrl?: string | null): string {
   const baseUrl = getResolvedSiteUrl(siteUrl);
-  const path = pathname?.trim() || (canUseWindow() ? window.location.pathname : "/");
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  return `${baseUrl}${normalizedPath}`;
+  const raw = pathname?.trim() || (canUseWindow() ? window.location.pathname : "/");
+
+  // keep only the path portion — drop ?query and #hash
+  let path = raw.split(/[?#]/)[0];
+  if (!path.startsWith("/")) path = `/${path}`;
+  path = path.replace(/\/{2,}/g, "/"); // collapse // → /
+
+  // force a single trailing slash (root "/" already has one)
+  if (!path.endsWith("/")) path = `${path}/`;
+
+  return `${baseUrl}${path}`;
 }

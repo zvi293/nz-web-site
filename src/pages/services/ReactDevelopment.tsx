@@ -317,12 +317,12 @@ const ReactDevelopment = () => {
           </p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4">
             {[
-              { label: "פיתוח אתרים מתקדם", href: "/services/website-development" },
-              { label: "בניית אתרים מקצועיים", href: "/services/web-development" },
-              { label: "אתר תדמית לעסקים", href: "/services/business-website" },
-              { label: "מערכת ניהול תורים", href: "/services/appointment-system" },
-              { label: "שיפור מהירות אתרים", href: "/services/website-performance" },
-              { label: "כל השירותים", href: "/services" },
+              { label: "פיתוח אתרים מתקדם", href: "/services/website-development/" },
+              { label: "בניית אתרים מקצועיים", href: "/services/web-development/" },
+              { label: "אתר תדמית לעסקים", href: "/services/business-website/" },
+              { label: "מערכת ניהול תורים", href: "/services/appointment-system/" },
+              { label: "שיפור מהירות אתרים", href: "/services/website-performance/" },
+              { label: "כל השירותים", href: "/services/" },
             ].map((s) => (
               <Link
                 key={s.href}
@@ -352,7 +352,7 @@ const ReactDevelopment = () => {
               שתפו אותנו בדרישות – ונעזור לכם לבנות את זה נכון.
             </p>
             <Link
-              to="/contact"
+              to="/contact/"
               className="inline-block bg-primary text-primary-foreground font-bold text-base px-10 py-4 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
             >
               צרו קשר

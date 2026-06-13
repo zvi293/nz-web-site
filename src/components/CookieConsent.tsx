@@ -56,7 +56,7 @@ const CookieConsent = () => {
               <div className="flex-1 space-y-3">
                 <p className="text-sm text-foreground leading-relaxed">
                   באתר NZ-web אנחנו משתמשים בעוגיות כדי להבטיח לך את חוויית הגלישה הטובה והמדויקת ביותר. המשך השימוש באתר מהווה הסכמה ל
-                  <Link to="/privacy" className="text-primary hover:underline">מדיניות הפרטיות</Link>
+                  <Link to="/privacy/" className="text-primary hover:underline">מדיניות הפרטיות</Link>
                   {" "}שלנו.
                 </p>
                 <Button

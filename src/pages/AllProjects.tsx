@@ -153,14 +153,14 @@ const AllProjects = () => {
         <div className="mt-16 text-center md:mt-24">
           <p className="mb-4 text-lg text-muted-foreground">רוצים פרויקט כזה? בואו נדבר.</p>
           <Link
-            to="/contact"
+            to="/contact/"
             className="inline-block rounded-2xl bg-primary px-10 py-4 text-base font-bold text-primary-foreground shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl btn-glow"
           >
             צרו קשר
           </Link>
           <p className="mt-4 text-sm text-muted-foreground">
             מחפשים תהליך פיתוח מסודר לאתר חדש?{" "}
-            <Link to="/services/website-development" className="text-primary hover:underline">
+            <Link to="/services/website-development/" className="text-primary hover:underline">
               קראו על שירות פיתוח האתרים שלנו
             </Link>
           </p>

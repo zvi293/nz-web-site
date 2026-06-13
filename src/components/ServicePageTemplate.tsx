@@ -220,14 +220,14 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
             </div>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                to="/contact"
+                to="/contact/"
                 className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 text-base font-bold text-white shadow-lg shadow-primary/30 transition-all duration-300 hover:scale-[1.04] hover:brightness-110 btn-glow"
               >
                 {config.hero.ctaText}
                 <ArrowLeft className="h-4 w-4" />
               </Link>
               <Link
-                to="/projects"
+                to="/projects/"
                 className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20"
               >
                 ראו דוגמאות עבודה
@@ -499,7 +499,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
           <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
               יש שאלה שלא ענינו עליה?{" "}
-              <Link to="/contact" className="font-semibold text-primary hover:underline">
+              <Link to="/contact/" className="font-semibold text-primary hover:underline">
                 דברו איתנו ישירות
               </Link>
             </p>
@@ -515,14 +515,14 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
           </p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:gap-4">
             {[
-              { label: "בניית אתרים מקצועיים", href: "/services/web-development" },
-              { label: "אתר תדמית לעסקים", href: "/services/business-website" },
-              { label: "מערכת ניהול תורים", href: "/services/appointment-system" },
-              { label: "דפי נחיתה ממירים", href: "/services/landing-page-development" },
-              { label: "פיתוח אתרים", href: "/services/website-development" },
-              { label: "React Development", href: "/services/react-development" },
-              { label: "כל השירותים", href: "/services" },
-              { label: "צרו קשר", href: "/contact" },
+              { label: "בניית אתרים מקצועיים", href: "/services/web-development/" },
+              { label: "אתר תדמית לעסקים", href: "/services/business-website/" },
+              { label: "מערכת ניהול תורים", href: "/services/appointment-system/" },
+              { label: "דפי נחיתה ממירים", href: "/services/landing-page-development/" },
+              { label: "פיתוח אתרים", href: "/services/website-development/" },
+              { label: "React Development", href: "/services/react-development/" },
+              { label: "כל השירותים", href: "/services/" },
+              { label: "צרו קשר", href: "/contact/" },
             ]
               .filter((s) => s.href !== config.schemaUrl.replace("https://nz-web.com", ""))
               .slice(0, 6)
@@ -556,7 +556,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
           </h2>
           <p className="mb-10 text-lg text-white/60">{config.cta.subtitle}</p>
           <Link
-            to="/contact"
+            to="/contact/"
             className="inline-flex items-center gap-2.5 rounded-2xl bg-primary px-10 py-5 text-lg font-bold text-white shadow-xl shadow-primary/30 transition-all duration-300 hover:scale-[1.04] hover:brightness-110 btn-glow"
           >
             {config.cta.buttonText}

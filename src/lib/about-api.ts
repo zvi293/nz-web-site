@@ -86,7 +86,7 @@ const defaultData: AboutPageData = {
   ctaTitle: "מוכנים להתחיל?",
   ctaSubtitle: "צרו איתנו קשר ונבנה יחד משהו שיזכרו",
   ctaButtonText: "צור קשר",
-  ctaButtonLink: "/contact",
+  ctaButtonLink: "/contact/",
 };
 
 class AboutRepositoryError extends Error {

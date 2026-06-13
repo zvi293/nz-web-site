@@ -200,9 +200,9 @@ const Terms = () => {
               <Section number="7" title="פרטיות ונגישות">
                 <p>
                   השימוש באתר כפוף ל
-                  <Link to="/privacy" className="mx-1 text-primary hover:underline">מדיניות הפרטיות</Link>
+                  <Link to="/privacy/" className="mx-1 text-primary hover:underline">מדיניות הפרטיות</Link>
                   ול
-                  <Link to="/accessibility" className="mx-1 text-primary hover:underline">הצהרת הנגישות</Link>
+                  <Link to="/accessibility/" className="mx-1 text-primary hover:underline">הצהרת הנגישות</Link>
                   המפורסמות באתר, המהוות חלק בלתי נפרד מתנאי שימוש אלו.
                 </p>
               </Section>

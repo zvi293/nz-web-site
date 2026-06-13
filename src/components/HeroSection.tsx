@@ -333,12 +333,12 @@ const HeroSection = () => {
           {/* Buttons */}
           <div ref={buttonsRef} className="flex flex-wrap gap-3 pt-1 sm:gap-4 sm:pt-2">
             <Link
-              to="/contact"
+              to="/contact/"
               className="btn-glow rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground transition-all duration-200 hover:scale-[1.04] hover:brightness-110 active:scale-[0.97] sm:px-10 sm:py-4 sm:text-base">
               {contactLabel}
             </Link>
             <Link
-              to="/services"
+              to="/services/"
               className="rounded-xl border border-border/80 bg-background px-8 py-3.5 text-sm font-medium text-foreground transition-all duration-200 hover:scale-[1.04] hover:border-primary/30 hover:bg-primary/[0.04] active:scale-[0.97] sm:px-10 sm:py-4 sm:text-base">
               {aboutLabel}
             </Link>

@@ -21,7 +21,7 @@ const services = [
     subtitle: "Full-Stack Development",
     description: "אתרים מהירים, יציבים ומרהיבים שבנויים לביצועים ולתוצאות עסקיות אמיתיות.",
     features: ["React + TypeScript", "מובייל-פירסט", "SEO טכני", "ממשק ניהול"],
-    href: "/services/web-development",
+    href: "/services/web-development/",
     accent: "#3b82f6",
     accentRgb: "59,130,246",
     popular: false,
@@ -32,7 +32,7 @@ const services = [
     subtitle: "Business Website",
     description: "כרטיס הביקור הדיגיטלי שלכם — עובד 24/6, בונה אמון ומביא לידים.",
     features: ["עיצוב ייחודי לברנד", "תוכן ממיר", "סוציאל פרוף", "SEO אורגני"],
-    href: "/services/business-website",
+    href: "/services/business-website/",
     accent: "#8b5cf6",
     accentRgb: "139,92,246",
     popular: true,
@@ -43,7 +43,7 @@ const services = [
     subtitle: "Advanced Development",
     description: "ארכיטקטורה נכונה שמחזיקה לאורך שנים — מסד נתונים, API ומערכות מורכבות.",
     features: ["ארכיטקטורה מתקדמת", "Supabase + PostgreSQL", "CI/CD", "Scalable"],
-    href: "/services/website-development",
+    href: "/services/website-development/",
     accent: "#10b981",
     accentRgb: "16,185,129",
     popular: false,
@@ -54,7 +54,7 @@ const services = [
     subtitle: "Appointment System",
     description: "תפסיקו לנהל תורים בטלפון — מערכת חכמה שחוסכת שעות בשבוע.",
     features: ["הזמנות אונליין 24/6", "תזכורות אוטומטיות", "דוחות ואנליטיקס", "Google Calendar"],
-    href: "/services/appointment-system",
+    href: "/services/appointment-system/",
     accent: "#f97316",
     accentRgb: "249,115,22",
     popular: false,
@@ -65,7 +65,7 @@ const services = [
     subtitle: "Landing Pages",
     description: "דפים שממירים גולשים ללקוחות — בנויים לקמפיינים ממומנים ולקידום אורגני.",
     features: ["עיצוב ממוקד המרה", "זמן טעינה <2s", "A/B Testing", "אינטגרציה לפרסום"],
-    href: "/services/landing-page-development",
+    href: "/services/landing-page-development/",
     accent: "#ec4899",
     accentRgb: "236,72,153",
     popular: false,
@@ -76,7 +76,7 @@ const services = [
     subtitle: "SPA & Web Apps",
     description: "אפליקציות React מתקדמות — Single Page Applications, דשבורדים ומערכות UI.",
     features: ["React 18 + Hooks", "State Management", "Performance", "TypeScript"],
-    href: "/services/react-development",
+    href: "/services/react-development/",
     accent: "#14b8a6",
     accentRgb: "20,184,166",
     popular: false,
@@ -287,7 +287,7 @@ const ServicesIndex = () => {
             דברו איתנו — נבין את הצרכים ונמליץ על הפתרון הנכון. בלי התחייבות.
           </p>
           <button
-            onClick={() => navigate("/contact")}
+            onClick={() => navigate("/contact/")}
             className="inline-flex items-center gap-2.5 rounded-2xl bg-primary px-10 py-5 text-lg font-bold text-white shadow-xl shadow-primary/30 transition-all duration-300 hover:scale-[1.04] hover:brightness-110 btn-glow"
           >
             <MessageCircle className="h-5 w-5" />

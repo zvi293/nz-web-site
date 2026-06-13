@@ -4,10 +4,19 @@ import { motion } from "framer-motion";
 import { Home, ArrowLeft, MessageCircle } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { useSeoMeta } from "@/hooks/useSeoMeta";
 
 const NotFound = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  /* A real 404 must never be indexed. This page is also pre-rendered to
+     dist/404.html, which Netlify serves with a genuine HTTP 404 status. */
+  useSeoMeta({
+    title: "404 — הדף לא נמצא | NZ-web",
+    description: "הדף שחיפשתם לא נמצא. חזרו לדף הבית של NZ-web או צרו איתנו קשר.",
+    noindex: true,
+  });
 
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
@@ -88,7 +97,7 @@ const NotFound = () => {
             </button>
 
             <button
-              onClick={() => navigate("/contact")}
+              onClick={() => navigate("/contact/")}
               className="inline-flex items-center gap-2.5 rounded-2xl border border-border/60 bg-card px-7 py-3.5 text-sm font-semibold text-foreground transition-all duration-200 hover:border-primary/30 hover:bg-primary/[0.05] hover:scale-[1.04]"
             >
               <MessageCircle className="h-4 w-4 text-primary" />
@@ -104,10 +113,10 @@ const NotFound = () => {
             transition={{ duration: 0.5, delay: 0.7 }}
           >
             {[
-              { label: "פרויקטים", href: "/projects" },
+              { label: "פרויקטים", href: "/projects/" },
               { label: "שירותים", href: "/#services" },
-              { label: "מי אנחנו", href: "/about" },
-              { label: "שאלות נפוצות", href: "/faq" },
+              { label: "מי אנחנו", href: "/about/" },
+              { label: "שאלות נפוצות", href: "/faq/" },
             ].map((link) => (
               <button
                 key={link.href}

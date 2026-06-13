@@ -16,34 +16,34 @@ import {
 
 /* ── Service links shown in dropdown ── */
 const serviceLinks = [
-  { label: "בניית אתרים מקצועיים", href: "/services/web-development", icon: Monitor, desc: "Full-Stack, React, ביצועים גבוהים" },
-  { label: "פיתוח אתרים", href: "/services/website-development", icon: Code2, desc: "ארכיטקטורה, API, מערכות מורכבות" },
-  { label: "אתר תדמית לעסקים", href: "/services/business-website", icon: Briefcase, desc: "ייצוג מקצועי שממיר לידים" },
-  { label: "מערכת ניהול תורים", href: "/services/appointment-system", icon: CalendarDays, desc: "הזמנות אונליין ואוטומציה" },
-  { label: "דפי נחיתה", href: "/services/landing-page-development", icon: Target, desc: "ממירים גולשים ללקוחות" },
-  { label: "React Development", href: "/services/react-development", icon: Globe, desc: "אפליקציות React מתקדמות" },
+  { label: "בניית אתרים מקצועיים", href: "/services/web-development/", icon: Monitor, desc: "Full-Stack, React, ביצועים גבוהים" },
+  { label: "פיתוח אתרים", href: "/services/website-development/", icon: Code2, desc: "ארכיטקטורה, API, מערכות מורכבות" },
+  { label: "אתר תדמית לעסקים", href: "/services/business-website/", icon: Briefcase, desc: "ייצוג מקצועי שממיר לידים" },
+  { label: "מערכת ניהול תורים", href: "/services/appointment-system/", icon: CalendarDays, desc: "הזמנות אונליין ואוטומציה" },
+  { label: "דפי נחיתה", href: "/services/landing-page-development/", icon: Target, desc: "ממירים גולשים ללקוחות" },
+  { label: "React Development", href: "/services/react-development/", icon: Globe, desc: "אפליקציות React מתקדמות" },
 ];
 
 const navLinks = [
-  { label: "שירותים", href: "/services", type: "services" }, // special type
+  { label: "שירותים", href: "/services/", type: "services" }, // special type
   { label: "פרויקטים", href: "#portfolio", type: "hash" },
-  { label: "מי אנחנו", href: "/about", type: "route" },
-  { label: "שאלות נפוצות", href: "/faq", type: "route" },
+  { label: "מי אנחנו", href: "/about/", type: "route" },
+  { label: "שאלות נפוצות", href: "/faq/", type: "route" },
 ];
 
 const menuItems = [
   { label: "ראשי", href: "/", type: "route" },
-  { label: "מי אנחנו", href: "/about", type: "route" },
-  { label: "פרויקטים", href: "/projects", type: "route" },
-  { label: "שאלות נפוצות", href: "/faq", type: "route" },
-  { label: "בלוג", href: "/blog", type: "route" },
-  { label: "צור קשר", href: "/contact", type: "route" },
+  { label: "מי אנחנו", href: "/about/", type: "route" },
+  { label: "פרויקטים", href: "/projects/", type: "route" },
+  { label: "שאלות נפוצות", href: "/faq/", type: "route" },
+  { label: "בלוג", href: "/blog/", type: "route" },
+  { label: "צור קשר", href: "/contact/", type: "route" },
 ];
 
 const mobileNavLinks = [
-  { label: "שירותים", href: "/services", type: "route" },
-  { label: "פרויקטים", href: "/projects", type: "route" },
-  { label: "אודות", href: "/about", type: "route" },
+  { label: "שירותים", href: "/services/", type: "route" },
+  { label: "פרויקטים", href: "/projects/", type: "route" },
+  { label: "אודות", href: "/about/", type: "route" },
 ];
 
 /* ── Services Dropdown ── */
@@ -93,7 +93,7 @@ const ServicesDropdown = ({ onClose }: { onClose: () => void }) => {
         {/* Bottom CTA */}
         <div className="mt-3 border-t border-border/40 pt-3">
           <button
-            onClick={() => { navigate("/contact"); onClose(); }}
+            onClick={() => { navigate("/contact/"); onClose(); }}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/[0.08] py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary/[0.14]"
           >
             <MessageCircle className="h-4 w-4" />
@@ -201,7 +201,7 @@ const Header = () => {
                     onMouseLeave={() => setServicesOpen(false)}
                   >
                     <button
-                      onClick={() => { navigate("/services"); setServicesOpen(false); }}
+                      onClick={() => { navigate("/services/"); setServicesOpen(false); }}
                       className={`nav-link-hover relative flex items-center gap-1 pb-1 font-rubik text-[14px] font-medium tracking-wide transition-colors lg:text-[15px] ${
                         servicesOpen ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                       }`}
@@ -236,8 +236,8 @@ const Header = () => {
           {/* Right actions */}
           <div className="flex items-center gap-3 shrink-0">
             <a
-              href="/contact"
-              onClick={(e) => { e.preventDefault(); navigate("/contact"); }}
+              href="/contact/"
+              onClick={(e) => { e.preventDefault(); navigate("/contact/"); }}
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-md shadow-primary/25 transition-all duration-200 hover:scale-[1.04] hover:brightness-110 active:scale-[0.97] btn-glow"
             >
               <MessageCircle className="h-4 w-4" />
@@ -291,8 +291,8 @@ const Header = () => {
           {/* Mobile CTA + hamburger */}
           <div className="flex items-center gap-1.5 shrink-0">
             <a
-              href="/contact"
-              onClick={(e) => { e.preventDefault(); navigate("/contact"); }}
+              href="/contact/"
+              onClick={(e) => { e.preventDefault(); navigate("/contact/"); }}
               className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-[11px] font-bold text-primary-foreground shadow-md shadow-primary/20 transition-all hover:brightness-110 btn-glow"
             >
               <MessageCircle className="h-3.5 w-3.5" />
@@ -368,8 +368,8 @@ const Header = () => {
 
                 <div className="mt-5 px-1">
                   <a
-                    href="/contact"
-                    onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); navigate("/contact"); }}
+                    href="/contact/"
+                    onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); navigate("/contact/"); }}
                     className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 font-heebo text-base font-bold text-white shadow-lg transition-all hover:brightness-110"
                   >
                     <MessageCircle className="h-5 w-5" />

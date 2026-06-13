@@ -12,10 +12,11 @@
  * The React bundle still hydrates on top for the normal SPA experience.
  *
  * It also regenerates dist/sitemap.xml from the same route list — one source
- * of truth, no manual maintenance.
+ * of truth, no manual maintenance — and renders a branded dist/404.html so
+ * Netlify returns a genuine HTTP 404 for unmatched paths.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { preview } from "vite";
@@ -101,11 +102,20 @@ function writePage(routePath, html) {
   writeFileSync(join(dir, "index.html"), html, "utf-8");
 }
 
+/* ─── normalize any route path to its canonical TRAILING-SLASH form ─── */
+function withTrailingSlash(path) {
+  if (!path || path === "/") return "/";
+  const clean = path.split(/[?#]/)[0].replace(/\/{2,}/g, "/");
+  return clean.endsWith("/") ? clean : `${clean}/`;
+}
+
 /* ─── build sitemap.xml from the route list ─── */
 function writeSitemap(routes) {
   const urls = routes
     .map(({ path, changefreq, priority, lastmod }) => {
-      const loc = `${BASE_URL}${path === "/" ? "/" : path}`;
+      /* Every <loc> must be the final URL that returns 200 with NO 301 hop —
+         i.e. the trailing-slash form, identical to each page's self-canonical. */
+      const loc = `${BASE_URL}${withTrailingSlash(path)}`;
       const alt =
         path === "/"
           ? `\n    <xhtml:link rel="alternate" hreflang="he" href="${loc}"/>`
@@ -168,6 +178,11 @@ async function run() {
     );
     writeSitemap(routes);
     console.log("  ✓  sitemap.xml — " + routes.length + " URLs\n");
+    /* Even without pre-render, ship a 404.html so Netlify returns a real HTTP
+       404 for unmatched paths (the SPA shell renders the branded NotFound page
+       client-side). Without this file Netlify would serve a generic 404. */
+    copyFileSync(join(DIST, "index.html"), join(DIST, "404.html"));
+    console.log("  ✓  404.html (SPA shell fallback)\n");
     await server.httpServer.close();
     return;
   }
@@ -217,6 +232,39 @@ async function run() {
     } finally {
       await page.close();
     }
+  }
+
+  /* ─── 404 page ─── render the SPA's NotFound route and save it as
+     dist/404.html. Netlify serves this for any unmatched path WITH a genuine
+     HTTP 404 status, replacing the old soft-404 (unknown URLs returning 200). */
+  try {
+    const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    page.on("request", (req) => {
+      const type = req.resourceType();
+      if (type === "image" || type === "media" || type === "font") req.abort();
+      else req.continue();
+    });
+    await page.goto(`${origin}/__nz_not_found__`, {
+      waitUntil: "domcontentloaded",
+      timeout: 20000,
+    });
+    await page.waitForFunction(
+      () => {
+        const root = document.getElementById("root");
+        return root && root.childElementCount > 0 && document.querySelector("footer") && document.title;
+      },
+      { timeout: 20000, polling: 150 }
+    );
+    await new Promise((r) => setTimeout(r, 500));
+    const html = await page.content();
+    writeFileSync(join(DIST, "404.html"), html, "utf-8");
+    await page.close();
+    console.log("  ✓  404.html (branded, noindex)");
+  } catch (err) {
+    /* Fall back to the SPA shell so Netlify still returns a real 404 status. */
+    copyFileSync(join(DIST, "index.html"), join(DIST, "404.html"));
+    console.warn(`  ⚠  404.html branded render failed (${err.message}) — used SPA shell fallback.`);
   }
 
   await browser.close();

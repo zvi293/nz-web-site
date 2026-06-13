@@ -16,15 +16,23 @@ export function useBreadcrumb({ name, path, parent }: BreadcrumbPage): void {
   useEffect(() => {
     const origin = "https://nz-web.com";
 
+    /* Breadcrumb item URLs must match the canonical (trailing-slash) form so
+       they point at the 200 URL, never the 301-redirecting non-slash one. */
+    const slash = (p: string) => {
+      if (!p || p === "/") return "/";
+      const clean = p.split(/[?#]/)[0].replace(/\/{2,}/g, "/");
+      return clean.endsWith("/") ? clean : `${clean}/`;
+    };
+
     const items: Array<{ "@type": string; position: number; name: string; item: string }> = [
       { "@type": "ListItem", position: 1, name: "דף הבית", item: `${origin}/` },
     ];
 
     if (parent) {
-      items.push({ "@type": "ListItem", position: 2, name: parent.name, item: `${origin}${parent.path}` });
-      items.push({ "@type": "ListItem", position: 3, name, item: `${origin}${path}` });
+      items.push({ "@type": "ListItem", position: 2, name: parent.name, item: `${origin}${slash(parent.path)}` });
+      items.push({ "@type": "ListItem", position: 3, name, item: `${origin}${slash(path)}` });
     } else {
-      items.push({ "@type": "ListItem", position: 2, name, item: `${origin}${path}` });
+      items.push({ "@type": "ListItem", position: 2, name, item: `${origin}${slash(path)}` });
     }
 
     const script = document.createElement("script");

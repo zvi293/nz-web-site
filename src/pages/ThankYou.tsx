@@ -137,7 +137,7 @@ const ThankYou = () => {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                to="/all-projects"
+                to="/projects/"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-border/40 bg-card text-foreground font-bold px-8 py-3 hover:bg-secondary transition-all duration-300"
               >
                 ראו פרויקטים

@@ -179,7 +179,7 @@ const Accessibility = () => {
                 </ul>
                 <p className="text-muted-foreground leading-relaxed mt-3">
                   ניתן לפנות אלינו באמצעות פרטי רכז הנגישות המפורטים לעיל,
-                  או דרך <Link to="/contact" className="text-primary hover:underline font-bold">טופס יצירת הקשר</Link> באתר.
+                  או דרך <Link to="/contact/" className="text-primary hover:underline font-bold">טופס יצירת הקשר</Link> באתר.
                 </p>
               </Section>
 

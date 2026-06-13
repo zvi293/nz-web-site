@@ -374,7 +374,7 @@ const AccessibilityWidget = () => {
                   <button
                     onClick={() => {
                       setIsOpen(false);
-                      navigate("/accessibility");
+                      navigate("/accessibility/");
                     }}
                     className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
                     aria-label="עבור לדף הצהרת הנגישות"

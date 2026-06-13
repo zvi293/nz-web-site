@@ -323,7 +323,7 @@ const ContactSection = () => {
       });
       setSendMethod("whatsapp");
       // Navigate to thank-you page after short delay (let confetti play)
-      setTimeout(() => { navigate("/thank-you"); }, 1800);
+      setTimeout(() => { navigate("/thank-you/"); }, 1800);
 
       confetti({
         particleCount: 120,
@@ -695,7 +695,7 @@ const ContactSection = () => {
                   >
                     קראתי ואני מאשר/ת את{" "}
                     <Link
-                      to="/terms"
+                      to="/terms/"
                       className="font-medium text-primary hover:underline"
                       target="_blank"
                     >
@@ -703,7 +703,7 @@ const ContactSection = () => {
                     </Link>{" "}
                     /{" "}
                     <Link
-                      to="/privacy"
+                      to="/privacy/"
                       className="font-medium text-primary hover:underline"
                       target="_blank"
                     >
