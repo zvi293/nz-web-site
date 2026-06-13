@@ -1,5 +1,6 @@
 import { Target, TrendingUp, Zap, MousePointer, BarChart3, TestTube, Megaphone, Clock, Shield } from "lucide-react";
 import ServicePageTemplate, { type ServicePageConfig } from "@/components/ServicePageTemplate";
+import { LANDING_CARDS } from "@/data/landings";
 
 const config: ServicePageConfig = {
   seo: {
@@ -11,6 +12,7 @@ const config: ServicePageConfig = {
   schemaId: "service-schema-landing-page",
   schemaServiceType: "Landing Page Development",
   schemaUrl: "https://nz-web.com/services/landing-page-development",
+  industries: LANDING_CARDS,
   hero: {
     badge: "דפי נחיתה",
     badgeIcon: Target,

@@ -28,6 +28,13 @@ import type {
   ServiceDeepDiveBlock,
 } from "@/components/ServicePageTemplate";
 import serviceDevImg from "@/assets/service-dev.webp";
+import { accountant } from "./verticals/accountant";
+import { realEstate } from "./verticals/real-estate";
+import { clinic } from "./verticals/clinic";
+import { architect } from "./verticals/architect";
+import { consultant } from "./verticals/consultant";
+import { beauty } from "./verticals/beauty";
+import { contractor } from "./verticals/contractor";
 
 const BASE_URL = "https://nz-web.com";
 const HUB = { name: "אתר תדמית לעסקים", path: "/services/business-website" } as const;
@@ -194,6 +201,13 @@ const lawyer: VerticalContent = {
 /* ───────────────────────── registry ───────────────────────── */
 export const VERTICALS: Record<string, VerticalContent> = {
   [lawyer.slug]: lawyer,
+  [accountant.slug]: accountant,
+  [realEstate.slug]: realEstate,
+  [clinic.slug]: clinic,
+  [architect.slug]: architect,
+  [consultant.slug]: consultant,
+  [beauty.slug]: beauty,
+  [contractor.slug]: contractor,
 };
 
 /** Build a full ServicePageConfig from a vertical slug (null if unknown). */
@@ -233,4 +247,11 @@ export const VERTICAL_PATHS = Object.values(VERTICALS).map(
 export const VERTICAL_LINKS = Object.values(VERTICALS).map((v) => ({
   label: v.navName,
   href: `/services/business-website/${v.slug}/`,
+}));
+
+/** Richer list (with a short description) for the hub "industries" grid. */
+export const VERTICAL_CARDS = Object.values(VERTICALS).map((v) => ({
+  label: v.navName,
+  href: `/services/business-website/${v.slug}/`,
+  desc: v.hero.badge,
 }));

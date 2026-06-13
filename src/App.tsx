@@ -38,6 +38,7 @@ const BusinessWebsite = lazy(() => import("./pages/services/BusinessWebsite"));
 const AppointmentSystem = lazy(() => import("./pages/services/AppointmentSystem"));
 const LandingPageDevelopment = lazy(() => import("./pages/services/LandingPageDevelopment"));
 const VerticalBusinessWebsite = lazy(() => import("./pages/services/VerticalBusinessWebsite"));
+const LandingPageVertical = lazy(() => import("./pages/services/LandingPageVertical"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminPortfolio = lazy(() => import("./pages/AdminPortfolio"));
 
@@ -81,6 +82,7 @@ const AnimatedRoutes = () => {
           <Route path="/services/business-website/:vertical" element={wrap(<VerticalBusinessWebsite />)} />
           <Route path="/services/appointment-system" element={wrap(<AppointmentSystem />)} />
           <Route path="/services/landing-page-development" element={wrap(<LandingPageDevelopment />)} />
+          <Route path="/services/landing-page-development/:landing" element={wrap(<LandingPageVertical />)} />
           <Route path="/admin/login" element={wrap(<AdminLogin />)} />
           <Route element={<AdminRouteGuard />}>
             <Route path="/admin/portfolio" element={wrap(<AdminPortfolio />)} />

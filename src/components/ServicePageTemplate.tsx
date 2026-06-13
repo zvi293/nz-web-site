@@ -87,6 +87,8 @@ export interface ServicePageConfig {
   relatedLinks?: { label: string; href: string }[];
   /** Render the אתר-תדמית pricing packages section on this page (default off). */
   pricing?: boolean;
+  /** Optional "by industry/type" grid linking to every spoke page (for hub pages). */
+  industries?: { label: string; href: string; desc?: string }[];
 }
 
 /* ─────────────── Sub-components ─────────────── */
@@ -396,6 +398,45 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
                   </div>
                   <h3 className="mb-1.5 text-base font-bold text-foreground">{item.title}</h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Industries / types grid (hub → every spoke) ── */}
+      {config.industries && config.industries.length > 0 && (
+        <section className="border-t border-border/30 py-14 md:py-20">
+          <div className="container mx-auto max-w-5xl px-6">
+            <motion.div
+              className="mx-auto mb-10 max-w-2xl text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55 }}
+            >
+              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">לפי תחום</p>
+              <h2 className="text-2xl font-black text-foreground md:text-3xl lg:text-4xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
+                בחרו את התחום שלכם
+              </h2>
+            </motion.div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {config.industries.map((it, i) => (
+                <motion.div
+                  key={it.href}
+                  initial={{ opacity: 0, y: 22 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05, duration: 0.45 }}
+                >
+                  <Link
+                    to={it.href}
+                    className="group flex h-full flex-col rounded-2xl border border-border/40 bg-card p-5 text-right transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
+                  >
+                    <h3 className="mb-1 text-base font-bold text-foreground transition-colors group-hover:text-primary">{it.label}</h3>
+                    {it.desc && <p className="text-sm leading-relaxed text-muted-foreground">{it.desc}</p>}
+                  </Link>
                 </motion.div>
               ))}
             </div>
