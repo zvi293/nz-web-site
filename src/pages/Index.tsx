@@ -5,6 +5,7 @@ import HeroSection from "@/components/HeroSection";
 import AmbientShapes from "@/components/AmbientShapes";
 import AboutIntroSection from "@/components/AboutIntroSection";
 import ServicesSection from "@/components/ServicesSection";
+import PricingSection from "@/components/PricingSection";
 import ProcessSection from "@/components/ProcessSection";
 import PortfolioSection from "@/components/PortfolioSection";
 import ClientLogosSection from "@/components/ClientLogosSection";
@@ -59,6 +60,7 @@ const Index = () => {
       <Header />
       <HeroSection />
       <ServicesSection />
+      <PricingSection />
       <ProcessSection />
       <div id="portfolio" aria-hidden="true" />
       <PortfolioSection />

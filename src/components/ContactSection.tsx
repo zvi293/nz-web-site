@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   CheckCircle,
   Mail,
@@ -16,6 +16,7 @@ import confetti from "canvas-confetti";
 import { addLead } from "@/lib/leads-api";
 import { sendContactEmailNotification } from "@/lib/contact-email-api";
 import { getWhatsAppHref, useContactInfo } from "@/lib/contact-utils";
+import { getPlanLabel } from "@/data/pricing";
 import {
   Card,
   CardContent,
@@ -118,6 +119,7 @@ const ContactSection = () => {
   const honeypotRef = useRef<HTMLInputElement>(null);
   const termsRef = useRef<HTMLDivElement>(null);
   const contact = useContactInfo();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -249,6 +251,18 @@ const ContactSection = () => {
       clearErrors("email");
     }
   }, [clearErrors, sendMethod, setValue]);
+
+  /* Pre-fill the form when arriving from a pricing CTA (e.g. /contact/?plan=premium). */
+  useEffect(() => {
+    const planLabel = getPlanLabel(searchParams.get("plan"));
+    if (!planLabel) return;
+    setValue("inquiryType", "אתר תדמית לעסק", { shouldDirty: false, shouldValidate: true });
+    setValue(
+      "subject",
+      `אני מעוניין/ת בחבילת ${planLabel} לאתר תדמית. אשמח לפרטים ולהצעה.`,
+      { shouldDirty: true, shouldValidate: true },
+    );
+  }, [searchParams, setValue]);
 
   const onSubmit = async (data: ContactForm) => {
     setIsSubmitting(true);

@@ -26,6 +26,7 @@ const serviceLinks = [
 
 const navLinks = [
   { label: "שירותים", href: "/services/", type: "services" }, // special type
+  { label: "חבילות", href: "#pricing", type: "hash" },
   { label: "פרויקטים", href: "#portfolio", type: "hash" },
   { label: "מי אנחנו", href: "/about/", type: "route" },
   { label: "שאלות נפוצות", href: "/faq/", type: "route" },
@@ -42,7 +43,7 @@ const menuItems = [
 
 const mobileNavLinks = [
   { label: "שירותים", href: "/services/", type: "route" },
-  { label: "פרויקטים", href: "/projects/", type: "route" },
+  { label: "חבילות", href: "/#pricing", type: "route" },
   { label: "אודות", href: "/about/", type: "route" },
 ];
 
@@ -279,7 +280,16 @@ const Header = () => {
                 href={link.href}
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate(link.href);
+                  if (link.href.includes("#")) {
+                    const hash = `#${link.href.split("#")[1]}`;
+                    if (location.pathname === "/") {
+                      scrollToSelectorWithRetry(hash);
+                    } else {
+                      navigate("/", { state: { scrollTo: hash, scrollNonce: Date.now() } });
+                    }
+                  } else {
+                    navigate(link.href);
+                  }
                 }}
                 className="shrink-0 whitespace-nowrap rounded-lg px-2 py-1.5 text-[10.5px] font-semibold text-muted-foreground transition-colors hover:bg-primary/[0.07] hover:text-foreground"
               >

@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "react-router-dom";
+import { scrollToSelectorWithRetry } from "@/lib/scroll-navigation";
 import { motion, useInView } from "framer-motion";
 import heroVisual from "@/assets/hero-visual.png";
 
@@ -36,6 +37,7 @@ const heroParagraph =
   "אנחנו ב-NZ-web מפתחים חוויות דיגיטליות מרהיבות, החל מאתרי תדמית יוקרתיים ועד חנויות איקומרס מורכבות, עם ביצועים חסרי פשרות.";
 const contactLabel = "דברו איתנו";
 const aboutLabel = "השירותים שלנו";
+const pricingLabel = "החבילות שלנו";
 const heroImageAlt = "NZ-web – עיצוב ופיתוח אתרים מתקדם";
 
 const StatsBar = () => {
@@ -342,6 +344,12 @@ const HeroSection = () => {
               className="rounded-xl border border-border/80 bg-background px-8 py-3.5 text-sm font-medium text-foreground transition-all duration-200 hover:scale-[1.04] hover:border-primary/30 hover:bg-primary/[0.04] active:scale-[0.97] sm:px-10 sm:py-4 sm:text-base">
               {aboutLabel}
             </Link>
+            <a
+              href="#pricing"
+              onClick={(e) => { e.preventDefault(); scrollToSelectorWithRetry("#pricing"); }}
+              className="rounded-xl border border-primary/30 bg-primary/[0.06] px-8 py-3.5 text-sm font-semibold text-primary transition-all duration-200 hover:scale-[1.04] hover:bg-primary/[0.12] active:scale-[0.97] sm:px-10 sm:py-4 sm:text-base">
+              {pricingLabel}
+            </a>
           </div>
 
           {/* Stats bar */}

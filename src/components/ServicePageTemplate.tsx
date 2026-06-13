@@ -8,6 +8,7 @@ import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
+import PricingSection from "@/components/PricingSection";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -80,6 +81,12 @@ export interface ServicePageConfig {
     subtitle: string;
     buttonText: string;
   };
+  /** Optional content image rendered in the intro (e.g. on vertical pages). */
+  image?: { src: string; alt: string; width?: number; height?: number };
+  /** Optional curated internal links (hub-and-spoke). Overrides the default related-services list. */
+  relatedLinks?: { label: string; href: string }[];
+  /** Render the אתר-תדמית pricing packages section on this page (default off). */
+  pricing?: boolean;
 }
 
 /* ─────────────── Sub-components ─────────────── */
@@ -255,6 +262,21 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
                 <p key={i} className="text-base leading-[1.9] text-muted-foreground md:text-lg">{p}</p>
               ))}
             </div>
+            {config.image && (
+              <figure className="mt-10 overflow-hidden rounded-3xl border border-border/40 bg-card shadow-sm">
+                <div className="aspect-[16/9] w-full">
+                  <img
+                    src={config.image.src}
+                    alt={config.image.alt}
+                    width={config.image.width}
+                    height={config.image.height}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </figure>
+            )}
           </motion.div>
         </div>
       </section>
@@ -507,6 +529,9 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
         </div>
       </section>
 
+      {/* ── Pricing packages (opt-in via config.pricing) ── */}
+      {config.pricing && <PricingSection withFaqSchema={false} />}
+
       {/* ── Internal links — related services ── */}
       <section className="border-t border-border/30 py-10 md:py-14">
         <div className="container mx-auto max-w-4xl px-6">
@@ -514,7 +539,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
             שירותים נוספים שיכולים לעניין אתכם
           </p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:gap-4">
-            {[
+            {(config.relatedLinks ?? [
               { label: "בניית אתרים מקצועיים", href: "/services/web-development/" },
               { label: "אתר תדמית לעסקים", href: "/services/business-website/" },
               { label: "מערכת ניהול תורים", href: "/services/appointment-system/" },
@@ -523,7 +548,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
               { label: "React Development", href: "/services/react-development/" },
               { label: "כל השירותים", href: "/services/" },
               { label: "צרו קשר", href: "/contact/" },
-            ]
+            ])
               .filter((s) => s.href !== config.schemaUrl.replace("https://nz-web.com", ""))
               .slice(0, 6)
               .map((s) => (

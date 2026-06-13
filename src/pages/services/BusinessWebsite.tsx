@@ -1,5 +1,6 @@
 import { Briefcase, TrendingUp, Users, Eye, MessageCircle, Star, Palette, Globe } from "lucide-react";
 import ServicePageTemplate, { type ServicePageConfig } from "@/components/ServicePageTemplate";
+import { VERTICAL_LINKS } from "@/data/verticals";
 
 const config: ServicePageConfig = {
   seo: {
@@ -96,6 +97,15 @@ const config: ServicePageConfig = {
     subtitle: "שיחת ייעוץ ראשונית ללא עלות — מתאמים?",
     buttonText: "בואו נדבר",
   },
+  /* Hub → spoke: surface the per-industry אתר תדמית pages with descriptive anchors. */
+  relatedLinks: [
+    ...VERTICAL_LINKS,
+    { label: "מערכת ניהול תורים לעסק", href: "/services/appointment-system/" },
+    { label: "דף נחיתה ממיר לקמפיין", href: "/services/landing-page-development/" },
+    { label: "בניית אתרים מקצועיים", href: "/services/web-development/" },
+    { label: "צרו קשר לשיחת ייעוץ", href: "/contact/" },
+  ],
+  pricing: true,
 };
 
 const BusinessWebsite = () => <ServicePageTemplate config={config} />;

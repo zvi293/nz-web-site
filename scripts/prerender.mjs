@@ -40,6 +40,7 @@ const STATIC_ROUTES = [
   { path: "/services/web-development",          changefreq: "monthly", priority: "0.9" },
   { path: "/services/website-development",      changefreq: "monthly", priority: "0.9" },
   { path: "/services/business-website",         changefreq: "monthly", priority: "0.9" },
+  { path: "/services/business-website/lawyer",  changefreq: "monthly", priority: "0.85" },
   { path: "/services/appointment-system",       changefreq: "monthly", priority: "0.9" },
   { path: "/services/landing-page-development", changefreq: "monthly", priority: "0.85" },
   { path: "/services/landing-pages",            changefreq: "monthly", priority: "0.8" },
