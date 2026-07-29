@@ -5,10 +5,15 @@
  * All colours come from the brand tokens, so the whole thing re-tints in dark
  * mode instead of turning into grey smudges. Intentionally low-contrast — the
  * hero and CTA sections carry their own, stronger aurora on top of this.
+ *
+ * md+ only. On phones this is a viewport-sized FIXED layer holding six large
+ * animated gradients that the compositor has to hold still while the content
+ * scrolls over it — a real cost, for orbs that the opaque section backgrounds
+ * cover anyway at that width.
  */
 const AmbientShapes = () => {
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none fixed inset-0 z-0 hidden overflow-hidden md:block" aria-hidden="true">
       {/* Top-right — brand blue */}
       <div
         className="animate-float-slow absolute -top-32 -right-24 h-[560px] w-[560px] rounded-full"

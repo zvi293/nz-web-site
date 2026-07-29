@@ -654,6 +654,35 @@ html {
   .text-gradient-brand { animation: none; background-size: 100% auto; }
 }
 
+/* ── Phones: scroll smoothness beats decoration ───────────────────────────────
+   Every rule below removes a cost that is paid on EVERY scroll frame, which is
+   what made the page feel like it was flickering and stuttering on a phone.
+   None of these effects are legible at phone size. Desktop is untouched. */
+@media (max-width: 767px) {
+  /* A backdrop-filter bar sitting over moving content has to re-blur the pixels
+     behind it every frame. Flat translucent fill instead — over a solid page
+     background the difference is invisible, the cost is not. */
+  .nz-header-shell {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: hsl(var(--background) / 0.94);
+  }
+
+  /* mix-blend-mode forces the whole section to be re-composited against its
+     backdrop as it moves. The grain sits at 3.5% opacity — nobody sees it on a
+     6" screen, everybody feels it. */
+  .nz-grain::after { display: none; }
+
+  /* Animating a 90px blur means re-rasterising a viewport-sized blurred layer
+     on every tick. Keep the orbs, park the animation. */
+  .nz-aurora::before,
+  .nz-aurora::after {
+    animation: none;
+    will-change: auto;
+    filter: blur(56px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .nz-build-block { animation: none; opacity: 1; transform: none; }
   .nz-float-a, .nz-float-b, .nz-float-c, .nz-build-shimmer, .nz-hero-float,

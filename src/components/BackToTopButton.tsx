@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp } from "lucide-react";
+
+const R = 21;
+const C = 2 * Math.PI * R;
 
 /**
  * Back-to-top control.
@@ -14,27 +17,44 @@ import { ArrowUp } from "lucide-react";
  */
 const BackToTopButton = () => {
   const [visible, setVisible] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const progressRef = useRef(0);
+  const ringRef = useRef<SVGCircleElement>(null);
 
+  /* One rAF-batched measurement per frame, and the ring is written straight to
+     the DOM node. This used to setState the progress on every scroll event,
+     which re-rendered the button — SVG, gradient defs and all — dozens of times
+     a second on every page of the site. `visible` is still state, but it's a
+     boolean React bails out of when unchanged. */
   useEffect(() => {
-    const onScroll = () => {
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const y = window.scrollY;
+      progressRef.current = max > 0 ? Math.min(y / max, 1) : 0;
+      if (ringRef.current) {
+        ringRef.current.style.strokeDashoffset = `${C * (1 - progressRef.current)}`;
+      }
       setVisible(y > window.innerHeight * 1.2);
-      setProgress(max > 0 ? Math.min(y / max, 1) : 0);
     };
-    onScroll();
+
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+
+    measure();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
 
   const toTop = () => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
   };
-
-  const R = 21;
-  const C = 2 * Math.PI * R;
 
   return (
     <AnimatePresence>
@@ -53,7 +73,10 @@ const BackToTopButton = () => {
           {/* progress ring */}
           <svg className="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 48 48" aria-hidden="true">
             <circle cx="24" cy="24" r={R} fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
+            {/* The offset is seeded from the ref so the ring is already correct on
+                the frame it mounts, then updated imperatively from then on. */}
             <circle
+              ref={ringRef}
               cx="24"
               cy="24"
               r={R}
@@ -62,7 +85,7 @@ const BackToTopButton = () => {
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeDasharray={C}
-              strokeDashoffset={C * (1 - progress)}
+              style={{ strokeDashoffset: C * (1 - progressRef.current) }}
             />
             <defs>
               <linearGradient id="nz-progress" x1="0%" y1="0%" x2="100%" y2="100%">

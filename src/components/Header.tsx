@@ -33,15 +33,16 @@ const navLinks = [
   { label: "שאלות נפוצות", href: "/faq/", type: "route" },
 ];
 
-/* The three quick links kept inline in the mobile bar, in display order. */
+/* The one quick link kept inline in the mobile bar. Everything else — שירותים,
+   אודות and the rest — lives in the drawer, so the bar stays uncrowded on a
+   360px screen. */
 const mobileNavLinks = [
-  { label: "שירותים", href: "/services/" },
   { label: "חבילות", href: "/#pricing" },
-  { label: "אודות", href: "/about/" },
 ];
 
 const menuItems = [
   { label: "ראשי", href: "/", type: "route" },
+  { label: "שירותים", href: "/services/", type: "route" },
   { label: "מי אנחנו", href: "/about/", type: "route" },
   { label: "פרויקטים", href: "/projects/", type: "route" },
   { label: "חבילות", href: "/packages/", type: "route" },
@@ -221,7 +222,10 @@ const Header = () => {
   return (
     <header dir="rtl" className="fixed top-0 left-0 right-0 z-50 px-3 pt-2 md:px-5 md:pt-3">
       <div
-        className={`mx-auto max-w-7xl rounded-2xl transition-all duration-500 md:rounded-[1.35rem] ${
+        /* nz-header-shell is a hook for index.css, which swaps the backdrop-blur
+           for a flat fill on phones — a blurred bar over moving content is the
+           single most expensive thing on a scrolling mobile page. */
+        className={`nz-header-shell mx-auto max-w-7xl rounded-2xl transition-all duration-500 md:rounded-[1.35rem] ${
           scrolled
             ? "glass-strong border border-border/50 shadow-elevated"
             : "border border-transparent bg-background/45 backdrop-blur-md"
@@ -339,7 +343,7 @@ const Header = () => {
         </div>
 
         {/* ── Mobile ──
-            Order (RTL, right → left): logo · שירותים · חבילות · אודות · CTA · menu */}
+            Order (RTL, right → left): logo · חבילות · CTA · menu */}
         <div className="flex md:hidden items-center justify-between gap-0.5 px-2 py-2 xs:gap-1 xs:px-2.5">
           {/* Logo */}
           <a
@@ -351,7 +355,7 @@ const Header = () => {
             <Wordmark compact />
           </a>
 
-          {/* Quick links — the three destinations people actually reach for.
+          {/* Quick link — the one destination people actually reach for.
               Everything else lives in the drawer. */}
           {/* Sized by its content, not flex-1 — a growing nav box would let the
               labels spill over the logo and the CTA on 360px screens. */}

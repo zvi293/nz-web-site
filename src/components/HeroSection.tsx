@@ -182,7 +182,12 @@ const HeroSection = () => {
       gsap.set(subtext, { y: 18 });
       gsap.set(buttons, { y: 20, scale: 0.97, transformOrigin: "50% 50%" });
 
-      if (sectionRef.current && visualParallax) {
+      /* Parallax is a desktop-only garnish: 20px of counter-scroll costs a
+         scrubbed tween that runs for the whole height of the hero, and on a
+         phone that lands on top of everything else moving. */
+      const wantsParallax = window.matchMedia("(min-width: 768px)").matches;
+
+      if (wantsParallax && sectionRef.current && visualParallax) {
         parallaxTweenRef.current = gsap.to(visualParallax, {
           y: -20,
           ease: "none",
@@ -340,45 +345,13 @@ const HeroSection = () => {
     };
   }, []);
 
-  /* Mobile / touch: tilt the hero visual slightly toward the scroll direction. */
-  useEffect(() => {
-    const tilt = tiltRef.current;
-    if (!tilt) return;
-
-    // Primary pointer is touch (coarse). Reliable where `(hover:)` lies on
-    // Android and `maxTouchPoints` lies on Windows laptops.
-    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!coarsePointer || reduced) return; // desktop already has the mouse-tilt
-
-    let lastY = window.scrollY;
-    let resetTimer: ReturnType<typeof setTimeout> | undefined;
-    const onScroll = () => {
-      const y = window.scrollY;
-      const delta = y - lastY;
-      lastY = y;
-      if (Math.abs(delta) < 0.5) return;
-      const dir = delta > 0 ? 1 : -1; // down → +, up → −
-      gsap.to(tilt, {
-        transformPerspective: 1100, // 3D depth lives on the element itself — never depends on a parent
-        rotateX: dir * 16,
-        y: dir * 8,
-        duration: 0.45,
-        ease: "power2.out",
-      });
-      clearTimeout(resetTimer);
-      resetTimer = setTimeout(() => {
-        gsap.to(tilt, { rotateX: 0, y: 0, duration: 0.85, ease: "power3.out" });
-      }, 240);
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      clearTimeout(resetTimer);
-      gsap.killTweensOf(tilt);
-    };
-  }, []);
+  /* Touch devices deliberately have NO scroll-driven tilt on the hero visual.
+     There used to be one — every scroll event spawned a GSAP tween that rocked
+     the artwork ±16° in 3D and reset it 240ms later. On a phone that meant a
+     large 3D-transformed layer being re-rasterised for the whole scroll, on top
+     of the CSS float animation already running on its parent: the artwork
+     visibly juddered and the page read as broken. The gentle `nz-hero-float`
+     drift is the entire mobile treatment now. */
 
   return (
     <section
@@ -556,7 +529,7 @@ const HeroSection = () => {
                   <FloatingBadge
                     className="-bottom-5 left-2 lg:-left-8"
                     icon={Smartphone}
-                    title="מובייל-פירסט"
+                    title="Mobile-First"
                     subtitle="מושלם בכל מסך"
                     delay={1.35}
                   />

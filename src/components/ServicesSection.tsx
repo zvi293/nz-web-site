@@ -128,10 +128,17 @@ const ServiceVisual = ({
     clearPlayTimer();
   }, [service.id, service.video]);
 
+  /* Perpetual drift on the visual — md+ only, and never under reduced motion.
+     On a phone an image that keeps moving (and rotating 1.2°) while the page is
+     already moving reads as the page juddering, and one never-ending tween per
+     service block keeps that many composited layers alive for the session. */
   useEffect(() => {
     if (!containerRef.current) return;
     const mainEl = containerRef.current.querySelector("[data-main-img]");
-    if (mainEl) {
+    if (!mainEl) return;
+
+    const mm = gsap.matchMedia();
+    mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
       floatTweenRef.current?.kill();
       floatTweenRef.current = gsap.to(mainEl, {
         y: -16,
@@ -141,12 +148,14 @@ const ServiceVisual = ({
         yoyo: true,
         ease: "sine.inOut"
       });
-    }
 
-    return () => {
-      floatTweenRef.current?.kill();
-      floatTweenRef.current = null;
-    };
+      return () => {
+        floatTweenRef.current?.kill();
+        floatTweenRef.current = null;
+      };
+    });
+
+    return () => mm.revert();
   }, [index]);
 
   // Video playback with mobile-safe visibility rules

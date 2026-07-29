@@ -245,27 +245,37 @@ const ProcessSection = () => {
      framer-motion's useScroll({ target }) was used before, but every page sits
      inside PageTransition's transformed wrapper, which breaks its offset
      measurement and logs a "non-static position" warning on every mount.
-     ScrollTrigger measures through transforms correctly. */
+     ScrollTrigger measures through transforms correctly.
+
+     md+ only: the three blobs it moves carry 120–150px blurs, and scrubbing
+     them means the compositor re-rasterises those layers for the whole height
+     of the section — one of the things that made phone scrolling stutter. */
   useEffect(() => {
     if (!sectionRef.current || !blobsRef.current) return;
-    const tween = gsap.fromTo(
-      blobsRef.current,
-      { yPercent: 0 },
-      {
-        yPercent: 6,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 0.6,
+
+    const mm = gsap.matchMedia();
+    mm.add("(min-width: 768px)", () => {
+      const tween = gsap.fromTo(
+        blobsRef.current,
+        { yPercent: 0 },
+        {
+          yPercent: 6,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.6,
+          },
         },
-      },
-    );
-    return () => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
-    };
+      );
+      return () => {
+        tween.scrollTrigger?.kill();
+        tween.kill();
+      };
+    });
+
+    return () => mm.revert();
   }, []);
 
   return (

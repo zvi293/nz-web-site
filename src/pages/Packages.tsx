@@ -77,19 +77,30 @@ const PackageNav = ({
 
   /* Only while the packages themselves are on screen — never over the hero,
      the FAQ or the footer. */
+  /* rAF-batched: getBoundingClientRect forces a layout, and running one per
+     scroll event (rather than per frame) is how a cheap boolean check turns
+     into scroll stutter on a phone. */
   useEffect(() => {
-    const onScroll = () => {
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return setVisible(false);
       setVisible(rect.top < 150 && rect.bottom > 320);
     };
 
-    onScroll();
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+
+    measure();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
     };
   }, [containerRef]);
 
