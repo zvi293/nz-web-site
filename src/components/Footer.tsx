@@ -12,7 +12,7 @@ import {
   Youtube,
   ArrowLeft,
 } from "lucide-react";
-import { useSiteSettings } from "@/lib/site-settings-api";
+import { siteSettings } from "@/content/site-settings";
 import { getMailtoHref, getTelHref, getWhatsAppHref } from "@/lib/contact-utils";
 
 // ── CSS-animated wave shapes (reliable cross-browser, no framer-motion SVG path issues) ──
@@ -44,7 +44,6 @@ function createWaveAnimation(paths: WavePathFrames) {
 }
 
 const Footer = () => {
-  const { settings: siteSettings } = useSiteSettings();
   const { contact, social, footer: footerSettings, socialVisibility } = siteSettings;
   const backWave = createWaveAnimation(backWavePaths);
   const frontWave = createWaveAnimation(frontWavePaths);
@@ -68,6 +67,7 @@ const Footer = () => {
     { label: "מי אנחנו", href: "/about/" },
     { label: "פרויקטים", href: "/projects/" },
     { label: "שירותים", href: "/#services" },
+    { label: "חבילות אתר תדמית", href: "/packages/" },
     { label: "שאלות נפוצות", href: "/faq/" },
     { label: "בלוג", href: "/blog/" },
     { label: "צור קשר", href: "/contact/" },
@@ -351,14 +351,6 @@ const Footer = () => {
               <p className="font-heebo text-xs text-white/30">
                 עוצב ופותח עם ❤️ בישראל
               </p>
-
-              {/* Admin link */}
-              <Link
-                to="/admin/portfolio"
-                className="font-heebo text-[10px] text-white/10 transition-colors hover:text-white/30"
-              >
-                ניהול
-              </Link>
             </div>
           </div>
         </div>

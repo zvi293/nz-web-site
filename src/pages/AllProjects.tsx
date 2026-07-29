@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { fetchProjects, type Project } from "@/lib/projects-api";
+import { publishedProjects } from "@/content/projects";
+import type { Project } from "@/content/types";
 import { createLabeledImageDataUri, isRenderableAssetUrl } from "@/lib/runtime-safety";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -36,7 +37,7 @@ const ProjectCardImage = ({ project }: { project: Project }) => {
 };
 
 const AllProjects = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const projects = publishedProjects;
   const gridRef = useRef<HTMLDivElement>(null);
 
   useSeoMeta({
@@ -46,10 +47,6 @@ const AllProjects = () => {
     keywords: "פורטפוליו בניית אתרים, דוגמאות אתרים, פרויקטי פיתוח, אתרים שבנינו, תיק עבודות בניית אתרים",
   });
   useBreadcrumb({ name: "פרויקטים", path: "/projects" });
-
-  useEffect(() => {
-    fetchProjects().then(setProjects);
-  }, []);
 
   useEffect(() => {
     if (!gridRef.current || projects.length === 0) return;

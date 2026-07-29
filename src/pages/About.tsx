@@ -8,7 +8,7 @@ import { motion, useInView } from "framer-motion";
 import { Plus, Minus, Code2, Palette, Zap, Users, Award, Star, ArrowLeft } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { fetchAboutData, getDefaultAboutData, type AboutPageData } from "@/lib/about-api";
+import { aboutContent } from "@/content/about";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -96,7 +96,7 @@ const AccordionColumn = ({ title, items, delayOffset = 0 }: AccordionColumnProps
 };
 
 const About = () => {
-  const [data, setData] = useState<AboutPageData>(getDefaultAboutData());
+  const data = aboutContent;
   const statsRef = useRef<HTMLDivElement>(null);
   const statsInView = useInView(statsRef, { once: true, margin: "-60px" });
 
@@ -107,18 +107,6 @@ const About = () => {
     keywords: "NZ-web מי אנחנו, סטודיו לבניית אתרים, צבי משה, פיתוח אתרים ישראל, סטודיו לעיצוב אתרים",
   });
   useBreadcrumb({ name: "מי אנחנו", path: "/about" });
-
-  useEffect(() => {
-    let isActive = true;
-    const load = async () => {
-      try {
-        const d = await fetchAboutData();
-        if (isActive) setData(d);
-      } catch { /* use defaults */ }
-    };
-    void load();
-    return () => { isActive = false; };
-  }, []);
 
   return (
     <main className="relative bg-background pt-[72px]" dir="rtl">

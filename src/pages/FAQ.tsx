@@ -13,12 +13,12 @@ import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
-import { fetchFaqItems, getDefaultFaqItems, type FaqItem } from "@/lib/faq-api";
+import { visibleFaqItems } from "@/content/faq";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const FAQ = () => {
-  const [faqItems, setFaqItems] = useState<FaqItem[]>(() => getDefaultFaqItems().filter((item) => item.visible));
+  const faqItems = visibleFaqItems;
   const [searchQuery, setSearchQuery] = useState("");
 
   useSeoMeta({
@@ -28,12 +28,6 @@ const FAQ = () => {
     keywords: "שאלות נפוצות בניית אתרים, כמה עולה לבנות אתר, מחיר בניית אתר, זמן בניית אתר, FAQ פיתוח אתרים, שאלות על בניית אתר",
   });
   useBreadcrumb({ name: "שאלות נפוצות", path: "/faq" });
-
-  useEffect(() => {
-    void fetchFaqItems()
-      .then((items) => setFaqItems(items.filter((item) => item.visible)))
-      .catch(() => undefined);
-  }, []);
 
   const filteredItems = faqItems.filter(
     (item) =>

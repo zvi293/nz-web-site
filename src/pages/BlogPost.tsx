@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Clock, Calendar, ArrowLeft, ArrowRight, User } from "lucide-react";
@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
-import { fetchBlogPost, fetchBlogPosts, formatDate, type BlogPost as Post } from "@/lib/blog-api";
+import { getBlogPost, getRelatedPosts, formatDate } from "@/lib/blog";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -38,9 +38,8 @@ const DEFAULT_SERVICE = { label: "כל השירותים שלנו", href: "/servi
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [post, setPost] = useState<Post | null>(null);
-  const [related, setRelated] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const post = slug ? getBlogPost(slug) : null;
+  const related = slug ? getRelatedPosts(slug) : [];
 
   const articleSchema = post ? {
     "@context": "https://schema.org",
@@ -79,7 +78,7 @@ const BlogPost = () => {
     description: post?.excerpt ?? "",
     /* A slug that resolves to no post (e.g. a stale link, or a path served via
        the /blog/* SPA fallback) must not be indexed as a thin/empty page. */
-    noindex: !loading && !post,
+    noindex: !post,
     ogImage: post?.cover_image || undefined,
     schema: articleSchema,
   });
@@ -93,25 +92,8 @@ const BlogPost = () => {
   });
 
   useEffect(() => {
-    if (!slug) return;
-    setLoading(true);
-    fetchBlogPost(slug).then((data) => {
-      setPost(data);
-      setLoading(false);
-    });
-    fetchBlogPosts().then((all) => {
-      setRelated(all.filter((p) => p.slug !== slug).slice(0, 3));
-    });
     window.scrollTo({ top: 0 });
   }, [slug]);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
-  }
 
   if (!post) {
     return (

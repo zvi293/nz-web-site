@@ -1,10 +1,10 @@
-import { fetchSiteSettings, useContactInfo, type ContactInfo } from "@/lib/site-settings-api";
+import { siteSettings } from "@/content/site-settings";
+import type { ContactInfo } from "@/content/types";
 
-export function getContactInfo(): ContactInfo {
-  return fetchSiteSettings().contact;
-}
+export type { ContactInfo };
 
-export { useContactInfo };
+/** Phone / email / WhatsApp details — edit them in src/content/site-settings.ts. */
+export const contactInfo: ContactInfo = siteSettings.contact;
 
 export function getTelHref(phone: string): string {
   return `tel:${phone.replace(/[^\d+]/g, "")}`;
@@ -15,7 +15,7 @@ export function getMailtoHref(email: string): string {
 }
 
 export function getWhatsAppHref(
-  contact: ContactInfo = getContactInfo(),
+  contact: ContactInfo = contactInfo,
   message: string = contact.whatsappMessage,
 ): string {
   return `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(message)}`;

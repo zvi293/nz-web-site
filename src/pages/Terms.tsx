@@ -16,7 +16,7 @@ import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
-import { getMailtoHref, getTelHref, useContactInfo } from "@/lib/contact-utils";
+import { getMailtoHref, getTelHref, contactInfo } from "@/lib/contact-utils";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -62,8 +62,6 @@ const Section = ({
 
 /* ── Page ── */
 const Terms = () => {
-  const contact = useContactInfo();
-
   useSeoMeta({
     title: "תנאי שימוש | NZ-web",
     description:
@@ -225,18 +223,18 @@ const Terms = () => {
                 <p className="mb-4">בכל שאלה או הבהרה לגבי תנאי השימוש, ניתן לפנות לצבי משה:</p>
                 <div className="space-y-3 rounded-2xl border border-border/40 bg-secondary/30 p-5">
                   <a
-                    href={getTelHref(contact.phone)}
+                    href={getTelHref(contactInfo.phone)}
                     className="flex items-center gap-3 text-foreground transition-colors hover:text-primary"
                   >
                     <Phone className="h-5 w-5 text-primary" />
-                    {contact.phone}
+                    {contactInfo.phone}
                   </a>
                   <a
-                    href={getMailtoHref(contact.email)}
+                    href={getMailtoHref(contactInfo.email)}
                     className="flex items-center gap-3 text-foreground transition-colors hover:text-primary"
                   >
                     <Mail className="h-5 w-5 text-primary" />
-                    {contact.email}
+                    {contactInfo.email}
                   </a>
                 </div>
               </Section>

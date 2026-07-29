@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Clock, Calendar, ArrowLeft, BookOpen, Tag } from "lucide-react";
@@ -8,7 +8,7 @@ import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
-import { fetchBlogPosts, formatDate, type BlogPost } from "@/lib/blog-api";
+import { getBlogPosts, formatDate, type BlogPost } from "@/lib/blog";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -84,9 +84,8 @@ const PostCard = ({ post, index }: { post: BlogPost; index: number }) => {
 };
 
 const Blog = () => {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const posts = getBlogPosts();
   const [activeCategory, setActiveCategory] = useState("הכל");
-  const [loading, setLoading] = useState(true);
 
   useSeoMeta({
     title: "בלוג בניית אתרים | מדריכים ו-SEO | NZ-web",
@@ -94,10 +93,6 @@ const Blog = () => {
     keywords: "בלוג בניית אתרים, מדריך פיתוח אתרים, טיפים SEO, מאמרים עיצוב אתרים, כמה עולה אתר, React WordPress השוואה",
   });
   useBreadcrumb({ name: "בלוג", path: "/blog" });
-
-  useEffect(() => {
-    fetchBlogPosts().then((data) => { setPosts(data); setLoading(false); });
-  }, []);
 
   const filtered = activeCategory === "הכל" ? posts : posts.filter((p) => p.category === activeCategory);
   const availableCategories = CATEGORIES.filter((c) => c === "הכל" || posts.some((p) => p.category === c));
@@ -152,13 +147,7 @@ const Blog = () => {
       {/* Posts grid */}
       <section className="pb-20 md:pb-28">
         <div className="container mx-auto px-5 md:px-6">
-          {loading ? (
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-80 animate-pulse rounded-3xl bg-secondary/60" />
-              ))}
-            </div>
-          ) : filtered.length === 0 ? (
+          {filtered.length === 0 ? (
             <div className="py-20 text-center text-muted-foreground">אין מאמרים בקטגוריה זו.</div>
           ) : (
             <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { ChevronRight, ChevronLeft, Quote, Star } from "lucide-react";
-import { fetchTestimonials, type Testimonial } from "@/lib/testimonials-api";
+import { testimonials } from "@/content/testimonials";
 
 const StarRating = ({ count }: { count: number }) => (
   <div className="flex gap-0.5">
@@ -14,13 +14,8 @@ const StarRating = ({ count }: { count: number }) => (
 const TestimonialsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
-
-  useEffect(() => {
-    fetchTestimonials().then(setTestimonials);
-  }, []);
 
   /**
    * Injects AggregateRating + Review JSON-LD built from the REAL testimonials.
@@ -65,7 +60,7 @@ const TestimonialsSection = () => {
     return () => {
       document.getElementById(SCHEMA_ID)?.remove();
     };
-  }, [testimonials]);
+  }, []);
 
   const prev = () => {
     if (!testimonials.length) return;

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { getCanonicalUrl, getResolvedOgImageUrl } from "@/lib/site-url";
-import { useSiteSettings } from "@/lib/site-settings-api";
+import { siteSettings as settings } from "@/content/site-settings";
 
 export interface SeoMetaOptions {
   title: string;
@@ -36,7 +36,6 @@ export function useSeoMeta({
   ogImage,
   schema,
 }: SeoMetaOptions): void {
-  const { settings } = useSiteSettings();
 
   useEffect(() => {
     const canonicalUrl = getCanonicalUrl(window.location.pathname, settings.siteUrl);
@@ -122,5 +121,5 @@ export function useSeoMeta({
 
       schemaEl?.remove();
     };
-  }, [title, description, noindex, ogImage, schema, settings.seo.ogImage, settings.siteUrl]);
+  }, [title, description, noindex, ogImage, schema]);
 }

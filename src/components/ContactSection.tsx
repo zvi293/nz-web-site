@@ -5,7 +5,6 @@ import { z } from "zod";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   CheckCircle,
-  Mail,
   MessageCircle,
   User,
   Phone,
@@ -13,9 +12,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { addLead } from "@/lib/leads-api";
-import { sendContactEmailNotification } from "@/lib/contact-email-api";
-import { getWhatsAppHref, useContactInfo } from "@/lib/contact-utils";
+import { getWhatsAppHref, contactInfo } from "@/lib/contact-utils";
 import { getPlanLabel } from "@/data/pricing";
 import {
   Card,
@@ -42,22 +39,17 @@ const inquiryTypeOptions = [
   "משהו אחר",
 ] as const;
 
-const emailFieldSchema = z
-  .string()
-  .trim()
-  .max(100, { message: "כתובת האימייל חייבת להיות עד 100 תווים" })
-  .optional()
-  .or(z.literal(""));
-
+/**
+ * The site has no backend: submitting opens WhatsApp with the details the
+ * visitor filled in, pre-composed. Nothing is stored or sent server-side.
+ */
 const contactSchema = z
   .object({
-    sendMethod: z.enum(["whatsapp", "email"]),
     name: z
       .string()
       .trim()
       .min(2, { message: "השם חייב להכיל לפחות 2 תווים" })
       .max(50, { message: "השם חייב להיות עד 50 תווים" }),
-    email: emailFieldSchema,
     phone: z
       .string()
       .trim()
@@ -75,50 +67,17 @@ const contactSchema = z
       .string()
       .trim()
       .max(200, { message: "נושא הפנייה חייב להיות עד 200 תווים" }),
-  })
-  .superRefine((data, ctx) => {
-    if (data.sendMethod !== "email") {
-      return;
-    }
-
-    const email = data.email?.trim() ?? "";
-    if (!email) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["email"],
-        message: "כתובת אימייל חייבת",
-      });
-      return;
-    }
-
-    if (!z.string().email().safeParse(email).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["email"],
-        message: "כתובת אימייל לא תקינה",
-      });
-    }
   });
 
 type ContactForm = z.infer<typeof contactSchema>;
 
 const ContactSection = () => {
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submissionWarning, setSubmissionWarning] = useState<string | null>(
-    null,
-  );
-  const [sendMethod, setSendMethod] = useState<"whatsapp" | "email">(
-    "whatsapp",
-  );
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [formStartedAt] = useState(() => new Date().toISOString());
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const honeypotRef = useRef<HTMLInputElement>(null);
   const termsRef = useRef<HTMLDivElement>(null);
-  const contact = useContactInfo();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -183,16 +142,13 @@ const ContactSection = () => {
     handleSubmit,
     reset,
     setValue,
-    clearErrors,
     formState: { errors, isValid },
   } = useForm<ContactForm>({
     resolver: zodResolver(contactSchema),
     mode: "onChange",
     shouldUnregister: true,
     defaultValues: {
-      sendMethod: "whatsapp",
       name: "",
-      email: "",
       phone: "",
       inquiryType: "",
       subject: "",
@@ -221,7 +177,7 @@ const ContactSection = () => {
   };
 
   const scrollToFirstError = (errorKeys: string[]) => {
-    const fieldOrder = ["name", "email", "phone", "inquiryType", "subject"];
+    const fieldOrder = ["name", "phone", "inquiryType", "subject"];
 
     const firstField = fieldOrder.find((field) => errorKeys.includes(field));
     if (firstField) {
@@ -237,21 +193,6 @@ const ContactSection = () => {
     }
   };
 
-  useEffect(() => {
-    setValue("sendMethod", sendMethod, {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-
-    if (sendMethod === "whatsapp") {
-      setValue("email", "", {
-        shouldDirty: false,
-        shouldValidate: false,
-      });
-      clearErrors("email");
-    }
-  }, [clearErrors, sendMethod, setValue]);
-
   /* Pre-fill the form when arriving from a pricing CTA (e.g. /contact/?plan=premium). */
   useEffect(() => {
     const planLabel = getPlanLabel(searchParams.get("plan"));
@@ -264,78 +205,31 @@ const ContactSection = () => {
     );
   }, [searchParams, setValue]);
 
-  const onSubmit = async (data: ContactForm) => {
-    setIsSubmitting(true);
-    setSubmissionWarning(null);
-
+  const onSubmit = (data: ContactForm) => {
     try {
-      let submissionNotice: string | null = null;
-      const effectiveSendMethod = data.sendMethod;
-      const leadEmail =
-        effectiveSendMethod === "email"
-          ? data.email?.trim() ?? ""
-          : undefined;
       const subject = data.subject.trim();
-
-      const lead = await addLead({
-        name: data.name,
-        email: leadEmail,
-        phone: data.phone,
-        inquiryType: data.inquiryType,
-        subject,
-        sendMethod: effectiveSendMethod,
-      });
-
-      if (effectiveSendMethod === "whatsapp") {
-        const subjectLine = subject ? `\n\nנושא הפנייה: ${subject}` : "";
-        const message = `שלום! אני ${data.name}.
+      const subjectLine = subject ? `\n\nנושא הפנייה: ${subject}` : "";
+      const message = `שלום! אני ${data.name}.
 
 טלפון: ${data.phone}${subjectLine}
 
 אשמח לקבל מידע נוסף על השירותים שלכם.`;
 
-        const whatsappUrl = getWhatsAppHref(
-          contact,
-          data.inquiryType
-            ? `${message}\nסוג פנייה: ${data.inquiryType}`
-            : message,
-        );
-        window.open(whatsappUrl, "_blank");
-      } else {
-        try {
-          await sendContactEmailNotification({
-            leadId: lead.id,
-            name: lead.name,
-            email: lead.email,
-            phone: lead.phone,
-            inquiryType: lead.inquiryType,
-            subject: lead.subject || "",
-            sendMethod: "email",
-            createdAt: lead.createdAt,
-            formStartedAt,
-            submittedAt: new Date().toISOString(),
-            honeypot: honeypotRef.current?.value ?? "",
-          });
-        } catch (error) {
-          console.error(error);
-          const errorMessage = error instanceof Error ? error.message : "";
-          submissionNotice = errorMessage.includes("RATE_LIMITED")
-            ? "הפנייה נשמרה במערכת, אך נחסמה שליחת מייל נוספת לזמן קצר כדי למנוע ספאם."
-            : "הפנייה נשמרה במערכת, אך שליחת מייל ההתראה נכשלה כרגע.";
-          setSubmissionWarning(submissionNotice);
-        }
-      }
+      const whatsappUrl = getWhatsAppHref(
+        contactInfo,
+        data.inquiryType
+          ? `${message}\nסוג פנייה: ${data.inquiryType}`
+          : message,
+      );
+      window.open(whatsappUrl, "_blank");
 
       setIsSubmitted(true);
       reset({
-        sendMethod: "whatsapp",
         name: "",
-        email: "",
         phone: "",
         inquiryType: "",
         subject: "",
       });
-      setSendMethod("whatsapp");
       // Navigate to thank-you page after short delay (let confetti play)
       setTimeout(() => { navigate("/thank-you/"); }, 1800);
 
@@ -362,11 +256,8 @@ const ContactSection = () => {
       }, 300);
 
       toast({
-        title: submissionNotice
-          ? "הפנייה נשמרה במערכת"
-          : "הפנייה נשלחה בהצלחה!",
-        description: submissionNotice ?? "אנחנו ניצור איתך קשר בהקדם האפשרי.",
-        variant: submissionNotice ? "destructive" : "default",
+        title: "הפנייה נשלחה בהצלחה!",
+        description: "אנחנו ניצור איתך קשר בהקדם האפשרי.",
       });
 
       setTimeout(() => {
@@ -375,12 +266,10 @@ const ContactSection = () => {
     } catch (error) {
       console.error(error);
       toast({
-        title: "שגיאה בשליחת הפנייה",
-        description: "אנא נסה שוב מאוחר יותר.",
+        title: "שגיאה בפתיחת וואטסאפ",
+        description: "אנא נסו שוב, או צרו קשר ישירות בטלפון.",
         variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -413,7 +302,7 @@ const ContactSection = () => {
                 הפנייה נשלחה בהצלחה!
               </h3>
               <p className="text-emerald-700">
-                {submissionWarning ?? "אנחנו ניצור איתך קשר בהקדם האפשרי."}
+                אנחנו ניצור איתך קשר בהקדם האפשרי.
               </p>
             </CardContent>
           </Card>
@@ -466,70 +355,13 @@ const ContactSection = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <motion.div
-                className="mb-6"
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: false }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              >
-                <Label className="mb-3 block text-sm font-medium">
-                  בחר אופן קבלת הפנייה:
-                </Label>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant={sendMethod === "whatsapp" ? "default" : "outline"}
-                    onClick={() => setSendMethod("whatsapp")}
-                    className={`flex-1 gap-2 ${
-                      sendMethod === "whatsapp"
-                        ? "border-[#25D366] bg-[#25D366] text-white hover:border-[#25D366] hover:bg-[#25D366] hover:text-white"
-                        : "border-[#BFEFD1] bg-[#DDF8E8] text-[#1E7A46] hover:border-[#2ECC71] hover:bg-[#2ECC71] hover:text-white"
-                    }`}
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    וואטסאפ
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={sendMethod === "email" ? "default" : "outline"}
-                    onClick={() => setSendMethod("email")}
-                    className={`flex-1 gap-2 ${
-                      sendMethod === "email"
-                        ? "border-[#5DADE2] bg-[#5DADE2] text-white hover:border-[#5DADE2] hover:bg-[#5DADE2] hover:text-white"
-                        : "border border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-800"
-                    }`}
-                  >
-                    <Mail className="h-4 w-4" />
-                    אימייל
-                  </Button>
-                </div>
-              </motion.div>
-
               <form
                 onSubmitCapture={handleFormSubmitCapture}
                 onSubmit={handleSubmit(onSubmit, onInvalid)}
                 className="space-y-6"
               >
-                <input
-                  ref={honeypotRef}
-                  type="text"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  className="hidden"
-                  aria-hidden="true"
-                  defaultValue=""
-                />
-                <input
-                  type="hidden"
-                  name="formStartedAt"
-                  value={formStartedAt}
-                  readOnly
-                />
-                <input type="hidden" {...register("sendMethod")} />
-
                 <motion.div
-                  className={`grid grid-cols-1 gap-6 ${sendMethod === "email" ? "md:grid-cols-2" : ""}`}
+                  className="grid grid-cols-1 gap-6"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false }}
@@ -559,32 +391,6 @@ const ContactSection = () => {
                     )}
                   </div>
 
-                  {sendMethod === "email" && (
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="email"
-                        className="flex items-center gap-2 text-sm font-medium"
-                      >
-                        <Mail className="h-4 w-4 text-primary" />
-                        אימייל <span className="text-destructive">*</span>
-                      </Label>
-                      <div className="relative">
-                        <Input
-                          id="email"
-                          type="email"
-                          {...register("email")}
-                          placeholder="your@email.com"
-                          className={`pr-10 transition-shadow duration-300 focus:shadow-md focus:shadow-primary/10 ${errors.email ? "border-destructive" : ""}`}
-                        />
-                        <Mail className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
-                      </div>
-                      {errors.email && (
-                        <p className="text-sm text-destructive">
-                          {errors.email.message}
-                        </p>
-                      )}
-                    </div>
-                  )}
                 </motion.div>
 
                 <motion.div
@@ -736,22 +542,14 @@ const ContactSection = () => {
                     type="submit"
                     size="lg"
                     className="w-full gap-2 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                    disabled={!isValid || isSubmitting || !acceptedTerms}
+                    disabled={!isValid || !acceptedTerms}
                   >
-                    {sendMethod === "whatsapp" ? (
-                      <MessageCircle className="h-4 w-4" />
-                    ) : (
-                      <Mail className="h-4 w-4" />
-                    )}
-                    {isSubmitting
-                      ? "שולח..."
-                      : `שלח פנייה ${sendMethod === "whatsapp" ? "בוואטסאפ" : "באימייל"}`}
+                    <MessageCircle className="h-4 w-4" />
+                    שלח פנייה בוואטסאפ
                   </Button>
 
                   <p className="mt-4 text-center text-xs text-muted-foreground">
-                    {sendMethod === "whatsapp"
-                      ? "לחיצה על כפתור השליחה תפתח את אפליקציית הוואטסאפ עם הפרטים שמילאת"
-                      : "לחיצה על כפתור השליחה תשמור את הפנייה במערכת ותשלח מייל אל צוות האתר"}
+                    לחיצה על כפתור השליחה תפתח את אפליקציית הוואטסאפ עם הפרטים שמילאת
                   </p>
                 </motion.div>
               </form>

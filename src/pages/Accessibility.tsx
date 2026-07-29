@@ -6,13 +6,12 @@ import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Phone, Mail, MessageCircle, User, AccessibilityIcon } from "lucide-react";
-import { useSiteSettings } from "@/lib/site-settings-api";
+import { siteSettings } from "@/content/site-settings";
 import { getMailtoHref, getTelHref, getWhatsAppHref } from "@/lib/contact-utils";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const Accessibility = () => {
-  const { settings: siteSettings } = useSiteSettings();
   const { accessibility, contact } = siteSettings;
   const lastUpdated = accessibility.lastUpdated;
 

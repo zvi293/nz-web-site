@@ -15,17 +15,11 @@
 #    correct. Pre-rendered files (everything else) take precedence over these
 #    rules and are served directly. ──
 #
-#    /blog/*    — dynamic posts (a post published between builds has no file yet;
-#                 unknown slugs render the in-app "not found" with noindex).
-#    /admin/*   — admin login + portfolio (client-only, never pre-rendered).
+#    /blog/*    — blog posts (an unknown slug renders the in-app "not found"
+#                 with noindex instead of a hard 404 mid-navigation).
 #    /thank-you — post-submit page (robots-disallowed, reached via client nav).
 [[redirects]]
   from   = "/blog/*"
-  to     = "/index.html"
-  status = 200
-
-[[redirects]]
-  from   = "/admin/*"
   to     = "/index.html"
   status = 200
 

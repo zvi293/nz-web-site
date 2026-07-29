@@ -5,8 +5,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import { AuthProvider } from "./components/auth/AuthProvider";
-import AdminRouteGuard from "./components/auth/AdminRouteGuard";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import CustomCursor from "./components/CustomCursor";
@@ -20,6 +18,7 @@ const queryClient = new QueryClient();
 
 const About = lazy(() => import("./pages/About"));
 const AllProjects = lazy(() => import("./pages/AllProjects"));
+const Packages = lazy(() => import("./pages/Packages"));
 const Accessibility = lazy(() => import("./pages/Accessibility"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const FAQ = lazy(() => import("./pages/FAQ"));
@@ -39,8 +38,6 @@ const AppointmentSystem = lazy(() => import("./pages/services/AppointmentSystem"
 const LandingPageDevelopment = lazy(() => import("./pages/services/LandingPageDevelopment"));
 const VerticalBusinessWebsite = lazy(() => import("./pages/services/VerticalBusinessWebsite"));
 const LandingPageVertical = lazy(() => import("./pages/services/LandingPageVertical"));
-const AdminLogin = lazy(() => import("./pages/AdminLogin"));
-const AdminPortfolio = lazy(() => import("./pages/AdminPortfolio"));
 
 const RouteFallback = () => (
   <div className="min-h-screen bg-background" aria-hidden="true" />
@@ -64,6 +61,7 @@ const AnimatedRoutes = () => {
           <Route path="/" element={<PageTransition><Index /></PageTransition>} />
           <Route path="/about" element={wrap(<About />)} />
           <Route path="/projects" element={wrap(<AllProjects />)} />
+          <Route path="/packages" element={wrap(<Packages />)} />
           <Route path="/accessibility" element={wrap(<Accessibility />)} />
           <Route path="/privacy" element={wrap(<Privacy />)} />
           <Route path="/faq" element={wrap(<FAQ />)} />
@@ -83,10 +81,6 @@ const AnimatedRoutes = () => {
           <Route path="/services/appointment-system" element={wrap(<AppointmentSystem />)} />
           <Route path="/services/landing-page-development" element={wrap(<LandingPageDevelopment />)} />
           <Route path="/services/landing-page-development/:landing" element={wrap(<LandingPageVertical />)} />
-          <Route path="/admin/login" element={wrap(<AdminLogin />)} />
-          <Route element={<AdminRouteGuard />}>
-            <Route path="/admin/portfolio" element={wrap(<AdminPortfolio />)} />
-          </Route>
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>
@@ -97,35 +91,33 @@ const AnimatedRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
-        <CustomCursor />
-        <Toaster />
-        <Sonner />
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <ScrollToTop />
-          <Analytics />
-          {/* Skip-to-content link — WCAG 2.4.1 "Bypass Blocks". Hidden until focused via keyboard. */}
-          <a
-            href="#main-content"
-            onClick={(e) => {
-              e.preventDefault();
-              const main = document.getElementById("main-content");
-              if (main) {
-                main.setAttribute("tabindex", "-1");
-                main.focus();
-                main.scrollIntoView();
-              }
-            }}
-            className="sr-only focus:not-sr-only focus:fixed focus:right-4 focus:top-4 focus:z-[10050] focus:rounded-lg focus:bg-primary focus:px-5 focus:py-2.5 focus:text-sm focus:font-bold focus:text-primary-foreground focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
-          >
-            דלג לתוכן הראשי
-          </a>
-          <div id="main-content">
-            <AnimatedRoutes />
-          </div>
-          <CookieConsent />
-        </BrowserRouter>
-      </AuthProvider>
+      <CustomCursor />
+      <Toaster />
+      <Sonner />
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <ScrollToTop />
+        <Analytics />
+        {/* Skip-to-content link — WCAG 2.4.1 "Bypass Blocks". Hidden until focused via keyboard. */}
+        <a
+          href="#main-content"
+          onClick={(e) => {
+            e.preventDefault();
+            const main = document.getElementById("main-content");
+            if (main) {
+              main.setAttribute("tabindex", "-1");
+              main.focus();
+              main.scrollIntoView();
+            }
+          }}
+          className="sr-only focus:not-sr-only focus:fixed focus:right-4 focus:top-4 focus:z-[10050] focus:rounded-lg focus:bg-primary focus:px-5 focus:py-2.5 focus:text-sm focus:font-bold focus:text-primary-foreground focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
+        >
+          דלג לתוכן הראשי
+        </a>
+        <div id="main-content">
+          <AnimatedRoutes />
+        </div>
+        <CookieConsent />
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

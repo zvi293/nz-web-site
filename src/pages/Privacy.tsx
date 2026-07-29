@@ -6,13 +6,11 @@ import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
-import { getMailtoHref, getTelHref, useContactInfo } from "@/lib/contact-utils";
+import { getMailtoHref, getTelHref, contactInfo } from "@/lib/contact-utils";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const Privacy = () => {
-  const contact = useContactInfo();
-
   useSeoMeta({
     title: "מדיניות פרטיות | NZ-web",
     description:
@@ -176,18 +174,18 @@ const Privacy = () => {
                   <p className="mb-4">לכל שאלה בנושא פרטיות המידע, ניתן לפנות לצבי משה:</p>
                   <div className="rounded-2xl border border-border/40 bg-card p-6 space-y-3">
                     <a
-                      href={getTelHref(contact.phone)}
+                      href={getTelHref(contactInfo.phone)}
                       className="flex items-center gap-3 text-foreground hover:text-primary transition-colors"
                     >
                       <Phone className="h-5 w-5 text-primary" />
-                      {contact.phone}
+                      {contactInfo.phone}
                     </a>
                     <a
-                      href={getMailtoHref(contact.email)}
+                      href={getMailtoHref(contactInfo.email)}
                       className="flex items-center gap-3 text-foreground hover:text-primary transition-colors"
                     >
                       <Mail className="h-5 w-5 text-primary" />
-                      {contact.email}
+                      {contactInfo.email}
                     </a>
                   </div>
                 </Section>

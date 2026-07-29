@@ -1,8 +1,7 @@
-import { getWhatsAppHref, useContactInfo } from "@/lib/contact-utils";
+import { getWhatsAppHref, contactInfo } from "@/lib/contact-utils";
 
 const WhatsAppButton = () => {
-  const contact = useContactInfo();
-  const url = getWhatsAppHref(contact);
+  const url = getWhatsAppHref(contactInfo);
 
   return (
     <a

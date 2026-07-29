@@ -33,6 +33,7 @@ const STATIC_ROUTES = [
   { path: "/",                                  changefreq: "weekly",  priority: "1.0" },
   { path: "/about",                             changefreq: "monthly", priority: "0.8" },
   { path: "/projects",                          changefreq: "weekly",  priority: "0.85" },
+  { path: "/packages",                          changefreq: "monthly", priority: "0.9" },
   { path: "/contact",                           changefreq: "monthly", priority: "0.9" },
   { path: "/faq",                               changefreq: "monthly", priority: "0.75" },
   { path: "/blog",                              changefreq: "weekly",  priority: "0.8" },
@@ -61,48 +62,36 @@ const STATIC_ROUTES = [
   { path: "/accessibility",                     changefreq: "yearly",  priority: "0.3" },
 ];
 
-/* ─── read env (.env.local for local builds, process.env on Netlify) ─── */
-function loadEnv() {
-  const env = { ...process.env };
-  const envFile = join(ROOT, ".env.local");
-  if (existsSync(envFile)) {
-    for (const line of readFileSync(envFile, "utf-8").split("\n")) {
-      const m = line.match(/^\s*([\w.-]+)\s*=\s*(.*)\s*$/);
-      if (m) env[m[1]] = m[2].replace(/^["']|["']$/g, "");
-    }
+/* ─── blog routes, read straight from the static content module ───
+   src/content/blog.ts is TypeScript with asset imports, so it cannot simply be
+   imported here — the slugs and dates are pulled out textually instead. Keep
+   the `slug: "…"` / `published_at: "…"` fields in each post object (that is the
+   shape the file is written in) and this keeps working. */
+function getBlogRoutes() {
+  const file = join(ROOT, "src", "content", "blog.ts");
+  if (!existsSync(file)) {
+    console.warn("  ⚠  src/content/blog.ts not found — skipping blog routes.");
+    return [];
   }
-  return env;
-}
 
-/* ─── fetch published blog slugs from Supabase ─── */
-async function fetchBlogSlugs(env) {
-  const url = env.VITE_SUPABASE_URL;
-  const key = env.VITE_SUPABASE_ANON_KEY;
-  if (!url || !key) {
-    console.warn("  ⚠  Supabase env vars missing — skipping dynamic blog routes.");
-    return [];
+  const source = readFileSync(file, "utf-8");
+  const routes = [];
+  const pattern = /slug:\s*"([^"]+)"[\s\S]*?published_at:\s*"([^"]+)"/g;
+
+  for (const [, slug, publishedAt] of source.matchAll(pattern)) {
+    routes.push({
+      path: `/blog/${slug}`,
+      changefreq: "monthly",
+      priority: "0.7",
+      lastmod: (publishedAt || TODAY).slice(0, 10),
+    });
   }
-  try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 15000);
-    const res = await fetch(
-      `${url}/rest/v1/blog_posts?select=slug,published_at&is_published=eq.true&order=published_at.desc`,
-      { headers: { apikey: key, Authorization: `Bearer ${key}` }, signal: ctrl.signal }
-    ).finally(() => clearTimeout(timer));
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const rows = await res.json();
-    return rows
-      .filter((r) => r && typeof r.slug === "string" && r.slug)
-      .map((r) => ({
-        path: `/blog/${r.slug}`,
-        changefreq: "monthly",
-        priority: "0.7",
-        lastmod: (r.published_at || TODAY).slice(0, 10),
-      }));
-  } catch (err) {
-    console.warn(`  ⚠  Could not fetch blog slugs (${err.message}) — skipping dynamic blog routes.`);
-    return [];
+
+  if (routes.length === 0) {
+    console.warn("  ⚠  No blog posts found in src/content/blog.ts.");
   }
+
+  return routes;
 }
 
 /* ─── write a fully-rendered page to dist/<route>/index.html ─── */
@@ -159,10 +148,8 @@ async function run() {
   }
 
   console.log("\n🔍  Pre-rendering pages for SEO...\n");
-  const env = loadEnv();
 
-  const blogRoutes = await fetchBlogSlugs(env);
-  const routes = [...STATIC_ROUTES, ...blogRoutes];
+  const routes = [...STATIC_ROUTES, ...getBlogRoutes()];
 
   /* serve the built dist/ folder */
   const server = await preview({

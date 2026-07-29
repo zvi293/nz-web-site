@@ -3,7 +3,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion, useInView } from "framer-motion";
 
-import { fetchLogos, type ClientLogo } from "@/lib/logos-api";
+import { visibleClientLogos } from "@/content/client-logos";
+import type { ClientLogo } from "@/content/types";
 import { createLabeledImageDataUri, isRenderableAssetUrl } from "@/lib/runtime-safety";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -37,61 +38,14 @@ const LogoCard = ({ logo }: { logo: ClientLogo }) => {
 };
 
 const ClientLogosSection = () => {
-  const [logos, setLogos] = useState<ClientLogo[]>([]);
-  const [shouldLoad, setShouldLoad] = useState(false);
-  const triggerRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const scrollerInnerRef = useRef<HTMLDivElement>(null);
-  const hasRequestedRef = useRef(false);
   const isInView = useInView(sectionRef, { once: true, margin: "-60px" });
 
-  useEffect(() => {
-    if (shouldLoad) return;
-
-    if (typeof window === "undefined" || typeof window.IntersectionObserver === "undefined") {
-      setShouldLoad(true);
-      return;
-    }
-
-    const target = triggerRef.current;
-    if (!target) {
-      setShouldLoad(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          setShouldLoad(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "1200px 0px" },
-    );
-
-    observer.observe(target);
-    return () => observer.disconnect();
-  }, [shouldLoad]);
-
-  useEffect(() => {
-    if (!shouldLoad || hasRequestedRef.current) return;
-
-    hasRequestedRef.current = true;
-    let active = true;
-
-    void fetchLogos().then((rows) => {
-      if (active) setLogos(rows);
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [shouldLoad]);
-
   const visibleLogos = useMemo(
-    () => logos.filter((logo) => Boolean(logo.name.trim())),
-    [logos],
+    () => visibleClientLogos.filter((logo) => Boolean(logo.name.trim())),
+    [],
   );
 
   useEffect(() => {
@@ -137,10 +91,7 @@ const ClientLogosSection = () => {
     };
   }, [visibleLogos]);
 
-  if (!shouldLoad) {
-    return <div ref={triggerRef} className="h-px w-full" aria-hidden="true" />;
-  }
-
+  /* No logos configured in src/content/client-logos.ts → the strip stays hidden. */
   if (visibleLogos.length === 0) return null;
 
   return (

@@ -1,25 +1,7 @@
-const reportedMessages = new Set<string>();
-const blockedLogoHosts = new Set(["logo.clearbit.com"]);
-
 interface DataUriOptions {
   background?: string;
   foreground?: string;
   fontSize?: number;
-}
-
-export function reportDevNoticeOnce(key: string, message: string, error?: unknown) {
-  if (!import.meta.env.DEV || reportedMessages.has(key)) {
-    return;
-  }
-
-  reportedMessages.add(key);
-
-  if (error) {
-    console.info(message, error);
-    return;
-  }
-
-  console.info(message);
 }
 
 export function isRenderableAssetUrl(value?: string | null): value is string {
@@ -55,27 +37,6 @@ export function isRenderableAssetUrl(value?: string | null): value is string {
   } catch {
     return false;
   }
-}
-
-export function isBlockedLogoUrl(value?: string | null): boolean {
-  if (!value) {
-    return false;
-  }
-
-  try {
-    const parsed = new URL(value);
-    return blockedLogoHosts.has(parsed.hostname.toLowerCase());
-  } catch {
-    return false;
-  }
-}
-
-export function normalizeLogoImageUrl(name: string, value?: string | null) {
-  if (isRenderableAssetUrl(value) && !isBlockedLogoUrl(value)) {
-    return value;
-  }
-
-  return createLabeledImageDataUri(name, { background: "#ffffff", foreground: "#0f172a", fontSize: 28 });
 }
 
 export function createLabeledImageDataUri(label: string, options: DataUriOptions = {}) {

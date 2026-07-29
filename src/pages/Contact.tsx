@@ -7,7 +7,7 @@ import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
-import { getMailtoHref, getTelHref, useContactInfo } from "@/lib/contact-utils";
+import { getMailtoHref, getTelHref, contactInfo } from "@/lib/contact-utils";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -22,8 +22,6 @@ const floatingParticles = Array.from({ length: 8 }, (_, i) => ({
 
 const Contact = () => {
   const heroRef = useRef<HTMLDivElement>(null);
-  const contact = useContactInfo();
-
   useSeoMeta({
     title: "צרו קשר | קבלו הצעת מחיר לבניית אתר | NZ-web",
     description:
@@ -35,14 +33,14 @@ const Contact = () => {
     {
       icon: Phone,
       title: "טלפון",
-      value: contact.phone,
-      href: getTelHref(contact.phone)
+      value: contactInfo.phone,
+      href: getTelHref(contactInfo.phone)
     },
     {
       icon: Mail,
       title: "אימייל",
-      value: contact.email,
-      href: getMailtoHref(contact.email)
+      value: contactInfo.email,
+      href: getMailtoHref(contactInfo.email)
     },
     {
       icon: Clock,

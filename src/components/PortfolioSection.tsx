@@ -4,9 +4,9 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
-import { SkeletonPortfolioCard } from "@/components/SkeletonCard";
 
-import { fetchProjects, type Project } from "@/lib/projects-api";
+import { featuredProjects } from "@/content/projects";
+import type { Project } from "@/content/types";
 import { createLabeledImageDataUri, isRenderableAssetUrl } from "@/lib/runtime-safety";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -93,13 +93,9 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
 );
 
 const PortfolioSection = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const projects = featuredProjects;
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    fetchProjects().then((all) => setProjects(all.filter((p) => p.featured)));
-  }, []);
 
   useEffect(() => {
     if (projects.length === 0) return;
@@ -114,20 +110,9 @@ const PortfolioSection = () => {
     return () => ctx.revert();
   }, [projects]);
 
+  /* Content is static — this only happens if every project is unpublished. */
   if (projects.length === 0) {
-    return (
-      <section dir="rtl" className="relative overflow-hidden bg-background py-10 md:py-14">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="mb-10 text-center">
-            <div className="mx-auto mb-4 h-3 w-28 rounded-full bg-secondary/80" />
-            <div className="mx-auto h-8 w-64 rounded-xl bg-secondary/80" />
-          </div>
-          <div className="mx-auto grid max-w-5xl grid-cols-2 gap-4 md:gap-8">
-            {[1, 2, 3, 4].map((i) => <SkeletonPortfolioCard key={i} />)}
-          </div>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (

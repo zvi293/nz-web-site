@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as LucideIcons from "lucide-react";
-import { SkeletonServiceBlock } from "@/components/SkeletonCard";
 
-import { fetchServices, type ServiceRow } from "@/lib/services-api";
+import { publishedServices } from "@/content/services";
+import type { ServiceItem } from "@/content/types";
 import { isRenderableAssetUrl, isSafeInlineSvg } from "@/lib/runtime-safety";
 
 import servicePlanning from "@/assets/service-planning.webp";
@@ -21,13 +21,13 @@ const fallbackImagesByOrder: Record<number, string> = {
   4: serviceSeo,
 };
 
-const getServiceImage = (service: ServiceRow) => {
+const getServiceImage = (service: ServiceItem) => {
   return isRenderableAssetUrl(service.image)
     ? service.image
     : fallbackImagesByOrder[service.order] || servicePlanning;
 };
 
-const IconRenderer = ({ service }: { service: ServiceRow }) => {
+const IconRenderer = ({ service }: { service: ServiceItem }) => {
   if (service.iconType === "image" && isRenderableAssetUrl(service.iconImage)) {
     return <img src={service.iconImage} alt={`אייקון שירות ${service.badge}`} className="h-7 w-7 object-contain" />;
   }
@@ -51,7 +51,7 @@ const IconRenderer = ({ service }: { service: ServiceRow }) => {
 const ServiceVisual = ({
   service,
   index
-}: { service: ServiceRow; index: number; }) => {
+}: { service: ServiceItem; index: number; }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -282,11 +282,7 @@ const ServicesSection = () => {
   const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
   const blockRefs = useRef<(HTMLDivElement | null)[]>([]);
   
-  const [services, setServices] = useState<ServiceRow[]>([]);
-  
-  useEffect(() => {
-    fetchServices().then(data => setServices(data));
-  }, []);
+  const services = publishedServices;
 
   useEffect(() => {
     if (services.length === 0) return;
@@ -489,20 +485,9 @@ const ServicesSection = () => {
     };
   }, [services]);
 
+  /* Content is static — this only happens if every service is unpublished. */
   if (services.length === 0) {
-    return (
-      <section id="services" dir="rtl" className="relative overflow-hidden py-10 md:py-14" style={{ backgroundColor: "hsl(0 0% 100%)" }}>
-        <div className="container mx-auto px-5 md:px-6">
-          <div className="mx-auto mb-12 max-w-3xl text-center">
-            <div className="mx-auto mb-4 h-3 w-28 rounded-full bg-secondary/80" />
-            <div className="mx-auto h-10 w-80 rounded-xl bg-secondary/80" />
-          </div>
-          <div className="mx-auto flex max-w-6xl flex-col gap-8">
-            {[1, 2, 3].map((i) => <SkeletonServiceBlock key={i} />)}
-          </div>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (
