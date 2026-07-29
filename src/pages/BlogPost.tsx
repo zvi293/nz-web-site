@@ -159,13 +159,15 @@ const BlogPost = () => {
           {/* Cover image */}
           {post.cover_image && (
             <div className="mb-10 overflow-hidden rounded-3xl">
+              {/* fetchpriority is spread in lowercase — React 18 only forwards
+                  the DOM attribute in this spelling (camelCase lands in React 19). */}
               <img
                 src={post.cover_image}
                 alt={`${post.title} – NZ-web`}
                 width={post.cover_width}
                 height={post.cover_height}
                 className="h-auto w-full object-cover"
-                fetchPriority="high"
+                {...{ fetchpriority: "high" }}
                 decoding="async"
               />
             </div>

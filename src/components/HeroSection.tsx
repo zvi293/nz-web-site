@@ -527,8 +527,10 @@ const HeroSection = () => {
                     </div>
                     {/* viewport */}
                     <div className="relative overflow-hidden">
-                      {/* LCP element: intrinsic size + fetchPriority so the box
-                          is reserved (no CLS) and the file is requested first. */}
+                      {/* LCP element: intrinsic size + fetchpriority so the box
+                          is reserved (no CLS) and the file is requested first.
+                          Lowercase on purpose — React 18 only forwards the DOM
+                          attribute in this spelling (camelCase lands in React 19). */}
                       <img
                         src={heroVisual}
                         alt={heroImageAlt}
@@ -536,7 +538,7 @@ const HeroSection = () => {
                         height={1024}
                         className="h-auto w-full"
                         loading="eager"
-                        fetchPriority="high"
+                        {...{ fetchpriority: "high" }}
                         decoding="async"
                       />
                       {/* glass sheen sweeping across the screen */}

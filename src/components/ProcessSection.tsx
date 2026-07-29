@@ -1,6 +1,10 @@
-import { useRef } from "react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MessageCircle, PencilRuler, Code2, Rocket, Check } from "lucide-react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const steps = [
   {
@@ -234,9 +238,35 @@ const StepNode = ({
 
 const ProcessSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
+  const blobsRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-60px" });
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "6%"]);
+
+  /* Background parallax via GSAP ScrollTrigger (the codebase's scroll engine).
+     framer-motion's useScroll({ target }) was used before, but every page sits
+     inside PageTransition's transformed wrapper, which breaks its offset
+     measurement and logs a "non-static position" warning on every mount.
+     ScrollTrigger measures through transforms correctly. */
+  useEffect(() => {
+    if (!sectionRef.current || !blobsRef.current) return;
+    const tween = gsap.fromTo(
+      blobsRef.current,
+      { yPercent: 0 },
+      {
+        yPercent: 6,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 0.6,
+        },
+      },
+    );
+    return () => {
+      tween.scrollTrigger?.kill();
+      tween.kill();
+    };
+  }, []);
 
   return (
     <section
@@ -246,11 +276,11 @@ const ProcessSection = () => {
       aria-label="תהליך העבודה שלנו"
     >
       {/* Parallax ambient blobs */}
-      <motion.div className="pointer-events-none absolute inset-0" style={{ y: bgY }}>
+      <div ref={blobsRef} className="pointer-events-none absolute inset-0">
         <div className="absolute right-[-5%] top-0 h-[600px] w-[500px] rounded-full bg-blue-500/[0.04] blur-[150px]" />
         <div className="absolute left-[-5%] bottom-0 h-[500px] w-[450px] rounded-full bg-orange-500/[0.04] blur-[130px]" />
         <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/[0.03] blur-[120px]" />
-      </motion.div>
+      </div>
 
       <div className="container relative z-10 mx-auto px-5 md:px-6">
         {/* Header */}
