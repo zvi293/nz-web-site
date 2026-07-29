@@ -180,64 +180,69 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
   const BadgeIcon = config.hero.badgeIcon;
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <AmbientShapes />
       <Header />
       <BackToHome />
 
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(222,47%,10%)] via-[hsl(218,42%,16%)] to-[hsl(215,38%,22%)] py-20 md:py-28">
+      <section className="nz-brand-dark nz-grain relative overflow-hidden py-20 md:py-28">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[140px]" />
-          <div className="absolute bottom-0 right-0 h-[300px] w-[400px] rounded-full bg-emerald-500/8 blur-[100px]" />
+          <div
+            className="absolute left-1/2 top-1/2 h-[620px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(circle, hsl(var(--brand-2) / 0.3), transparent 65%)" }}
+          />
         </div>
         {/* Floating dots */}
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute h-1.5 w-1.5 rounded-full bg-primary/30"
+            className="absolute h-1.5 w-1.5 rounded-full bg-white/30"
             style={{ left: `${15 + i * 14}%`, top: `${20 + (i % 3) * 22}%` }}
             animate={{ y: [0, -18, 0], opacity: [0.3, 0.8, 0.3] }}
             transition={{ duration: 2.5 + i * 0.4, repeat: Infinity, delay: i * 0.35 }}
           />
         ))}
-        <div className="container relative z-10 mx-auto max-w-4xl px-6 text-center">
+        <div className="container relative z-10 mx-auto max-w-4xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 backdrop-blur-sm">
-              <BadgeIcon className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-white/90">{config.hero.badge}</span>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-4 py-2 backdrop-blur-md">
+              <BadgeIcon className="h-4 w-4" style={{ color: "hsl(var(--brand-3))" }} />
+              <span className="text-sm font-semibold text-white/90">{config.hero.badge}</span>
             </div>
-            <h1 className="mb-5 text-3xl font-black leading-tight text-white md:text-5xl lg:text-6xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
+            <h1 className="text-display mb-5 text-white" style={{ fontFamily: "'Heebo', sans-serif" }}>
               {config.hero.title.replace(config.hero.highlight, "")}{" "}
               <span className="text-gradient-brand">{config.hero.highlight}</span>
             </h1>
-            <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-white/65 md:text-xl">
+            <p className="text-lede mx-auto mb-10 max-w-2xl text-pretty text-white/70">
               {config.hero.subtitle}
             </p>
             {/* Hero stats */}
-            <div className="mb-10 flex flex-wrap justify-center gap-6 md:gap-10">
+            <div className="mx-auto mb-10 grid max-w-lg grid-cols-3 gap-2.5 sm:gap-4">
               {config.hero.stats.map((s, i) => (
-                <div key={i} className="flex flex-col items-center gap-1">
-                  <span className="text-2xl font-black text-white md:text-3xl">{s.value}</span>
-                  <span className="text-xs text-white/50">{s.label}</span>
+                <div
+                  key={i}
+                  className="flex flex-col items-center gap-1 rounded-2xl border border-white/10 bg-white/[0.05] px-2 py-3 backdrop-blur-md"
+                >
+                  <span className="text-xl font-black text-white sm:text-2xl md:text-3xl">{s.value}</span>
+                  <span className="text-[10.5px] text-white/55 sm:text-xs">{s.label}</span>
                 </div>
               ))}
             </div>
-            <div className="flex flex-wrap justify-center gap-3">
+            <div className="flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
               <Link
                 to="/contact/"
-                className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 text-base font-bold text-white shadow-lg shadow-primary/30 transition-all duration-300 hover:scale-[1.04] hover:brightness-110 btn-glow"
+                className="btn-brand group inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-base font-bold transition-all duration-300 hover:scale-[1.04]"
               >
                 {config.hero.ctaText}
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
               </Link>
               <Link
                 to="/projects/"
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20"
               >
                 ראו דוגמאות עבודה
               </Link>
@@ -256,7 +261,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
             transition={{ duration: 0.6 }}
             className="text-right"
           >
-            <h2 className="mb-6 text-2xl font-black leading-snug text-foreground md:text-3xl lg:text-4xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
+            <h2 className="mb-6 text-section-title text-foreground" style={{ fontFamily: "'Heebo', sans-serif" }}>
               {config.intro.title}
             </h2>
             <div className="space-y-4">
@@ -288,7 +293,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
         <section className="border-t border-border/30 py-14 md:py-20">
           <div className="container mx-auto max-w-3xl px-6">
             <motion.h2
-              className="mb-10 text-2xl font-black leading-snug text-foreground md:text-3xl lg:text-4xl"
+              className="mb-10 text-section-title text-foreground"
               style={{ fontFamily: "'Heebo', sans-serif" }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -326,8 +331,8 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
             viewport={{ once: true }}
             transition={{ duration: 0.55 }}
           >
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">מה כולל השירות</p>
-            <h2 className="text-2xl font-black text-foreground md:text-3xl lg:text-4xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
+            <p className="nz-eyebrow mb-4">מה כולל השירות</p>
+            <h2 className="text-section-title text-foreground" style={{ fontFamily: "'Heebo', sans-serif" }}>
               כל מה שאתם צריכים, במקום אחד
             </h2>
           </motion.div>
@@ -337,7 +342,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
               return (
                 <motion.div
                   key={i}
-                  className="group relative overflow-hidden rounded-2xl border border-border/40 bg-card p-6 transition-all duration-400 hover:-translate-y-1 hover:shadow-xl"
+                  className="spotlight group relative overflow-hidden rounded-[1.35rem] border border-border/50 bg-card p-6 shadow-soft transition-all duration-500 hover:-translate-y-1.5 hover:shadow-floating"
                   style={{ borderColor: `${f.accent}20` }}
                   initial={{ opacity: 0, y: 28 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -375,8 +380,8 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
               viewport={{ once: true }}
               transition={{ duration: 0.55 }}
             >
-              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">למי זה מתאים</p>
-              <h2 className="text-2xl font-black text-foreground md:text-3xl lg:text-4xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
+              <p className="nz-eyebrow mb-4">למי זה מתאים</p>
+              <h2 className="text-section-title text-foreground" style={{ fontFamily: "'Heebo', sans-serif" }}>
                 {config.whoFor.title}
               </h2>
               {config.whoFor.subtitle && (
@@ -387,7 +392,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
               {config.whoFor.items.map((item, i) => (
                 <motion.div
                   key={i}
-                  className="rounded-2xl border border-border/40 bg-card p-6 text-right"
+                  className="hover-lift rounded-2xl border border-border/50 bg-card p-6 text-right shadow-soft"
                   initial={{ opacity: 0, y: 22 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -416,8 +421,8 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
               viewport={{ once: true }}
               transition={{ duration: 0.55 }}
             >
-              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">לפי תחום</p>
-              <h2 className="text-2xl font-black text-foreground md:text-3xl lg:text-4xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
+              <p className="nz-eyebrow mb-4">לפי תחום</p>
+              <h2 className="text-section-title text-foreground" style={{ fontFamily: "'Heebo', sans-serif" }}>
                 בחרו את התחום שלכם
               </h2>
             </motion.div>
@@ -453,7 +458,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">איך זה עובד</p>
+            <p className="nz-eyebrow mb-4">איך זה עובד</p>
             <h2 className="text-2xl font-black text-foreground md:text-3xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
               תהליך העבודה שלנו
             </h2>
@@ -462,7 +467,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
             {config.process.map((step, i) => (
               <motion.div
                 key={i}
-                className="flex gap-5 rounded-2xl border border-border/40 bg-card p-5 md:p-6"
+                className="hover-lift flex gap-5 rounded-2xl border border-border/50 bg-card p-5 shadow-soft md:p-6"
                 initial={{ opacity: 0, x: -24 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -491,7 +496,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">הטכנולוגיות שאנחנו עובדים איתן</p>
+              <p className="nz-eyebrow mb-3">הטכנולוגיות שאנחנו עובדים איתן</p>
               <p className="mb-7 text-xs text-muted-foreground">סטאק מודרני, מנוסה ומוכח בפרויקטים אמיתיים</p>
               <div className="flex flex-wrap justify-center gap-2.5">
                 {config.techStack.map((tech) => (
@@ -517,7 +522,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
       <section className="py-14 md:py-20">
         <div ref={resultsRef} className="container mx-auto max-w-4xl px-6">
           <motion.p
-            className="mb-10 text-center text-sm font-semibold uppercase tracking-widest text-primary"
+            className="nz-eyebrow mx-auto mb-8 flex w-fit"
             initial={{ opacity: 0 }}
             animate={resultsInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.5 }}
@@ -528,7 +533,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
             {config.results.map((r, i) => (
               <motion.div
                 key={i}
-                className="rounded-3xl border border-border/40 bg-card p-7 text-center shadow-sm"
+                className="hover-lift rounded-[1.5rem] border border-border/50 bg-card p-7 text-center shadow-soft"
                 initial={{ opacity: 0, y: 24 }}
                 animate={resultsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: i * 0.12, duration: 0.55 }}
@@ -551,7 +556,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">שאלות ותשובות</p>
+            <p className="nz-eyebrow mb-4">שאלות ותשובות</p>
             <h2 className="text-2xl font-black text-foreground md:text-3xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
               כל מה שרציתם לדעת
             </h2>
@@ -606,27 +611,30 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
       </section>
 
       {/* ── CTA ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-emerald-950 py-20 md:py-28">
+      <section className="nz-brand-dark nz-grain relative overflow-hidden py-20 md:py-28">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[120px]" />
+          <div
+            className="absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px]"
+            style={{ background: "radial-gradient(circle, hsl(var(--brand-2) / 0.28), transparent 65%)" }}
+          />
         </div>
         <motion.div
-          className="container relative z-10 mx-auto max-w-2xl px-6 text-center"
+          className="container relative z-10 mx-auto max-w-2xl text-center"
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.65 }}
         >
-          <h2 className="mb-5 text-3xl font-black leading-tight text-white md:text-5xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
+          <h2 className="text-section-title mb-5 text-white" style={{ fontFamily: "'Heebo', sans-serif" }}>
             {config.cta.title}
           </h2>
-          <p className="mb-10 text-lg text-white/60">{config.cta.subtitle}</p>
+          <p className="text-lede mb-10 text-pretty text-white/65">{config.cta.subtitle}</p>
           <Link
             to="/contact/"
-            className="inline-flex items-center gap-2.5 rounded-2xl bg-primary px-10 py-5 text-lg font-bold text-white shadow-xl shadow-primary/30 transition-all duration-300 hover:scale-[1.04] hover:brightness-110 btn-glow"
+            className="btn-brand group inline-flex items-center gap-2.5 rounded-2xl px-10 py-5 text-lg font-bold transition-all duration-300 hover:scale-[1.04]"
           >
             {config.cta.buttonText}
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" />
           </Link>
         </motion.div>
       </section>

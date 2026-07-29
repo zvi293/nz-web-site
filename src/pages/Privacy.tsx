@@ -31,12 +31,12 @@ const Privacy = () => {
   ];
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
       <BackToHome />
 
       {/* Hero Section */}
-      <section className="relative py-16 md:py-24 bg-gradient-to-br from-[hsl(222,47%,10%)] via-[hsl(218,42%,16%)] to-[hsl(215,38%,22%)] overflow-hidden">
+      <section className="relative py-16 md:py-24 nz-brand-dark overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/30 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl"></div>
@@ -56,7 +56,7 @@ const Privacy = () => {
             >
               <Shield className="h-6 w-6 text-primary" />
             </motion.div>
-            <h1 className="font-heebo text-3xl md:text-5xl font-black text-white mb-4">
+            <h1 className="text-display font-heebo text-balance text-white mb-4">
               מדיניות פרטיות
             </h1>
             <p className="text-white/80 text-lg">

@@ -26,12 +26,10 @@ const NotFound = () => {
     <div className="flex min-h-screen flex-col bg-background" dir="rtl">
       <Header />
 
-      <main className="relative flex flex-1 items-center justify-center overflow-hidden px-6 pt-[72px]">
+      <main className="relative flex flex-1 items-center justify-center overflow-hidden px-6 pt-[68px] md:pt-[84px]">
         {/* Ambient blobs */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute right-1/4 top-0 h-[500px] w-[500px] rounded-full bg-primary/[0.05] blur-[140px]" />
-          <div className="absolute bottom-0 left-1/4 h-[400px] w-[400px] rounded-full bg-accent/[0.05] blur-[120px]" />
-        </div>
+        <div className="nz-aurora" aria-hidden="true" />
+        <div className="nz-grid opacity-60" aria-hidden="true" />
 
         <div className="relative z-10 flex flex-col items-center text-center">
           {/* Giant 404 */}
@@ -52,7 +50,7 @@ const NotFound = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="rounded-3xl border border-border/40 bg-card/90 px-8 py-6 shadow-2xl backdrop-blur-xl">
+              <div className="glass-strong ring-gradient rounded-3xl px-8 py-6">
                 <div className="mb-3 flex justify-center">
                   {/* Animated glitch emoji */}
                   <motion.span
@@ -63,7 +61,7 @@ const NotFound = () => {
                     🔍
                   </motion.span>
                 </div>
-                <p className="text-sm font-semibold uppercase tracking-widest text-primary">שגיאה 404</p>
+                <p className="nz-eyebrow">שגיאה 404</p>
                 <h1 className="mt-1 text-xl font-black text-foreground md:text-2xl">הדף לא נמצא</h1>
               </div>
             </motion.div>
@@ -90,7 +88,7 @@ const NotFound = () => {
           >
             <button
               onClick={() => navigate("/")}
-              className="inline-flex items-center gap-2.5 rounded-2xl bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-200 hover:scale-[1.04] hover:brightness-110 btn-glow"
+              className="btn-brand inline-flex items-center gap-2.5 rounded-2xl px-7 py-3.5 text-sm font-bold transition-all duration-200 hover:scale-[1.04]"
             >
               <Home className="h-4 w-4" />
               חזרה לדף הבית

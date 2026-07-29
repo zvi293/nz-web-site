@@ -54,17 +54,15 @@ const AboutIntroSection = () => {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="text-right"
           >
-            <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">
-              קצת עלינו
-            </p>
+            <span className="nz-eyebrow mb-5">קצת עלינו</span>
             <h2
-              className="mb-6 text-3xl font-black leading-tight text-foreground md:text-4xl lg:text-5xl"
+              className="text-section-title mb-6 text-foreground"
               style={{ fontFamily: "'Heebo', sans-serif" }}
             >
               לא סתם עוד סטודיו{" "}
               <span className="text-gradient-brand">לבניית אתרים</span>
             </h2>
-            <div className="space-y-4 text-base leading-[1.95] text-muted-foreground md:text-lg">
+            <div className="text-lede space-y-4 text-pretty text-muted-foreground">
               <p>
                 NZ-web הוא סטודיו קטן עם גישה גדולה. אנחנו מאמינים שאתר הוא לא רק עיצוב יפה או
                 קוד נקי — הוא הדרך של העסק שלכם לפגוש את הלקוחות שלו. ולכן אנחנו ניגשים לכל
@@ -88,7 +86,7 @@ const AboutIntroSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.1 + i * 0.08, duration: 0.5 }}
-                    className="rounded-2xl border border-border/40 bg-card p-5"
+                    className="hover-lift rounded-2xl border border-border/50 bg-card p-5 shadow-soft"
                   >
                     <div
                       className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl"
@@ -108,7 +106,7 @@ const AboutIntroSection = () => {
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
               <Link
                 to="/contact/"
-                className="inline-flex items-center gap-2 rounded-2xl bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.03] hover:brightness-110"
+                className="btn-brand inline-flex items-center gap-2 rounded-2xl px-7 py-3.5 text-sm font-bold transition-all hover:scale-[1.03]"
               >
                 דברו איתנו
                 <ArrowLeft className="h-4 w-4" />

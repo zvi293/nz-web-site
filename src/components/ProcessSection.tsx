@@ -81,11 +81,11 @@ const StepCard = ({
       initial={{ opacity: 0, x: isRight ? 40 : -40 }}
       animate={isInView ? { opacity: 1, x: 0 } : {}}
       transition={{ delay: index * 0.18 + 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative overflow-hidden rounded-2xl border p-6 backdrop-blur-sm transition-all duration-500 hover:-translate-y-1 md:rounded-3xl md:p-8"
+      className="group relative overflow-hidden rounded-[1.35rem] border p-6 backdrop-blur-md transition-all duration-500 hover:-translate-y-1.5 md:rounded-[1.75rem] md:p-8"
       style={{
-        borderColor: `rgba(${step.accentRgb},0.2)`,
-        background: `linear-gradient(135deg, hsl(var(--card)/0.97) 0%, hsl(var(--card)/0.85) 100%)`,
-        boxShadow: `0 4px 24px -6px rgba(${step.accentRgb},0.08)`,
+        borderColor: `rgba(${step.accentRgb},0.22)`,
+        background: `linear-gradient(135deg, hsl(var(--card)/0.96) 0%, hsl(var(--card)/0.82) 100%)`,
+        boxShadow: `0 10px 34px -14px rgba(${step.accentRgb},0.35), 0 2px 10px -4px rgba(${step.accentRgb},0.12)`,
       }}
     >
       {/* Hover glow */}
@@ -242,7 +242,7 @@ const ProcessSection = () => {
     <section
       ref={sectionRef}
       dir="rtl"
-      className="relative overflow-hidden py-10 md:py-14 bg-background"
+      className="relative overflow-hidden bg-surface py-14 md:py-20"
       aria-label="תהליך העבודה שלנו"
     >
       {/* Parallax ambient blobs */}
@@ -260,14 +260,12 @@ const ProcessSection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">
-            איך אנחנו עובדים
-          </p>
-          <h2 className="mb-5 text-3xl font-black leading-tight text-foreground md:text-4xl lg:text-5xl">
+          <span className="nz-eyebrow mb-5">איך אנחנו עובדים</span>
+          <h2 className="text-section-title mb-5 text-foreground">
             תהליך פשוט,{" "}
             <span className="text-gradient-brand">תוצאות יוצאות דופן</span>
           </h2>
-          <p className="mx-auto max-w-xl text-base leading-[1.9] text-muted-foreground md:text-lg">
+          <p className="text-lede mx-auto max-w-xl text-pretty text-muted-foreground">
             ארבעה שלבים ברורים מהרעיון ועד ההשקה — בלי הפתעות, בלי עיכובים מיותרים.
           </p>
         </motion.div>

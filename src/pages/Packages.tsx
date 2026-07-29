@@ -281,7 +281,7 @@ const PackageSection = ({ plan, index }: { plan: PricingPlan; index: number }) =
               rel="noopener noreferrer"
               className={`mt-6 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-bold transition-all duration-300 hover:scale-[1.02] ${
                 plan.featured
-                  ? "btn-glow bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:brightness-110"
+                  ? "btn-brand"
                   : "border border-primary/30 bg-primary/[0.06] text-primary hover:bg-primary/[0.12]"
               }`}
             >
@@ -423,7 +423,7 @@ const Packages = () => {
   }, []);
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
       <BackToHome />
       <PackageNav activeSlug={activeSlug} containerRef={sectionsRef} />
@@ -452,7 +452,7 @@ const Packages = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
-              className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.07] px-4 py-1.5 text-xs font-bold text-primary md:text-sm"
+              className="nz-eyebrow"
             >
               <Sparkles className="h-3.5 w-3.5" />
               {PACKAGES_PAGE.eyebrow} · שלוש חבילות
@@ -462,7 +462,7 @@ const Packages = () => {
               initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.08, ease: EASE }}
-              className="mt-5 text-[1.95rem] font-black leading-[1.15] text-foreground md:text-5xl"
+              className="text-display mt-5 text-balance text-foreground"
               style={{ fontFamily: "'Heebo', sans-serif" }}
             >
               בניית אתר תדמית{" "}
@@ -525,7 +525,7 @@ const Packages = () => {
       <section className="border-t border-border/30 bg-secondary/25 py-14 md:py-20">
         <div className="container mx-auto max-w-2xl px-5 md:px-6">
           <div className="mb-8 text-center">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">שאלות נפוצות</p>
+            <p className="nz-eyebrow mb-3">שאלות נפוצות</p>
             <h2
               className="text-2xl font-black text-foreground md:text-3xl"
               style={{ fontFamily: "'Heebo', sans-serif" }}
@@ -563,7 +563,7 @@ const Packages = () => {
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-glow inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-8 py-4 text-sm font-bold text-primary-foreground shadow-lg transition-all hover:scale-[1.03] hover:brightness-110 sm:w-auto"
+                className="btn-brand inline-flex w-full items-center justify-center gap-2 rounded-2xl px-8 py-4 text-sm font-bold transition-all hover:scale-[1.03] sm:w-auto"
               >
                 <MessageCircle className="h-4 w-4" />
                 {PACKAGES_PAGE.ctaButton}

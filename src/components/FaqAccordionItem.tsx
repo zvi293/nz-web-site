@@ -12,15 +12,17 @@ const FaqAccordionItem = ({ faq }: { faq: FaqEntry }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/40 bg-card">
+    <div className="overflow-hidden rounded-2xl border border-border/50 bg-card shadow-soft transition-shadow duration-300 hover:shadow-elevated">
       <button
         onClick={() => setOpen(!open)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-4 px-5 py-4 text-right"
+        className="group flex w-full items-center justify-between gap-4 px-5 py-4 text-right"
       >
-        <span className="text-sm font-bold text-foreground md:text-base">{faq.q}</span>
+        <span className="text-sm font-bold text-foreground transition-colors duration-200 group-hover:text-primary md:text-base">
+          {faq.q}
+        </span>
         <ChevronDown
-          className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+          className={`h-4 w-4 shrink-0 text-muted-foreground transition-all duration-300 group-hover:text-primary ${open ? "rotate-180 text-primary" : ""}`}
         />
       </button>
       <motion.div

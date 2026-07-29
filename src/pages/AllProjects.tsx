@@ -59,17 +59,17 @@ const AllProjects = () => {
   }, [projects]);
 
   return (
-    <div dir="rtl" className="min-h-screen bg-background pt-[72px]">
+    <div dir="rtl" className="min-h-screen bg-background pt-[68px] md:pt-[84px]">
       <Header />
       <BackToHome />
 
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-20">
         {/* Header */}
         <div className="mb-12 text-center md:mb-16">
-          <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">
+          <p className="nz-eyebrow mb-5">
             פורטפוליו
           </p>
-          <h1 className="text-3xl font-black leading-tight text-foreground md:text-4xl lg:text-5xl">
+          <h1 className="text-section-title text-foreground">
             הפרויקטים שלנו
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
@@ -89,7 +89,7 @@ const AllProjects = () => {
               href={project.link || "#"}
               target={project.link ? "_blank" : "_self"}
               rel="noopener noreferrer"
-              className="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-border/40 bg-card shadow-[0_4px_24px_-6px_hsl(var(--foreground)/0.06)] transition-all duration-500 hover:-translate-y-2 hover:border-primary/25 hover:shadow-[0_20px_60px_-12px_hsl(var(--primary)/0.15)] md:rounded-3xl"
+              className="spotlight group relative flex cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border border-border/50 bg-card shadow-[0_4px_24px_-6px_hsl(var(--foreground)/0.06)] transition-all duration-500 hover:-translate-y-2 hover:border-primary/25 hover:shadow-[0_20px_60px_-12px_hsl(var(--primary)/0.15)] md:rounded-3xl"
             >
               {/* Image with hover overlay */}
               <div className="relative h-44 overflow-hidden md:h-56">
@@ -151,7 +151,7 @@ const AllProjects = () => {
           <p className="mb-4 text-lg text-muted-foreground">רוצים פרויקט כזה? בואו נדבר.</p>
           <Link
             to="/contact/"
-            className="inline-block rounded-2xl bg-primary px-10 py-4 text-base font-bold text-primary-foreground shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl btn-glow"
+            className="btn-brand inline-block rounded-2xl px-10 py-4 text-base font-bold text-primary-foreground shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl btn-glow"
           >
             צרו קשר
           </Link>

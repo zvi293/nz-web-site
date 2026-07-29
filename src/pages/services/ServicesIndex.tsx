@@ -103,7 +103,7 @@ const ServicesIndex = () => {
   useBreadcrumb({ name: "שירותים", path: "/services" });
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <AmbientShapes />
       <Header />
       <BackToHome />
@@ -119,7 +119,7 @@ const ServicesIndex = () => {
             initial={{ opacity: 0, y: 16 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5 }}
-            className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary"
+            className="nz-eyebrow mb-5"
           >
             מה אנחנו עושים
           </motion.p>
@@ -238,7 +238,7 @@ const ServicesIndex = () => {
       <section className="bg-secondary/30 py-14 md:py-18">
         <div className="container mx-auto max-w-4xl px-6">
           <motion.p
-            className="mb-8 text-center text-sm font-semibold uppercase tracking-widest text-primary"
+            className="nz-eyebrow mx-auto mb-6 flex w-fit"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -269,7 +269,7 @@ const ServicesIndex = () => {
       </section>
 
       {/* ── CTA ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-emerald-950 py-20 text-center md:py-28">
+      <section className="relative overflow-hidden nz-brand-dark py-20 text-center md:py-28">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[130px]" />
         </div>
@@ -288,7 +288,7 @@ const ServicesIndex = () => {
           </p>
           <button
             onClick={() => navigate("/contact/")}
-            className="inline-flex items-center gap-2.5 rounded-2xl bg-primary px-10 py-5 text-lg font-bold text-white shadow-xl shadow-primary/30 transition-all duration-300 hover:scale-[1.04] hover:brightness-110 btn-glow"
+            className="btn-brand inline-flex items-center gap-2.5 rounded-2xl px-10 py-5 text-lg font-bold transition-all duration-300 hover:scale-[1.04]"
           >
             <MessageCircle className="h-5 w-5" />
             פגישת ייעוץ ללא עלות

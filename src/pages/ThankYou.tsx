@@ -37,7 +37,7 @@ const ThankYou = () => {
   ];
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
 
       {/* Main Content */}
@@ -81,7 +81,7 @@ const ThankYou = () => {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="space-y-3"
             >
-              <h1 className="font-heebo text-3xl md:text-5xl font-black text-foreground">
+              <h1 className="text-display font-heebo text-balance text-foreground">
                 הפנייה נשלחה בהצלחה!
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground">
@@ -131,7 +131,7 @@ const ThankYou = () => {
             >
               <Link
                 to="/"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground font-bold px-8 py-3 hover:shadow-lg hover:scale-105 transition-all duration-300"
+                className="btn-brand inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 font-bold transition-all duration-300 hover:scale-105"
               >
                 חזרה לדף הבית
                 <ArrowRight className="h-4 w-4" />

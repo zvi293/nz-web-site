@@ -83,12 +83,12 @@ const Terms = () => {
   ];
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
       <BackToHome />
 
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(222,47%,10%)] via-[hsl(218,42%,16%)] to-[hsl(215,38%,22%)] py-16 md:py-24">
+      <section className="relative overflow-hidden nz-brand-dark py-16 md:py-24">
         <div className="pointer-events-none absolute inset-0 opacity-10">
           <div className="absolute right-10 top-20 h-72 w-72 rounded-full bg-primary/30 blur-3xl" />
           <div className="absolute bottom-0 left-20 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
@@ -102,7 +102,7 @@ const Terms = () => {
             <div className="mx-auto mb-6 inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary/40 bg-primary/20">
               <Scale className="h-6 w-6 text-primary" />
             </div>
-            <h1 className="mb-4 font-heebo text-3xl font-black text-white md:text-5xl">
+            <h1 className="text-display mb-4 font-heebo text-balance text-white">
               תנאי שימוש
             </h1>
             <p className="text-lg text-white/80">עודכן לאחרונה: 9 במרץ 2026</p>

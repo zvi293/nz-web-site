@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Check, Crown, ArrowLeft, MessageCircle } from "lucide-react";
 import FaqAccordionItem from "@/components/FaqAccordionItem";
 import { getWhatsAppHref, contactInfo } from "@/lib/contact-utils";
+import { useSpotlight } from "@/hooks/useSpotlight";
 import {
   PRICING_PLANS,
   PRICING_FAQS,
@@ -16,25 +17,42 @@ import {
 
 /* ── single plan card ── */
 const PlanCard = ({ plan, index }: { plan: PricingPlan; index: number }) => {
+  const onSpotlight = useSpotlight();
   const waHref = getWhatsAppHref(
     contactInfo,
     `היי! אני מעוניין/ת בחבילת ${plan.name} לאתר תדמית (עלות הקמה: ${plan.setup}, ${plan.monthly} לחודש). אשמח לפרטים ולהצעה.`,
   );
   return (
   <motion.div
+    onPointerMove={onSpotlight}
     initial={{ opacity: 0, y: 28 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ delay: index * 0.08, duration: 0.5 }}
     whileHover={{ y: -10, transition: { type: "spring", stiffness: 300, damping: 18 } }}
-    className={`group relative flex flex-col rounded-3xl border bg-card p-6 transition-shadow duration-300 hover:shadow-2xl md:p-7 ${
+    className={`spotlight group relative flex flex-col rounded-[1.75rem] border bg-card p-6 transition-shadow duration-300 md:p-7 ${
       plan.featured
-        ? "border-primary/50 shadow-xl shadow-primary/10 ring-1 ring-primary/30 hover:shadow-primary/25"
-        : "border-border/40 shadow-sm"
+        ? "z-10 border-primary/40 shadow-brand ring-1 ring-primary/25"
+        : "border-border/50 shadow-soft hover:shadow-elevated"
     }`}
   >
+    {/* featured cards get a living gradient halo */}
+    {plan.featured && (
+      <>
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] opacity-70 blur-xl"
+          style={{ background: "linear-gradient(135deg, hsl(var(--brand-1) / 0.3), hsl(var(--brand-3) / 0.3))" }}
+          aria-hidden="true"
+        />
+        <div className="ring-gradient pointer-events-none absolute inset-0 rounded-[inherit]" aria-hidden="true" />
+      </>
+    )}
+
     {plan.badge && (
-      <div className="absolute -top-3 right-6 inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground shadow-md">
+      <div
+        className="absolute -top-3.5 right-6 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold text-white shadow-brand"
+        style={{ background: "linear-gradient(100deg, hsl(var(--brand-1)), hsl(var(--brand-2)) 55%, hsl(var(--brand-3)))" }}
+      >
         <Crown className="h-3.5 w-3.5" />
         {plan.badge}
       </div>
@@ -47,17 +65,25 @@ const PlanCard = ({ plan, index }: { plan: PricingPlan; index: number }) => {
     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{plan.tagline}</p>
 
     {/* prices — one-time setup + monthly retainer */}
-    <div className="mt-5 flex flex-col gap-4 border-y border-border/40 py-5">
+    <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-border/40 bg-secondary/30 p-4">
       <div>
         <p className="text-xs font-semibold text-muted-foreground">הקמה חד-פעמית</p>
         <p className="mt-0.5 text-xs text-muted-foreground/80">{plan.setupNote}</p>
         <p className="mt-1 text-xl font-black text-foreground">{plan.setup}</p>
       </div>
-      <div>
+      <div className="border-t border-border/40 pt-3.5">
         <p className="text-xs font-semibold text-muted-foreground">מנוי חודשי</p>
         <p className="mt-0.5 text-xs text-muted-foreground/80">{plan.monthlyNote}</p>
         <div className="mt-1 flex items-baseline gap-1.5">
-          <span className="text-3xl font-black text-foreground">{plan.monthly}</span>
+          <span className="text-4xl font-black text-transparent"
+            style={{
+              backgroundImage: "linear-gradient(120deg, hsl(var(--brand-1)), hsl(var(--brand-2)) 60%, hsl(var(--brand-3)))",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+            }}
+          >
+            {plan.monthly}
+          </span>
           <span className="text-sm text-muted-foreground">/ לחודש</span>
         </div>
       </div>
@@ -88,9 +114,9 @@ const PlanCard = ({ plan, index }: { plan: PricingPlan; index: number }) => {
       href={waHref}
       target="_blank"
       rel="noopener noreferrer"
-      className={`mt-6 inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-bold transition-all duration-300 hover:scale-[1.03] ${
+      className={`mt-6 inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-4 text-sm font-bold transition-all duration-300 hover:scale-[1.03] ${
         plan.featured
-          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:brightness-110 btn-glow"
+          ? "btn-brand"
           : "border border-primary/30 bg-primary/[0.06] text-primary hover:bg-primary/[0.12]"
       }`}
     >
@@ -149,25 +175,34 @@ const PricingSection = ({ id = "pricing", withFaqSchema = true }: PricingSection
   }, [withFaqSchema]);
 
   return (
-    <section id={id} dir="rtl" aria-labelledby="pricing-heading" className="scroll-mt-24 border-t border-border/30 bg-secondary/20 py-16 md:py-24">
-      <div className="container mx-auto max-w-6xl px-5 md:px-6">
+    <section
+      id={id}
+      dir="rtl"
+      aria-labelledby="pricing-heading"
+      className="relative scroll-mt-24 overflow-hidden border-y border-border/40 bg-background py-16 md:py-24"
+    >
+      {/* atmosphere */}
+      <div className="nz-aurora opacity-60" aria-hidden="true" />
+      <div className="nz-grid opacity-50" aria-hidden="true" />
+
+      <div className="container relative z-10 mx-auto max-w-6xl">
         {/* heading */}
         <motion.div
-          className="mx-auto mb-12 max-w-2xl text-center"
+          className="mx-auto mb-12 max-w-2xl text-center md:mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.55 }}
         >
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">אתרי תדמית</p>
-          <h2 id="pricing-heading" className="text-2xl font-black text-foreground md:text-3xl lg:text-4xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
-            חבילות לאתר תדמית
+          <span className="nz-eyebrow mb-5">אתרי תדמית</span>
+          <h2 id="pricing-heading" className="text-section-title text-foreground" style={{ fontFamily: "'Heebo', sans-serif" }}>
+            חבילות ל<span className="text-gradient-brand">אתר תדמית</span>
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">{PRICING_INTRO}</p>
+          <p className="text-lede mt-4 text-pretty text-muted-foreground">{PRICING_INTRO}</p>
         </motion.div>
 
         {/* plan cards */}
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {PRICING_PLANS.map((plan, i) => (
             <PlanCard key={plan.slug} plan={plan} index={i} />
           ))}

@@ -18,8 +18,9 @@ const ScrollProgressBar = () => {
       className="fixed top-0 left-0 right-0 z-[200] h-[3px] origin-left"
       style={{
         scaleX,
-        background: "linear-gradient(90deg, hsl(217,91%,50%), hsl(199,89%,48%), hsl(217,91%,60%))",
-        boxShadow: "0 0 8px 1px hsl(217,91%,60%/0.5)",
+        background:
+          "linear-gradient(90deg, hsl(var(--brand-1)), hsl(var(--brand-2)) 50%, hsl(var(--brand-3)))",
+        boxShadow: "0 0 12px 1px hsl(var(--brand-2) / 0.55)",
       }}
     />
   );

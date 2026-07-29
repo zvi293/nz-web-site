@@ -63,14 +63,14 @@ const Contact = () => {
   }, []);
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
 
       {/* ג”€ג”€ Hero Banner ג”€ג”€ */}
       <section
         ref={heroRef}
-        className="relative overflow-hidden bg-gradient-to-br from-[hsl(220,35%,18%)] via-[hsl(218,32%,24%)] to-[hsl(215,30%,30%)] py-24 md:py-32">
-        
+        className="nz-brand-dark nz-grain relative overflow-hidden py-24 md:py-32">
+
         {/* Floating particles */}
         {floatingParticles.map((p) =>
         <motion.div
@@ -98,17 +98,28 @@ const Contact = () => {
 
         {/* Radial glow */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/10 blur-[120px]" />
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[620px] h-[620px] rounded-full blur-[120px]"
+            style={{ background: "radial-gradient(circle, hsl(var(--brand-2) / 0.32), transparent 65%)" }}
+          />
+          <div
+            className="absolute bottom-0 right-[10%] w-[320px] h-[320px] rounded-full blur-[110px]"
+            style={{ background: "radial-gradient(circle, hsl(var(--brand-1) / 0.26), transparent 65%)" }}
+          />
         </div>
 
-        <div className="relative z-10 container mx-auto max-w-4xl px-6 text-center">
-          <h1 className="hero-anim text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-5 leading-tight font-heebo">
+        <div className="relative z-10 container mx-auto max-w-4xl text-center">
+          <span className="hero-anim nz-eyebrow mb-6 border-white/15 bg-white/[0.07] text-white/85">
+            <Sparkles className="h-3.5 w-3.5" />
+            שיחת ייעוץ ראשונה ללא עלות
+          </span>
+          <h1 className="hero-anim text-display mb-5 text-white font-heebo">
             בואו נבנה משהו
-            <span className="text-primary"> מדהים </span>
+            <span className="text-gradient-brand"> מדהים </span>
             יחד
           </h1>
 
-          <p className="hero-anim text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed font-heebo">
+          <p className="hero-anim text-lede mx-auto max-w-2xl text-pretty text-white/70 font-heebo">
             ספרו לנו על הפרויקט שלכם ואנחנו נחזור אליכם עם הצעה מותאמת אישית
           </p>
         </div>
@@ -125,7 +136,7 @@ const Contact = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
-                className="group flex flex-col items-center gap-2 rounded-2xl border border-border/50 bg-card p-5 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center">
+                className="group flex flex-col items-center gap-2 rounded-2xl border border-border/50 bg-card p-5 text-center shadow-elevated transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/25 hover:shadow-floating">
                 
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
                     <Icon className="h-5 w-5" />

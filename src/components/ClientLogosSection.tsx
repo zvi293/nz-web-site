@@ -24,7 +24,7 @@ const LogoCard = ({ logo }: { logo: ClientLogo }) => {
   }, [fallbackSrc, logo.image]);
 
   return (
-    <div className="flex h-20 w-32 flex-shrink-0 items-center justify-center rounded-2xl border border-border/40 bg-card/80 p-4 grayscale backdrop-blur-sm transition-all duration-400 hover:border-primary/20 hover:shadow-lg hover:grayscale-0 hover:scale-105 md:h-24 md:w-40 md:p-5">
+    <div className="flex h-20 w-32 flex-shrink-0 items-center justify-center rounded-2xl border border-border/50 bg-card/80 p-4 opacity-70 grayscale backdrop-blur-sm transition-all duration-500 hover:scale-105 hover:border-primary/25 hover:opacity-100 hover:shadow-elevated hover:grayscale-0 md:h-24 md:w-40 md:p-5">
       <img
         src={src}
         alt={`לוגו לקוח - ${logo.name}`}
@@ -98,11 +98,11 @@ const ClientLogosSection = () => {
     <section
       ref={sectionRef}
       dir="rtl"
-      className="relative overflow-hidden py-8 md:py-12"
+      className="relative overflow-hidden bg-surface-2 py-10 md:py-14"
       aria-label="לקוחות שבחרו בנו"
     >
       {/* Subtle background */}
-      <div className="absolute inset-0 bg-secondary/30" />
+      <div className="nz-dots opacity-50" aria-hidden="true" />
 
       <div className="relative z-10">
         {/* Header */}
@@ -112,10 +112,8 @@ const ClientLogosSection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">
-            הם כבר בחרו בנו
-          </p>
-          <h2 className="text-2xl font-black text-foreground md:text-3xl lg:text-4xl">
+          <span className="nz-eyebrow mb-4">הם כבר בחרו בנו</span>
+          <h2 className="text-section-title text-foreground">
             עסקים שמאמינים ב
             <span className="text-gradient-brand">NZ-web</span>
           </h2>
@@ -124,9 +122,9 @@ const ClientLogosSection = () => {
         {/* Scrolling logos with fade masks */}
         <div className="relative">
           {/* Fade left */}
-          <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-background/0 to-background md:w-40" />
+          <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-16 bg-gradient-to-l from-surface-2/0 to-surface-2 md:w-40" />
           {/* Fade right */}
-          <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-gradient-to-r from-background/0 to-background md:w-40" />
+          <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-16 bg-gradient-to-r from-surface-2/0 to-surface-2 md:w-40" />
 
           <div ref={scrollerRef} className="relative w-full overflow-hidden">
             <div ref={scrollerInnerRef} className="flex w-max gap-5 md:gap-7">

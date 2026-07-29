@@ -48,9 +48,9 @@ const CookieConsent = () => {
           className="fixed bottom-4 left-4 right-4 md:left-4 md:right-auto md:max-w-md z-[9999]"
           dir="rtl"
         >
-          <div className="bg-background/95 backdrop-blur-md border border-border rounded-xl shadow-2xl p-5">
+          <div className="glass-strong ring-gradient rounded-2xl p-5">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+              <div className="shrink-0 rounded-xl bg-gradient-to-br from-brand-1/15 to-brand-3/15 p-2.5">
                 <Cookie className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1 space-y-3">
@@ -62,7 +62,7 @@ const CookieConsent = () => {
                 <Button
                   onClick={handleAccept}
                   size="sm"
-                  className="w-full transition-all duration-200 hover:shadow-lg"
+                  className="btn-brand w-full rounded-xl"
                 >
                   אישור
                 </Button>

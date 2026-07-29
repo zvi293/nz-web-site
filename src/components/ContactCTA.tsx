@@ -1,9 +1,9 @@
 import { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MessageCircle } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Button } from "@/components/ui/button";
+import { contactInfo, getWhatsAppHref } from "@/lib/contact-utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -194,20 +194,21 @@ const ContactCTA = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden py-14 md:py-20"
+      className="nz-grain relative overflow-hidden py-16 md:py-24"
       dir="rtl"
     >
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] via-background to-accent/[0.08]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-1/[0.07] via-background to-brand-3/[0.09]" />
+      <div className="nz-grid opacity-60" aria-hidden="true" />
 
       {/* Orbs */}
-      <div ref={orb1Ref} className="absolute -top-20 right-[5%] w-[400px] h-[400px] rounded-full bg-primary/[0.1] blur-[130px]" />
-      <div ref={orb2Ref} className="absolute -bottom-16 left-[8%] w-[320px] h-[320px] rounded-full bg-primary/[0.08] blur-[110px]" />
-      <div ref={orb3Ref} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/[0.04] blur-[150px]" />
+      <div ref={orb1Ref} className="absolute -top-20 right-[5%] w-[400px] h-[400px] rounded-full bg-brand-2/[0.14] blur-[130px]" />
+      <div ref={orb2Ref} className="absolute -bottom-16 left-[8%] w-[320px] h-[320px] rounded-full bg-brand-1/[0.12] blur-[110px]" />
+      <div ref={orb3Ref} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-brand-3/[0.07] blur-[150px]" />
 
       <div className="relative z-10 container mx-auto max-w-4xl px-6">
         {/* Main card */}
-        <div ref={cardRef} className="relative rounded-[2rem] border border-primary/15 bg-card/80 backdrop-blur-xl p-10 md:p-16 text-center shadow-[0_8px_60px_-12px_hsl(var(--primary)/0.15)] overflow-hidden">
+        <div ref={cardRef} className="glass-strong ring-gradient relative overflow-hidden rounded-[2rem] p-8 text-center sm:p-10 md:p-16">
 
           {/* Animated glow line */}
           <div ref={glowLineRef} className="absolute top-0 left-0 w-1/3 h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent pointer-events-none" />
@@ -231,28 +232,39 @@ const ContactCTA = () => {
               </span>
             </div>
 
-            <h2 ref={title1Ref} className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold text-foreground leading-[1.15] font-heebo mb-1">
+            <h2 ref={title1Ref} className="text-section-title mb-1 font-heebo text-foreground">
               יש לכם רעיון?
             </h2>
-            <h2 ref={title2Ref} className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.15] font-heebo mb-5">
+            <h2 ref={title2Ref} className="text-section-title mb-5 font-heebo">
               <span className="text-gradient-brand">בואו נהפוך אותו למציאות</span>
             </h2>
 
-            <p ref={descRef} className="text-lg md:text-xl text-muted-foreground max-w-lg mx-auto mb-10 leading-relaxed font-heebo">
+            <p ref={descRef} className="text-lede mx-auto mb-9 max-w-lg text-pretty font-heebo text-muted-foreground">
               ספרו לנו על הפרויקט שלכם ונחזור אליכם עם הצעה מותאמת אישית
             </p>
 
-            <div ref={btnRef}>
-              <Link to="/contact/">
-                <Button
-                  size="lg"
-                  className="gap-2.5 text-base font-semibold px-12 py-7 rounded-2xl btn-glow hover:scale-[1.04] active:scale-[0.97] transition-transform duration-200"
-                >
-                  צרו קשר עכשיו
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
+            <div ref={btnRef} className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                to="/contact/"
+                className="btn-brand group inline-flex w-full items-center justify-center gap-2.5 rounded-2xl px-10 py-4 text-base font-bold transition-transform duration-200 hover:scale-[1.03] active:scale-[0.97] sm:w-auto sm:px-12"
+              >
+                צרו קשר עכשיו
+                <ArrowLeft className="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" />
               </Link>
+              <a
+                href={getWhatsAppHref(contactInfo)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-ghost-glass inline-flex w-full items-center justify-center gap-2 rounded-2xl px-8 py-4 text-base font-bold text-foreground sm:w-auto"
+              >
+                <MessageCircle className="h-5 w-5 text-primary" />
+                וואטסאפ
+              </a>
             </div>
+
+            <p className="mt-6 text-xs font-medium text-muted-foreground/80">
+              בדרך כלל חוזרים אליכם באותו יום עסקים · ללא התחייבות
+            </p>
           </div>
         </div>
       </div>

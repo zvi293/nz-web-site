@@ -4,12 +4,19 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "react-router-dom";
 import { scrollToSelectorWithRetry } from "@/lib/scroll-navigation";
 import { motion, useInView } from "framer-motion";
+import { ArrowLeft, Gauge, ShieldCheck, Smartphone, Sparkles } from "lucide-react";
 import heroVisual from "@/assets/hero-visual.png";
 
 const stats = [
   { value: 50, suffix: "+", label: "פרויקטים" },
   { value: 5, suffix: "+", label: "שנות ניסיון" },
   { value: 100, suffix: "%", label: "שביעות רצון" },
+];
+
+const trustPoints = [
+  { icon: Gauge, label: "ציוני ביצועים גבוהים" },
+  { icon: Smartphone, label: "מובייל-פירסט 100%" },
+  { icon: ShieldCheck, label: "נגישות ותקינה" },
 ];
 
 const AnimatedNumber = ({ value, suffix, isInView }: { value: number; suffix: string; isInView: boolean }) => {
@@ -40,6 +47,7 @@ const aboutLabel = "השירותים שלנו";
 const pricingLabel = "החבילות שלנו";
 const heroImageAlt = "NZ-web – עיצוב ופיתוח אתרים מתקדם";
 
+/* ── Stats strip — glass chips that read as "proof", not decoration ── */
 const StatsBar = () => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-20px" });
@@ -47,30 +55,67 @@ const StatsBar = () => {
   return (
     <motion.div
       ref={ref}
-      className="flex flex-wrap gap-4 pt-2 sm:gap-6"
+      className="grid w-full max-w-md grid-cols-3 gap-2 pt-1 sm:gap-3"
       initial={{ opacity: 0, y: 16 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
     >
       {stats.map((stat, i) => (
-        <div key={i} className="flex items-center gap-2.5">
-          {i > 0 && <div className="h-6 w-px bg-border/60" />}
-          <div className="flex flex-col">
-            <span className="text-xl font-black leading-none text-foreground sm:text-2xl">
-              <AnimatedNumber value={stat.value} suffix={stat.suffix} isInView={isInView} />
-            </span>
-            <span className="text-[11px] font-medium text-muted-foreground sm:text-xs">
-              {stat.label}
-            </span>
-          </div>
+        <div
+          key={i}
+          className="glass-card rounded-2xl px-3 py-2.5 text-center sm:px-4 sm:py-3"
+        >
+          <span className="block text-xl font-black leading-none text-transparent sm:text-2xl"
+            style={{
+              backgroundImage: "linear-gradient(120deg, hsl(var(--brand-1)), hsl(var(--brand-3)))",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+            }}
+          >
+            <AnimatedNumber value={stat.value} suffix={stat.suffix} isInView={isInView} />
+          </span>
+          <span className="mt-1 block text-[10.5px] font-semibold text-muted-foreground sm:text-xs">
+            {stat.label}
+          </span>
         </div>
       ))}
     </motion.div>
   );
 };
 
+/* ── Small floating credential cards over the hero visual (sm+ only) ── */
+const FloatingBadge = ({
+  className,
+  icon: Icon,
+  title,
+  subtitle,
+  delay,
+}: {
+  className: string;
+  icon: typeof Gauge;
+  title: string;
+  subtitle: string;
+  delay: number;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 14, scale: 0.9 }}
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+    className={`glass-strong pointer-events-none absolute z-20 hidden items-center gap-2.5 rounded-2xl px-3.5 py-2.5 sm:flex ${className}`}
+  >
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-1/20 to-brand-3/20 text-primary">
+      <Icon className="h-4 w-4" strokeWidth={2.2} />
+    </span>
+    <span className="text-right leading-tight">
+      <span className="block text-[13px] font-black text-foreground">{title}</span>
+      <span className="block text-[10.5px] font-medium text-muted-foreground">{subtitle}</span>
+    </span>
+  </motion.div>
+);
+
 const HeroSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
   const line1Ref = useRef<HTMLSpanElement>(null);
   const line2Ref = useRef<HTMLSpanElement>(null);
   const subtextRef = useRef<HTMLParagraphElement>(null);
@@ -89,13 +134,14 @@ const HeroSection = () => {
       const visualIntro = visualIntroRef.current;
       const visualParallax = visualParallaxRef.current;
       const visualFloat = visualFloatRef.current;
+      const badge = badgeRef.current;
       const line1 = line1Ref.current;
       const line2 = line2Ref.current;
       const subtext = subtextRef.current;
       const buttons = buttonsRef.current;
 
       if (prefersReducedMotion) {
-        gsap.set([visualIntro, visualParallax, visualFloat, line1, line2, subtext, buttons], {
+        gsap.set([visualIntro, visualParallax, visualFloat, badge, line1, line2, subtext, buttons], {
           clearProps: "all",
           opacity: 1,
           x: 0,
@@ -115,9 +161,10 @@ const HeroSection = () => {
         transformOrigin: "50% 50%",
       });
       gsap.set(visualParallax, { y: 0 });
-      gsap.set([line1, line2, subtext, buttons], { opacity: 0 });
-      gsap.set(line1, { x: 34, y: 14 });
-      gsap.set(line2, { x: 40, y: 18 });
+      gsap.set([badge, subtext, buttons], { opacity: 0 });
+      /* Lines rise out of their overflow-hidden mask — the classic editorial reveal. */
+      gsap.set([line1, line2], { opacity: 0, yPercent: 108 });
+      gsap.set(badge, { y: -12 });
       gsap.set(subtext, { y: 18 });
       gsap.set(buttons, { y: 20, scale: 0.97, transformOrigin: "50% 50%" });
 
@@ -163,16 +210,20 @@ const HeroSection = () => {
         });
       }
 
+      if (badge) {
+        tl.to(badge, { opacity: 1, y: 0, duration: 0.6 }, "-=1.1");
+      }
+
       if (line1) {
         tl.to(
           line1,
           {
             opacity: 1,
-            x: 0,
-            y: 0,
-            duration: 0.82,
+            yPercent: 0,
+            duration: 0.9,
+            ease: "expo.out",
           },
-          "-=0.54",
+          "-=0.62",
         );
       }
 
@@ -181,11 +232,11 @@ const HeroSection = () => {
           line2,
           {
             opacity: 1,
-            x: 0,
-            y: 0,
-            duration: 0.9,
+            yPercent: 0,
+            duration: 0.98,
+            ease: "expo.out",
           },
-          "-=0.58",
+          "-=0.74",
         );
       }
 
@@ -197,7 +248,7 @@ const HeroSection = () => {
             y: 0,
             duration: 0.72,
           },
-          "-=0.44",
+          "-=0.5",
         );
       }
 
@@ -210,12 +261,22 @@ const HeroSection = () => {
             scale: 1,
             duration: 0.68,
           },
-          "-=0.36",
+          "-=0.4",
         );
       }
     }, sectionRef);
 
+    /* Failsafe — the headline is the single most important element on the site,
+       and the intro starts it at opacity 0. If rAF never runs (background tab on
+       first paint, a throttling browser, a stalled tween), snap the timeline to
+       its end so the hero can never be left invisible. */
+    const failsafe = window.setTimeout(() => {
+      const tl = introTimelineRef.current;
+      if (tl && tl.progress() < 1) tl.progress(1);
+    }, 3000);
+
     return () => {
+      window.clearTimeout(failsafe);
       parallaxTweenRef.current?.kill();
       parallaxTweenRef.current = null;
       introTimelineRef.current?.kill();
@@ -236,7 +297,7 @@ const HeroSection = () => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!finePointer || reduced) return;
 
-    const MAX_DEG = 20; // tilt amount (degrees)
+    const MAX_DEG = 18; // tilt amount (degrees)
     const MAX_SHIFT = 16; // positional drift toward the cursor (px) — adds depth
     const onMove = (e: MouseEvent) => {
       const rect = section.getBoundingClientRect();
@@ -286,8 +347,8 @@ const HeroSection = () => {
       const dir = delta > 0 ? 1 : -1; // down → +, up → −
       gsap.to(tilt, {
         transformPerspective: 1100, // 3D depth lives on the element itself — never depends on a parent
-        rotateX: dir * 22,
-        y: dir * 10,
+        rotateX: dir * 18,
+        y: dir * 9,
         duration: 0.45,
         ease: "power2.out",
       });
@@ -306,54 +367,93 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} dir="rtl" aria-label={heroAriaLabel} className="relative overflow-hidden bg-background">
-      {/* Subtle ambient shapes */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-32 right-1/4 h-[500px] w-[500px] rounded-full bg-primary/[0.04] blur-[120px]" />
-        <div className="absolute bottom-0 left-1/4 h-[350px] w-[350px] rounded-full bg-primary/[0.03] blur-[100px]" />
-        <div className="absolute top-1/2 right-[10%] h-[200px] w-[200px] rounded-full bg-accent/[0.05] blur-[80px]" />
-      </div>
+    <section
+      ref={sectionRef}
+      dir="rtl"
+      aria-label={heroAriaLabel}
+      className="nz-grain relative overflow-hidden bg-background"
+    >
+      {/* ── Atmosphere: aurora + technical grid + a soft ceiling wash ── */}
+      <div className="nz-aurora" aria-hidden="true" />
+      <div className="nz-grid opacity-70" aria-hidden="true" />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-56 opacity-70"
+        style={{ background: "linear-gradient(to bottom, hsl(var(--brand-2) / 0.07), transparent)" }}
+        aria-hidden="true"
+      />
 
-      <div className="container relative z-10 mx-auto flex min-h-[78vh] flex-col items-center gap-8 px-5 py-10 sm:gap-12 sm:py-14 lg:min-h-[88vh] lg:flex-row lg:gap-20 lg:py-0">
+      <div className="container relative z-10 mx-auto flex min-h-[calc(100svh-140px)] flex-col items-center gap-9 py-10 sm:gap-12 sm:py-14 lg:min-h-[calc(100svh-72px)] lg:flex-row lg:gap-16 lg:py-0 xl:gap-20">
         {/* Right Side - Content */}
-        <div className="flex flex-1 flex-col items-start gap-5 sm:gap-7">
+        <div className="flex flex-1 flex-col items-start gap-5 sm:gap-6">
+          {/* Availability pill */}
+          <div ref={badgeRef} className="nz-eyebrow">
+            <span className="relative flex h-2 w-2">
+              <span className="nz-pulse-ring absolute inline-flex h-full w-full rounded-full bg-emerald-500" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
+            פנויים לפרויקטים חדשים
+            <Sparkles className="h-3.5 w-3.5" />
+          </div>
+
           {/* Headline */}
-          <h1 className="text-[2.2rem] font-black leading-[1.1] tracking-tight text-foreground sm:text-[2.75rem] md:text-[3.5rem] lg:text-[4.25rem] xl:text-[5rem]">
-            <span ref={line1Ref} className="block">{heroLine1}</span>
-            <span ref={line2Ref} className="mt-1 block whitespace-nowrap text-gradient-brand sm:mt-2">
-              {heroLine2}
+          <h1 className="text-display text-foreground">
+            <span className="reveal-mask">
+              <span ref={line1Ref} className="block">{heroLine1}</span>
+            </span>
+            <span className="reveal-mask mt-0.5 sm:mt-1.5">
+              <span
+                ref={line2Ref}
+                className="block whitespace-normal text-gradient-brand sm:whitespace-nowrap"
+              >
+                {heroLine2}
+              </span>
             </span>
           </h1>
 
           {/* Subtext */}
           <p
             ref={subtextRef}
-            className="max-w-md text-[1rem] leading-[1.85] text-muted-foreground sm:text-[1.1rem] md:text-lg">
+            className="text-lede max-w-lg text-pretty text-muted-foreground">
             {heroParagraph}
           </p>
 
           {/* Buttons */}
-          <div ref={buttonsRef} className="flex flex-wrap gap-3 pt-1 sm:gap-4 sm:pt-2">
+          {/* Mobile: one full-width primary, then the two secondaries side by side.
+              sm+: everything collapses onto a single inline row (`sm:contents`). */}
+          <div ref={buttonsRef} className="flex w-full max-w-md flex-col gap-2.5 pt-1 sm:max-w-none sm:flex-row sm:flex-wrap sm:gap-3.5">
             <Link
               to="/contact/"
-              className="btn-glow rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground transition-all duration-200 hover:scale-[1.04] hover:brightness-110 active:scale-[0.97] sm:px-10 sm:py-4 sm:text-base">
+              className="btn-brand group inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-[15px] font-bold hover:scale-[1.03] active:scale-[0.97] sm:px-9 sm:text-base">
               {contactLabel}
+              <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
             </Link>
-            <Link
-              to="/services/"
-              className="rounded-xl border border-border/80 bg-background px-8 py-3.5 text-sm font-medium text-foreground transition-all duration-200 hover:scale-[1.04] hover:border-primary/30 hover:bg-primary/[0.04] active:scale-[0.97] sm:px-10 sm:py-4 sm:text-base">
-              {aboutLabel}
-            </Link>
-            <a
-              href="#pricing"
-              onClick={(e) => { e.preventDefault(); scrollToSelectorWithRetry("#pricing"); }}
-              className="rounded-xl border border-primary/30 bg-primary/[0.06] px-8 py-3.5 text-sm font-semibold text-primary transition-all duration-200 hover:scale-[1.04] hover:bg-primary/[0.12] active:scale-[0.97] sm:px-10 sm:py-4 sm:text-base">
-              {pricingLabel}
-            </a>
+            <div className="grid grid-cols-2 gap-2.5 sm:contents">
+              <Link
+                to="/services/"
+                className="btn-ghost-glass inline-flex items-center justify-center rounded-2xl px-4 py-4 text-[14px] font-semibold text-foreground hover:scale-[1.03] active:scale-[0.97] sm:px-9 sm:text-base">
+                {aboutLabel}
+              </Link>
+              <a
+                href="#pricing"
+                onClick={(e) => { e.preventDefault(); scrollToSelectorWithRetry("#pricing"); }}
+                className="inline-flex items-center justify-center rounded-2xl border border-primary/25 bg-primary/[0.06] px-4 py-4 text-[14px] font-semibold text-primary transition-all duration-200 hover:scale-[1.03] hover:bg-primary/[0.12] active:scale-[0.97] sm:px-9 sm:text-base">
+                {pricingLabel}
+              </a>
+            </div>
           </div>
 
-          {/* Stats bar */}
+          {/* Stats */}
           <StatsBar />
+
+          {/* Trust row */}
+          <ul className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-medium text-muted-foreground sm:gap-x-5 sm:text-[13px]">
+            {trustPoints.map(({ icon: Icon, label }) => (
+              <li key={label} className="flex items-center gap-1.5">
+                <Icon className="h-3.5 w-3.5 text-primary" strokeWidth={2.2} />
+                {label}
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* Left Side - Visual */}
@@ -363,12 +463,40 @@ const HeroSection = () => {
               {/* float wrapper (CSS keyframe drift) → tilt wrapper (GSAP 3D tilt).
                   The tilt carries its own transformPerspective, so the 3D effect
                   never depends on — and can never be flattened by — a parent. */}
-              <div ref={visualFloatRef} className="nz-hero-float will-change-transform">
-                <div ref={tiltRef} className="will-change-transform">
-                  <img
-                    src={heroVisual}
-                    alt={heroImageAlt}
-                    className="soft-shadow-lg mx-auto w-full max-w-sm rounded-2xl sm:max-w-md lg:max-w-xl"
+              <div ref={visualFloatRef} className="nz-hero-float relative will-change-transform">
+                {/* glow bed behind the artwork */}
+                <div
+                  className="pointer-events-none absolute inset-6 -z-10 rounded-full opacity-70 blur-[70px]"
+                  style={{
+                    background:
+                      "radial-gradient(circle, hsl(var(--brand-2) / 0.35), hsl(var(--brand-1) / 0.2) 45%, transparent 70%)",
+                  }}
+                  aria-hidden="true"
+                />
+                <div ref={tiltRef} className="relative mx-auto w-full max-w-sm will-change-transform sm:max-w-md lg:max-w-xl">
+                  <div className="ring-gradient overflow-hidden rounded-[1.75rem] shadow-floating">
+                    <img
+                      src={heroVisual}
+                      alt={heroImageAlt}
+                      className="w-full"
+                      loading="eager"
+                      decoding="async"
+                    />
+                  </div>
+
+                  <FloatingBadge
+                    className="-top-4 right-2 lg:-right-6"
+                    icon={Gauge}
+                    title="ביצועים מהירים"
+                    subtitle="טעינה חדה בכל מכשיר"
+                    delay={1.15}
+                  />
+                  <FloatingBadge
+                    className="-bottom-5 left-2 lg:-left-8"
+                    icon={Smartphone}
+                    title="מובייל-פירסט"
+                    subtitle="מושלם בכל מסך"
+                    delay={1.35}
                   />
                 </div>
               </div>
@@ -377,8 +505,18 @@ const HeroSection = () => {
         </div>
       </div>
 
+      {/* Scroll cue — desktop only, sits inside the hero's bottom padding */}
+      <div className="pointer-events-none absolute bottom-5 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1.5 lg:flex">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">
+          גלול
+        </span>
+        <span className="flex h-8 w-5 items-start justify-center rounded-full border border-border pt-1.5">
+          <span className="nz-scroll-cue h-1.5 w-1 rounded-full bg-primary" />
+        </span>
+      </div>
+
       {/* Bottom fade divider */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-background to-transparent" />
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 };

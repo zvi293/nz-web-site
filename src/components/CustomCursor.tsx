@@ -21,6 +21,15 @@ const CustomCursor = () => {
     return () => mediaQuery.removeListener(updateEnabledState);
   }, []);
 
+  /* Only hide the native cursor while ours is actually on screen — the CSS rule
+     in index.css keys off this attribute instead of a blanket `cursor: none`. */
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isEnabled) root.setAttribute("data-custom-cursor", "on");
+    else root.removeAttribute("data-custom-cursor");
+    return () => root.removeAttribute("data-custom-cursor");
+  }, [isEnabled]);
+
   useEffect(() => {
     if (!isEnabled) {
       return;
@@ -102,10 +111,11 @@ const CustomCursor = () => {
           width: 16,
           height: 16,
           borderRadius: "50%",
-          background: "radial-gradient(circle, hsl(217 91% 65%), hsl(217 91% 50%))",
+          background: "radial-gradient(circle, hsl(var(--brand-3)), hsl(var(--brand-2)) 70%)",
           transform: "translate(-50%, -50%)",
           mixBlendMode: "normal",
-          boxShadow: "0 0 12px 3px hsl(217 91% 60% / 0.4), 0 0 24px 6px hsl(217 91% 60% / 0.15)",
+          boxShadow:
+            "0 0 12px 3px hsl(var(--brand-2) / 0.45), 0 0 26px 8px hsl(var(--brand-1) / 0.18)",
         }}
       />
       {/* Outer follower ring - larger, softer glow */}
@@ -116,10 +126,10 @@ const CustomCursor = () => {
           width: 52,
           height: 52,
           borderRadius: "50%",
-          background: "hsl(217 91% 60% / 0.08)",
-          border: "1.5px solid hsl(217 91% 60% / 0.25)",
+          background: "hsl(var(--brand-2) / 0.07)",
+          border: "1.5px solid hsl(var(--brand-2) / 0.28)",
           transform: "translate(-50%, -50%)",
-          boxShadow: "0 0 20px 4px hsl(217 91% 60% / 0.08)",
+          boxShadow: "0 0 22px 5px hsl(var(--brand-2) / 0.09)",
         }}
       />
     </>

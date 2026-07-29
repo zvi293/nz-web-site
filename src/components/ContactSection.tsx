@@ -315,9 +315,10 @@ const ContactSection = () => {
     <section
       id="contact"
       aria-label="צור קשר"
-      className="relative overflow-hidden bg-secondary/20 px-4 py-16"
+      className="relative overflow-hidden bg-surface px-4 py-16"
       dir="rtl"
     >
+      <div className="nz-aurora opacity-50" aria-hidden="true" />
       <canvas
         ref={canvasRef}
         className="pointer-events-none absolute inset-0 z-0 h-full w-full"
@@ -331,10 +332,10 @@ const ContactSection = () => {
           viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="mb-4 text-3xl font-bold text-foreground lg:text-4xl">
-            צור קשר
+          <h2 className="text-section-title mb-4 text-foreground">
+            צור <span className="text-gradient-brand">קשר</span>
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+          <p className="text-lede mx-auto max-w-2xl text-pretty text-muted-foreground">
             מעוניין בשירותים שלנו? השאר פרטים ואנחנו ניצור איתך קשר
           </p>
         </motion.div>
@@ -345,7 +346,7 @@ const ContactSection = () => {
           viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.7, delay: 0.15 }}
         >
-          <Card className="border-border/50 bg-card/95 shadow-2xl backdrop-blur-sm">
+          <Card className="ring-gradient rounded-[1.75rem] border-border/50 bg-card/95 shadow-floating backdrop-blur-md">
             <CardHeader>
               <CardTitle className="text-center text-xl">
                 פרטי יצירת קשר
@@ -444,7 +445,7 @@ const ContactSection = () => {
                       id="inquiryType"
                       {...register("inquiryType")}
                       defaultValue=""
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm ring-offset-background transition-shadow duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus:shadow-md focus:shadow-primary/10"
+                      className="flex h-12 w-full rounded-xl border border-input bg-background px-4 py-2 pr-10 text-sm ring-offset-background transition-all duration-200 hover:border-primary/30 focus-visible:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-0"
                     >
                       <option value="">בחרו אם רלוונטי</option>
                       {inquiryTypeOptions.map((option) => (
@@ -541,7 +542,7 @@ const ContactSection = () => {
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full gap-2 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                    className="btn-brand h-auto w-full gap-2 rounded-2xl py-4 text-base font-bold transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
                     disabled={!isValid || !acceptedTerms}
                   >
                     <MessageCircle className="h-4 w-4" />

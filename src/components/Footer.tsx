@@ -166,22 +166,39 @@ const Footer = () => {
         </div>
 
         {/* Top glow line */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+        <div
+          className="absolute top-0 left-0 right-0 h-px"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, hsl(var(--brand-1) / 0.5), hsl(var(--brand-3) / 0.6), transparent)",
+          }}
+        />
 
         <div className="relative z-10 mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
 
             {/* Column 1: Branding + tagline */}
             <div className="flex flex-col gap-5">
-              <Link to="/">
+              <Link to="/" aria-label="NZ-web — לדף הבית">
                 <motion.div
-                  className="text-3xl font-black tracking-tight text-white font-heebo"
+                  className="flex items-center gap-2.5 text-3xl font-black tracking-tight text-white font-heebo"
                   style={{ letterSpacing: "-0.02em" }}
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.04 }}
                   transition={{ type: "spring", stiffness: 400, damping: 15 }}
                 >
+                  <span
+                    className="grid h-9 w-9 place-items-center rounded-xl text-sm text-white"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, hsl(var(--brand-1)), hsl(var(--brand-2)) 55%, hsl(var(--brand-3)))",
+                      boxShadow: "0 8px 24px -8px hsl(var(--brand-2) / 0.7)",
+                    }}
+                    aria-hidden="true"
+                  >
+                    N
+                  </span>
                   NZ
-                  <span className="text-primary">-web</span>
+                  <span className="text-gradient-brand">-web</span>
                 </motion.div>
               </Link>
               <p className="text-sm leading-relaxed text-white/50 italic font-heebo">
@@ -245,7 +262,7 @@ const Footer = () => {
                     <li key={link.href}>
                       <Link
                         to={link.href}
-                        className="group inline-flex items-center gap-1.5 font-heebo text-sm text-white/65 transition-all duration-200 hover:text-white"
+                        className="group inline-flex items-center gap-1.5 py-1.5 font-heebo text-sm text-white/70 transition-all duration-200 hover:text-white"
                       >
                         <ArrowLeft className="h-3 w-3 opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0" />
                         {link.label}
@@ -266,10 +283,10 @@ const Footer = () => {
                   <li key={link.href}>
                     <Link
                       to={link.href}
-                      className={`group inline-flex items-center gap-1.5 font-heebo text-sm transition-all duration-200 hover:text-white ${
+                      className={`group inline-flex items-center gap-1.5 py-1.5 font-heebo text-sm transition-all duration-200 hover:text-white ${
                         link.highlight
-                          ? "font-semibold text-amber-400/80 hover:text-amber-300"
-                          : "text-white/65"
+                          ? "font-semibold text-amber-400/90 hover:text-amber-300"
+                          : "text-white/70"
                       }`}
                     >
                       <ArrowLeft className="h-3 w-3 opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0" />

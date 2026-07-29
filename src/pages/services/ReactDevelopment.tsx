@@ -97,7 +97,7 @@ const ReactDevelopment = () => {
   }, []);
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
       <BackToHome />
 
@@ -113,7 +113,7 @@ const ReactDevelopment = () => {
               <Layers className="h-4 w-4" />
               <span className="text-sm font-medium">פיתוח React</span>
             </div>
-            <h1 className="font-heebo text-3xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
+            <h1 className="text-display font-heebo text-balance text-foreground mb-4">
               פיתוח אתרי React מתקדמים
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
@@ -337,7 +337,7 @@ const ReactDevelopment = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-slate-900 via-blue-950 to-emerald-950">
+      <section className="py-16 md:py-24 nz-brand-dark">
         <div className="mx-auto max-w-2xl px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -353,7 +353,7 @@ const ReactDevelopment = () => {
             </p>
             <Link
               to="/contact/"
-              className="inline-block bg-primary text-primary-foreground font-bold text-base px-10 py-4 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+              className="btn-brand inline-block font-bold text-base px-10 py-4 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
             >
               צרו קשר
             </Link>

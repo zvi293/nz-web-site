@@ -109,19 +109,21 @@ const About = () => {
   useBreadcrumb({ name: "מי אנחנו", path: "/about" });
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <AmbientShapes />
       <Header />
       <BackToHome />
 
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden py-20 md:py-28">
-        <div className="container mx-auto max-w-3xl px-6 text-center">
+      <section className="nz-grain relative overflow-hidden py-20 md:py-28">
+        <div className="nz-aurora opacity-70" aria-hidden="true" />
+        <div className="nz-grid opacity-60" aria-hidden="true" />
+        <div className="container relative z-10 mx-auto max-w-3xl text-center">
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary"
+            className="nz-eyebrow mb-5"
           >
             {data.heroSubtitle}
           </motion.p>
@@ -129,7 +131,7 @@ const About = () => {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-6 text-4xl font-black leading-tight text-foreground md:text-6xl"
+            className="text-display mb-6 text-balance text-foreground"
             style={{ fontFamily: "'Heebo', sans-serif" }}
           >
             {data.heroTitle}
@@ -138,7 +140,7 @@ const About = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mx-auto max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl"
+            className="text-lede mx-auto max-w-xl text-pretty text-muted-foreground"
           >
             {data.heroDescription.split("\n").map((line, i, arr) => (
               <span key={i}>{line}{i < arr.length - 1 && <br className="hidden md:block" />}</span>
@@ -288,7 +290,7 @@ const About = () => {
       </section>
 
       {/* ── CTA ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-emerald-950 py-20 text-center md:py-28">
+      <section className="relative overflow-hidden nz-brand-dark py-20 text-center md:py-28">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-3xl" />
           <div className="absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-emerald-500/10 blur-3xl" />
@@ -306,7 +308,7 @@ const About = () => {
           <p className="mb-10 text-lg text-primary/90 md:text-xl">{data.ctaSubtitle}</p>
           <button
             onClick={() => { window.location.href = data.ctaButtonLink; }}
-            className="inline-block rounded-2xl bg-primary px-12 py-5 text-lg font-bold text-white shadow-lg shadow-primary/30 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/40 cursor-pointer btn-glow"
+            className="btn-brand inline-block rounded-2xl px-12 py-5 text-lg font-bold shadow-lg shadow-primary/30 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/40 cursor-pointer btn-glow"
           >
             {data.ctaButtonText}
           </button>

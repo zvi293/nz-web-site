@@ -62,7 +62,7 @@ const FAQ = () => {
   }, [faqItems]);
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
       <BackToHome />
 
@@ -78,7 +78,7 @@ const FAQ = () => {
               <HelpCircle className="h-4 w-4" />
               <span className="text-sm font-medium">שאלות נפוצות</span>
             </div>
-            <h1 className="font-heebo text-3xl md:text-5xl font-bold text-foreground mb-4">
+            <h1 className="text-display font-heebo text-balance text-foreground mb-4">
               שאלות נפוצות
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -109,7 +109,7 @@ const FAQ = () => {
                 placeholder="חפשו שאלה..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-2xl border border-border/40 bg-card px-4 pr-12 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+                className="w-full rounded-xl border border-border/60 bg-card px-4 pr-12 py-3.5 transition-all duration-200 hover:border-primary/30 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
               />
               {searchQuery && (
                 <button
@@ -172,7 +172,7 @@ const FAQ = () => {
             </p>
             <Link
               to="/contact/"
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-bold px-8 py-3 rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
+              className="btn-brand inline-flex items-center gap-2 rounded-full px-8 py-3.5 font-bold transition-all duration-300 hover:scale-105"
             >
               <ArrowRight className="h-4 w-4" />
               צרו קשר

@@ -496,30 +496,30 @@ const ServicesSection = () => {
       id="services"
       dir="rtl"
       aria-label="השירותים שלנו"
-      className="relative overflow-hidden py-10 md:py-14 lg:py-16"
-      style={{ backgroundColor: "hsl(0 0% 100%)" }}>
-      
+      className="nz-grain relative scroll-mt-24 overflow-hidden bg-surface py-14 md:py-20 lg:py-24">
+
       {/* Background ambient shapes */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 right-0 h-[600px] w-[600px] rounded-full bg-primary/[0.03] blur-[140px]" />
-        <div className="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-accent/[0.04] blur-[120px]" />
+        <div className="absolute -top-40 right-0 h-[600px] w-[600px] rounded-full bg-brand-2/[0.05] blur-[140px]" />
+        <div className="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-brand-3/[0.05] blur-[120px]" />
       </div>
+      <div className="nz-dots opacity-40" aria-hidden="true" />
 
-      <div className="container relative z-10 mx-auto px-5 md:px-6">
+      <div className="container relative z-10 mx-auto">
         {/* Section Header */}
-        <div ref={headerRef} className="mx-auto mb-10 max-w-3xl text-center md:mb-14">
-          <p className="mb-4 text-sm font-semibold tracking-widest text-primary uppercase">השירותים שלנו</p>
-          <h2 className="mb-6 text-3xl font-black leading-tight text-foreground md:text-4xl lg:text-5xl xl:text-[3.25rem]">
+        <div ref={headerRef} className="mx-auto mb-11 max-w-3xl text-center md:mb-16">
+          <span className="nz-eyebrow mb-5">השירותים שלנו</span>
+          <h2 className="text-section-title mb-5 text-foreground">
             איך אנחנו ב-<span className="text-gradient-brand">NZ-web</span> עושים את זה?
           </h2>
-          <p className="mx-auto max-w-2xl text-base leading-[1.9] text-muted-foreground md:text-lg">
+          <p className="text-lede mx-auto max-w-2xl text-pretty text-muted-foreground">
             אנחנו לא סתם בונים אתרים, אנחנו יוצרים נכסים דיגיטליים שמייצרים רווחים.
             החזון שלכם פוגש את הטכנולוגיה והעיצוב שלנו, בדרך למוצר מנצח.
           </p>
         </div>
 
         {/* Service Rows */}
-        <div className="mx-auto flex max-w-6xl flex-col gap-5 md:gap-16 lg:gap-20">
+        <div className="mx-auto flex max-w-6xl flex-col gap-7 md:gap-16 lg:gap-20">
           {services.map((service, i) =>
           <div
             key={service.id}
@@ -527,14 +527,17 @@ const ServicesSection = () => {
               rowRefs.current[i] = el;
               blockRefs.current[i] = el;
             }}
-            className="relative rounded-[2rem] p-5 md:p-12 lg:p-16 overflow-hidden">
-            
+            className="group relative overflow-hidden rounded-[1.75rem] p-6 shadow-elevated transition-shadow duration-500 hover:shadow-floating md:rounded-[2.25rem] md:p-12 lg:p-16">
+
               {/* Dynamic background per block */}
               <div
               data-block-bg
-              className="absolute inset-0 rounded-[2rem] -z-0 transition-all duration-700"
+              className="absolute inset-0 rounded-[inherit] -z-0 transition-all duration-700"
               style={{ background: service.bgGradient }} />
-            
+
+              {/* Crisp inner edge — keeps the pastel blocks from bleeding into the section */}
+              <div className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/50" />
+
 
               <div
               className={`relative z-10 flex flex-col items-center gap-5 md:gap-16 lg:flex-row lg:gap-20 ${

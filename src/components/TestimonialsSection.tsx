@@ -104,10 +104,10 @@ const TestimonialsSection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">
+          <p className="nz-eyebrow mb-5">
             מה הלקוחות אומרים
           </p>
-          <h2 className="mb-4 text-3xl font-black leading-tight text-foreground md:text-4xl lg:text-5xl">
+          <h2 className="mb-4 text-section-title text-foreground">
             לקוחות מרוצים,{" "}
             <span className="text-gradient-brand">תוצאות מדידות</span>
           </h2>

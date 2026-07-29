@@ -34,7 +34,7 @@ const PostCard = ({ post, index }: { post: BlogPost; index: number }) => {
       viewport={{ once: true }}
       transition={{ delay: index * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       onClick={() => navigate(`/blog/${post.slug}`)}
-      className="group flex cursor-pointer flex-col overflow-hidden rounded-3xl border border-border/40 bg-card transition-all duration-400 hover:-translate-y-1.5 hover:border-primary/20 hover:shadow-xl"
+      className="spotlight group flex cursor-pointer flex-col overflow-hidden rounded-[1.75rem] border border-border/50 bg-card shadow-soft transition-all duration-400 hover:-translate-y-1.5 hover:border-primary/20 hover:shadow-xl"
     >
       {/* Cover image / placeholder */}
       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-secondary to-secondary/50">
@@ -98,7 +98,7 @@ const Blog = () => {
   const availableCategories = CATEGORIES.filter((c) => c === "הכל" || posts.some((p) => p.category === c));
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <AmbientShapes />
       <Header />
       <BackToHome />
@@ -109,7 +109,7 @@ const Blog = () => {
           <div className="absolute right-1/4 top-0 h-[400px] w-[400px] rounded-full bg-primary/[0.04] blur-[130px]" />
         </div>
         <div className="container relative z-10 mx-auto max-w-3xl px-6 text-center">
-          <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">
+          <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="nz-eyebrow mb-5">
             הבלוג שלנו
           </motion.p>
           <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="mb-5 text-4xl font-black leading-tight text-foreground md:text-6xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
@@ -166,7 +166,7 @@ const Blog = () => {
             יש לכם שאלה שלא ענינו עליה?
           </h2>
           <p className="mb-8 text-muted-foreground">נשמח לדבר — שיחת ייעוץ ראשונית ללא עלות.</p>
-          <Link to="/contact/" className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 font-bold text-primary-foreground shadow-lg transition-all hover:brightness-110 hover:scale-[1.04] btn-glow">
+          <Link to="/contact/" className="btn-brand inline-flex items-center gap-2 rounded-2xl px-8 py-4 font-bold transition-all hover:scale-[1.04]">
             צרו קשר
             <ArrowLeft className="h-4 w-4" />
           </Link>

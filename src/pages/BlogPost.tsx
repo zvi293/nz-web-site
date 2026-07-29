@@ -97,7 +97,7 @@ const BlogPost = () => {
 
   if (!post) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background gap-4 pt-[72px]" dir="rtl">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background gap-4 pt-[68px] md:pt-[84px]" dir="rtl">
         <Header />
         <p className="text-xl font-bold text-foreground">המאמר לא נמצא</p>
         <Link to="/blog/" className="text-primary hover:underline">חזרה לבלוג</Link>
@@ -107,7 +107,7 @@ const BlogPost = () => {
   }
 
   return (
-    <main className="relative bg-background pt-[72px]" dir="rtl">
+    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <AmbientShapes />
       <Header />
 
@@ -131,7 +131,7 @@ const BlogPost = () => {
           </div>
 
           {/* Title */}
-          <h1 className="mb-6 text-3xl font-black leading-tight text-foreground md:text-5xl" style={{ fontFamily: "'Heebo', sans-serif" }}>
+          <h1 className="text-display mb-6 text-balance text-foreground" style={{ fontFamily: "'Heebo', sans-serif" }}>
             {post.title}
           </h1>
 
@@ -181,9 +181,9 @@ const BlogPost = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">מוכנים להתחיל?</p>
+          <p className="nz-eyebrow mb-3">מוכנים להתחיל?</p>
           <h3 className="mb-4 text-xl font-black text-foreground md:text-2xl">יש לכם פרויקט בראש?</h3>
-          <Link to="/contact/" className="inline-flex items-center gap-2 rounded-2xl bg-primary px-8 py-3.5 font-bold text-primary-foreground transition-all hover:brightness-110 hover:scale-[1.04] btn-glow">
+          <Link to="/contact/" className="btn-brand inline-flex items-center gap-2 rounded-2xl px-8 py-3.5 font-bold transition-all hover:scale-[1.04]">
             בואו נדבר
             <ArrowLeft className="h-4 w-4" />
           </Link>

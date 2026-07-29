@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import { scrollToSelectorWithRetry } from "@/lib/scroll-navigation";
-import { MessageCircle, ChevronDown, Monitor, Briefcase, CalendarDays, Target, Code2, Globe, Menu } from "lucide-react";
+import { MessageCircle, ChevronDown, Monitor, Briefcase, CalendarDays, Target, Code2, Globe, Menu, ArrowLeft, Phone } from "lucide-react";
+import { contactInfo, getTelHref, getWhatsAppHref } from "@/lib/contact-utils";
 import {
   Sheet,
   SheetContent,
@@ -36,16 +37,28 @@ const menuItems = [
   { label: "ראשי", href: "/", type: "route" },
   { label: "מי אנחנו", href: "/about/", type: "route" },
   { label: "פרויקטים", href: "/projects/", type: "route" },
+  { label: "חבילות", href: "/packages/", type: "route" },
   { label: "שאלות נפוצות", href: "/faq/", type: "route" },
   { label: "בלוג", href: "/blog/", type: "route" },
   { label: "צור קשר", href: "/contact/", type: "route" },
 ];
 
-const mobileNavLinks = [
-  { label: "שירותים", href: "/services/", type: "route" },
-  { label: "חבילות", href: "/#pricing", type: "route" },
-  { label: "אודות", href: "/about/", type: "route" },
-];
+/* ── Wordmark ── */
+const Wordmark = ({ compact = false }: { compact?: boolean }) => (
+  <span
+    className={`flex items-center gap-2 font-black tracking-tight text-foreground ${compact ? "text-lg" : "text-[22px]"}`}
+    style={{ fontFamily: "'Heebo', sans-serif", letterSpacing: "-0.03em" }}
+  >
+    <span
+      className={`grid place-items-center rounded-xl text-white shadow-brand ${compact ? "h-7 w-7 text-[11px]" : "h-8 w-8 text-xs"}`}
+      style={{ background: "linear-gradient(135deg, hsl(var(--brand-1)), hsl(var(--brand-2)) 55%, hsl(var(--brand-3)))" }}
+      aria-hidden="true"
+    >
+      N
+    </span>
+    NZ<span className="text-gradient-brand">-web</span>
+  </span>
+);
 
 /* ── Services Dropdown ── */
 const ServicesDropdown = ({ onClose }: { onClose: () => void }) => {
@@ -56,27 +69,29 @@ const ServicesDropdown = ({ onClose }: { onClose: () => void }) => {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -6, scale: 0.97 }}
       transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-      className="absolute top-full left-1/2 z-50 mt-2 w-[520px] -translate-x-1/2 overflow-hidden rounded-2xl border border-border/50 bg-card/95 shadow-2xl backdrop-blur-xl"
-      style={{ boxShadow: "0 20px 60px -12px hsl(var(--primary)/0.12), 0 4px 16px -4px hsl(var(--foreground)/0.08)" }}
+      className="glass-strong absolute top-full left-1/2 z-50 mt-3 w-[540px] -translate-x-1/2 overflow-hidden rounded-3xl"
     >
       {/* Top accent line */}
-      <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+      <div
+        className="h-[2px] w-full"
+        style={{ background: "linear-gradient(90deg, transparent, hsl(var(--brand-2) / 0.7), hsl(var(--brand-3) / 0.7), transparent)" }}
+      />
 
       <div className="p-4">
         <p className="mb-3 px-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
           השירותים שלנו
         </p>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-1.5">
           {serviceLinks.map((svc) => {
             const Icon = svc.icon;
             return (
               <button
                 key={svc.href}
                 onClick={() => { navigate(svc.href); onClose(); }}
-                className="group flex items-start gap-3 rounded-xl p-3 text-right transition-all duration-200 hover:bg-primary/[0.06]"
+                className="group flex items-start gap-3 rounded-2xl p-3 text-right transition-all duration-200 hover:bg-primary/[0.07]"
               >
-                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
-                  <Icon className="h-4 w-4 text-primary" strokeWidth={1.8} />
+                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-1/12 to-brand-3/12 transition-all duration-300 group-hover:from-brand-1/25 group-hover:to-brand-3/25 group-hover:scale-105">
+                  <Icon className="h-4 w-4 text-primary" strokeWidth={1.9} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold leading-snug text-foreground group-hover:text-primary transition-colors">
@@ -95,10 +110,11 @@ const ServicesDropdown = ({ onClose }: { onClose: () => void }) => {
         <div className="mt-3 border-t border-border/40 pt-3">
           <button
             onClick={() => { navigate("/contact/"); onClose(); }}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/[0.08] py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary/[0.14]"
+            className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-primary/[0.08] py-3 text-sm font-semibold text-primary transition-all hover:bg-primary/[0.15]"
           >
             <MessageCircle className="h-4 w-4" />
             לא בטוחים איזה שירות? דברו איתנו
+            <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
           </button>
         </div>
       </div>
@@ -162,34 +178,36 @@ const Header = () => {
     else { navigate("/" + link.href); }
   };
 
+  const goHome = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (window.location.pathname === "/") window.scrollTo({ top: 0 });
+    else { navigate("/"); setTimeout(() => window.scrollTo({ top: 0 }), 50); }
+  };
+
   return (
-    <header dir="rtl" className="fixed top-0 left-0 right-0 z-50">
+    <header dir="rtl" className="fixed top-0 left-0 right-0 z-50 px-3 pt-2 md:px-5 md:pt-3">
       <div
-        className={`transition-all duration-500 border-b ${
+        className={`mx-auto max-w-7xl rounded-2xl transition-all duration-500 md:rounded-[1.35rem] ${
           scrolled
-            ? "bg-background/75 backdrop-blur-2xl backdrop-saturate-200 shadow-[0_1px_30px_-4px_hsl(var(--primary)/0.1)] border-border/40"
-            : "bg-background/20 backdrop-blur-xl border-transparent"
+            ? "glass-strong border border-border/50 shadow-elevated"
+            : "border border-transparent bg-background/45 backdrop-blur-md"
         }`}
       >
         {/* ── Desktop ── */}
-        <div className="hidden md:flex container mx-auto items-center justify-between px-6 py-3">
+        <div className="hidden md:flex items-center justify-between gap-4 px-4 py-2.5 lg:px-5">
           {/* Logo */}
           <a
             ref={logoRef}
             href="/"
-            onClick={(e) => {
-              e.preventDefault();
-              if (window.location.pathname === "/") window.scrollTo({ top: 0 });
-              else { navigate("/"); setTimeout(() => window.scrollTo({ top: 0 }), 50); }
-            }}
-            className="text-2xl font-black tracking-tight text-foreground cursor-pointer select-none shrink-0"
-            style={{ fontFamily: "'Heebo', sans-serif", letterSpacing: "-0.02em" }}
+            onClick={goHome}
+            className="shrink-0 cursor-pointer select-none"
+            aria-label="NZ-web — לדף הבית"
           >
-            NZ<span className="text-gradient-brand">-web</span>
+            <Wordmark />
           </a>
 
           {/* Centre nav */}
-          <nav ref={navRef} className="flex items-center gap-6 lg:gap-8">
+          <nav ref={navRef} className="flex items-center gap-1 rounded-full border border-border/40 bg-secondary/40 px-1.5 py-1 lg:gap-1.5">
             {navLinks.map((link) => {
               /* Services — dropdown trigger */
               if (link.type === "services") {
@@ -203,8 +221,10 @@ const Header = () => {
                   >
                     <button
                       onClick={() => { navigate("/services/"); setServicesOpen(false); }}
-                      className={`nav-link-hover relative flex items-center gap-1 pb-1 font-rubik text-[14px] font-medium tracking-wide transition-colors lg:text-[15px] ${
-                        servicesOpen ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                      className={`relative flex items-center gap-1 rounded-full px-3.5 py-2 font-rubik text-[13.5px] font-medium tracking-wide transition-all duration-200 lg:text-[14.5px] ${
+                        servicesOpen
+                          ? "bg-background text-foreground shadow-soft"
+                          : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
                       }`}
                     >
                       שירותים
@@ -221,12 +241,17 @@ const Header = () => {
                 );
               }
               /* Regular links */
+              const isActive = link.type === "route" && location.pathname.startsWith(link.href.replace(/\/$/, ""));
               return (
                 <a
                   key={link.label}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link)}
-                  className="nav-link-hover relative pb-1 font-rubik text-[14px] font-medium tracking-wide text-muted-foreground transition-colors hover:text-foreground lg:text-[15px]"
+                  className={`relative rounded-full px-3.5 py-2 font-rubik text-[13.5px] font-medium tracking-wide transition-all duration-200 lg:text-[14.5px] ${
+                    isActive
+                      ? "bg-background text-foreground shadow-soft"
+                      : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                  }`}
                 >
                   {link.label}
                 </a>
@@ -235,11 +260,11 @@ const Header = () => {
           </nav>
 
           {/* Right actions */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <a
               href="/contact/"
               onClick={(e) => { e.preventDefault(); navigate("/contact/"); }}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-md shadow-primary/25 transition-all duration-200 hover:scale-[1.04] hover:brightness-110 active:scale-[0.97] btn-glow"
+              className="btn-brand group inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold hover:scale-[1.04] active:scale-[0.97]"
             >
               <MessageCircle className="h-4 w-4" />
               בואו נדבר
@@ -249,7 +274,7 @@ const Header = () => {
             <button
               onClick={() => setIsMenuOpen(true)}
               aria-label="פתח תפריט מלא"
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-gradient-to-br from-primary/10 to-accent/10 text-foreground transition-all duration-200 hover:scale-105 hover:border-primary/30 hover:text-primary"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 bg-secondary/40 text-foreground transition-all duration-200 hover:scale-105 hover:border-primary/35 hover:text-primary"
             >
               <Menu className="h-5 w-5" />
             </button>
@@ -257,65 +282,41 @@ const Header = () => {
         </div>
 
         {/* ── Mobile ── */}
-        <div className="flex md:hidden items-center justify-between px-3 py-2.5 gap-2">
+        <div className="flex md:hidden items-center justify-between gap-2 px-3 py-2">
           {/* Logo */}
           <a
             href="/"
-            onClick={(e) => {
-              e.preventDefault();
-              if (window.location.pathname === "/") window.scrollTo({ top: 0 });
-              else { navigate("/"); setTimeout(() => window.scrollTo({ top: 0 }), 50); }
-            }}
-            className="text-lg font-black tracking-tight text-foreground cursor-pointer select-none shrink-0"
-            style={{ fontFamily: "'Heebo', sans-serif", letterSpacing: "-0.02em" }}
+            onClick={goHome}
+            className="shrink-0 cursor-pointer select-none"
+            aria-label="NZ-web — לדף הבית"
           >
-            NZ<span className="text-gradient-brand">-web</span>
+            <Wordmark compact />
           </a>
-
-          {/* Mobile nav links (always visible — short labels, no overflow) */}
-          <nav className="flex min-w-0 flex-1 items-center justify-center gap-0.5">
-            {mobileNavLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (link.href.includes("#")) {
-                    const hash = `#${link.href.split("#")[1]}`;
-                    if (location.pathname === "/") {
-                      scrollToSelectorWithRetry(hash);
-                    } else {
-                      navigate("/", { state: { scrollTo: hash, scrollNonce: Date.now() } });
-                    }
-                  } else {
-                    navigate(link.href);
-                  }
-                }}
-                className="shrink-0 whitespace-nowrap rounded-lg px-2 py-1.5 text-[10.5px] font-semibold text-muted-foreground transition-colors hover:bg-primary/[0.07] hover:text-foreground"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
 
           {/* Mobile CTA + hamburger */}
           <div className="flex items-center gap-1.5 shrink-0">
             <a
+              href={getTelHref(contactInfo.phone)}
+              aria-label="חייגו אלינו"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 bg-secondary/40 text-foreground transition-all active:scale-95"
+            >
+              <Phone className="h-[18px] w-[18px]" />
+            </a>
+            <a
               href="/contact/"
               onClick={(e) => { e.preventDefault(); navigate("/contact/"); }}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-[11px] font-bold text-primary-foreground shadow-md shadow-primary/20 transition-all hover:brightness-110 btn-glow"
+              className="btn-brand inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[13px] font-bold"
             >
-              <MessageCircle className="h-3.5 w-3.5" />
+              <MessageCircle className="h-4 w-4" />
               בואו נדבר
             </a>
 
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
                 <motion.button
-                  className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-primary/15 bg-gradient-to-br from-primary/10 to-accent/10 backdrop-blur-xl transition-all group"
+                  className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-secondary/40 transition-all"
                   aria-label="תפריט"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.94 }}
                 >
                   <div className="flex flex-col items-end justify-center gap-[4.5px]">
                     <motion.span className="block h-[2px] rounded-full bg-foreground"
@@ -334,30 +335,45 @@ const Header = () => {
                 </motion.button>
               </SheetTrigger>
 
-              <SheetContent side="left" className="w-[300px] border-l-0 bg-gradient-to-br from-slate-900 via-blue-950 to-emerald-950 overflow-y-auto">
-                <SheetHeader>
+              <SheetContent
+                side="left"
+                className="w-[320px] max-w-[88vw] overflow-y-auto border-l-0 p-5 text-white"
+                style={{
+                  background:
+                    "linear-gradient(160deg, hsl(226 48% 9%) 0%, hsl(230 52% 12%) 45%, hsl(200 60% 12%) 100%)",
+                }}
+              >
+                {/* ambient brand glow inside the drawer */}
+                <div
+                  className="pointer-events-none absolute -top-24 left-[-20%] h-64 w-64 rounded-full blur-[80px]"
+                  style={{ background: "radial-gradient(circle, hsl(var(--brand-2) / 0.4), transparent 70%)" }}
+                  aria-hidden="true"
+                />
+
+                <SheetHeader className="relative">
                   <SheetTitle className="text-right font-heebo text-xl font-black text-white">
-                    NZ<span className="text-yellow-300">-web</span>
+                    NZ<span style={{ color: "hsl(var(--brand-3))" }}>-web</span>
                   </SheetTitle>
                   <SheetDescription className="text-right text-sm text-white/55">
                     תפריט ניווט — כל העמודים והשירותים של NZ-web
                   </SheetDescription>
                 </SheetHeader>
 
-                <nav className="mt-4 flex flex-col gap-1" dir="rtl">
+                <nav className="relative mt-5 flex flex-col gap-0.5" dir="rtl">
                   {menuItems.map((item) => (
                     <a
                       key={item.label}
                       href={item.href}
                       onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); navigate(item.href); }}
-                      className="rounded-xl px-4 py-3 font-heebo text-base font-medium text-white/85 transition-all hover:bg-white/10 hover:text-white"
+                      className="group flex items-center justify-between rounded-xl px-4 py-3 font-heebo text-[15px] font-semibold text-white/85 transition-all hover:bg-white/10 hover:text-white"
                     >
                       {item.label}
+                      <ArrowLeft className="h-3.5 w-3.5 opacity-0 transition-all group-hover:opacity-70" />
                     </a>
                   ))}
 
                   {/* Services sub-section */}
-                  <div className="mt-3 border-t border-white/10 pt-3">
+                  <div className="mt-4 border-t border-white/10 pt-4">
                     <p className="mb-2 px-4 text-[10px] font-bold uppercase tracking-widest text-white/40">השירותים שלנו</p>
                     {serviceLinks.map((svc) => {
                       const Icon = svc.icon;
@@ -368,25 +384,37 @@ const Header = () => {
                           onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); navigate(svc.href); }}
                           className="flex items-center gap-3 rounded-xl px-4 py-2.5 transition-all hover:bg-white/10"
                         >
-                          <Icon className="h-4 w-4 shrink-0 text-primary/80" strokeWidth={1.8} />
-                          <span className="font-heebo text-sm text-white/75">{svc.label}</span>
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.07]">
+                            <Icon className="h-4 w-4" style={{ color: "hsl(var(--brand-3))" }} strokeWidth={1.8} />
+                          </span>
+                          <span className="font-heebo text-sm text-white/80">{svc.label}</span>
                         </a>
                       );
                     })}
                   </div>
                 </nav>
 
-                <div className="mt-5 px-1">
+                <div className="relative mt-6 flex flex-col gap-2.5">
                   <a
                     href="/contact/"
                     onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); navigate("/contact/"); }}
-                    className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 font-heebo text-base font-bold text-white shadow-lg transition-all hover:brightness-110"
+                    className="btn-brand flex items-center justify-center gap-2 rounded-2xl px-6 py-4 font-heebo text-base font-bold"
                   >
                     <MessageCircle className="h-5 w-5" />
                     בואו נדבר
                   </a>
+                  <a
+                    href={getWhatsAppHref(contactInfo)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.06] px-6 py-3.5 font-heebo text-sm font-bold text-white/90 transition-all hover:bg-white/[0.12]"
+                  >
+                    וואטסאפ מהיר
+                  </a>
                 </div>
-                <div className="mt-4 px-1">
+
+                <div className="relative mt-5 flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
+                  <span className="font-heebo text-xs font-semibold text-white/60">מצב תצוגה</span>
                   <ThemeToggle />
                 </div>
               </SheetContent>

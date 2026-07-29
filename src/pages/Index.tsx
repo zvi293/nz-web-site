@@ -55,7 +55,7 @@ const Index = () => {
   }, [location.hash, location.pathname, location.state, navigate]);
 
   return (
-    <main key={location.key} className="relative bg-background pt-[72px]">
+    <main key={location.key} className="relative bg-background pt-[68px] md:pt-[84px]">
       <AmbientShapes />
       <Header />
       <HeroSection />
