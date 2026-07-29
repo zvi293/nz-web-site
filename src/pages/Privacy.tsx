@@ -32,9 +32,11 @@ const Privacy = () => {
   ];
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
       <BackToHome />
+
+      <main id="page-content">
 
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 nz-brand-dark overflow-hidden">
@@ -61,7 +63,7 @@ const Privacy = () => {
               מדיניות פרטיות
             </h1>
             <p className="text-white/80 text-lg">
-              עודכן לאחרונה: 9 במרץ 2026
+              עודכן לאחרונה: 29 ביולי 2026
             </p>
           </motion.div>
         </div>
@@ -92,14 +94,14 @@ const Privacy = () => {
                       <span className="shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">א</span>
                       <div>
                         <strong className="text-foreground">מידע אישי שנמסר מרצון:</strong>
-                        <span className="text-muted-foreground"> בעת מילוי טופס צור קשר או פנייה בוואטסאפ, נאספים פרטים כגון שם מלא, כתובת אימייל ומספר טלפון.</span>
+                        <span className="text-muted-foreground"> בעת מילוי טופס יצירת הקשר נאספים שם מלא, מספר טלפון ותוכן הפנייה. חשוב לדעת: לאתר אין שרת משלו — הטופס אינו שומר דבר באתר, אלא פותח את אפליקציית וואטסאפ עם הודעה מוכנה שאתם שולחים בעצמכם. הפרטים מגיעים אלינו כהודעת וואטסאפ רגילה, בכפוף למדיניות הפרטיות של WhatsApp (מבית Meta).</span>
                       </div>
                     </li>
                     <li className="flex gap-3">
                       <span className="shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">ב</span>
                       <div>
                         <strong className="text-foreground">מידע טכני אוטומטי:</strong>
-                        <span className="text-muted-foreground"> נתונים על אופן הגלישה, כתובת IP, סוג דפדפן וזמני שהייה באתר, לצורך שיפור חוויית המשתמש ואופטימיזציה (SEO).</span>
+                        <span className="text-muted-foreground"> ספקית האחסון (Netlify) מעבדת נתוני תעבורה בסיסיים, כגון כתובת IP, לצורך הגשת האתר ואבטחתו. כלי סטטיסטיקה (Google Analytics / Meta Pixel) נטענים רק אם אישרתם זאת בבאנר העוגיות — ללא אישור, שום כלי מדידה אינו נטען.</span>
                       </div>
                     </li>
                   </ul>
@@ -115,10 +117,6 @@ const Privacy = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-primary mt-1">•</span>
-                      ניהול נתונים מאובטח באמצעות מערכות כגון Supabase.
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary mt-1">•</span>
                       שיפור ביצועי האתר והתאמת התוכן לצרכי הלקוחות.
                     </li>
                     <li className="flex items-start gap-2">
@@ -130,35 +128,79 @@ const Privacy = () => {
 
                 {/* Section 4 */}
                 <Section number="4" title="העברת מידע לצדדים שלישיים">
-                  <p>
-                    אנו לא מוכרים או משכירים מידע אישי לצדדים שלישיים. המידע עשוי לעבור לספקי
-                    שירות חיצוניים רק לצורך תפעול האתר (לדוגמה: שירותי אחסון ב-Netlify או ניהול
-                    בסיס נתונים ב-Supabase) ותחת התחייבותם לשמירה על פרטיות.
+                  <p className="mb-3">
+                    אנו לא מוכרים ולא משכירים מידע אישי לצדדים שלישיים. מידע עובר לספקים חיצוניים
+                    רק במידה הנדרשת לתפעול האתר:
+                  </p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      <span><strong className="text-foreground">Netlify</strong> — אחסון והגשת האתר (עיבוד נתוני תעבורה בסיסיים).</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      <span><strong className="text-foreground">WhatsApp (Meta)</strong> — פניות מהטופס נשלחות דרך וואטסאפ, מתוך בחירתכם ומהחשבון שלכם.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      <span><strong className="text-foreground">Google Analytics / Meta Pixel</strong> — רק לאחר הסכמה מפורשת בבאנר העוגיות, לצורך סטטיסטיקה מצרפית.</span>
+                    </li>
+                  </ul>
+                  <p className="mt-3">
+                    מסירת מידע מעבר לכך תיעשה רק אם נידרש לכך על פי דין או צו של רשות מוסמכת.
                   </p>
                 </Section>
 
                 {/* Section 5 */}
                 <Section number="5" title="עוגיות (Cookies)" icon={<Cookie className="h-5 w-5" />}>
+                  <p className="mb-3">
+                    האתר משתמש באחסון מקומי (localStorage) בדפדפן שלכם לצרכים תפעוליים בלבד:
+                    שמירת העדפות הנגישות שבחרתם, מצב התצוגה (בהיר/כהה) ותיעוד בחירתכם בבאנר העוגיות.
+                    מידע זה נשאר במכשיר שלכם ואינו נשלח אלינו.
+                  </p>
                   <p>
-                    האתר משתמש ב-"עוגיות" לצורך תפעולו השוטף, איסוף נתונים סטטיסטיים ואבטחת מידע.
-                    הגולש יכול לבחור לחסום את השימוש בעוגיות דרך הגדרות הדפדפן שלו, אך הדבר עלול
-                    לפגוע בחלק מהפונקציות של האתר.
+                    עוגיות סטטיסטיקה ושיווק (Google Analytics / Meta Pixel) נטענות אך ורק לאחר
+                    שאישרתם זאת בבאנר — בחירת "רק חיוניות" משאירה את האתר ללא כלי מדידה כלל.
+                    בנוסף, ניתן למחוק או לחסום עוגיות בכל עת דרך הגדרות הדפדפן.
                   </p>
                 </Section>
 
                 {/* Section 6 */}
                 <Section number="6" title="אבטחת מידע" icon={<Lock className="h-5 w-5" />}>
                   <p>
-                    אנו מיישמים נהלים ומערכות אבטחה מתקדמות כדי להגן על המידע מפני גישה בלתי מורשית.
-                    עם זאת, לא ניתן להבטיח חסינות מוחלטת בפני חדירה למערכות תקשורת דיגיטליות.
+                    האתר מוגש בהצפנת HTTPS מלאה (TLS) עם כותרות אבטחה מחמירות, ואינו מפעיל שרת,
+                    מסד נתונים או מערכת התחברות — כך שאין באתר מאגר פרטים אישיים שניתן לפרוץ אליו.
+                    פניות שהגיעו אלינו בוואטסאפ או בדוא״ל נשמרות באותם ערוצים בלבד. עם זאת,
+                    לא ניתן להבטיח חסינות מוחלטת בפני חדירה למערכות תקשורת דיגיטליות.
                   </p>
                 </Section>
 
                 {/* Section 7 */}
                 <Section number="7" title="זכויות המשתמש">
-                  <p>
-                    בהתאם לחוק הגנת הפרטיות, התשמ"א-1981, כל אדם זכאי לעיין במידע המוחזק עליו במאגר
-                    מידע, לבקש לתקנו או למחוק אותו.
+                  <p className="mb-3">
+                    בהתאם לחוק הגנת הפרטיות, התשמ"א-1981 (כולל תיקון 13 שנכנס לתוקף באוגוסט 2025),
+                    עומדות לכם הזכויות הבאות:
+                  </p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      לעיין במידע המוחזק עליכם ולדעת איזה מידע קיים אצלנו.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      לבקש תיקון של מידע שגוי או מחיקתו.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      לחזור בכם מהסכמה לעוגיות סטטיסטיקה (ניקוי נתוני האתר בדפדפן מאפס את הבחירה, והבאנר יוצג מחדש).
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      לבקש הסרה מכל דיוור, ככל שיישלח, בכל עת.
+                    </li>
+                  </ul>
+                  <p className="mt-3">
+                    למימוש זכויותיכם פנו אלינו בפרטים שבסעיף 9 — נטפל בפנייה בהקדם.
                   </p>
                 </Section>
 
@@ -238,11 +280,13 @@ const Privacy = () => {
         </div>
       </section>
 
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

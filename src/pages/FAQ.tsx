@@ -2,12 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, HelpCircle, Search, X } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import FaqAccordionItem from "@/components/FaqAccordionItem";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
@@ -15,6 +10,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import BackToTopButton from "@/components/BackToTopButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { visibleFaqItems } from "@/content/faq";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -63,9 +59,15 @@ const FAQ = () => {
   }, [faqItems]);
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
       <BackToHome />
+
+      <main id="page-content">
+
+      <div className="mx-auto max-w-4xl px-6 pt-6">
+        <Breadcrumbs items={[{ label: "שאלות נפוצות" }]} className="mb-0" />
+      </div>
 
       {/* Hero */}
       <section className="relative py-16 md:py-24 bg-gradient-to-b from-secondary to-background">
@@ -123,13 +125,17 @@ const FAQ = () => {
             </div>
             {searchQuery && filteredItems.length === 0 && (
               <p className="text-center text-muted-foreground text-sm mt-4">
-                לא נמצאו תוצאות עבור "{searchQuery}". נסו חפוש אחר.
+                לא נמצאו תוצאות עבור "{searchQuery}". נסו חיפוש אחר.
               </p>
             )}
           </motion.div>
 
-          {/* FAQ Accordion */}
-          <Accordion type="single" collapsible className="space-y-3">
+          {/* FAQ Accordion — uses the site's shared FaqAccordionItem, which keeps
+              every answer in the DOM. The Radix accordion that used to be here
+              unmounts collapsed content, so the pre-rendered HTML shipped 15
+              questions and zero answers: nothing for Google's FAQ rich result to
+              match against, and nothing for an answer engine to quote. */}
+          <div className="space-y-3">
             {filteredItems.map((item, i) => (
               <motion.div
                 key={item.id}
@@ -138,28 +144,10 @@ const FAQ = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.04 }}
               >
-                <AccordionItem
-                  value={`faq-${item.id}`}
-                  className="relative border border-border/40 rounded-2xl px-6 overflow-hidden bg-card shadow-sm hover:shadow-md transition-shadow duration-200 group"
-                >
-                  {/* Left Accent Bar */}
-                  <div className="absolute right-0 top-0 h-full w-1 rounded-r-2xl bg-gradient-to-b from-primary/60 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-                  <AccordionTrigger className="font-heebo text-right text-base font-semibold text-foreground py-5 hover:no-underline gap-4">
-                    <span className="flex items-center gap-3">
-                      <span className="flex shrink-0 items-center justify-center h-7 w-7 rounded-full bg-primary/10 text-primary text-xs font-black group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                        {i + 1}
-                      </span>
-                      {item.question}
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="font-heebo text-muted-foreground leading-relaxed text-sm pr-10 pb-5">
-                    {item.answer}
-                  </AccordionContent>
-                </AccordionItem>
+                <FaqAccordionItem faq={{ q: item.question, a: item.answer }} index={i} />
               </motion.div>
             ))}
-          </Accordion>
+          </div>
 
           {/* CTA */}
           <motion.div
@@ -188,11 +176,13 @@ const FAQ = () => {
         </div>
       </section>
 
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

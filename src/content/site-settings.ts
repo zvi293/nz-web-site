@@ -54,7 +54,7 @@ export const siteSettings: SiteSettings = {
         content: "אנו משקיעים מאמצים רבים בתחזוקת נגישות האתר. עם זאת, ייתכן שיתגלו דפים או חלקים שטרם הונגשו במלואם."
       }
     ],
-    lastUpdated: "9 במרץ 2026",
+    lastUpdated: "29 ביולי 2026",
     coordinatorName: "צבי משה",
     coordinatorEmail: "zvi293293@gmail.com",
     coordinatorPhone: "058-7292029"

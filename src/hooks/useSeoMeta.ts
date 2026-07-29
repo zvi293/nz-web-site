@@ -99,6 +99,9 @@ export function useSeoMeta({
     let schemaEl: HTMLScriptElement | null = null;
     if (schema) {
       const schemas = Array.isArray(schema) ? schema : [schema];
+      /* Pre-rendered pages arrive with this script already baked into the HTML;
+         appending without removing it would duplicate the schema after hydration. */
+      document.getElementById(schemaScriptId)?.remove();
       schemaEl = document.createElement("script");
       schemaEl.type = "application/ld+json";
       schemaEl.id = schemaScriptId;

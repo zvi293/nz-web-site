@@ -62,6 +62,10 @@ const STATIC_ROUTES = [
   { path: "/accessibility",                     changefreq: "yearly",  priority: "0.3" },
 ];
 
+/* Routes that must exist as real static files (so a direct load / refresh works)
+   but must NEVER enter the sitemap. Each page sets `noindex` on itself. */
+const UNLISTED_ROUTES = [{ path: "/thank-you" }];
+
 /* ─── blog routes, read straight from the static content module ───
    src/content/blog.ts is TypeScript with asset imports, so it cannot simply be
    imported here — the slugs and dates are pulled out textually instead. Keep
@@ -94,12 +98,24 @@ function getBlogRoutes() {
   return routes;
 }
 
-/* ─── write a fully-rendered page to dist/<route>/index.html ─── */
+/* ─── write a fully-rendered page to dist/<route>/index.html ───
+   IMPORTANT: nothing may be written while the crawl is still running.
+   `vite preview` serves dist/index.html as the SPA fallback for every route, so
+   overwriting it mid-crawl would make every *later* route boot from the already-
+   rendered homepage — inheriting its <head> (its JSON-LD, its injected schema).
+   Renders are therefore buffered and flushed only after the browser is closed. */
 function writePage(routePath, html) {
   const segments = routePath.replace(/^\//, "").split("/").filter(Boolean);
   const dir = segments.length ? join(DIST, ...segments) : DIST;
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "index.html"), html, "utf-8");
+}
+
+/* Buffered renders: route path → rendered HTML. Flushed by flushPages(). */
+const renderedPages = new Map();
+
+function flushPages() {
+  for (const [routePath, html] of renderedPages) writePage(routePath, html);
 }
 
 /* ─── normalize any route path to its canonical TRAILING-SLASH form ─── */
@@ -149,7 +165,11 @@ async function run() {
 
   console.log("\n🔍  Pre-rendering pages for SEO...\n");
 
+  /* `routes` = everything that goes in the sitemap.
+     `crawlRoutes` = everything that gets a static file (sitemap routes + the
+     unlisted, self-noindexed ones). */
   const routes = [...STATIC_ROUTES, ...getBlogRoutes()];
+  const crawlRoutes = [...routes, ...UNLISTED_ROUTES];
 
   /* serve the built dist/ folder */
   const server = await preview({
@@ -188,7 +208,7 @@ async function run() {
   let success = 0;
   let fail = 0;
 
-  for (const route of routes) {
+  for (const route of crawlRoutes) {
     const page = await browser.newPage();
     /* block heavy/irrelevant requests so pages settle fast */
     await page.setRequestInterception(true);
@@ -221,7 +241,7 @@ async function run() {
       await new Promise((r) => setTimeout(r, 500));
 
       const html = await page.content();
-      writePage(route.path, html);
+      renderedPages.set(route.path, html);
       console.log(`  ✓  ${route.path}`);
       success++;
     } catch (err) {
@@ -256,17 +276,25 @@ async function run() {
     );
     await new Promise((r) => setTimeout(r, 500));
     const html = await page.content();
-    writeFileSync(join(DIST, "404.html"), html, "utf-8");
+    renderedPages.set("/404.html", html);
     await page.close();
     console.log("  ✓  404.html (branded, noindex)");
   } catch (err) {
-    /* Fall back to the SPA shell so Netlify still returns a real 404 status. */
-    copyFileSync(join(DIST, "index.html"), join(DIST, "404.html"));
+    /* Fall back to the SPA shell so Netlify still returns a real 404 status.
+       dist/index.html is still the pristine shell at this point — nothing has
+       been written yet — which is exactly what the fallback wants. */
+    renderedPages.set("/404.html", readFileSync(join(DIST, "index.html"), "utf-8"));
     console.warn(`  ⚠  404.html branded render failed (${err.message}) — used SPA shell fallback.`);
   }
 
   await browser.close();
   await server.httpServer.close();
+
+  /* Every route has been captured against a pristine shell — safe to write now. */
+  const notFoundHtml = renderedPages.get("/404.html");
+  renderedPages.delete("/404.html");
+  flushPages();
+  if (notFoundHtml) writeFileSync(join(DIST, "404.html"), notFoundHtml, "utf-8");
 
   writeSitemap(routes);
   console.log(`\n  ✓  sitemap.xml — ${routes.length} URLs`);

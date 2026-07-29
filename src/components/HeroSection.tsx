@@ -527,11 +527,16 @@ const HeroSection = () => {
                     </div>
                     {/* viewport */}
                     <div className="relative overflow-hidden">
+                      {/* LCP element: intrinsic size + fetchPriority so the box
+                          is reserved (no CLS) and the file is requested first. */}
                       <img
                         src={heroVisual}
                         alt={heroImageAlt}
-                        className="w-full"
+                        width={1024}
+                        height={1024}
+                        className="h-auto w-full"
                         loading="eager"
+                        fetchPriority="high"
                         decoding="async"
                       />
                       {/* glass sheen sweeping across the screen */}

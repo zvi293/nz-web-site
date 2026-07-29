@@ -1,14 +1,14 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Home, ArrowLeft, MessageCircle } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 
 const NotFound = () => {
   const location = useLocation();
-  const navigate = useNavigate();
 
   /* A real 404 must never be indexed. This page is also pre-rendered to
      dist/404.html, which Netlify serves with a genuine HTTP 404 status. */
@@ -86,21 +86,23 @@ const NotFound = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.55 }}
           >
-            <button
-              onClick={() => navigate("/")}
+            {/* Real links — a 404 is a recovery page, and its escape routes must
+                be crawlable/followable, not JS-only buttons. */}
+            <Link
+              to="/"
               className="btn-brand inline-flex items-center gap-2.5 rounded-2xl px-7 py-3.5 text-sm font-bold transition-all duration-200 hover:scale-[1.04]"
             >
-              <Home className="h-4 w-4" />
+              <Home aria-hidden="true" className="h-4 w-4" />
               חזרה לדף הבית
-            </button>
+            </Link>
 
-            <button
-              onClick={() => navigate("/contact/")}
+            <Link
+              to="/contact/"
               className="inline-flex items-center gap-2.5 rounded-2xl border border-border/60 bg-card px-7 py-3.5 text-sm font-semibold text-foreground transition-all duration-200 hover:border-primary/30 hover:bg-primary/[0.05] hover:scale-[1.04]"
             >
-              <MessageCircle className="h-4 w-4 text-primary" />
+              <MessageCircle aria-hidden="true" className="h-4 w-4 text-primary" />
               צרו קשר
-            </button>
+            </Link>
           </motion.div>
 
           {/* Quick nav links */}
@@ -112,24 +114,25 @@ const NotFound = () => {
           >
             {[
               { label: "פרויקטים", href: "/projects/" },
-              { label: "שירותים", href: "/#services" },
+              { label: "שירותים", href: "/services/" },
               { label: "מי אנחנו", href: "/about/" },
               { label: "שאלות נפוצות", href: "/faq/" },
             ].map((link) => (
-              <button
+              <Link
                 key={link.href}
-                onClick={() => navigate(link.href)}
+                to={link.href}
                 className="group flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
               >
-                <ArrowLeft className="h-3 w-3 opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:-translate-x-0.5" />
+                <ArrowLeft aria-hidden="true" className="h-3 w-3 opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:-translate-x-0.5" />
                 {link.label}
-              </button>
+              </Link>
             ))}
           </motion.div>
         </div>
       </main>
 
       <Footer />
+      <AccessibilityWidget />
     </div>
   );
 };

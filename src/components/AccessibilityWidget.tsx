@@ -115,14 +115,38 @@ const AccessibilityWidget = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [settings.readingGuide]);
 
-  // Keyboard trap for panel
+  /* Escape closes; Tab is trapped inside the dialog.
+     A `role="dialog" aria-modal="true"` that leaks focus back to the page behind
+     it fails WCAG 2.4.3 — and this is the accessibility menu itself, so it has to
+     be exemplary. */
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        e.preventDefault();
         setIsOpen(false);
         triggerRef.current?.focus();
+        return;
+      }
+
+      if (e.key !== "Tab" || !panelRef.current) return;
+
+      const focusable = panelRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey && (active === first || !panelRef.current.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
       }
     };
 
@@ -130,12 +154,19 @@ const AccessibilityWidget = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
 
-  // Focus panel on open
+  /* Move focus into the panel on open, and stop the page behind it scrolling. */
   useEffect(() => {
-    if (isOpen && panelRef.current) {
-      const firstButton = panelRef.current.querySelector("button");
-      if (firstButton) (firstButton as HTMLButtonElement).focus();
-    }
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const firstButton = panelRef.current?.querySelector("button");
+    firstButton?.focus();
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
   }, [isOpen]);
 
   const updateSetting = <K extends keyof AccessibilitySettings>(
@@ -171,27 +202,26 @@ const AccessibilityWidget = () => {
   return (
     <>
       {/* Floating Accessibility Button */}
+      {/* 48px, not 40: this is the legally-required accessibility control, so it
+          has to clear the 44×44 minimum touch target comfortably. It also sits
+          above the cookie banner's z-index band so it is never unreachable. */}
       <button
         ref={triggerRef}
+        type="button"
         onClick={() => setIsOpen(true)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setIsOpen(true);
-          }
-        }}
         aria-label="פתח תפריט נגישות"
         aria-expanded={isOpen}
+        aria-haspopup="dialog"
         aria-controls="accessibility-panel"
-        className="fixed bottom-[88px] left-[32px] z-50 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-primary/50 cursor-pointer"
+        className="fixed bottom-[92px] left-6 z-[10020] flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 cursor-pointer"
       >
-        <img src={accessibilityIcon} alt="" className="h-5 w-5 invert" aria-hidden="true" />
+        <img src={accessibilityIcon} alt="" width={24} height={24} className="h-6 w-6 invert" aria-hidden="true" />
       </button>
 
       {/* Reading Guide Line */}
       {settings.readingGuide && (
         <div
-          className="fixed left-0 right-0 h-[3px] bg-primary/80 pointer-events-none z-[9999] transition-transform duration-75"
+          className="fixed left-0 right-0 h-[3px] bg-primary/80 pointer-events-none z-[10010] transition-transform duration-75"
           style={{ top: `${readingGuideY}px` }}
           aria-hidden="true"
         />
@@ -206,7 +236,7 @@ const AccessibilityWidget = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm"
+              className="fixed inset-0 z-[10030] bg-black/50 backdrop-blur-sm"
               onClick={() => setIsOpen(false)}
               aria-hidden="true"
             />
@@ -223,7 +253,7 @@ const AccessibilityWidget = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -400, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 left-0 bottom-0 z-[101] w-[380px] max-w-[92vw] bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 shadow-2xl overflow-y-auto"
+              className="fixed top-0 left-0 bottom-0 z-[10040] w-[380px] max-w-[92vw] bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 shadow-2xl overflow-y-auto"
               dir="rtl"
             >
               {/* Header */}

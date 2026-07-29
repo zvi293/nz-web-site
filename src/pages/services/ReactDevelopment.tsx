@@ -98,9 +98,11 @@ const ReactDevelopment = () => {
   }, []);
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
       <BackToHome />
+
+      <main id="page-content">
 
       {/* Hero */}
       <section className="relative py-16 md:py-24 bg-gradient-to-b from-secondary to-background">
@@ -362,11 +364,13 @@ const ReactDevelopment = () => {
         </div>
       </section>
 
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

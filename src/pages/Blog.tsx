@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Clock, Calendar, ArrowLeft, BookOpen, Tag } from "lucide-react";
 import Header from "@/components/Header";
@@ -10,6 +10,7 @@ import BackToTopButton from "@/components/BackToTopButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
 import { getBlogPosts, formatDate, type BlogPost } from "@/lib/blog";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -25,7 +26,6 @@ const categoryColors: Record<string, string> = {
 };
 
 const PostCard = ({ post, index }: { post: BlogPost; index: number }) => {
-  const navigate = useNavigate();
   const color = categoryColors[post.category] ?? "#3b82f6";
 
   return (
@@ -34,52 +34,64 @@ const PostCard = ({ post, index }: { post: BlogPost; index: number }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      onClick={() => navigate(`/blog/${post.slug}`)}
-      className="spotlight group flex cursor-pointer flex-col overflow-hidden rounded-[1.75rem] border border-border/50 bg-card shadow-soft transition-all duration-400 hover:-translate-y-1.5 hover:border-primary/20 hover:shadow-xl"
+      className="spotlight group flex flex-col overflow-hidden rounded-[1.75rem] border border-border/50 bg-card shadow-soft transition-all duration-400 hover:-translate-y-1.5 hover:border-primary/20 hover:shadow-xl"
     >
-      {/* Cover image / placeholder */}
-      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-secondary to-secondary/50">
-        {post.cover_image ? (
-          <img src={post.cover_image} alt={post.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <BookOpen className="h-12 w-12 text-muted-foreground/30" />
+      {/* One real <Link> covers the whole card (crawlable + keyboard-reachable);
+          the previous onClick-on-<article> was invisible to both crawlers and
+          the Tab key. */}
+      <Link to={`/blog/${post.slug}/`} className="flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
+        {/* Cover image / placeholder */}
+        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-secondary to-secondary/50">
+          {post.cover_image ? (
+            <img
+              src={post.cover_image}
+              alt={`תמונת שער למאמר: ${post.title}`}
+              width={post.cover_width}
+              height={post.cover_height}
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <BookOpen aria-hidden="true" className="h-12 w-12 text-muted-foreground/30" />
+            </div>
+          )}
+          {/* Category badge */}
+          <span
+            className="absolute right-4 top-4 rounded-full px-3 py-1 text-xs font-bold text-white shadow-md"
+            style={{ backgroundColor: color }}
+          >
+            {post.category}
+          </span>
+        </div>
+
+        {/* Content */}
+        <div className="flex flex-1 flex-col gap-3 p-6">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Calendar aria-hidden="true" className="h-3.5 w-3.5" />
+              {formatDate(post.published_at)}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock aria-hidden="true" className="h-3.5 w-3.5" />
+              {post.read_time} דקות קריאה
+            </span>
           </div>
-        )}
-        {/* Category badge */}
-        <span
-          className="absolute right-4 top-4 rounded-full px-3 py-1 text-xs font-bold text-white shadow-md"
-          style={{ backgroundColor: color }}
-        >
-          {post.category}
-        </span>
-      </div>
 
-      {/* Content */}
-      <div className="flex flex-1 flex-col gap-3 p-6">
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <Calendar className="h-3.5 w-3.5" />
-            {formatDate(post.published_at)}
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5" />
-            {post.read_time} דקות קריאה
-          </span>
+          <h2 className="text-lg font-black leading-snug text-foreground transition-colors group-hover:text-primary md:text-xl">
+            {post.title}
+          </h2>
+          <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+            {post.excerpt}
+          </p>
+
+          <div className="flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 group-hover:gap-3" style={{ color }}>
+            קרא עוד
+            <ArrowLeft aria-hidden="true" className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
+          </div>
         </div>
-
-        <h2 className="text-lg font-black leading-snug text-foreground transition-colors group-hover:text-primary md:text-xl">
-          {post.title}
-        </h2>
-        <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
-          {post.excerpt}
-        </p>
-
-        <div className="flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 group-hover:gap-3" style={{ color }}>
-          קרא עוד
-          <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
-        </div>
-      </div>
+      </Link>
     </motion.article>
   );
 };
@@ -88,10 +100,36 @@ const Blog = () => {
   const posts = getBlogPosts();
   const [activeCategory, setActiveCategory] = useState("הכל");
 
+  /* Blog entity + the post list as machine-readable entries. */
+  const blogSchema = useMemo(
+    () => ({
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "@id": "https://nz-web.com/blog/",
+      name: "הבלוג של NZ-web",
+      description:
+        "מדריכים, טיפים ותובנות מקצועיות על בניית אתרים, פיתוח אתרים, עיצוב UI/UX וקידום SEO בישראל.",
+      url: "https://nz-web.com/blog/",
+      inLanguage: "he",
+      publisher: { "@id": "https://nz-web.com/#organization" },
+      blogPost: posts.map((p) => ({
+        "@type": "BlogPosting",
+        "@id": `https://nz-web.com/blog/${p.slug}/#article`,
+        headline: p.title,
+        description: p.excerpt,
+        url: `https://nz-web.com/blog/${p.slug}/`,
+        datePublished: p.published_at,
+        author: { "@id": "https://nz-web.com/#founder" },
+      })),
+    }),
+    [posts],
+  );
+
   useSeoMeta({
     title: "בלוג בניית אתרים | מדריכים ו-SEO | NZ-web",
     description: "מדריכים, טיפים ותובנות מקצועיות על בניית אתרים, פיתוח אתרים, עיצוב UI/UX וקידום SEO בישראל. תוכן מניסיון אמיתי מהשטח.",
     keywords: "בלוג בניית אתרים, מדריך פיתוח אתרים, טיפים SEO, מאמרים עיצוב אתרים, כמה עולה אתר, React WordPress השוואה",
+    schema: blogSchema,
   });
   useBreadcrumb({ name: "בלוג", path: "/blog" });
 
@@ -99,10 +137,16 @@ const Blog = () => {
   const availableCategories = CATEGORIES.filter((c) => c === "הכל" || posts.some((p) => p.category === c));
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <AmbientShapes />
       <Header />
       <BackToHome />
+
+      <main id="page-content">
+
+      <div className="container mx-auto px-5 pt-6 md:px-6">
+        <Breadcrumbs items={[{ label: "בלוג" }]} className="mb-0" />
+      </div>
 
       {/* Hero */}
       <section className="relative overflow-hidden py-16 md:py-24">
@@ -174,11 +218,13 @@ const Blog = () => {
         </div>
       </section>
 
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

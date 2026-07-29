@@ -52,18 +52,6 @@ export interface FaqItem {
   order: number;
 }
 
-export interface Testimonial {
-  id: string;
-  name: string;
-  role: string;
-  company: string;
-  text: string;
-  rating: number;
-  initials: string;
-  avatar_color: string;
-  sort_order: number;
-}
-
 export interface BlogPost {
   id: string;
   title: string;
@@ -72,6 +60,10 @@ export interface BlogPost {
   content: string;
   category: string;
   cover_image: string;
+  /** Intrinsic pixel size of `cover_image`. Rendered as width/height on the
+   *  <img> so the browser reserves the right box before the file arrives (CLS). */
+  cover_width: number;
+  cover_height: number;
   author: string;
   read_time: number;
   published_at: string;

@@ -57,9 +57,11 @@ const Index = () => {
   }, [location.hash, location.pathname, location.state, navigate]);
 
   return (
-    <main key={location.key} className="relative bg-background pt-[68px] md:pt-[84px]">
+    <div key={location.key} className="relative bg-background pt-[68px] md:pt-[84px]">
       <AmbientShapes />
       <Header />
+
+      <main id="page-content">
       <HeroSection />
 
       {/* Brand ribbon — bridges the hero into the page and states the offering
@@ -77,11 +79,13 @@ const Index = () => {
       <AboutIntroSection />
       <ClientLogosSection />
       <ContactCTA />
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

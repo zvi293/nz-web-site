@@ -84,6 +84,37 @@ export function getResolvedOgImageUrl(siteUrl?: string | null, ogImage?: string 
 }
 
 /**
+ * Promotes a bundled asset path ("/assets/cover-a1b2.webp") to an absolute URL.
+ *
+ * Vite rewrites imported images to a root-relative hashed path. That is fine in
+ * `<img src>`, but Open Graph and schema.org both require absolute URLs — a
+ * relative one is silently dropped by Google and by every social scraper.
+ */
+export function getAbsoluteAssetUrl(path?: string | null): string {
+  const value = path?.trim();
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith("data:") || value.startsWith("blob:")) return "";
+  return `${getEnvSiteUrl()}${value.startsWith("/") ? value : `/${value}`}`;
+}
+
+/**
+ * Normalises an ABSOLUTE url to the canonical trailing-slash form.
+ *
+ * Every URL the site publishes — canonicals, breadcrumb items, schema `url`
+ * fields — must be the exact address that answers 200. Netlify 301-redirects
+ * `/services` → `/services/`, so a slash-less URL in structured data points at a
+ * redirect and weakens the signal.
+ */
+export function withTrailingSlash(url: string): string {
+  if (!url) return url;
+  const [base, ...rest] = url.split(/([?#])/);
+  const suffix = rest.join("");
+  if (/\.[a-z0-9]{2,5}$/i.test(base)) return url; // a file, not a route
+  return base.endsWith("/") ? `${base}${suffix}` : `${base}/${suffix}`;
+}
+
+/**
  * Builds the self-referential canonical URL for a route.
  *
  * The site is served with a forced TRAILING SLASH (Netlify redirects

@@ -16,7 +16,6 @@
     <meta name="geo.region" content="IL" />
     <meta name="geo.country" content="Israel" />
     <meta name="language" content="Hebrew" />
-    <meta name="revisit-after" content="7 days" />
 
     <!-- ══ Canonical ══ -->
     <link rel="canonical" href="https://nz-web.com/" />
@@ -26,7 +25,6 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="NZ-web" />
     <meta property="og:locale" content="he_IL" />
-    <meta property="og:locale:alternate" content="en_US" />
     <meta property="og:url" content="https://nz-web.com/" />
     <meta property="og:title" content="NZ-web | בניית אתרים ופיתוח אתרים מקצועי לעסקים בישראל" />
     <meta property="og:description" content="NZ-web – סטודיו מוביל לבניית אתרים ופיתוח אתרים בישראל. בניית אתר תדמית, בניית אתר מכירות, חנות אונליין, דפי נחיתה ומערכת ניהול תורים. ביצועים ללא פשרות." />
@@ -52,17 +50,30 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <!-- ══ Fonts ══
+         Self-hosted (was a CSS @import from fonts.googleapis.com, which the
+         browser could only discover AFTER downloading and parsing the whole
+         bundled stylesheet — two extra origins on the critical path). The
+         @font-face rules are inlined so they are known at first byte, and the
+         two faces used above the fold are preloaded. -->
+    <link rel="preload" href="/fonts/heebo-400-hebrew.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/heebo-900-hebrew.woff2" as="font" type="font/woff2" crossorigin />
+    <style id="nz-fonts">@font-face {font-family:'Heebo';font-style:normal;font-weight:300;font-display:swap;src:url('/fonts/heebo-300-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face {font-family:'Heebo';font-style:normal;font-weight:300;font-display:swap;src:url('/fonts/heebo-300-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face {font-family:'Heebo';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/heebo-400-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face {font-family:'Heebo';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/heebo-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face {font-family:'Heebo';font-style:normal;font-weight:500;font-display:swap;src:url('/fonts/heebo-500-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face {font-family:'Heebo';font-style:normal;font-weight:500;font-display:swap;src:url('/fonts/heebo-500-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face {font-family:'Heebo';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/heebo-600-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face {font-family:'Heebo';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/heebo-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face {font-family:'Heebo';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/heebo-700-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face {font-family:'Heebo';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/heebo-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face {font-family:'Heebo';font-style:normal;font-weight:800;font-display:swap;src:url('/fonts/heebo-800-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face {font-family:'Heebo';font-style:normal;font-weight:800;font-display:swap;src:url('/fonts/heebo-800-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face {font-family:'Heebo';font-style:normal;font-weight:900;font-display:swap;src:url('/fonts/heebo-900-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face {font-family:'Heebo';font-style:normal;font-weight:900;font-display:swap;src:url('/fonts/heebo-900-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face {font-family:'Rubik';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/rubik-400-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face {font-family:'Rubik';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/rubik-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face {font-family:'Rubik';font-style:normal;font-weight:500;font-display:swap;src:url('/fonts/rubik-500-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face {font-family:'Rubik';font-style:normal;font-weight:500;font-display:swap;src:url('/fonts/rubik-500-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face {font-family:'Rubik';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/rubik-600-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face {font-family:'Rubik';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/rubik-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face {font-family:'Rubik';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/rubik-700-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}@font-face {font-family:'Rubik';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/rubik-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}</style>
+
     <!-- ══ Performance ══ -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://wa.me" />
 
-    <!-- ══ JSON-LD: LocalBusiness + ProfessionalService ══ -->
+    <!-- ══ JSON-LD: the single business entity ══
+         One node, one @id. LocalBusiness and ProfessionalService are both
+         subtypes of Organization, so a separate Organization node would only
+         split the same company into two entities in the knowledge graph.
+         Everything else on the site (WebSite.publisher, Service.provider,
+         BlogPosting.publisher) points back at this @id. -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": ["LocalBusiness", "ProfessionalService"],
-      "@id": "https://nz-web.com/#business",
+      "@type": ["Organization", "LocalBusiness", "ProfessionalService"],
+      "@id": "https://nz-web.com/#organization",
       "name": "NZ-web",
       "alternateName": ["NZ web", "NZ-web סטודיו", "סטודיו NZ-web"],
       "url": "https://nz-web.com/",
@@ -78,6 +89,19 @@
       "priceRange": "₪₪",
       "currenciesAccepted": "ILS",
       "paymentAccepted": "Cash, Credit Card, Bank Transfer",
+      "telephone": "+972-58-7292029",
+      "email": "nzweb295@gmail.com",
+      "knowsAbout": [
+        "בניית אתרים",
+        "פיתוח אתרים",
+        "בניית אתר תדמית",
+        "דפי נחיתה",
+        "מערכת ניהול תורים",
+        "קידום אתרים אורגני",
+        "עיצוב UI/UX",
+        "React",
+        "TypeScript"
+      ],
       "areaServed": [
         { "@type": "Country", "name": "Israel", "sameAs": "https://www.wikidata.org/wiki/Q801" },
         { "@type": "City", "name": "תל אביב" },
@@ -92,8 +116,16 @@
       "address": {
         "@type": "PostalAddress",
         "addressCountry": "IL",
-        "addressLocality": "ישראל"
+        "addressRegion": "ישראל"
       },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],
+          "opens": "09:00",
+          "closes": "18:00"
+        }
+      ],
       "contactPoint": [
         {
           "@type": "ContactPoint",
@@ -101,21 +133,18 @@
           "email": "nzweb295@gmail.com",
           "contactType": "customer service",
           "availableLanguage": ["Hebrew", "English"],
-          "contactOption": "TollFree",
-          "hoursAvailable": {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Sunday","Monday","Tuesday","Wednesday","Thursday"],
-            "opens": "09:00",
-            "closes": "18:00"
-          }
+          "areaServed": "IL"
         }
       ],
       "founder": {
         "@type": "Person",
+        "@id": "https://nz-web.com/#founder",
         "name": "צבי משה",
         "alternateName": "Zvi Moshe",
         "jobTitle": "Full Stack Developer & UI/UX Expert",
-        "knowsAbout": ["בניית אתרים","פיתוח אתרים","React","TypeScript","UI/UX Design","SEO"]
+        "url": "https://nz-web.com/about/",
+        "worksFor": { "@id": "https://nz-web.com/#organization" },
+        "knowsAbout": ["בניית אתרים", "פיתוח אתרים", "React", "TypeScript", "UI/UX Design", "SEO"]
       },
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
@@ -126,7 +155,7 @@
             "itemOffered": {
               "@type": "Service",
               "name": "בניית אתרים מקצועיים",
-              "url": "https://nz-web.com/services/web-development",
+              "url": "https://nz-web.com/services/web-development/",
               "description": "בניית אתרים מהירים, יציבים ומרהיבים לעסקים בישראל"
             }
           },
@@ -135,7 +164,7 @@
             "itemOffered": {
               "@type": "Service",
               "name": "בניית אתר תדמית לעסקים",
-              "url": "https://nz-web.com/services/business-website",
+              "url": "https://nz-web.com/services/business-website/",
               "description": "בניית אתר תדמית מקצועי שמייצג את העסק ומביא לידים"
             }
           },
@@ -144,7 +173,7 @@
             "itemOffered": {
               "@type": "Service",
               "name": "מערכת ניהול תורים",
-              "url": "https://nz-web.com/services/appointment-system",
+              "url": "https://nz-web.com/services/appointment-system/",
               "description": "מערכת קביעת תורים חכמה לעסקים עם הזמנות אונליין ותזכורות אוטומטיות"
             }
           },
@@ -153,7 +182,7 @@
             "itemOffered": {
               "@type": "Service",
               "name": "בניית דפי נחיתה",
-              "url": "https://nz-web.com/services/landing-page-development",
+              "url": "https://nz-web.com/services/landing-page-development/",
               "description": "דפי נחיתה ממירים לקמפיינים ממומנים"
             }
           },
@@ -162,22 +191,18 @@
             "itemOffered": {
               "@type": "Service",
               "name": "פיתוח אתרים",
-              "url": "https://nz-web.com/services/website-development",
+              "url": "https://nz-web.com/services/website-development/",
               "description": "פיתוח אתרים מתקדם עם ארכיטקטורה שמחזיקה לשנים"
             }
           }
         ]
       },
-      "sameAs": [
-        "https://www.facebook.com/nzweb",
-        "https://www.linkedin.com/company/nz-web",
-        "https://github.com/nz-web"
-      ],
+      "sameAs": ["https://share.google/EdFxHaKFKBy4TeMvW"],
       "inLanguage": ["he", "en"]
     }
     </script>
 
-    <!-- ══ JSON-LD: WebSite with SearchAction ══ -->
+    <!-- ══ JSON-LD: WebSite ══ -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -187,55 +212,7 @@
       "url": "https://nz-web.com/",
       "inLanguage": "he",
       "description": "סטודיו לבניית אתרים ופיתוח אתרים מקצועי בישראל",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://nz-web.com/blog?q={search_term_string}"
-        },
-        "query-input": "required name=search_term_string"
-      },
-      "publisher": {
-        "@id": "https://nz-web.com/#business"
-      }
-    }
-    </script>
-
-    <!-- ══ JSON-LD: BreadcrumbList root ══ -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "ראשי", "item": "https://nz-web.com/" },
-        { "@type": "ListItem", "position": 2, "name": "שירותים", "item": "https://nz-web.com/services" },
-        { "@type": "ListItem", "position": 3, "name": "פרויקטים", "item": "https://nz-web.com/projects" },
-        { "@type": "ListItem", "position": 4, "name": "בלוג", "item": "https://nz-web.com/blog" },
-        { "@type": "ListItem", "position": 5, "name": "צרו קשר", "item": "https://nz-web.com/contact" }
-      ]
-    }
-    </script>
-
-    <!-- ══ JSON-LD: Organization ══ -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "@id": "https://nz-web.com/#organization",
-      "name": "NZ-web",
-      "url": "https://nz-web.com/",
-      "logo": "https://nz-web.com/nz-web-logo.png",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+972-58-7292029",
-        "email": "nzweb295@gmail.com",
-        "contactType": "sales",
-        "availableLanguage": ["Hebrew","English"]
-      },
-      "sameAs": [
-        "https://www.facebook.com/nzweb",
-        "https://www.linkedin.com/company/nz-web"
-      ]
+      "publisher": { "@id": "https://nz-web.com/#organization" }
     }
     </script>
   </head>

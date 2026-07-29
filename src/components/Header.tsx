@@ -86,17 +86,21 @@ const ServicesDropdown = ({ onClose }: { onClose: () => void }) => {
         <p className="mb-3 px-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
           השירותים שלנו
         </p>
+        {/* Anchors, not buttons: these six are the primary internal links to the
+            service pages. A crawler cannot follow an onClick handler, and a
+            keyboard user cannot Tab to a link that does not exist. */}
         <div className="grid grid-cols-2 gap-1.5">
           {serviceLinks.map((svc) => {
             const Icon = svc.icon;
             return (
-              <button
+              <a
                 key={svc.href}
-                onClick={() => { navigate(svc.href); onClose(); }}
-                className="group flex items-start gap-3 rounded-2xl p-3 text-right transition-all duration-200 hover:bg-primary/[0.07]"
+                href={svc.href}
+                onClick={(e) => { e.preventDefault(); navigate(svc.href); onClose(); }}
+                className="group flex items-start gap-3 rounded-2xl p-3 text-right transition-all duration-200 hover:bg-primary/[0.07] focus-visible:bg-primary/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               >
                 <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-1/12 to-brand-3/12 transition-all duration-300 group-hover:from-brand-1/25 group-hover:to-brand-3/25 group-hover:scale-105">
-                  <Icon className="h-4 w-4 text-primary" strokeWidth={1.9} />
+                  <Icon aria-hidden="true" className="h-4 w-4 text-primary" strokeWidth={1.9} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold leading-snug text-foreground group-hover:text-primary transition-colors">
@@ -106,21 +110,22 @@ const ServicesDropdown = ({ onClose }: { onClose: () => void }) => {
                     {svc.desc}
                   </p>
                 </div>
-              </button>
+              </a>
             );
           })}
         </div>
 
         {/* Bottom CTA */}
         <div className="mt-3 border-t border-border/40 pt-3">
-          <button
-            onClick={() => { navigate("/contact/"); onClose(); }}
-            className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-primary/[0.08] py-3 text-sm font-semibold text-primary transition-all hover:bg-primary/[0.15]"
+          <a
+            href="/contact/"
+            onClick={(e) => { e.preventDefault(); navigate("/contact/"); onClose(); }}
+            className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-primary/[0.08] py-3 text-sm font-semibold text-primary transition-all hover:bg-primary/[0.15] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           >
-            <MessageCircle className="h-4 w-4" />
+            <MessageCircle aria-hidden="true" className="h-4 w-4" />
             לא בטוחים איזה שירות? דברו איתנו
-            <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
-          </button>
+            <ArrowLeft aria-hidden="true" className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
+          </a>
         </div>
       </div>
     </motion.div>
@@ -136,6 +141,7 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const servicesRef = useRef<HTMLDivElement>(null);
+  const servicesTriggerRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -250,9 +256,27 @@ const Header = () => {
                     className="relative"
                     onMouseEnter={() => setServicesOpen(true)}
                     onMouseLeave={() => setServicesOpen(false)}
+                    /* Focus mirrors hover, so the panel is reachable with Tab and
+                       closes on Escape. It used to open on hover only, which meant
+                       a keyboard user could never reach the six service links. */
+                    onFocus={() => setServicesOpen(true)}
+                    onBlur={(e) => {
+                      if (!e.currentTarget.contains(e.relatedTarget as Node)) setServicesOpen(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape" && servicesOpen) {
+                        e.preventDefault();
+                        setServicesOpen(false);
+                        servicesTriggerRef.current?.focus();
+                      }
+                    }}
                   >
-                    <button
-                      onClick={() => { navigate("/services/"); setServicesOpen(false); }}
+                    <a
+                      ref={servicesTriggerRef}
+                      href="/services/"
+                      aria-expanded={servicesOpen}
+                      aria-haspopup="true"
+                      onClick={(e) => { e.preventDefault(); navigate("/services/"); setServicesOpen(false); }}
                       className={`relative flex items-center gap-1 rounded-full px-3.5 py-2 font-rubik text-[13.5px] font-medium tracking-wide transition-all duration-200 lg:text-[14.5px] ${
                         servicesOpen
                           ? "bg-background text-foreground shadow-soft"
@@ -261,9 +285,10 @@ const Header = () => {
                     >
                       שירותים
                       <ChevronDown
+                        aria-hidden="true"
                         className={`h-3.5 w-3.5 transition-transform duration-200 ${servicesOpen ? "rotate-180" : ""}`}
                       />
-                    </button>
+                    </a>
                     <AnimatePresence>
                       {servicesOpen && (
                         <ServicesDropdown onClose={() => setServicesOpen(false)} />

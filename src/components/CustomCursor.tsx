@@ -54,46 +54,43 @@ const CustomCursor = () => {
       });
     };
 
-    const onEnterInteractive = () => {
+    const INTERACTIVE = "a, button, [role='button'], input, textarea, select, [data-hover]";
+
+    const grow = () => {
       gsap.to(cursor, { scale: 0.4, opacity: 0.6, duration: 0.3, ease: "power2.out" });
       gsap.to(follower, { scale: 1.8, opacity: 0.08, duration: 0.4, ease: "power2.out", borderWidth: 2 });
     };
 
-    const onLeaveInteractive = () => {
+    const shrink = () => {
       gsap.to(cursor, { scale: 1, opacity: 1, duration: 0.3, ease: "power2.out" });
       gsap.to(follower, { scale: 1, opacity: 0.12, duration: 0.4, ease: "power2.out", borderWidth: 1.5 });
     };
 
-    window.addEventListener("mousemove", onMove);
-
-    const attachEvents = () => {
-      const interactiveElements = document.querySelectorAll("a, button, [role='button'], input, textarea, [data-hover]");
-      interactiveElements.forEach((el) => {
-        el.addEventListener("mouseenter", onEnterInteractive);
-        el.addEventListener("mouseleave", onLeaveInteractive);
-      });
-      return interactiveElements;
+    /* Two delegated listeners on the document — previously this queried every
+       `a, button, input…` in the page and bound two listeners to each, then a
+       MutationObserver re-ran that whole scan on any DOM change while only ever
+       cleaning up the FIRST batch, so listeners accumulated for the whole
+       session. Delegation is O(1) and cannot leak. */
+    const onOver = (e: MouseEvent) => {
+      const from = (e.relatedTarget as Element | null)?.closest?.(INTERACTIVE) ?? null;
+      const to = (e.target as Element | null)?.closest?.(INTERACTIVE) ?? null;
+      if (to && to !== from) grow();
     };
 
-    const elements = attachEvents();
+    const onOut = (e: MouseEvent) => {
+      const from = (e.target as Element | null)?.closest?.(INTERACTIVE) ?? null;
+      const to = (e.relatedTarget as Element | null)?.closest?.(INTERACTIVE) ?? null;
+      if (from && from !== to) shrink();
+    };
 
-    // Re-attach on DOM changes for dynamic content
-    const observer = new MutationObserver(() => {
-      elements.forEach((el) => {
-        el.removeEventListener("mouseenter", onEnterInteractive);
-        el.removeEventListener("mouseleave", onLeaveInteractive);
-      });
-      attachEvents();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener("mousemove", onMove, { passive: true });
+    document.addEventListener("mouseover", onOver, { passive: true });
+    document.addEventListener("mouseout", onOut, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", onMove);
-      observer.disconnect();
-      elements.forEach((el) => {
-        el.removeEventListener("mouseenter", onEnterInteractive);
-        el.removeEventListener("mouseleave", onLeaveInteractive);
-      });
+      document.removeEventListener("mouseover", onOver);
+      document.removeEventListener("mouseout", onOut);
     };
   }, [isEnabled]);
 
@@ -106,6 +103,8 @@ const CustomCursor = () => {
       {/* Inner dot - bigger, bluer */}
       <div
         ref={cursorRef}
+        data-nz-cursor="dot"
+        aria-hidden="true"
         className="pointer-events-none fixed top-0 left-0 z-[10001] hidden lg:block"
         style={{
           width: 16,
@@ -121,6 +120,8 @@ const CustomCursor = () => {
       {/* Outer follower ring - larger, softer glow */}
       <div
         ref={followerRef}
+        data-nz-cursor="ring"
+        aria-hidden="true"
         className="pointer-events-none fixed top-0 left-0 z-[10000] hidden lg:block"
         style={{
           width: 52,

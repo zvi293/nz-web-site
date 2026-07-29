@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import {
@@ -12,6 +12,7 @@ import BackToTopButton from "@/components/BackToTopButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
 import BackToHome from "@/components/BackToHome";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -92,7 +93,6 @@ const whyUs = [
 ];
 
 const ServicesIndex = () => {
-  const navigate = useNavigate();
   const headerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(headerRef, { once: true });
 
@@ -104,10 +104,16 @@ const ServicesIndex = () => {
   useBreadcrumb({ name: "שירותים", path: "/services" });
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <AmbientShapes />
       <Header />
       <BackToHome />
+
+      <main id="page-content">
+
+      <div className="container mx-auto px-6 pt-6">
+        <Breadcrumbs items={[{ label: "שירותים" }]} className="mb-0" />
+      </div>
 
       {/* ── Hero ── */}
       <section className="relative overflow-hidden py-20 md:py-28">
@@ -166,8 +172,10 @@ const ServicesIndex = () => {
                       ✦ הכי פופולרי
                     </div>
                   )}
-                  <button
-                    onClick={() => navigate(svc.href)}
+                  {/* A real link — these six cards are the hub's primary internal
+                      links, and an onClick <button> is invisible to crawlers. */}
+                  <Link
+                    to={svc.href}
                     className="group relative flex h-full w-full flex-col overflow-hidden rounded-3xl border bg-card p-7 text-right transition-all duration-400 hover:-translate-y-1.5 hover:shadow-2xl"
                     style={{
                       borderColor: svc.popular ? `rgba(${svc.accentRgb},0.35)` : "hsl(var(--border)/0.5)",
@@ -227,7 +235,7 @@ const ServicesIndex = () => {
                         <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
                       </div>
                     </div>
-                  </button>
+                  </Link>
                 </motion.div>
               );
             })}
@@ -287,21 +295,23 @@ const ServicesIndex = () => {
           <p className="mb-10 text-lg text-white/60">
             דברו איתנו — נבין את הצרכים ונמליץ על הפתרון הנכון. בלי התחייבות.
           </p>
-          <button
-            onClick={() => navigate("/contact/")}
+          <Link
+            to="/contact/"
             className="btn-brand inline-flex items-center gap-2.5 rounded-2xl px-10 py-5 text-lg font-bold transition-all duration-300 hover:scale-[1.04]"
           >
             <MessageCircle className="h-5 w-5" />
             פגישת ייעוץ ללא עלות
-          </button>
+          </Link>
         </motion.div>
       </section>
+
+      </main>
 
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

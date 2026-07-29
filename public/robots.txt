@@ -1,26 +1,42 @@
+# nz-web.com — everything is crawlable except the post-submit thank-you page.
 User-agent: *
 Allow: /
 Disallow: /thank-you
 
-User-agent: Googlebot
+# ── AI / answer-engine crawlers (GEO·AEO·LLMO) — explicitly welcome ──
+User-agent: GPTBot
 Allow: /
 
-User-agent: Googlebot-Image
+User-agent: OAI-SearchBot
 Allow: /
 
-User-agent: Bingbot
+User-agent: ChatGPT-User
 Allow: /
 
-User-agent: Twitterbot
+User-agent: ClaudeBot
 Allow: /
 
-User-agent: facebookexternalhit
+User-agent: Claude-Web
 Allow: /
 
-User-agent: LinkedInBot
+User-agent: anthropic-ai
 Allow: /
 
-User-agent: WhatsApp
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: CCBot
 Allow: /
 
 Sitemap: https://nz-web.com/sitemap.xml
+
+# Summary of the business for language models: https://nz-web.com/llms.txt

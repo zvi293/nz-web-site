@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@400;500;600;700&display=swap');
+/* Heebo + Rubik are self-hosted from /public/fonts and declared inline in
+   index.html — see the "Fonts" block there. An @import here would put two extra
+   origins (fonts.googleapis.com → fonts.gstatic.com) on the critical path,
+   discoverable only after this whole stylesheet had been downloaded and parsed. */
 
 @tailwind base;
 
@@ -144,9 +147,12 @@ html {
     letter-spacing: -0.022em;
   }
 
-  /* Hide default cursor only while the custom cursor is actually mounted. */
+  /* Hide default cursor only while the custom cursor is actually mounted.
+     `body:not(.a11y-big-cursor)` is load-bearing: without it this rule (higher
+     specificity, also !important) beat the accessibility menu's "big cursor"
+     option and the feature silently did nothing on desktop. */
   @media (min-width: 1024px) {
-    html[data-custom-cursor="on"] * {
+    html[data-custom-cursor="on"] body:not(.a11y-big-cursor) * {
       cursor: none !important;
     }
   }
@@ -791,10 +797,14 @@ button:active, a:active {
   transition: none !important;
 }
 
-/* Big Cursor */
+/* Big Cursor — replaces the system pointer with an oversized one. The decorative
+   custom cursor is hidden while it is on, otherwise two pointers chase each other. */
 .a11y-big-cursor,
 .a11y-big-cursor * {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M8 8L40 20L24 26L18 40Z' fill='%23000' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") 8 8, auto !important;
+}
+.a11y-big-cursor [data-nz-cursor] {
+  display: none !important;
 }
 
 /* Focus Outline */

@@ -10,6 +10,7 @@ import { Plus, Minus, Code2, Palette, Zap, Users, Award, Star, ArrowLeft } from 
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { aboutContent } from "@/content/about";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -39,7 +40,7 @@ const statsData = [
 
 const coreValues = [
   { icon: Code2, title: "קוד נקי", desc: "כל שורת קוד נכתבת עם תשומת לב מלאה לביצועים, קריאות ותחזוקה." },
-  { icon: Palette, title: "עיצוב מדויק", desc: "כל פיקסל מתוכנן. חווית משתמש שמרגישה טבעית ומוביאה תוצאות." },
+  { icon: Palette, title: "עיצוב מדויק", desc: "כל פיקסל מתוכנן. חווית משתמש שמרגישה טבעית ומביאה תוצאות." },
   { icon: Zap, title: "ביצועים ראשונים", desc: "אתרים שנטענים מהר, עובדים חלק ומדורגים גבוה בגוגל." },
 ];
 
@@ -64,30 +65,38 @@ const AccordionColumn = ({ title, items, delayOffset = 0 }: AccordionColumnProps
       <div className="flex flex-col gap-3">
         {items.map((item, i) => {
           const isOpen = openIndex === i;
+          const panelId = `about-panel-${title.replace(/\s+/g, "-")}-${i}`;
           return (
             <div key={i} className="border-b border-border/50 pb-3">
               <button
+                type="button"
                 onClick={() => setOpenIndex(isOpen ? null : i)}
+                aria-expanded={isOpen}
+                aria-controls={panelId}
                 className="flex w-full items-center justify-between gap-4 text-right group cursor-pointer"
               >
                 <span className="text-base font-bold text-foreground transition-colors group-hover:text-primary md:text-lg">
                   {item.title}
                 </span>
-                <span className="shrink-0 text-muted-foreground transition-colors group-hover:text-primary">
+                <span aria-hidden="true" className="shrink-0 text-muted-foreground transition-colors group-hover:text-primary">
                   {isOpen ? <Minus size={18} /> : <Plus size={18} />}
                 </span>
               </button>
-              {isOpen && (
-                <motion.p
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden pt-3 text-sm leading-relaxed text-muted-foreground md:text-base"
-                >
+              {/* Collapsed, not unmounted — the copy has to survive into the
+                  pre-rendered HTML, otherwise crawlers get bare headings. */}
+              <motion.div
+                id={panelId}
+                aria-hidden={!isOpen}
+                {...(isOpen ? {} : { inert: "" })}
+                initial={false}
+                animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <p className="pt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
                   {item.desc}
-                </motion.p>
-              )}
+                </p>
+              </motion.div>
             </div>
           );
         })}
@@ -110,10 +119,16 @@ const About = () => {
   useBreadcrumb({ name: "מי אנחנו", path: "/about" });
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <AmbientShapes />
       <Header />
       <BackToHome />
+
+      <main id="page-content">
+
+      <div className="container mx-auto max-w-3xl px-6 pt-6">
+        <Breadcrumbs items={[{ label: "מי אנחנו" }]} className="mb-0" />
+      </div>
 
       {/* ── Hero ── */}
       <section className="nz-grain relative overflow-hidden py-20 md:py-28">
@@ -316,11 +331,13 @@ const About = () => {
         </motion.div>
       </section>
 
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

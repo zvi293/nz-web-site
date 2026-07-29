@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import * as LucideIcons from "lucide-react";
+import { Target, Palette, Code2, Search, type LucideIcon } from "lucide-react";
 
 import { publishedServices } from "@/content/services";
 import type { ServiceItem } from "@/content/types";
@@ -21,31 +21,53 @@ const fallbackImagesByOrder: Record<number, string> = {
   4: serviceSeo,
 };
 
+/* Intrinsic pixel size of each fallback image, so the <img> can reserve its box
+   before the file arrives. A service that supplies its own `image` has no known
+   size — it falls back to the block's own 4:3 ratio. */
+const fallbackSizesByOrder: Record<number, { w: number; h: number }> = {
+  1: { w: 1024, h: 1024 },
+  2: { w: 1824, h: 1824 },
+  3: { w: 1280, h: 720 },
+  4: { w: 743, h: 557 },
+};
+
 const getServiceImage = (service: ServiceItem) => {
   return isRenderableAssetUrl(service.image)
     ? service.image
     : fallbackImagesByOrder[service.order] || servicePlanning;
 };
 
+const getServiceImageSize = (service: ServiceItem) =>
+  isRenderableAssetUrl(service.image)
+    ? undefined
+    : fallbackSizesByOrder[service.order] ?? fallbackSizesByOrder[1];
+
+/* Only the icons the content actually names.
+   This was `import * as LucideIcons` + a dynamic lookup, which is un-tree-shakeable:
+   rollup had to keep ALL ~1,600 lucide icons, and they shipped in the main bundle
+   on every page. Adding a new `iconLucideName` to src/content/services.ts means
+   adding it here too — that is the trade, and it is worth ~700KB. */
+const SERVICE_ICONS: Record<string, LucideIcon> = {
+  Target,
+  Palette,
+  Code2,
+  Search,
+};
+
 const IconRenderer = ({ service }: { service: ServiceItem }) => {
   if (service.iconType === "image" && isRenderableAssetUrl(service.iconImage)) {
-    return <img src={service.iconImage} alt={`אייקון שירות ${service.badge}`} className="h-7 w-7 object-contain" />;
+    return <img src={service.iconImage} alt="" aria-hidden="true" className="h-7 w-7 object-contain" />;
   }
   if (service.iconType === "svg" && isSafeInlineSvg(service.iconSvg)) {
-    return <div className="h-7 w-7 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: service.iconSvg }} />;
+    return <div className="h-7 w-7 flex items-center justify-center" aria-hidden="true" dangerouslySetInnerHTML={{ __html: service.iconSvg }} />;
   }
-  
-  if (service.iconType === "lucide" && service.iconLucideName) {
-    // @ts-ignore
-    const IconComponent = LucideIcons[service.iconLucideName];
-    if (IconComponent) {
-      return <IconComponent className="h-7 w-7" />;
-    }
-  }
-  
-  // Default fallback
-  const DefaultIcon = LucideIcons.Target;
-  return <DefaultIcon className="h-7 w-7" />;
+
+  const IconComponent =
+    (service.iconType === "lucide" && service.iconLucideName
+      ? SERVICE_ICONS[service.iconLucideName]
+      : undefined) ?? Target;
+
+  return <IconComponent className="h-7 w-7" aria-hidden="true" />;
 };
 
 const ServiceVisual = ({
@@ -61,6 +83,7 @@ const ServiceVisual = ({
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
   const hasVideo = Boolean(service.video && isRenderableAssetUrl(service.video) && !videoFailed);
   const posterSrc = getServiceImage(service);
+  const imageSize = getServiceImageSize(service);
 
   const clearPlayTimer = () => {
     if (playTimerRef.current) {
@@ -241,17 +264,21 @@ const ServiceVisual = ({
             <img
             src={getServiceImage(service)}
             alt={`שירות ${service.badge} – NZ-web`}
+            width={imageSize?.w}
+            height={imageSize?.h}
             className="w-full h-auto object-cover"
             loading="lazy"
             decoding="async" />
-          
+
             <video
             ref={videoRef}
             src={videoSrc ?? undefined}
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="none"
+            aria-hidden="true"
+            tabIndex={-1}
             poster={posterSrc}
             onCanPlay={() => {
               if (shouldPlayRef.current) {
@@ -266,6 +293,8 @@ const ServiceVisual = ({
         <img
           src={getServiceImage(service)}
           alt={`שירות ${service.badge} – NZ-web`}
+          width={imageSize?.w}
+          height={imageSize?.h}
           className="w-full h-auto object-cover"
           loading="lazy"
           decoding="async" />

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import { ArrowLeft, Check, ChevronDown, type LucideIcon } from "lucide-react";
@@ -11,8 +11,10 @@ import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
 import PricingSection from "@/components/PricingSection";
 import MarqueeRibbon from "@/components/MarqueeRibbon";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
+import { withTrailingSlash } from "@/lib/site-url";
 
 /* ─────────────── Types ─────────────── */
 export interface ServiceFeature {
@@ -97,6 +99,9 @@ export interface ServicePageConfig {
 
 const FaqItem = ({ faq, index }: { faq: ServiceFaq; index: number }) => {
   const [open, setOpen] = useState(false);
+  const reactId = useId();
+  const panelId = `svc-faq-panel-${reactId}`;
+  const buttonId = `svc-faq-button-${reactId}`;
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -105,16 +110,29 @@ const FaqItem = ({ faq, index }: { faq: ServiceFaq; index: number }) => {
       transition={{ delay: index * 0.07, duration: 0.45 }}
       className="overflow-hidden rounded-2xl border border-border/40 bg-card transition-shadow duration-200 hover:shadow-md"
     >
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-right"
-      >
-        <span className="text-sm font-bold text-foreground md:text-base">{faq.q}</span>
-        <ChevronDown
-          className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
+      <h3 className="m-0">
+        <button
+          type="button"
+          id={buttonId}
+          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          aria-controls={panelId}
+          className="flex w-full items-center justify-between gap-4 px-6 py-5 text-right"
+        >
+          <span className="text-sm font-bold text-foreground md:text-base">{faq.q}</span>
+          <ChevronDown
+            aria-hidden="true"
+            className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+          />
+        </button>
+      </h3>
+      {/* Collapsed via height, never unmounted — see FaqAccordionItem for why. */}
       <motion.div
+        id={panelId}
+        role="region"
+        aria-labelledby={buttonId}
+        aria-hidden={!open}
+        {...(open ? {} : { inert: "" })}
         initial={false}
         animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
@@ -143,12 +161,16 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
     script.textContent = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Service",
+      "@id": `${withTrailingSlash(config.schemaUrl)}#service`,
       serviceType: config.schemaServiceType,
       name: config.seo.title,
       description: config.seo.description,
-      provider: { "@type": "Organization", name: "NZ-web", url: "https://nz-web.com" },
+      /* Reference the single business entity declared in index.html rather than
+         re-describing it — one provider entity, not one per service page. */
+      provider: { "@id": "https://nz-web.com/#organization" },
       areaServed: { "@type": "Country", name: "Israel" },
-      url: config.schemaUrl,
+      availableLanguage: "he",
+      url: withTrailingSlash(config.schemaUrl),
     });
     document.getElementById(config.schemaId)?.remove();
     document.head.appendChild(script);
@@ -182,10 +204,12 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
   const BadgeIcon = config.hero.badgeIcon;
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <AmbientShapes />
       <Header />
       <BackToHome />
+
+      <main id="page-content">
 
       {/* ── Hero ── */}
       <section className="nz-brand-dark nz-grain relative overflow-hidden py-20 md:py-28">
@@ -262,6 +286,15 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
       {/* ── Intro ── */}
       <section className="py-14 md:py-20">
         <div className="container mx-auto max-w-3xl px-6">
+          {/* Visible trail matching the BreadcrumbList JSON-LD above. */}
+          <Breadcrumbs
+            items={[
+              ...(config.breadcrumb.parent
+                ? [{ label: config.breadcrumb.parent.name, href: withTrailingSlash(config.breadcrumb.parent.path) }]
+                : []),
+              { label: config.breadcrumb.name },
+            ]}
+          />
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -647,11 +680,13 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
         </motion.div>
       </section>
 
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

@@ -9,6 +9,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import BackToTopButton from "@/components/BackToTopButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { getMailtoHref, getTelHref, contactInfo } from "@/lib/contact-utils";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -64,8 +65,14 @@ const Contact = () => {
   }, []);
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
+
+      <main id="page-content">
+
+      <div className="container mx-auto px-6 pt-6">
+        <Breadcrumbs items={[{ label: "צור קשר" }]} className="mb-0" />
+      </div>
 
       {/* ג”€ג”€ Hero Banner ג”€ג”€ */}
       <section
@@ -159,11 +166,13 @@ const Contact = () => {
       {/* ג”€ג”€ Contact Form ג”€ג”€ */}
       <ContactSection />
 
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>);
+    </div>);
 
 };
 

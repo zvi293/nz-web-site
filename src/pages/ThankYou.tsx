@@ -13,6 +13,9 @@ const ThankYou = () => {
   useSeoMeta({
     title: "תודה על הפנייה | NZ-web",
     description: "תודה שפנית אלינו! קיבלנו את הפנייה שלך ונחזור אליך בהקדם.",
+    /* Transactional page — it has a static file so a refresh works, but it must
+       never enter the index (it is also Disallow-ed in robots.txt). */
+    noindex: true,
   });
   useBreadcrumb({ name: "תודה על הפנייה", path: "/thank-you" });
 
@@ -20,13 +23,13 @@ const ThankYou = () => {
     {
       number: "1",
       icon: <Mail className="h-6 w-6" />,
-      title: "תקבלו אישור במייל",
-      description: "תקבלו אישור בדוא״ל תוך כמה דקות",
+      title: "הפנייה נשלחה בוואטסאפ",
+      description: "ההודעה עם הפרטים שמילאתם נפתחה בוואטסאפ שלנו",
     },
     {
       number: "2",
       icon: <Users className="h-6 w-6" />,
-      title: "נייצור איתכם קשר",
+      title: "ניצור איתכם קשר",
       description: "ניצור איתכם קשר תוך 24 שעות",
     },
     {
@@ -38,8 +41,10 @@ const ThankYou = () => {
   ];
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
+
+      <main id="page-content">
 
       {/* Main Content */}
       <section className="relative min-h-screen flex items-center justify-center py-20 px-6 overflow-hidden">
@@ -163,11 +168,13 @@ const ThankYou = () => {
         </div>
       </section>
 
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

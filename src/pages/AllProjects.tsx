@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { publishedProjects } from "@/content/projects";
@@ -7,9 +7,14 @@ import { createLabeledImageDataUri, isRenderableAssetUrl } from "@/lib/runtime-s
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import BackToTopButton from "@/components/BackToTopButton";
+import AccessibilityWidget from "@/components/AccessibilityWidget";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import gsap from "gsap";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
+import { getAbsoluteAssetUrl } from "@/lib/site-url";
 
 const ProjectCardImage = ({ project }: { project: Project }) => {
   const fallbackSrc = createLabeledImageDataUri(project.title, {
@@ -40,11 +45,45 @@ const AllProjects = () => {
   const projects = publishedProjects;
   const gridRef = useRef<HTMLDivElement>(null);
 
+  /* An ItemList makes the portfolio machine-readable: search engines and answer
+     engines get the work as structured entries rather than as a wall of cards. */
+  const collectionSchema = useMemo(
+    () => ({
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "@id": "https://nz-web.com/projects/#collection",
+      name: "פרויקטים של NZ-web",
+      description:
+        "פרויקטי בניית אתרים ופיתוח אתרים שביצענו ללקוחות בישראל — אתרי תדמית, מערכות ניהול תורים ודפי נחיתה.",
+      url: "https://nz-web.com/projects/",
+      inLanguage: "he",
+      isPartOf: { "@id": "https://nz-web.com/#website" },
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: projects.length,
+        itemListElement: projects.map((project, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          item: {
+            "@type": "CreativeWork",
+            name: project.title,
+            description: project.description,
+            ...(project.link ? { url: project.link } : {}),
+            ...(getAbsoluteAssetUrl(project.image) ? { image: getAbsoluteAssetUrl(project.image) } : {}),
+            creator: { "@id": "https://nz-web.com/#organization" },
+          },
+        })),
+      },
+    }),
+    [projects],
+  );
+
   useSeoMeta({
     title: "פורטפוליו | פרויקטי בניית אתרים ופיתוח | NZ-web",
     description:
       "גלו פרויקטי בניית אתרים ופיתוח אתרים שביצענו ללקוחות בישראל. אתרי תדמית, חנויות אונליין, מערכות ניהול תורים ודפי נחיתה — כל פרויקט עם תוצאות מדידות.",
     keywords: "פורטפוליו בניית אתרים, דוגמאות אתרים, פרויקטי פיתוח, אתרים שבנינו, תיק עבודות בניית אתרים",
+    schema: collectionSchema,
   });
   useBreadcrumb({ name: "פרויקטים", path: "/projects" });
 
@@ -63,7 +102,8 @@ const AllProjects = () => {
       <Header />
       <BackToHome />
 
-      <div className="container mx-auto px-4 py-12 md:px-6 md:py-20">
+      <main className="container mx-auto px-4 py-12 md:px-6 md:py-20">
+        <Breadcrumbs items={[{ label: "פרויקטים" }]} />
         {/* Header */}
         <div className="mb-12 text-center md:mb-16">
           <p className="nz-eyebrow mb-5">
@@ -162,8 +202,11 @@ const AllProjects = () => {
             </Link>
           </p>
         </div>
-      </div>
+      </main>
       <Footer />
+      <WhatsAppButton />
+      <BackToTopButton />
+      <AccessibilityWidget />
     </div>
   );
 };

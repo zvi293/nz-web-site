@@ -80,43 +80,44 @@ const ContactSection = () => {
   const termsRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
 
+  /* Decorative animated fog behind the form.
+     Six full-canvas radial-gradient fills per frame is not cheap, so it only
+     runs while the section is actually on screen and the tab is visible, and it
+     is skipped entirely for visitors who asked for reduced motion. Previously it
+     ran forever from mount — burning a phone's battery on a page the visitor had
+     already scrolled past. */
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationId: number;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    let animationId = 0;
+    let running = false;
+    let onScreen = false;
     let time = 0;
+
+    const blobs = [
+      { x: 0.2, y: 0.3, r: 400, speed: 1, phase: 0 },
+      { x: 0.7, y: 0.5, r: 450, speed: 0.7, phase: 1.5 },
+      { x: 0.5, y: 0.7, r: 380, speed: 1.2, phase: 3 },
+      { x: 0.8, y: 0.2, r: 420, speed: 0.5, phase: 4.5 },
+      { x: 0.3, y: 0.8, r: 400, speed: 0.9, phase: 2.5 },
+      { x: 0.5, y: 0.2, r: 350, speed: 0.6, phase: 5 },
+    ];
 
     const resize = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
     };
 
-    resize();
-    window.addEventListener("resize", resize);
-
-    const drawFog = () => {
-      time += 0.003;
+    const paint = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const blobs = [
-        { x: 0.2, y: 0.3, r: 400, speed: 1, phase: 0 },
-        { x: 0.7, y: 0.5, r: 450, speed: 0.7, phase: 1.5 },
-        { x: 0.5, y: 0.7, r: 380, speed: 1.2, phase: 3 },
-        { x: 0.8, y: 0.2, r: 420, speed: 0.5, phase: 4.5 },
-        { x: 0.3, y: 0.8, r: 400, speed: 0.9, phase: 2.5 },
-        { x: 0.5, y: 0.2, r: 350, speed: 0.6, phase: 5 },
-      ];
-
       for (const blob of blobs) {
-        const cx =
-          canvas.width * blob.x +
-          Math.sin(time * blob.speed + blob.phase) * 120;
-        const cy =
-          canvas.height * blob.y +
-          Math.cos(time * blob.speed * 0.8 + blob.phase) * 90;
+        const cx = canvas.width * blob.x + Math.sin(time * blob.speed + blob.phase) * 120;
+        const cy = canvas.height * blob.y + Math.cos(time * blob.speed * 0.8 + blob.phase) * 90;
         const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, blob.r);
         gradient.addColorStop(0, "hsla(210, 70%, 70%, 0.35)");
         gradient.addColorStop(0.4, "hsla(210, 60%, 75%, 0.18)");
@@ -125,15 +126,54 @@ const ContactSection = () => {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
+    };
 
+    const drawFog = () => {
+      time += 0.003;
+      paint();
       animationId = requestAnimationFrame(drawFog);
     };
 
-    drawFog();
+    const stop = () => {
+      if (!running) return;
+      running = false;
+      cancelAnimationFrame(animationId);
+    };
+
+    const start = () => {
+      if (running || !onScreen || document.hidden || reduceMotion.matches) return;
+      running = true;
+      drawFog();
+    };
+
+    resize();
+    paint(); // one static frame, so the backdrop is never blank
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        onScreen = entry.isIntersecting;
+        if (onScreen) start();
+        else stop();
+      },
+      { rootMargin: "120px" },
+    );
+    observer.observe(canvas);
+
+    const onVisibility = () => (document.hidden ? stop() : start());
+    const onResize = () => {
+      resize();
+      paint();
+    };
+
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("resize", onResize);
+    reduceMotion.addEventListener?.("change", () => (reduceMotion.matches ? stop() : start()));
 
     return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener("resize", resize);
+      stop();
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
@@ -329,7 +369,7 @@ const ContactSection = () => {
           className="mb-12 text-center"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-section-title mb-4 text-foreground">
@@ -343,7 +383,7 @@ const ContactSection = () => {
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.7, delay: 0.15 }}
         >
           <Card className="ring-gradient rounded-[1.75rem] border-border/50 bg-card/95 shadow-floating backdrop-blur-md">
@@ -365,7 +405,7 @@ const ContactSection = () => {
                   className="grid grid-cols-1 gap-6"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
+                  viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.4 }}
                 >
                   <div className="space-y-2">
@@ -381,12 +421,17 @@ const ContactSection = () => {
                         id="name"
                         {...register("name")}
                         placeholder="השם המלא שלך"
+                        autoComplete="name"
+                        required
+                        aria-required="true"
+                        aria-invalid={errors.name ? "true" : "false"}
+                        aria-describedby={errors.name ? "name-error" : undefined}
                         className={`pr-10 transition-shadow duration-300 focus:shadow-md focus:shadow-primary/10 ${errors.name ? "border-destructive" : ""}`}
                       />
                       <User className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
                     </div>
                     {errors.name && (
-                      <p className="text-sm text-destructive">
+                      <p id="name-error" role="alert" className="text-sm text-destructive">
                         {errors.name.message}
                       </p>
                     )}
@@ -398,7 +443,7 @@ const ContactSection = () => {
                   className="grid grid-cols-1 gap-6"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
+                  viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.5 }}
                 >
                   <div className="space-y-2">
@@ -414,12 +459,19 @@ const ContactSection = () => {
                         id="phone"
                         {...register("phone")}
                         placeholder="050-1234567"
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        required
+                        aria-required="true"
+                        aria-invalid={errors.phone ? "true" : "false"}
+                        aria-describedby={errors.phone ? "phone-error" : undefined}
                         className={`pr-10 transition-shadow duration-300 focus:shadow-md focus:shadow-primary/10 ${errors.phone ? "border-destructive" : ""}`}
                       />
                       <Phone className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
                     </div>
                   {errors.phone && (
-                      <p className="text-sm text-destructive">
+                      <p id="phone-error" role="alert" className="text-sm text-destructive">
                         {errors.phone.message}
                       </p>
                     )}
@@ -430,7 +482,7 @@ const ContactSection = () => {
                   className="space-y-2"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
+                  viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.55 }}
                 >
                   <Label
@@ -467,7 +519,7 @@ const ContactSection = () => {
                   className="space-y-2"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
+                  viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.6 }}
                 >
                   <Label
@@ -483,12 +535,14 @@ const ContactSection = () => {
                       {...register("subject")}
                       placeholder="תאר בקצרה את הפרויקט או השירות שאתה מעוניין בו..."
                       rows={4}
+                      aria-invalid={errors.subject ? "true" : "false"}
+                      aria-describedby={errors.subject ? "subject-error" : undefined}
                       className={`pr-10 transition-shadow duration-300 focus:shadow-md focus:shadow-primary/10 ${errors.subject ? "border-destructive" : ""}`}
                     />
                     <FileText className="absolute right-3 top-3 h-4 w-4 text-muted-foreground/50" />
                   </div>
                   {errors.subject && (
-                    <p className="text-sm text-destructive">
+                    <p id="subject-error" role="alert" className="text-sm text-destructive">
                       {errors.subject.message}
                     </p>
                   )}
@@ -499,7 +553,7 @@ const ContactSection = () => {
                   className="flex items-start gap-3"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
+                  viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.65 }}
                 >
                   <Checkbox
@@ -519,6 +573,7 @@ const ContactSection = () => {
                       to="/terms/"
                       className="font-medium text-primary hover:underline"
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       תנאי השימוש
                     </Link>{" "}
@@ -527,6 +582,7 @@ const ContactSection = () => {
                       to="/privacy/"
                       className="font-medium text-primary hover:underline"
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       מדיניות ופרטיות
                     </Link>
@@ -536,7 +592,7 @@ const ContactSection = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false }}
+                  viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.7 }}
                 >
                   <Button

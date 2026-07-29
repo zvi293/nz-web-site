@@ -24,9 +24,11 @@ const Accessibility = () => {
   useBreadcrumb({ name: "הצהרת נגישות", path: "/accessibility" });
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
       <BackToHome />
+
+      <main id="page-content">
 
       {/* Hero */}
       <section className="relative py-16 md:py-24 nz-brand-dark overflow-hidden">
@@ -55,7 +57,7 @@ const Accessibility = () => {
               הצהרת נגישות
             </h1>
             <p className="text-white/80 text-lg">
-              נתחייבות לנגישות מלאה לכל המשתמשים
+              מחויבות לנגישות מלאה לכל המשתמשים
             </p>
           </motion.div>
         </div>
@@ -121,10 +123,56 @@ const Accessibility = () => {
                 </div>
               </Section>
 
+              <Section title="היקף ההצהרה והשירות">
+                <p className="text-muted-foreground leading-relaxed mb-3">
+                  הצהרה זו חלה על אתר האינטרנט <strong className="text-foreground">nz-web.com</strong> ועל כלל עמודיו,
+                  המופעל על ידי <strong className="text-foreground">NZ-web</strong> — סטודיו לבניית ופיתוח אתרים בבעלות {accessibility.coordinatorName}.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  <strong className="text-foreground">שירות מקוון בלבד:</strong> לעסק אין מקום קבלת קהל פתוח לציבור,
+                  ולכן תקנות הנגישות למבנה ולסביבה פיזית אינן חלות עליו. מלוא השירות ניתן מרחוק —
+                  בטלפון, בוואטסאפ, בדוא״ל ובפגישות מקוונות.
+                </p>
+              </Section>
+
+              <Section title="אופן ביצוע ההנגשה ובדיקתה">
+                <p className="text-muted-foreground leading-relaxed mb-3">
+                  הנגשת האתר בוצעה על ידי צוות הפיתוח של NZ-web כחלק מתהליך הפיתוח עצמו, ולא כשכבה שהוספה בדיעבד:
+                  מבנה HTML סמנטי, תגיות ARIA, ניגודיות צבעים, ניווט מקלדת מלא, טקסט חלופי לתמונות
+                  ותפריט נגישות ייעודי הזמין בכל עמוד באתר.
+                </p>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>בדיקות אוטומטיות של תאימות לתקן WCAG 2.1 ברמה AA</li>
+                  <li>בדיקות ידניות של ניווט מקלדת בלבד, ללא עכבר</li>
+                  <li>בדיקות עם קוראי מסך במערכות הפעלה שונות</li>
+                  <li>בדיקות תצוגה במסכי מובייל, טאבלט ומחשב</li>
+                </ul>
+                <p className="text-muted-foreground leading-relaxed mt-3">
+                  האתר לא נבדק עד כה על ידי מורשה נגישות שירות חיצוני. ככל שתתקבל פנייה על ליקוי נגישות,
+                  היא תיבדק ותטופל, ובמידת הצורך תבוצע גם בדיקה חיצונית.
+                </p>
+              </Section>
+
               <Section title="סייגים לנגישות">
                 <p className="text-muted-foreground leading-relaxed">
                   אנו משקיעים מאמצים רבים בתחזוקת נגישות האתר. עם זאת, ייתכן שיתגלו דפים או חלקים שטרם הונגשו במלואם
                   עקב מגבלות טכנולוגיות או שינויי תוכן. במידה ומצאתם תקלה, נשמח אם תעדכנו אותנו כדי שנוכל לתקן בהקדם.
+                  אנו ממשיכים לשפר את נגישות האתר באופן שוטף.
+                </p>
+              </Section>
+
+              <Section title="דרך חלופית לקבלת השירות">
+                <p className="text-muted-foreground leading-relaxed">
+                  אם נתקלתם בקושי בשימוש באתר, או שתוכן מסוים אינו נגיש עבורכם — אתם מוזמנים לקבל את אותו מידע
+                  ואת אותו שירות בדיוק בערוץ חלופי, ללא כל תנאי מקדים: בשיחת טלפון למספר{" "}
+                  <a href={getTelHref(accessibility.coordinatorPhone)} className="text-primary hover:underline font-bold">
+                    {accessibility.coordinatorPhone}
+                  </a>
+                  , בהודעת וואטסאפ, או בדוא״ל אל{" "}
+                  <a href={getMailtoHref(accessibility.coordinatorEmail)} className="text-primary hover:underline font-bold">
+                    {accessibility.coordinatorEmail}
+                  </a>
+                  . נשמח ללוות אתכם טלפונית בכל שלב.
                 </p>
               </Section>
 
@@ -205,11 +253,13 @@ const Accessibility = () => {
         </div>
       </section>
 
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

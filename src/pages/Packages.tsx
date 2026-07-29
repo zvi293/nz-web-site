@@ -39,6 +39,7 @@ import {
   type PlanIconKey,
   type PricingPlan,
 } from "@/data/pricing";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -385,15 +386,40 @@ const Packages = () => {
   useSeoMeta({
     title: PACKAGES_PAGE.seoTitle,
     description: PACKAGES_PAGE.seoDescription,
-    schema: {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: PACKAGES_FAQS.map((faq) => ({
-        "@type": "Question",
-        name: faq.q,
-        acceptedAnswer: { "@type": "Answer", text: faq.a },
-      })),
-    },
+    schema: [
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: PACKAGES_FAQS.map((faq) => ({
+          "@type": "Question",
+          name: faq.q,
+          acceptedAnswer: { "@type": "Answer", text: faq.a },
+        })),
+      },
+      /* The three packages as machine-readable offers — this is the page a
+         "כמה עולה אתר תדמית" query should resolve to, so the prices are stated
+         in schema and not only in styled markup. Numbers are parsed from the
+         display strings so pricing.ts stays the single source of truth. */
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "@id": "https://nz-web.com/packages/#service",
+        name: "בניית אתר תדמית לעסק",
+        serviceType: "Business Website Design & Development",
+        provider: { "@id": "https://nz-web.com/#organization" },
+        areaServed: { "@type": "Country", name: "Israel" },
+        url: "https://nz-web.com/packages/",
+        offers: PRICING_PLANS.map((plan) => ({
+          "@type": "Offer",
+          name: `חבילת ${plan.name} — אתר תדמית`,
+          url: `https://nz-web.com/packages/#${plan.slug}`,
+          priceCurrency: "ILS",
+          price: Number(plan.setup.replace(/[^\d]/g, "")) || undefined,
+          description: `${plan.tagline} (הקמה ${plan.setup} + ${plan.monthly} לחודש, ללא התחייבות)`,
+          availability: "https://schema.org/InStock",
+        })),
+      },
+    ],
   });
   useBreadcrumb({ name: "חבילות אתר תדמית", path: PACKAGES_PAGE.path });
 
@@ -424,10 +450,16 @@ const Packages = () => {
   }, []);
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
       <BackToHome />
+
+      <main id="page-content">
       <PackageNav activeSlug={activeSlug} containerRef={sectionsRef} />
+
+      <div className="container mx-auto max-w-5xl px-4 pt-6 md:px-6">
+        <Breadcrumbs items={[{ label: "חבילות אתר תדמית" }]} className="mb-0" />
+      </div>
 
       {/* ── hero ── */}
       <section className="relative overflow-hidden pb-10 pt-10 md:pb-14 md:pt-16">
@@ -580,11 +612,13 @@ const Packages = () => {
         </div>
       </section>
 
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

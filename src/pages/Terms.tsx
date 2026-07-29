@@ -84,9 +84,11 @@ const Terms = () => {
   ];
 
   return (
-    <main className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
+    <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <Header />
       <BackToHome />
+
+      <main id="page-content">
 
       {/* ── Hero ── */}
       <section className="relative overflow-hidden nz-brand-dark py-16 md:py-24">
@@ -106,7 +108,7 @@ const Terms = () => {
             <h1 className="text-display mb-4 font-heebo text-balance text-white">
               תנאי שימוש
             </h1>
-            <p className="text-lg text-white/80">עודכן לאחרונה: 9 במרץ 2026</p>
+            <p className="text-lg text-white/80">עודכן לאחרונה: 29 ביולי 2026</p>
           </motion.div>
         </div>
       </section>
@@ -289,11 +291,13 @@ const Terms = () => {
         </div>
       </section>
 
+      </main>
+
       <Footer />
       <WhatsAppButton />
       <BackToTopButton />
       <AccessibilityWidget />
-    </main>
+    </div>
   );
 };
 

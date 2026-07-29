@@ -70,11 +70,13 @@ function injectTrackers(): void {
     (function (f: any, b: Document, e: string, v: string) {
       if (f.fbq) return;
       const n: any = (f.fbq = function () {
-        n.callMethod
-          ? // eslint-disable-next-line prefer-spread, prefer-rest-params
-            n.callMethod.apply(n, arguments)
-          : // eslint-disable-next-line prefer-rest-params
-            n.queue.push(arguments);
+        if (n.callMethod) {
+          // eslint-disable-next-line prefer-spread, prefer-rest-params
+          n.callMethod.apply(n, arguments);
+        } else {
+          // eslint-disable-next-line prefer-rest-params
+          n.queue.push(arguments);
+        }
       });
       if (!f._fbq) f._fbq = n;
       n.push = n;
