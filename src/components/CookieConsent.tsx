@@ -58,9 +58,12 @@ const CookieConsent = () => {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          /* Sits clear of the WhatsApp / back-to-top / accessibility stack in the
-             bottom corners, so none of them is ever covered on a phone. */
-          className="fixed bottom-[152px] left-4 right-4 z-[10000] md:bottom-4 md:right-auto md:max-w-md"
+          /* 152px clears the whole bottom-left FAB stack (WhatsApp ends at 80px,
+             the accessibility launcher at 140px) at EVERY breakpoint. It must not
+             be relaxed to `md:bottom-4` — on desktop the banner is ~158px tall,
+             so a 16px offset puts it straight over both buttons, and the
+             accessibility launcher has to stay reachable at all times. */
+          className="fixed bottom-[152px] left-4 right-4 z-[10000] md:right-auto md:max-w-md"
           dir="rtl"
           role="dialog"
           aria-modal="false"
