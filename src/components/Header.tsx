@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import { scrollToSelectorWithRetry } from "@/lib/scroll-navigation";
-import { MessageCircle, ChevronDown, Monitor, Briefcase, CalendarDays, Target, Code2, Globe, Menu, ArrowLeft } from "lucide-react";
+import { MessageCircle, ChevronDown, Monitor, Briefcase, CalendarDays, Target, Code2, Globe, Menu, ArrowLeft, Package } from "lucide-react";
 import { contactInfo, getWhatsAppHref } from "@/lib/contact-utils";
 import {
   Sheet,
@@ -35,9 +35,9 @@ const navLinks = [
 
 /* The one quick link kept inline in the mobile bar. Everything else — שירותים,
    אודות and the rest — lives in the drawer, so the bar stays uncrowded on a
-   360px screen. */
+   360px screen. Freeing that space is what pays for the chip treatment below. */
 const mobileNavLinks = [
-  { label: "חבילות", href: "/#pricing" },
+  { label: "חבילות", href: "/#pricing", icon: Package },
 ];
 
 const menuItems = [
@@ -355,33 +355,40 @@ const Header = () => {
             <Wordmark compact />
           </a>
 
-          {/* Quick link — the one destination people actually reach for.
-              Everything else lives in the drawer. */}
+          {/* Quick link — the one destination people actually reach for, drawn as
+              a branded chip. As 10.5px muted text it disappeared next to the logo
+              and the CTA; now it reads as a tappable target (and clears the 44px
+              touch height). Everything else lives in the drawer. */}
           {/* Sized by its content, not flex-1 — a growing nav box would let the
               labels spill over the logo and the CTA on 360px screens. */}
-          <nav className="flex shrink-0 items-center gap-0.5">
-            {mobileNavLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (link.href.includes("#")) {
-                    const hash = `#${link.href.split("#")[1]}`;
-                    if (location.pathname === "/") {
-                      scrollToSelectorWithRetry(hash);
+          <nav className="flex shrink-0 items-center gap-1">
+            {mobileNavLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (link.href.includes("#")) {
+                      const hash = `#${link.href.split("#")[1]}`;
+                      if (location.pathname === "/") {
+                        scrollToSelectorWithRetry(hash);
+                      } else {
+                        navigate("/", { state: { scrollTo: hash, scrollNonce: Date.now() } });
+                      }
                     } else {
-                      navigate("/", { state: { scrollTo: hash, scrollNonce: Date.now() } });
+                      navigate(link.href);
                     }
-                  } else {
-                    navigate(link.href);
-                  }
-                }}
-                className="shrink-0 whitespace-nowrap rounded-lg px-[3px] py-2 text-[10.5px] font-semibold text-muted-foreground transition-colors hover:bg-primary/[0.07] hover:text-foreground xs:px-2 xs:text-[12px]"
-              >
-                {link.label}
-              </a>
-            ))}
+                  }}
+                  className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-primary/30 bg-primary/[0.09] px-2.5 py-2 text-[12px] font-extrabold text-primary transition-all duration-200 active:scale-[0.97] xs:px-3.5 xs:text-[13px]"
+                  style={{ boxShadow: "0 2px 10px -5px hsl(var(--brand-2) / 0.55)" }}
+                >
+                  <Icon aria-hidden="true" className="h-[15px] w-[15px] shrink-0" strokeWidth={2.5} />
+                  {link.label}
+                </a>
+              );
+            })}
           </nav>
 
           {/* Mobile CTA + hamburger */}
@@ -389,16 +396,19 @@ const Header = () => {
             <a
               href="/contact/"
               onClick={(e) => { e.preventDefault(); navigate("/contact/"); }}
-              className="btn-brand inline-flex shrink-0 items-center gap-1 rounded-xl px-2 py-2 text-[10.5px] font-bold xs:gap-1.5 xs:px-3 xs:text-[12px]"
+              /* Matches the חבילות chip's type scale and height — the two sat at
+                 different sizes and the bar looked unbalanced. */
+              className="btn-brand inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-[12px] font-bold xs:px-3.5 xs:text-[13px]"
             >
-              <MessageCircle className="h-3.5 w-3.5 shrink-0" />
+              <MessageCircle className="h-[15px] w-[15px] shrink-0" />
               בואו נדבר
             </a>
 
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
                 <motion.button
-                  className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-secondary/40 transition-all"
+                  /* rounded-full so the bar reads as one family of pills. */
+                  className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/60 bg-secondary/40 transition-all"
                   aria-label="תפריט"
                   whileTap={{ scale: 0.94 }}
                 >
