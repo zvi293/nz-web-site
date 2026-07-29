@@ -1,6 +1,6 @@
 import { PencilRuler, Image as ImageIcon, LayoutGrid, Sparkles, Camera, Smartphone } from "lucide-react";
 import type { VerticalContent } from "@/data/verticals";
-import img from "@/assets/mockup-3d.png";
+import img from "@/assets/mockup-3d.webp";
 
 /* אדריכל / מעצב פנים — אתר תדמית / פורטפוליו */
 export const architect: VerticalContent = {

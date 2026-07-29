@@ -1,10 +1,11 @@
-import { useLayoutEffect, useRef, useEffect, useState } from "react";
+import { useLayoutEffect, useRef, useEffect, useState, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "react-router-dom";
 import { scrollToSelectorWithRetry } from "@/lib/scroll-navigation";
 import { motion, useInView } from "framer-motion";
-import { ArrowLeft, Gauge, ShieldCheck, Smartphone, Sparkles } from "lucide-react";
+import { ArrowLeft, Gauge, Lock, ShieldCheck, Smartphone, Sparkles, Star } from "lucide-react";
+import { useMagnetic } from "@/hooks/useMagnetic";
 import heroVisual from "@/assets/hero-visual.png";
 
 const stats = [
@@ -101,14 +102,14 @@ const FloatingBadge = ({
     initial={{ opacity: 0, y: 14, scale: 0.9 }}
     animate={{ opacity: 1, y: 0, scale: 1 }}
     transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-    className={`glass-strong pointer-events-none absolute z-20 hidden items-center gap-2.5 rounded-2xl px-3.5 py-2.5 sm:flex ${className}`}
+    className={`glass-strong pointer-events-none absolute z-20 flex items-center gap-2 rounded-2xl px-2.5 py-2 sm:gap-2.5 sm:px-3.5 sm:py-2.5 ${className}`}
   >
-    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-1/20 to-brand-3/20 text-primary">
-      <Icon className="h-4 w-4" strokeWidth={2.2} />
+    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-1/20 to-brand-3/20 text-primary sm:h-8 sm:w-8 sm:rounded-xl">
+      <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={2.2} />
     </span>
     <span className="text-right leading-tight">
-      <span className="block text-[13px] font-black text-foreground">{title}</span>
-      <span className="block text-[10.5px] font-medium text-muted-foreground">{subtitle}</span>
+      <span className="block text-[11.5px] font-black text-foreground sm:text-[13px]">{title}</span>
+      <span className="block text-[9.5px] font-medium text-muted-foreground sm:text-[10.5px]">{subtitle}</span>
     </span>
   </motion.div>
 );
@@ -126,6 +127,19 @@ const HeroSection = () => {
   const tiltRef = useRef<HTMLDivElement>(null);
   const parallaxTweenRef = useRef<gsap.core.Tween | null>(null);
   const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const magneticCta = useMagnetic<HTMLAnchorElement>(0.3, 70);
+
+  /* Pointer-tracked light. Written straight to CSS vars — no state, no renders. */
+  const handlePointer = useCallback((event: React.PointerEvent<HTMLElement>) => {
+    const el = event.currentTarget;
+    const rect = el.getBoundingClientRect();
+    el.style.setProperty("--hx", `${event.clientX - rect.left}px`);
+    el.style.setProperty("--hy", `${event.clientY - rect.top}px`);
+    el.style.setProperty("--hon", "1");
+  }, []);
+  const handlePointerLeave = useCallback((event: React.PointerEvent<HTMLElement>) => {
+    event.currentTarget.style.setProperty("--hon", "0");
+  }, []);
 
   useLayoutEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -170,7 +184,7 @@ const HeroSection = () => {
 
       if (sectionRef.current && visualParallax) {
         parallaxTweenRef.current = gsap.to(visualParallax, {
-          y: -26,
+          y: -20,
           ease: "none",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -297,8 +311,8 @@ const HeroSection = () => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!finePointer || reduced) return;
 
-    const MAX_DEG = 18; // tilt amount (degrees)
-    const MAX_SHIFT = 16; // positional drift toward the cursor (px) — adds depth
+    const MAX_DEG = 16; // tilt amount (degrees)
+    const MAX_SHIFT = 14; // positional drift toward the cursor (px) — adds depth
     const onMove = (e: MouseEvent) => {
       const rect = section.getBoundingClientRect();
       const px = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 .. 0.5
@@ -347,8 +361,8 @@ const HeroSection = () => {
       const dir = delta > 0 ? 1 : -1; // down → +, up → −
       gsap.to(tilt, {
         transformPerspective: 1100, // 3D depth lives on the element itself — never depends on a parent
-        rotateX: dir * 18,
-        y: dir * 9,
+        rotateX: dir * 16,
+        y: dir * 8,
         duration: 0.45,
         ease: "power2.out",
       });
@@ -371,20 +385,39 @@ const HeroSection = () => {
       ref={sectionRef}
       dir="rtl"
       aria-label={heroAriaLabel}
-      className="nz-grain relative overflow-hidden bg-background"
+      onPointerMove={handlePointer}
+      onPointerLeave={handlePointerLeave}
+      className="nz-grain relative bg-background"
     >
-      {/* ── Atmosphere: aurora + technical grid + a soft ceiling wash ── */}
-      <div className="nz-aurora" aria-hidden="true" />
-      <div className="nz-grid opacity-70" aria-hidden="true" />
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-56 opacity-70"
-        style={{ background: "linear-gradient(to bottom, hsl(var(--brand-2) / 0.07), transparent)" }}
-        aria-hidden="true"
-      />
+      {/* ── Atmosphere: aurora + technical grid + a soft ceiling wash ──
+          Clipped inside its own layer. The section itself must NOT clip: the
+          visual's float + scroll-parallax + tilt lift it above its layout box,
+          and an `overflow-hidden` on the section shaved the top off the
+          browser window on shorter desktop screens. */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="nz-aurora" />
+        <div className="nz-grid opacity-70" />
+        <div
+          className="absolute inset-x-0 top-0 h-56 opacity-70"
+          style={{ background: "linear-gradient(to bottom, hsl(var(--brand-2) / 0.07), transparent)" }}
+        />
+        {/* Light that follows the cursor across the whole hero */}
+        <div
+          className="absolute inset-0 transition-opacity duration-500"
+          style={{
+            opacity: "var(--hon, 0)",
+            background:
+              "radial-gradient(620px circle at var(--hx, 50%) var(--hy, 40%), hsl(var(--brand-2) / 0.13), transparent 62%)",
+          }}
+        />
+      </div>
 
-      <div className="container relative z-10 mx-auto flex min-h-[calc(100svh-140px)] flex-col items-center gap-9 py-10 sm:gap-12 sm:py-14 lg:min-h-[calc(100svh-72px)] lg:flex-row lg:gap-16 lg:py-0 xl:gap-20">
-        {/* Right Side - Content */}
-        <div className="flex flex-1 flex-col items-start gap-5 sm:gap-6">
+      {/* lg:py-8 is deliberate slack, not decoration — it is the room the
+          visual's transforms move into instead of into the section edge. */}
+      <div className="container relative z-10 mx-auto flex min-h-[calc(100svh-190px)] flex-col items-center gap-9 py-10 sm:gap-12 sm:py-14 lg:min-h-[calc(100svh-150px)] lg:flex-row lg:gap-16 lg:py-8 xl:gap-20">
+        {/* Right Side - Content. On phones the visual leads (order-first below),
+            so the copy follows it. */}
+        <div className="order-2 flex flex-1 flex-col items-start gap-5 sm:gap-6 lg:order-none">
           {/* Availability pill */}
           <div ref={badgeRef} className="nz-eyebrow">
             <span className="relative flex h-2 w-2">
@@ -417,13 +450,13 @@ const HeroSection = () => {
             {heroParagraph}
           </p>
 
-          {/* Buttons */}
           {/* Mobile: one full-width primary, then the two secondaries side by side.
               sm+: everything collapses onto a single inline row (`sm:contents`). */}
           <div ref={buttonsRef} className="flex w-full max-w-md flex-col gap-2.5 pt-1 sm:max-w-none sm:flex-row sm:flex-wrap sm:gap-3.5">
             <Link
+              ref={magneticCta}
               to="/contact/"
-              className="btn-brand group inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-[15px] font-bold hover:scale-[1.03] active:scale-[0.97] sm:px-9 sm:text-base">
+              className="btn-brand group inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-[15px] font-bold active:scale-[0.97] sm:px-9 sm:text-base">
               {contactLabel}
               <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
             </Link>
@@ -456,8 +489,8 @@ const HeroSection = () => {
           </ul>
         </div>
 
-        {/* Left Side - Visual */}
-        <div className="flex w-full flex-1 items-center justify-center">
+        {/* Left Side - Visual — first thing a phone user sees */}
+        <div className="order-1 flex w-full flex-1 items-center justify-center lg:order-none">
           <div ref={visualParallaxRef} className="relative w-full will-change-transform">
             <div ref={visualIntroRef} className="will-change-transform">
               {/* float wrapper (CSS keyframe drift) → tilt wrapper (GSAP 3D tilt).
@@ -473,16 +506,38 @@ const HeroSection = () => {
                   }}
                   aria-hidden="true"
                 />
-                <div ref={tiltRef} className="relative mx-auto w-full max-w-sm will-change-transform sm:max-w-md lg:max-w-xl">
-                  <div className="ring-gradient overflow-hidden rounded-[1.75rem] shadow-floating">
-                    <img
-                      src={heroVisual}
-                      alt={heroImageAlt}
-                      className="w-full"
-                      loading="eager"
-                      decoding="async"
-                    />
-                  </div>
+                <div ref={tiltRef} className="nz-hero-visual relative mx-auto w-full max-w-sm will-change-transform sm:max-w-md lg:max-w-xl">
+                  {/* ── Browser window: the work is shown as a shipped product, not a picture ── */}
+                  <figure className="ring-gradient overflow-hidden rounded-[1.5rem] bg-card shadow-floating">
+                    {/* chrome */}
+                    <div className="flex items-center gap-2 border-b border-border/60 bg-secondary/60 px-3.5 py-2.5" dir="ltr">
+                      <span className="flex gap-1.5" aria-hidden="true">
+                        <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+                      </span>
+                      <span className="mx-auto flex items-center gap-1.5 rounded-md bg-background/80 px-3 py-1 text-[10.5px] font-semibold text-muted-foreground shadow-sm sm:text-[11px]">
+                        <Lock className="h-2.5 w-2.5 text-emerald-500" />
+                        nz-web.com
+                      </span>
+                      <span className="flex gap-1" aria-hidden="true">
+                        <span className="h-1 w-3 rounded-full bg-muted-foreground/25" />
+                        <span className="h-1 w-3 rounded-full bg-muted-foreground/25" />
+                      </span>
+                    </div>
+                    {/* viewport */}
+                    <div className="relative overflow-hidden">
+                      <img
+                        src={heroVisual}
+                        alt={heroImageAlt}
+                        className="w-full"
+                        loading="eager"
+                        decoding="async"
+                      />
+                      {/* glass sheen sweeping across the screen */}
+                      <div className="nz-screen-sheen pointer-events-none absolute inset-y-0 w-1/3" aria-hidden="true" />
+                    </div>
+                  </figure>
 
                   <FloatingBadge
                     className="-top-4 right-2 lg:-right-6"
@@ -498,6 +553,21 @@ const HeroSection = () => {
                     subtitle="מושלם בכל מסך"
                     delay={1.35}
                   />
+
+                  {/* rating chip — desktop only, balances the composition */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: 1.55, ease: [0.22, 1, 0.36, 1] }}
+                    className="glass-strong pointer-events-none absolute -left-1.5 top-1/3 z-20 flex flex-col items-center gap-1 rounded-2xl px-2.5 py-2 sm:-left-4 sm:px-4 sm:py-3 xl:-left-10"
+                  >
+                    <span className="flex gap-0.5" aria-hidden="true">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className="h-2.5 w-2.5 fill-amber-400 text-amber-400 sm:h-3 sm:w-3" />
+                      ))}
+                    </span>
+                    <span className="text-[9.5px] font-black text-foreground sm:text-[11px]">לקוחות ממליצים</span>
+                  </motion.div>
                 </div>
               </div>
             </div>
@@ -506,7 +576,7 @@ const HeroSection = () => {
       </div>
 
       {/* Scroll cue — desktop only, sits inside the hero's bottom padding */}
-      <div className="pointer-events-none absolute bottom-5 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1.5 lg:flex">
+      <div className="pointer-events-none absolute bottom-[86px] left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1.5 lg:flex">
         <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">
           גלול
         </span>
@@ -514,9 +584,6 @@ const HeroSection = () => {
           <span className="nz-scroll-cue h-1.5 w-1 rounded-full bg-primary" />
         </span>
       </div>
-
-      {/* Bottom fade divider */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 };

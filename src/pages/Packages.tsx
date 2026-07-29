@@ -26,6 +26,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import BackToTopButton from "@/components/BackToTopButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import FaqAccordionItem from "@/components/FaqAccordionItem";
 import { getWhatsAppHref, contactInfo } from "@/lib/contact-utils";
@@ -581,6 +582,7 @@ const Packages = () => {
 
       <Footer />
       <WhatsAppButton />
+      <BackToTopButton />
       <AccessibilityWidget />
     </main>
   );

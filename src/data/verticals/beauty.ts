@@ -1,6 +1,6 @@
 import { Sparkles, CalendarCheck, BellRing, Smartphone, Image as ImageIcon, Clock } from "lucide-react";
 import type { VerticalContent } from "@/data/verticals";
-import img from "@/assets/mockup-mobile.png";
+import img from "@/assets/mockup-mobile.webp";
 
 /* יופי וטיפוח (קוסמטיקאית / מעצב שיער / מניקוריסטית) — דגש על מערכת תורים */
 export const beauty: VerticalContent = {

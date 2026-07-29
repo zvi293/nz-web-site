@@ -121,13 +121,16 @@ const AboutIntroSection = () => {
             </div>
           </motion.div>
 
-          {/* ── Animated "website being built" graphic — desktop only (decorative) ── */}
+          {/* ── Animated "website being built" graphic ──
+              Shown on every breakpoint: on phones it is the only visual on this
+              section, and it is the clearest demonstration of what we actually
+              do. Order-first on mobile so it leads the section. */}
           <motion.div
             initial={{ opacity: 0, scale: 0.94 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="hidden items-center justify-center lg:flex"
+            className="order-first flex items-center justify-center lg:order-none"
           >
             <div className="relative w-full max-w-md">
               {/* ambient glow */}

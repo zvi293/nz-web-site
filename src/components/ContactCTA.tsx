@@ -227,7 +227,7 @@ const ContactCTA = () => {
           <div className="relative z-10">
             {/* Logo */}
             <div ref={iconRef} className="mb-8">
-              <span className="text-3xl font-black tracking-tight text-foreground font-heebo" style={{ letterSpacing: "-0.02em" }}>
+              <span dir="ltr" className="inline-block text-3xl font-black tracking-tight text-foreground font-heebo" style={{ letterSpacing: "-0.02em" }}>
                 NZ<span className="text-gradient-brand">-web</span>
               </span>
             </div>

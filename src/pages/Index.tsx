@@ -8,6 +8,8 @@ import ServicesSection from "@/components/ServicesSection";
 import PricingSection from "@/components/PricingSection";
 import ProcessSection from "@/components/ProcessSection";
 import PortfolioSection from "@/components/PortfolioSection";
+import MarqueeRibbon from "@/components/MarqueeRibbon";
+import BackToTopButton from "@/components/BackToTopButton";
 import ClientLogosSection from "@/components/ClientLogosSection";
 import ContactCTA from "@/components/ContactCTA";
 import Footer from "@/components/Footer";
@@ -59,6 +61,14 @@ const Index = () => {
       <AmbientShapes />
       <Header />
       <HeroSection />
+
+      {/* Brand ribbon — bridges the hero into the page and states the offering
+          in one glance. Wrapper owns the overflow so the tilt can't create
+          horizontal scroll. */}
+      <div className="relative z-10 overflow-hidden bg-background py-5 md:py-7">
+        <MarqueeRibbon />
+      </div>
+
       <ServicesSection />
       <PricingSection />
       <ProcessSection />
@@ -69,6 +79,7 @@ const Index = () => {
       <ContactCTA />
       <Footer />
       <WhatsAppButton />
+      <BackToTopButton />
       <AccessibilityWidget />
     </main>
   );

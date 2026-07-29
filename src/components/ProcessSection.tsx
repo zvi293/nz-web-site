@@ -215,7 +215,7 @@ const StepNode = ({
         />
         {/* Animated fill */}
         <motion.div
-          className="absolute top-0 mx-auto w-px origin-top"
+          className="absolute inset-y-0 mx-auto w-px origin-top"
           style={{
             background: `linear-gradient(to bottom, ${step.accent}, ${steps[index + 1].accent})`,
             boxShadow: `0 0 6px 1px ${step.accent}50`,

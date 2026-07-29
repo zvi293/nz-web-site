@@ -51,7 +51,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
       target={project.link ? "_blank" : "_self"}
       rel="noopener noreferrer"
       onPointerMove={onSpotlight}
-      className="spotlight group relative block cursor-pointer overflow-hidden rounded-[1.5rem] border border-border/50 bg-card shadow-soft transition-all duration-500 hover:-translate-y-2 hover:border-primary/25 hover:shadow-floating md:rounded-[1.75rem]"
+      className="spotlight group relative block h-full cursor-pointer overflow-hidden rounded-[1.5rem] border border-border/50 bg-card shadow-soft transition-all duration-500 hover:-translate-y-2 hover:border-primary/25 hover:shadow-floating md:rounded-[1.75rem]"
     >
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden sm:aspect-[16/11]">
@@ -85,10 +85,10 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
             </span>
           ))}
         </div>
-        <h3 className="text-[15px] font-black leading-snug text-foreground transition-colors duration-300 group-hover:text-primary md:text-lg">
+        <h3 className="text-[14px] font-black leading-snug text-foreground transition-colors duration-300 group-hover:text-primary sm:text-[15px] md:text-lg">
           {project.title}
         </h3>
-        <p className="line-clamp-2 text-[12px] leading-relaxed text-muted-foreground md:line-clamp-3 md:text-sm">
+        <p className="line-clamp-3 text-[11.5px] leading-relaxed text-muted-foreground sm:text-[12px] md:text-sm">
           {project.description}
         </p>
         <div className="mt-0.5 flex items-center gap-1.5 text-[12px] font-bold text-primary transition-all duration-200 group-hover:gap-3 md:mt-1 md:text-sm">
@@ -150,8 +150,8 @@ const PortfolioSection = () => {
           </p>
         </div>
 
-        {/* Grid — no filters */}
-        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-5 xs:grid-cols-2 md:gap-8">
+        {/* Two across on every screen — the projects read as a pair, not a stack */}
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3.5 sm:gap-5 md:gap-7">
           {projects.map((project, i) => (
             <ProjectCard key={project.id} project={project} index={i} />
           ))}

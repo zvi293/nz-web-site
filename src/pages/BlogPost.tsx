@@ -5,6 +5,7 @@ import { Clock, Calendar, ArrowLeft, ArrowRight, User } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import BackToTopButton from "@/components/BackToTopButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
 import { getBlogPost, getRelatedPosts, formatDate } from "@/lib/blog";
@@ -210,6 +211,7 @@ const BlogPost = () => {
 
       <Footer />
       <WhatsAppButton />
+      <BackToTopButton />
       <AccessibilityWidget />
     </main>
   );

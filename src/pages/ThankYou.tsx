@@ -4,6 +4,7 @@ import { ArrowRight, Check, Mail, MessageSquare, Users } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import BackToTopButton from "@/components/BackToTopButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
@@ -164,6 +165,7 @@ const ThankYou = () => {
 
       <Footer />
       <WhatsAppButton />
+      <BackToTopButton />
       <AccessibilityWidget />
     </main>
   );

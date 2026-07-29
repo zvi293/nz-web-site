@@ -6,9 +6,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import BackToTopButton from "@/components/BackToTopButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
 import PricingSection from "@/components/PricingSection";
+import MarqueeRibbon from "@/components/MarqueeRibbon";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
@@ -250,6 +252,12 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
           </motion.div>
         </div>
       </section>
+
+      {/* Brand ribbon — same strip as the homepage, so every entry point to the
+          site speaks with one voice. */}
+      <div className="relative z-10 overflow-hidden bg-background py-5 md:py-6">
+        <MarqueeRibbon duration={44} />
+      </div>
 
       {/* ── Intro ── */}
       <section className="py-14 md:py-20">
@@ -641,6 +649,7 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
 
       <Footer />
       <WhatsAppButton />
+      <BackToTopButton />
       <AccessibilityWidget />
     </main>
   );

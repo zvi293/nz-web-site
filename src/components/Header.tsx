@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import { scrollToSelectorWithRetry } from "@/lib/scroll-navigation";
-import { MessageCircle, ChevronDown, Monitor, Briefcase, CalendarDays, Target, Code2, Globe, Menu, ArrowLeft, Phone } from "lucide-react";
-import { contactInfo, getTelHref, getWhatsAppHref } from "@/lib/contact-utils";
+import { MessageCircle, ChevronDown, Monitor, Briefcase, CalendarDays, Target, Code2, Globe, Menu, ArrowLeft } from "lucide-react";
+import { contactInfo, getWhatsAppHref } from "@/lib/contact-utils";
 import {
   Sheet,
   SheetContent,
@@ -33,6 +33,13 @@ const navLinks = [
   { label: "שאלות נפוצות", href: "/faq/", type: "route" },
 ];
 
+/* The three quick links kept inline in the mobile bar, in display order. */
+const mobileNavLinks = [
+  { label: "שירותים", href: "/services/" },
+  { label: "חבילות", href: "/#pricing" },
+  { label: "אודות", href: "/about/" },
+];
+
 const menuItems = [
   { label: "ראשי", href: "/", type: "route" },
   { label: "מי אנחנו", href: "/about/", type: "route" },
@@ -45,17 +52,15 @@ const menuItems = [
 
 /* ── Wordmark ── */
 const Wordmark = ({ compact = false }: { compact?: boolean }) => (
+  /* dir="ltr" is load-bearing: the brand is a Latin string sitting inside an RTL
+     page. Left to inherit, the bidi algorithm reorders "NZ" and "-web" and the
+     logo reads "web-NZ". A flex/grid wrapper here would break it the same way,
+     because each child becomes a separately-ordered box — keep this inline. */
   <span
-    className={`flex items-center gap-2 font-black tracking-tight text-foreground ${compact ? "text-lg" : "text-[22px]"}`}
+    dir="ltr"
+    className={`inline-block font-black tracking-tight text-foreground ${compact ? "text-lg" : "text-[27px]"}`}
     style={{ fontFamily: "'Heebo', sans-serif", letterSpacing: "-0.03em" }}
   >
-    <span
-      className={`grid place-items-center rounded-xl text-white shadow-brand ${compact ? "h-7 w-7 text-[11px]" : "h-8 w-8 text-xs"}`}
-      style={{ background: "linear-gradient(135deg, hsl(var(--brand-1)), hsl(var(--brand-2)) 55%, hsl(var(--brand-3)))" }}
-      aria-hidden="true"
-    >
-      N
-    </span>
     NZ<span className="text-gradient-brand">-web</span>
   </span>
 );
@@ -154,13 +159,36 @@ const Header = () => {
   useEffect(() => { setServicesOpen(false); }, [location.pathname]);
 
   useEffect(() => {
+    let tl: gsap.core.Timeline | null = null;
+
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      if (logoRef.current) tl.from(logoRef.current, { y: -20, opacity: 0, duration: 0.6 });
+      tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      /* clearProps strips the inline opacity/transform once each tween lands —
+         without it a killed or never-ticked tween leaves the whole nav at
+         opacity 0, i.e. an invisible menu. */
+      if (logoRef.current) {
+        tl.from(logoRef.current, { y: -20, opacity: 0, duration: 0.6, clearProps: "opacity,transform" });
+      }
       const navItems = navRef.current ? Array.from(navRef.current.children) : [];
-      if (navItems.length > 0) tl.from(navItems, { y: -20, opacity: 0, duration: 0.5, stagger: 0.08 }, "-=0.3");
+      if (navItems.length > 0) {
+        tl.from(
+          navItems,
+          { y: -20, opacity: 0, duration: 0.5, stagger: 0.08, clearProps: "opacity,transform" },
+          "-=0.3",
+        );
+      }
     });
-    return () => ctx.revert();
+
+    /* Belt and braces: the navigation must be on screen no matter what happens
+       to the animation frame loop. */
+    const failsafe = window.setTimeout(() => {
+      if (tl && tl.progress() < 1) tl.progress(1);
+    }, 2200);
+
+    return () => {
+      window.clearTimeout(failsafe);
+      ctx.revert();
+    };
   }, []);
 
   const handleNavClick = (
@@ -194,7 +222,11 @@ const Header = () => {
         }`}
       >
         {/* ── Desktop ── */}
-        <div className="hidden md:flex items-center justify-between gap-4 px-4 py-2.5 lg:px-5">
+        <div
+          className={`hidden md:flex items-center justify-between gap-4 px-4 transition-all duration-500 lg:px-5 ${
+            scrolled ? "py-2" : "py-3"
+          }`}
+        >
           {/* Logo */}
           <a
             ref={logoRef}
@@ -281,8 +313,9 @@ const Header = () => {
           </div>
         </div>
 
-        {/* ── Mobile ── */}
-        <div className="flex md:hidden items-center justify-between gap-2 px-3 py-2">
+        {/* ── Mobile ──
+            Order (RTL, right → left): logo · שירותים · חבילות · אודות · CTA · menu */}
+        <div className="flex md:hidden items-center justify-between gap-0.5 px-2 py-2 xs:gap-1 xs:px-2.5">
           {/* Logo */}
           <a
             href="/"
@@ -293,28 +326,50 @@ const Header = () => {
             <Wordmark compact />
           </a>
 
+          {/* Quick links — the three destinations people actually reach for.
+              Everything else lives in the drawer. */}
+          {/* Sized by its content, not flex-1 — a growing nav box would let the
+              labels spill over the logo and the CTA on 360px screens. */}
+          <nav className="flex shrink-0 items-center gap-0.5">
+            {mobileNavLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (link.href.includes("#")) {
+                    const hash = `#${link.href.split("#")[1]}`;
+                    if (location.pathname === "/") {
+                      scrollToSelectorWithRetry(hash);
+                    } else {
+                      navigate("/", { state: { scrollTo: hash, scrollNonce: Date.now() } });
+                    }
+                  } else {
+                    navigate(link.href);
+                  }
+                }}
+                className="shrink-0 whitespace-nowrap rounded-lg px-[3px] py-2 text-[10.5px] font-semibold text-muted-foreground transition-colors hover:bg-primary/[0.07] hover:text-foreground xs:px-2 xs:text-[12px]"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+
           {/* Mobile CTA + hamburger */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <a
-              href={getTelHref(contactInfo.phone)}
-              aria-label="חייגו אלינו"
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 bg-secondary/40 text-foreground transition-all active:scale-95"
-            >
-              <Phone className="h-[18px] w-[18px]" />
-            </a>
+          <div className="flex items-center gap-1 shrink-0">
             <a
               href="/contact/"
               onClick={(e) => { e.preventDefault(); navigate("/contact/"); }}
-              className="btn-brand inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[13px] font-bold"
+              className="btn-brand inline-flex shrink-0 items-center gap-1 rounded-xl px-2 py-2 text-[10.5px] font-bold xs:gap-1.5 xs:px-3 xs:text-[12px]"
             >
-              <MessageCircle className="h-4 w-4" />
+              <MessageCircle className="h-3.5 w-3.5 shrink-0" />
               בואו נדבר
             </a>
 
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
                 <motion.button
-                  className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-secondary/40 transition-all"
+                  className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-secondary/40 transition-all"
                   aria-label="תפריט"
                   whileTap={{ scale: 0.94 }}
                 >
@@ -351,7 +406,7 @@ const Header = () => {
                 />
 
                 <SheetHeader className="relative">
-                  <SheetTitle className="text-right font-heebo text-xl font-black text-white">
+                  <SheetTitle dir="ltr" className="text-right font-heebo text-xl font-black text-white">
                     NZ<span style={{ color: "hsl(var(--brand-3))" }}>-web</span>
                   </SheetTitle>
                   <SheetDescription className="text-right text-sm text-white/55">

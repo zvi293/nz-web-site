@@ -1,6 +1,6 @@
 import { Hammer, Phone, MapPin, Image as ImageIcon, Zap, ShieldCheck } from "lucide-react";
 import type { VerticalContent } from "@/data/verticals";
-import img from "@/assets/mockup-showcase.png";
+import img from "@/assets/mockup-showcase.webp";
 
 /* בעלי מקצוע (שיפוצניק / חשמלאי / נגר / אינסטלטור) — דגש על לידים ודף נחיתה */
 export const contractor: VerticalContent = {

@@ -8,6 +8,7 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import BackToTopButton from "@/components/BackToTopButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
 import BackToHome from "@/components/BackToHome";
@@ -298,6 +299,7 @@ const ServicesIndex = () => {
 
       <Footer />
       <WhatsAppButton />
+      <BackToTopButton />
       <AccessibilityWidget />
     </main>
   );

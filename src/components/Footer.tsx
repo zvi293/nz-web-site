@@ -180,25 +180,16 @@ const Footer = () => {
             {/* Column 1: Branding + tagline */}
             <div className="flex flex-col gap-5">
               <Link to="/" aria-label="NZ-web — לדף הבית">
+                {/* dir="ltr" + inline (no flex) — otherwise the RTL bidi pass
+                    reorders the two runs and the logo reads "web-NZ". */}
                 <motion.div
-                  className="flex items-center gap-2.5 text-3xl font-black tracking-tight text-white font-heebo"
+                  dir="ltr"
+                  className="inline-block text-3xl font-black tracking-tight text-white font-heebo"
                   style={{ letterSpacing: "-0.02em" }}
                   whileHover={{ scale: 1.04 }}
                   transition={{ type: "spring", stiffness: 400, damping: 15 }}
                 >
-                  <span
-                    className="grid h-9 w-9 place-items-center rounded-xl text-sm text-white"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, hsl(var(--brand-1)), hsl(var(--brand-2)) 55%, hsl(var(--brand-3)))",
-                      boxShadow: "0 8px 24px -8px hsl(var(--brand-2) / 0.7)",
-                    }}
-                    aria-hidden="true"
-                  >
-                    N
-                  </span>
-                  NZ
-                  <span className="text-gradient-brand">-web</span>
+                  NZ<span className="text-gradient-brand">-web</span>
                 </motion.div>
               </Link>
               <p className="text-sm leading-relaxed text-white/50 italic font-heebo">
@@ -338,8 +329,28 @@ const Footer = () => {
             </div>
           </div>
 
+          {/* Oversized wordmark watermark — the studio signing its own work */}
+          <div
+            className="pointer-events-none mt-12 select-none overflow-hidden text-center leading-[0.8]"
+            aria-hidden="true"
+          >
+            <span
+              className="block font-heebo font-black tracking-tighter text-transparent"
+              style={{
+                fontSize: "clamp(3.5rem, 15vw, 11rem)",
+                backgroundImage:
+                  "linear-gradient(180deg, hsl(0 0% 100% / 0.12), hsl(0 0% 100% / 0.015))",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                letterSpacing: "-0.05em",
+              }}
+            >
+              NZ-web
+            </span>
+          </div>
+
           {/* Bottom bar */}
-          <div className="mt-12 border-t border-white/[0.08] pt-8">
+          <div className="mt-2 border-t border-white/[0.08] pt-8">
             <div className="flex flex-col items-center gap-3 text-center">
               {/* SEO links */}
               <p className="font-heebo text-xs text-white/25">

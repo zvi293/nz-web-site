@@ -1,6 +1,6 @@
 import { Megaphone, MousePointerClick, Target, BarChart3, Zap, Smartphone } from "lucide-react";
 import type { VerticalContent } from "@/data/verticals";
-import img from "@/assets/mockup-dashboard.png";
+import img from "@/assets/mockup-dashboard.webp";
 
 /* דף נחיתה לקמפיין פייסבוק וגוגל */
 export const campaign: VerticalContent = {

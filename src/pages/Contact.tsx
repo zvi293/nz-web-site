@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import BackToTopButton from "@/components/BackToTopButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { getMailtoHref, getTelHref, contactInfo } from "@/lib/contact-utils";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
@@ -160,6 +161,7 @@ const Contact = () => {
 
       <Footer />
       <WhatsAppButton />
+      <BackToTopButton />
       <AccessibilityWidget />
     </main>);
 

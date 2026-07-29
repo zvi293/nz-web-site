@@ -1,6 +1,6 @@
 import { Stethoscope, CalendarCheck, HeartPulse, ShieldCheck, Smartphone, FileText } from "lucide-react";
 import type { VerticalContent } from "@/data/verticals";
-import img from "@/assets/contact-illustration.png";
+import img from "@/assets/contact-illustration.webp";
 
 /* קליניקה / רופא שיניים / מטפל — אתר תדמית + תורים */
 export const clinic: VerticalContent = {

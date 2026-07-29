@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import BackToTopButton from "@/components/BackToTopButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
@@ -363,6 +364,7 @@ const LandingPages = () => {
 
       <Footer />
       <WhatsAppButton />
+      <BackToTopButton />
       <AccessibilityWidget />
     </main>
   );

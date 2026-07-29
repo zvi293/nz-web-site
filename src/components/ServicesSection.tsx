@@ -538,6 +538,16 @@ const ServicesSection = () => {
               {/* Crisp inner edge — keeps the pastel blocks from bleeding into the section */}
               <div className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/50" />
 
+              {/* Oversized step numeral — anchors the eye and gives the stack rhythm */}
+              <span
+              aria-hidden="true"
+              className={`pointer-events-none absolute -top-4 select-none text-[7rem] font-black leading-none opacity-[0.07] transition-opacity duration-700 group-hover:opacity-[0.12] md:-top-8 md:text-[12rem] ${
+              service.reverse ? "left-4 md:left-10" : "right-4 md:right-10"}`
+              }
+              style={{ color: service.textColor }}>
+                {String(i + 1).padStart(2, "0")}
+              </span>
+
 
               <div
               className={`relative z-10 flex flex-col items-center gap-5 md:gap-16 lg:flex-row lg:gap-20 ${
@@ -547,12 +557,12 @@ const ServicesSection = () => {
                 {/* Text Block */}
                 <div data-text className="flex flex-1 flex-col gap-5 text-right">
                   <div
-                  className="flex h-16 w-16 items-center justify-center rounded-2xl text-white shadow-xl"
+                  className="flex h-16 w-16 items-center justify-center rounded-2xl text-white shadow-xl transition-transform duration-500 group-hover:-translate-y-1 group-hover:rotate-3"
                   style={{
                     backgroundColor: service.iconBg,
                     boxShadow: service.iconShadow
                   }}>
-                  
+
                     <IconRenderer service={service} />
                   </div>
 
