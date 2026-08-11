@@ -36,6 +36,8 @@ import {
   PACKAGES_PAGE,
   PRICING_INCLUDED_ITEMS,
   PRICING_PLANS,
+  PRICING_QUOTE_NOTE,
+  PRICING_QUOTE_SHORT,
   type PlanIconKey,
   type PricingPlan,
 } from "@/data/pricing";
@@ -130,7 +132,7 @@ const PackageNav = ({
               >
                 {plan.featured && <Crown className="h-3.5 w-3.5 shrink-0" />}
                 {plan.name}
-                <span className={isActive ? "opacity-80" : "opacity-60"}>{plan.monthly}</span>
+                <span className={isActive ? "opacity-80" : "opacity-60"}>{plan.nickname}</span>
               </a>
             );
           })}
@@ -141,7 +143,8 @@ const PackageNav = ({
 };
 
 /* ─────────────────────────────────────────────────────────────
-   Hero selector card — the price ladder at the top of the page.
+   Hero selector card — the package ladder at the top of the page.
+   No amounts: each package is quoted personally.
    ───────────────────────────────────────────────────────────── */
 const LadderCard = ({ plan, index }: { plan: PricingPlan; index: number }) => (
   <motion.a
@@ -167,15 +170,17 @@ const LadderCard = ({ plan, index }: { plan: PricingPlan; index: number }) => (
         <span className="text-base font-black text-foreground md:text-lg">{plan.name}</span>
         <span className="text-xs font-bold text-primary">{plan.nickname}</span>
       </div>
-      <p className="mt-1 text-xs text-muted-foreground sm:mt-2.5">
-        הקמה <span className="font-bold text-foreground/80">{plan.setup}</span>
+      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground sm:mt-2.5">
+        {plan.details.audience}
       </p>
     </div>
 
     <div className="flex shrink-0 items-center gap-2 sm:mt-1 sm:justify-between">
       <div className="text-left sm:text-right">
-        <p className="text-xl font-black leading-none text-foreground md:text-2xl">{plan.monthly}</p>
-        <p className="mt-1 text-[11px] text-muted-foreground">לחודש</p>
+        <p className="text-sm font-black leading-none text-foreground md:text-base">
+          {PRICING_QUOTE_SHORT}
+        </p>
+        <p className="mt-1 text-[11px] text-muted-foreground">הקמה + מנוי חודשי</p>
       </div>
       <span className="inline-flex items-center gap-1 text-xs font-bold text-primary transition-all duration-200 group-hover:gap-2">
         <span className="hidden sm:inline">לפירוט המלא</span>
@@ -192,7 +197,7 @@ const PackageSection = ({ plan, index }: { plan: PricingPlan; index: number }) =
   const { details } = plan;
   const waHref = getWhatsAppHref(
     contactInfo,
-    `היי! אני מעוניין/ת בחבילת ${plan.name} ${plan.nickname} לאתר תדמית (הקמה: ${plan.setup}, ${plan.monthly} לחודש). אשמח לפרטים ולהצעה.`,
+    `היי! אני מעוניין/ת בחבילת ${plan.name} ${plan.nickname} לאתר תדמית. אשמח לפרטים ולהצעה מותאמת.`,
   );
 
   return (
@@ -243,24 +248,24 @@ const PackageSection = ({ plan, index }: { plan: PricingPlan; index: number }) =
             </div>
             <p className="mt-2 text-lg font-bold text-primary">{plan.nickname}</p>
 
-            {/* price block */}
+            {/* payment model — the quote is personal, so no amounts are shown */}
             <div className="mt-5 overflow-hidden rounded-2xl border border-border/50">
               <div className="flex divide-x divide-x-reverse divide-border/50">
                 <div className="flex-1 bg-secondary/50 p-4">
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                     הקמה חד-פעמית
                   </p>
-                  <p className="mt-1 text-xl font-black text-foreground md:text-2xl">{plan.setup}</p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-foreground">{plan.setupNote}</p>
                 </div>
                 <div className="flex-1 bg-primary/[0.07] p-4">
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-primary/80">
                     מנוי חודשי
                   </p>
-                  <p className="mt-1 text-xl font-black text-primary md:text-2xl">{plan.monthly}</p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-primary">{plan.monthlyNote}</p>
                 </div>
               </div>
               <p className="border-t border-border/50 bg-card px-4 py-2.5 text-[11px] leading-relaxed text-muted-foreground">
-                {plan.monthlyNote} · ללא התחייבות
+                הצעה אישית לפי היקף הפרויקט · ללא התחייבות · בלי עלויות נסתרות
               </p>
             </div>
 
@@ -407,10 +412,10 @@ const Packages = () => {
           acceptedAnswer: { "@type": "Answer", text: faq.a },
         })),
       },
-      /* The three packages as machine-readable offers — this is the page a
-         "כמה עולה אתר תדמית" query should resolve to, so the prices are stated
-         in schema and not only in styled markup. Numbers are parsed from the
-         display strings so pricing.ts stays the single source of truth. */
+      /* The three packages as a machine-readable catalog. Deliberately WITHOUT
+         price / priceCurrency: pricing is per-client, so no amount is published
+         anywhere — not in markup, not in meta, not in structured data. Stating
+         a price here would leak a number into Google's rich results. */
       {
         "@context": "https://schema.org",
         "@type": "Service",
@@ -420,15 +425,17 @@ const Packages = () => {
         provider: { "@id": "https://nz-web.com/#organization" },
         areaServed: { "@type": "Country", name: "Israel" },
         url: "https://nz-web.com/packages/",
-        offers: PRICING_PLANS.map((plan) => ({
-          "@type": "Offer",
-          name: `חבילת ${plan.name} — אתר תדמית`,
-          url: `https://nz-web.com/packages/#${plan.slug}`,
-          priceCurrency: "ILS",
-          price: Number(plan.setup.replace(/[^\d]/g, "")) || undefined,
-          description: `${plan.tagline} (הקמה ${plan.setup} + ${plan.monthly} לחודש, ללא התחייבות)`,
-          availability: "https://schema.org/InStock",
-        })),
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "חבילות אתר תדמית",
+          itemListElement: PRICING_PLANS.map((plan) => ({
+            "@type": "Offer",
+            name: `חבילת ${plan.name} — אתר תדמית`,
+            url: `https://nz-web.com/packages/#${plan.slug}`,
+            description: `${plan.tagline} (הקמה חד-פעמית + מנוי חודשי, ללא התחייבות. הצעת מחיר אישית לפי היקף הפרויקט)`,
+            availability: "https://schema.org/InStock",
+          })),
+        },
       },
     ],
   });
@@ -523,7 +530,7 @@ const Packages = () => {
             </motion.p>
           </div>
 
-          {/* price ladder */}
+          {/* package ladder */}
           <div className="mt-9 grid grid-cols-1 gap-3.5 sm:grid-cols-3 md:mt-11 md:gap-4">
             {PRICING_PLANS.map((plan, i) => (
               <LadderCard key={plan.slug} plan={plan} index={i} />
@@ -552,6 +559,9 @@ const Packages = () => {
           </motion.ul>
           <p className="mt-3 text-center text-xs leading-relaxed text-muted-foreground md:text-[13px]">
             בכל החבילות. האתר באוויר, מאובטח ומתוחזק כל עוד המנוי החודשי פעיל.
+          </p>
+          <p className="mx-auto mt-2 max-w-xl text-center text-xs leading-relaxed text-muted-foreground md:text-[13px]">
+            {PRICING_QUOTE_NOTE}
           </p>
         </div>
       </section>

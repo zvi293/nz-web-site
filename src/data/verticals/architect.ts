@@ -129,7 +129,7 @@ export const architect: VerticalContent = {
     height: 697,
   },
   related: [
-    { label: "חבילות ומחירים לאתר תדמית", href: "/#pricing" },
+    { label: "חבילות אתר תדמית", href: "/#pricing" },
     { label: "אתר תדמית למתווך נדל\"ן", href: "/services/business-website/real-estate/" },
     { label: "בניית אתרים מקצועיים לעסקים", href: "/services/web-development/" },
     { label: "צרו קשר לשיחת אפיון", href: "/contact/" },

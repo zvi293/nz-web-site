@@ -127,7 +127,7 @@ export const trades: VerticalContent = {
   related: [
     { label: "אתר ודף נחיתה לבעלי מקצוע", href: "/services/business-website/contractor/" },
     { label: "דף נחיתה לקמפיין פייסבוק וגוגל", href: "/services/landing-page-development/campaign/" },
-    { label: "חבילות ומחירים לאתר תדמית", href: "/#pricing" },
+    { label: "חבילות אתר תדמית", href: "/#pricing" },
     { label: "צרו קשר להקמת דף", href: "/contact/" },
   ],
 };

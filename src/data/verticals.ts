@@ -191,7 +191,7 @@ const lawyer: VerticalContent = {
     height: 720,
   },
   related: [
-    { label: "חבילות ומחירים לאתר תדמית", href: "/#pricing" },
+    { label: "חבילות אתר תדמית", href: "/#pricing" },
     { label: "בניית אתרים מקצועיים לעסקים", href: "/services/web-development/" },
     { label: "דף נחיתה לקמפיין של המשרד", href: "/services/landing-page-development/" },
     { label: "צרו קשר לשיחת אפיון", href: "/contact/" },

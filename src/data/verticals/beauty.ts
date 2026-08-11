@@ -130,7 +130,7 @@ export const beauty: VerticalContent = {
   },
   related: [
     { label: "מערכת ניהול תורים מתקדמת", href: "/services/appointment-system/" },
-    { label: "חבילות ומחירים לאתר תדמית", href: "/#pricing" },
+    { label: "חבילות אתר תדמית", href: "/#pricing" },
     { label: "אתר ומערכת תורים לקליניקה", href: "/services/business-website/clinic/" },
     { label: "צרו קשר לשיחת אפיון", href: "/contact/" },
   ],

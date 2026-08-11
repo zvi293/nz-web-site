@@ -127,7 +127,7 @@ export const leadGeneration: VerticalContent = {
   related: [
     { label: "דף נחיתה לקמפיין פייסבוק וגוגל", href: "/services/landing-page-development/campaign/" },
     { label: "אתר תדמית לעסקים", href: "/services/business-website/" },
-    { label: "חבילות ומחירים לאתר תדמית", href: "/#pricing" },
+    { label: "חבילות אתר תדמית", href: "/#pricing" },
     { label: "צרו קשר להקמת דף", href: "/contact/" },
   ],
 };

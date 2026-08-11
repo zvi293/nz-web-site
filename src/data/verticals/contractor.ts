@@ -131,7 +131,7 @@ export const contractor: VerticalContent = {
   related: [
     { label: "בניית דף נחיתה לשיפוצניק וצבעי", href: "/services/landing-page-development/trades/" },
     { label: "בניית דף נחיתה ממיר", href: "/services/landing-page-development/" },
-    { label: "חבילות ומחירים לאתר תדמית", href: "/#pricing" },
+    { label: "חבילות אתר תדמית", href: "/#pricing" },
     { label: "צרו קשר לקבלת הצעה", href: "/contact/" },
   ],
 };

@@ -129,7 +129,7 @@ export const accountant: VerticalContent = {
     height: 1024,
   },
   related: [
-    { label: "חבילות ומחירים לאתר תדמית", href: "/#pricing" },
+    { label: "חבילות אתר תדמית", href: "/#pricing" },
     { label: "בניית אתר תדמית ליועץ ומאמן", href: "/services/business-website/consultant/" },
     { label: "בניית אתר תדמית לעורך דין", href: "/services/business-website/lawyer/" },
     { label: "צרו קשר לשיחת אפיון", href: "/contact/" },

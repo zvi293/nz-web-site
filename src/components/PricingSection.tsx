@@ -11,6 +11,7 @@ import {
   PRICING_COMMITMENT,
   PRICING_INCLUDED_NOTE,
   PRICING_INTRO,
+  PRICING_QUOTE_NOTE,
   getPlanDetailsHref,
   type PricingPlan,
 } from "@/data/pricing";
@@ -20,7 +21,7 @@ const PlanCard = ({ plan, index }: { plan: PricingPlan; index: number }) => {
   const onSpotlight = useSpotlight();
   const waHref = getWhatsAppHref(
     contactInfo,
-    `היי! אני מעוניין/ת בחבילת ${plan.name} לאתר תדמית (עלות הקמה: ${plan.setup}, ${plan.monthly} לחודש). אשמח לפרטים ולהצעה.`,
+    `היי! אני מעוניין/ת בחבילת ${plan.name} לאתר תדמית. אשמח לפרטים ולהצעה מותאמת.`,
   );
   return (
   <motion.div
@@ -64,29 +65,31 @@ const PlanCard = ({ plan, index }: { plan: PricingPlan; index: number }) => {
     <p className="mt-0.5 text-sm font-bold text-primary">{plan.nickname}</p>
     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{plan.tagline}</p>
 
-    {/* prices — one-time setup + monthly retainer */}
-    <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-border/40 bg-secondary/30 p-4">
-      <div>
-        <p className="text-xs font-semibold text-muted-foreground">הקמה חד-פעמית</p>
-        <p className="mt-0.5 text-xs text-muted-foreground/80">{plan.setupNote}</p>
-        <p className="mt-1 text-xl font-black text-foreground">{plan.setup}</p>
-      </div>
-      <div className="border-t border-border/40 pt-3.5">
-        <p className="text-xs font-semibold text-muted-foreground">מנוי חודשי</p>
-        <p className="mt-0.5 text-xs text-muted-foreground/80">{plan.monthlyNote}</p>
-        <div className="mt-1 flex items-baseline gap-1.5">
-          <span className="text-4xl font-black text-transparent"
-            style={{
-              backgroundImage: "linear-gradient(120deg, hsl(var(--brand-1)), hsl(var(--brand-2)) 60%, hsl(var(--brand-3)))",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-            }}
-          >
-            {plan.monthly}
-          </span>
-          <span className="text-sm text-muted-foreground">/ לחודש</span>
+    {/* payment model — no amounts anywhere: every package is quoted personally */}
+    <div className="mt-5 flex flex-col gap-3.5 rounded-2xl border border-border/40 bg-secondary/30 p-4">
+      <p
+        className="text-2xl font-black text-transparent"
+        style={{
+          backgroundImage: "linear-gradient(120deg, hsl(var(--brand-1)), hsl(var(--brand-2)) 60%, hsl(var(--brand-3)))",
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+        }}
+      >
+        הצעה אישית
+      </p>
+      <div className="flex flex-col gap-2.5 border-t border-border/40 pt-3.5">
+        <div>
+          <p className="text-xs font-semibold text-foreground">הקמה חד-פעמית</p>
+          <p className="mt-0.5 text-xs text-muted-foreground/90">{plan.setupNote}</p>
+        </div>
+        <div>
+          <p className="text-xs font-semibold text-foreground">מנוי חודשי, ללא התחייבות</p>
+          <p className="mt-0.5 text-xs text-muted-foreground/90">{plan.monthlyNote}</p>
         </div>
       </div>
+      <p className="border-t border-border/40 pt-3 text-xs leading-relaxed text-muted-foreground">
+        {PRICING_QUOTE_NOTE}
+      </p>
     </div>
 
     {/* features — each tier lists what it adds on top of the previous one */}

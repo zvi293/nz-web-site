@@ -103,7 +103,7 @@ const config: ServicePageConfig = {
     { label: "מערכת ניהול תורים לעסק", href: "/services/appointment-system/" },
     { label: "דף נחיתה ממיר לקמפיין", href: "/services/landing-page-development/" },
     { label: "בניית אתרים מקצועיים", href: "/services/web-development/" },
-    { label: "חבילות ומחירים לאתר תדמית", href: "/#pricing" },
+    { label: "חבילות אתר תדמית", href: "/#pricing" },
     { label: "צרו קשר לשיחת ייעוץ", href: "/contact/" },
   ],
   pricing: true,

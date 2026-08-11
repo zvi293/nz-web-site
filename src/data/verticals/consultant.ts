@@ -130,7 +130,7 @@ export const consultant: VerticalContent = {
   },
   related: [
     { label: "מערכת ניהול תורים לפגישות", href: "/services/appointment-system/" },
-    { label: "חבילות ומחירים לאתר תדמית", href: "/#pricing" },
+    { label: "חבילות אתר תדמית", href: "/#pricing" },
     { label: "אתר תדמית לרואה חשבון", href: "/services/business-website/accountant/" },
     { label: "צרו קשר לשיחת אפיון", href: "/contact/" },
   ],

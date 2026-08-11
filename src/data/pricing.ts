@@ -1,16 +1,21 @@
 /**
  * pricing.ts — the אתר-תדמית packages.
  *
- * Single source of truth for the 3 plans + the pricing FAQ. Edit prices and
- * features here without touching markup — PricingSection renders this file.
+ * Single source of truth for the 3 plans + the packages FAQ. Edit features
+ * here without touching markup — PricingSection renders this file.
+ *
+ * NO PRICES ANYWHERE. Deliberate policy: the quote is built per client and per
+ * project, so the site never states a number (not in copy, not in meta, not in
+ * schema). Only the payment *model* is described — a one-time setup + a monthly
+ * subscription — and every CTA leads to a personal quote.
  *
  * The tiers are cumulative: פרו is "everything in סמארט, plus…" and עילית is
  * "everything in פרו, plus…", so each card lists only what it adds
  * (`inheritsNote` + `features`).
  *
  * Rules baked in: month-to-month, NO minimum commitment (the site stays live
- * while the subscription is paid), and no VAT wording anywhere. CTAs are lead
- * capture only — no checkout/payment flow.
+ * while the subscription is paid). CTAs are lead capture only — no
+ * checkout/payment flow.
  */
 export type PlanSlug = "smart" | "pro" | "elite";
 
@@ -66,13 +71,9 @@ export interface PricingPlan {
   /** short nickname shown under the name, e.g. ״נוכחות״. */
   nickname: string;
   tagline: string;
-  /** one-time setup fee, formatted (no VAT wording). */
-  setup: string;
-  /** what the setup fee covers. */
+  /** what the one-time setup covers (never an amount). */
   setupNote: string;
-  /** monthly retainer, formatted. */
-  monthly: string;
-  /** what the monthly retainer covers. */
+  /** what the monthly retainer covers (never an amount). */
   monthlyNote: string;
   featured?: boolean;
   badge?: string;
@@ -90,9 +91,7 @@ const smart: PricingPlan = {
   name: "סמארט",
   nickname: "״נוכחות״",
   tagline: "הצעד הראשון ל״יש לי נוכחות מקצועית בגוגל״, מהר ובלי סיכון.",
-  setup: "2,500 ₪",
   setupNote: "תשלום אחד: בניית האתר מא׳ ועד ת׳",
-  monthly: "199 ₪",
   monthlyNote: "אחסון, אבטחה, תחזוקה וקידום שוטף",
   ctaText: "אני רוצה את החבילה הזו",
   features: [
@@ -110,7 +109,7 @@ const smart: PricingPlan = {
       "לעסק קטן, לעצמאי או לנותן שירות שצריך כרטיס ביקור דיגיטלי אמיתי, מהר ובלי סיכון.",
     highlights: ["עד 5 עמודים", "SEO בסיסי: 5 ביטויים", "עדכון חודשי כלול", "ליווי 14 יום"],
     howItWorks:
-      "משלמים 2,500 ₪ פעם אחת על בניית האתר, ואז 199 ₪ בחודש, שכוללים אחסון, אבטחה, גיבויים, תמיכה וכל שירותי הקידום של החבילה. בלי עלויות נסתרות, והאתר באוויר, מאובטח ומתוחזק כל עוד המנוי החודשי פעיל.",
+      "המודל פשוט: תשלום חד-פעמי על בניית האתר, ואז מנוי חודשי שכולל אחסון, אבטחה, גיבויים, תמיכה וכל שירותי הקידום של החבילה. בלי עלויות נסתרות, והאתר באוויר, מאובטח ומתוחזק כל עוד המנוי החודשי פעיל. את ההצעה המדויקת מקבלים אחרי שיחה קצרה, לפי היקף הפרויקט שלכם.",
     groups: [
       {
         title: "היקף האתר",
@@ -158,7 +157,7 @@ const smart: PricingPlan = {
     ],
     ctaText: "רוצה את חבילת ״נוכחות״? דברו איתי",
     closingNote:
-      "מתאים למי שצריך נוכחות. למי שרוצה שהאתר יביא לקוחות באופן פעיל: חבילת פרו.",
+      "מתאימה למי שצריך נוכחות מקצועית. למי שרוצה שהאתר יביא לקוחות באופן פעיל: חבילת פרו.",
   },
 };
 
@@ -167,9 +166,7 @@ const pro: PricingPlan = {
   name: "פרו",
   nickname: "״מובילות״",
   tagline: "האתר הופך מנכס תדמיתי למכונת לידים, עם שליטה מלאה שלכם ומספרים על השולחן.",
-  setup: "4,600 ₪",
   setupNote: "תשלום אחד: בניית האתר מא׳ ועד ת׳",
-  monthly: "390 ₪",
   monthlyNote: "אחסון, אבטחה, תחזוקה וקידום שוטף",
   featured: true,
   badge: "הנבחרת ביותר",
@@ -197,7 +194,7 @@ const pro: PricingPlan = {
       "ליווי 30 יום",
     ],
     howItWorks:
-      "משלמים 4,600 ₪ פעם אחת על בניית האתר, ואז 390 ₪ בחודש, שכוללים אחסון, אבטחה, פאנל ניהול, דוחות וכל שירותי הקידום. בלי עלויות נסתרות, והאתר באוויר, מאובטח ומתוחזק כל עוד המנוי החודשי פעיל.",
+      "תשלום חד-פעמי על בניית האתר, ואז מנוי חודשי שכולל אחסון, אבטחה, פאנל ניהול, דוחות וכל שירותי הקידום. בלי עלויות נסתרות, והאתר באוויר, מאובטח ומתוחזק כל עוד המנוי החודשי פעיל. את ההצעה המדויקת מקבלים אחרי שיחה קצרה, לפי היקף הפרויקט שלכם.",
     groups: [
       {
         title: "שליטה מלאה: פאנל ניהול אישי",
@@ -255,7 +252,7 @@ const pro: PricingPlan = {
     ],
     ctaText: "רוצה את חבילת ״מובילות״? דברו איתי",
     closingNote:
-      "הפרש של 2,100 ₪ בהקמה לעומת חבילת סמארט, ובתמורה אתר שאתם שולטים בו, בלוג שממשיך להביא לקוחות, ודוח חודשי שאומר לכם בדיוק אם ההשקעה עובדת.",
+      "צעד אחד מעל חבילת סמארט: אתר שאתם שולטים בו, בלוג שממשיך להביא לקוחות, ודוח חודשי שאומר לכם בדיוק אם ההשקעה עובדת.",
   },
 };
 
@@ -264,9 +261,7 @@ const elite: PricingPlan = {
   name: "עילית",
   nickname: "״פסגה״",
   tagline: "לא רק להופיע בגוגל, אלא להיות התשובה. גם בחיפוש וגם כשלקוח שואל את ChatGPT.",
-  setup: "5,000 ₪",
   setupNote: "תשלום אחד: בניית האתר מא׳ ועד ת׳",
-  monthly: "590 ₪",
   monthlyNote: "אחסון, אבטחה, תחזוקה, קידום AI ושוטף",
   ctaText: "אני רוצה את החבילה הזו",
   inheritsNote: "כל מה שבחבילת פרו, ובנוסף:",
@@ -292,7 +287,7 @@ const elite: PricingPlan = {
       "ליווי 60 יום",
     ],
     howItWorks:
-      "משלמים 5,000 ₪ פעם אחת על בניית האתר, ואז 590 ₪ בחודש, שכוללים את כל שירותי חבילת פרו + קידום במנועי AI ודוח אזכורים חודשי. בלי עלויות נסתרות, והאתר באוויר, מאובטח ומתוחזק כל עוד המנוי החודשי פעיל.",
+      "תשלום חד-פעמי על בניית האתר, ואז מנוי חודשי שכולל את כל שירותי חבילת פרו + קידום במנועי AI ודוח אזכורים חודשי. בלי עלויות נסתרות, והאתר באוויר, מאובטח ומתוחזק כל עוד המנוי החודשי פעיל. את ההצעה המדויקת מקבלים אחרי שיחה קצרה, לפי היקף הפרויקט שלכם.",
     groups: [
       {
         title: "קידום במנועי AI: GEO / AEO",
@@ -340,7 +335,7 @@ const elite: PricingPlan = {
     ],
     ctaText: "רוצה את חבילת ״פסגה״? דברו איתי",
     closingNote:
-      "ההקמה יקרה ב-400 ₪ בלבד מחבילת פרו. כל ההבדל האמיתי הוא ברמת הליווי החודשי ובנוכחות במקום שאף אחד מהמתחרים שלכם עוד לא נמצא בו.",
+      "ההבדל מחבילת פרו הוא ברמת הליווי החודשי ובנוכחות במקום שאף אחד מהמתחרים שלכם עוד לא נמצא בו: התשובות של מנועי ה-AI.",
   },
 };
 
@@ -365,7 +360,17 @@ export const PRICING_INCLUDED_NOTE =
 
 /** Nudge shown next to the WhatsApp link under the cards. */
 export const PRICING_COMMITMENT =
-  "לא בטוחים איזו חבילה מתאימה? ספרו לנו על העסק בהודעה קצרה, ותקבלו המלצה מקצועית שמדויקת למטרות ולתקציב שלכם.";
+  "לא בטוחים איזו חבילה מתאימה? ספרו לנו על העסק בהודעה קצרה, ותקבלו המלצה מקצועית והצעה אישית שמדויקת למטרות ולצרכים שלכם.";
+
+/**
+ * The line that replaces a price tag everywhere a plan is displayed.
+ * Every package is quoted personally, so no amount is ever rendered.
+ */
+export const PRICING_QUOTE_NOTE =
+  "ההצעה נבנית אישית לפי היקף הפרויקט — דברו איתנו ותקבלו הצעה מדויקת ושקופה.";
+
+/** Short version of the above, for tight spaces (cards, sticky nav, ladder). */
+export const PRICING_QUOTE_SHORT = "בהצעה אישית";
 
 export const PRICING_FAQS: { q: string; a: string }[] = [
   {
@@ -381,8 +386,8 @@ export const PRICING_FAQS: { q: string; a: string }[] = [
     a: "התשלום החודשי כולל אחסון, תעודת SSL, אבטחה, גיבויים, ניטור זמינות, תחזוקה שוטפת וקידום — ובחבילות הגבוהות גם אופטימיזציה למנועי AI, דוחות ביצועים ומכסת בקשות שינוי חודשית.",
   },
   {
-    q: "מהי עלות ההקמה?",
-    a: "עלות ההקמה היא תשלום חד-פעמי בתחילת הפרויקט, עבור בניית האתר ועיצובו מא׳ ועד ת׳. לאחר ההשקה משלמים רק את המנוי החודשי.",
+    q: "איך נקבע המחיר ולמה הוא לא מופיע באתר?",
+    a: "כל עסק מקבל הצעה אישית, כי ההיקף משתנה מלקוח ללקוח: מספר העמודים, כמות התוכן, מורכבות העיצוב והשירותים שנדרשים בפועל. לכן אנחנו לא מציגים מספרים באתר אלא בונים הצעה מדויקת ושקופה אחרי שיחה קצרה — בלי עלויות נסתרות. המודל תמיד זהה: תשלום הקמה חד-פעמי ואחריו מנוי חודשי, ללא התחייבות.",
   },
   {
     q: "מה זה פאנל הניהול?",
@@ -401,9 +406,9 @@ export const PACKAGES_PAGE = {
   title: "בניית אתר תדמית שעובד בשביל העסק שלך",
   subtitle:
     "שלוש חבילות, מטרה אחת: שהעסק שלך ייראה מצוין ברשת ויקבל מזה לקוחות. כל החבילות כוללות עיצוב אישי מאפס, התאמה מלאה למובייל, נגישות לפי התקן וזמני טעינה מהירים במיוחד.",
-  seoTitle: "בניית אתר תדמית לעסק: חבילות ומחירים | NZ-web",
+  seoTitle: "בניית אתר תדמית לעסק: החבילות שלנו | NZ-web",
   seoDescription:
-    "חבילות אתר תדמית של NZ-web: סמארט מ-2,500 ₪ הקמה ו-199 ₪ לחודש, פרו עם פאנל ניהול ובלוג, ועילית עם קידום במנועי AI. מה כלול בכל חבילה — בלי עלויות נסתרות.",
+    "שלוש חבילות אתר תדמית של NZ-web: סמארט לנוכחות מקצועית, פרו עם פאנל ניהול ובלוג, ועילית עם קידום במנועי AI. מה כלול בכל חבילה, והצעה אישית לפי היקף הפרויקט.",
   ctaTitle: "עדיין מתלבטים?",
   ctaSubtitle:
     "ספרו לנו על העסק בהודעה קצרה, ותקבלו המלצה מקצועית על החבילה שמתאימה לכם, בלי התחייבות.",
@@ -419,7 +424,7 @@ export function getPlanDetailsHref(slug: PlanSlug): string {
 export const PACKAGES_FAQS: { q: string; a: string }[] = [
   {
     q: "כמה עולה לבנות אתר תדמית לעסק?",
-    a: "אצלנו אתר תדמית מתחיל ב-2,500 ₪ הקמה חד-פעמית + 199 ₪ לחודש (חבילת סמארט ״נוכחות״), 4,600 ₪ + 390 ₪ לחודש לחבילת פרו ״מובילות״ עם פאנל ניהול ובלוג, ו-5,000 ₪ + 590 ₪ לחודש לחבילת עילית ״פסגה״ עם קידום במנועי AI. המנוי החודשי כולל אחסון, אבטחה, תחזוקה וקידום, בלי עלויות נסתרות.",
+    a: "המחיר נקבע אישית לכל עסק, ולכן אין באתר מחירון: הוא תלוי במספר העמודים, בכמות התוכן, במורכבות העיצוב ובחבילה שבוחרים (סמארט ״נוכחות״, פרו ״מובילות״ או עילית ״פסגה״). המודל תמיד זהה — תשלום הקמה חד-פעמי ואחריו מנוי חודשי שכולל אחסון, אבטחה, תחזוקה וקידום, בלי עלויות נסתרות. בשיחה קצרה נגדיר את ההיקף ותקבלו הצעה מדויקת ושקופה.",
   },
   {
     q: "איזו חבילת אתר תדמית מתאימה לעסק שלי?",

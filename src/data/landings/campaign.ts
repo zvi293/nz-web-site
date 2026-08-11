@@ -127,7 +127,7 @@ export const campaign: VerticalContent = {
   related: [
     { label: "דף נחיתה לייצור לידים לעסקים", href: "/services/landing-page-development/lead-generation/" },
     { label: "בניית אתרים מקצועיים לעסקים", href: "/services/web-development/" },
-    { label: "חבילות ומחירים לאתר תדמית", href: "/#pricing" },
+    { label: "חבילות אתר תדמית", href: "/#pricing" },
     { label: "צרו קשר להקמת דף", href: "/contact/" },
   ],
 };

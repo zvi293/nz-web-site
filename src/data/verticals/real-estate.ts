@@ -129,7 +129,7 @@ export const realEstate: VerticalContent = {
     height: 1824,
   },
   related: [
-    { label: "חבילות ומחירים לאתר תדמית", href: "/#pricing" },
+    { label: "חבילות אתר תדמית", href: "/#pricing" },
     { label: "בניית דף נחיתה לקמפיין", href: "/services/landing-page-development/campaign/" },
     { label: "אתר תדמית לאדריכל ומעצב פנים", href: "/services/business-website/architect/" },
     { label: "צרו קשר לשיחת אפיון", href: "/contact/" },
