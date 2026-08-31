@@ -326,6 +326,28 @@ const Footer = () => {
                 <MessageCircle className="h-4 w-4" />
                 וואטסאפ
               </motion.button>
+
+              {/* Zstore AI credit — logo in a fully-rounded white pill (no caption on this site) */}
+              <div className="pt-1">
+                <motion.a
+                  href="https://zstore-ai.co.il/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Zstore AI — מעבר לאתר"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                  className="inline-flex items-center rounded-full bg-white px-5 py-2.5 shadow-lg transition-shadow duration-300 hover:shadow-[0_8px_30px_rgba(99,102,241,0.35)]"
+                >
+                  <img
+                    src="/zstore-ai-logo.png"
+                    alt="Zstore AI"
+                    width="600"
+                    height="200"
+                    loading="lazy"
+                    className="h-7 w-auto"
+                  />
+                </motion.a>
+              </div>
             </div>
           </div>
 
