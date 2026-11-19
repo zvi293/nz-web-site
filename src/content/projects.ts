@@ -95,7 +95,7 @@ export const projects: PortfolioProject[] = [
     link: "https://jewishcalendar.co.il/",
     featured: true,
     published: true,
-    order: 2,
+    order: 3,
   },
   {
     id: "carmit-therapy",
@@ -108,9 +108,9 @@ export const projects: PortfolioProject[] = [
     image: carmitD960,
     shots: shots(carmitD1600, carmitD960, carmitM780, carmitM480),
     link: "https://carmit-therapy.com/",
-    featured: true,
+    featured: false,
     published: true,
-    order: 3,
+    order: 4,
   },
   {
     id: "mentor-moshe",
@@ -123,9 +123,9 @@ export const projects: PortfolioProject[] = [
     image: mentorD960,
     shots: shots(mentorD1600, mentorD960, mentorM780, mentorM480),
     link: "https://mentor-moshe.netlify.app/",
-    featured: false,
+    featured: true,
     published: true,
-    order: 4,
+    order: 2,
   },
   {
     id: "brows-studio",

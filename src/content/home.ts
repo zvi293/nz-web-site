@@ -25,6 +25,17 @@ export const hero = {
     "אנחנו מעצבים ובונים אתרי תדמית, דפי נחיתה ומערכות לעסקים. כל אתר מתחיל בדף לבן, נבנה בהתאמה אישית, ונמסר מהיר, נגיש ומוכן לגוגל.",
   primaryCta: "לשיחה בוואטסאפ",
   secondaryCta: { label: "לעבודות שלנו", href: "/projects/" },
+  /** Room label on the hero's floor line (SITE-PLAYBOOK §11 "rooms, not sections"). */
+  room: "אולם 00 · הכניסה",
+  /** The exhibition map on the hero's floor line (desktop): anchors to the rooms below. */
+  rooms: [
+    { label: "שירותים", href: "#services" },
+    { label: "התהליך", href: "#process" },
+    { label: "עבודות", href: "#portfolio" },
+    { label: "ההצעה", href: "#pricing" },
+    { label: "מגזין", href: "#magazine" },
+    { label: "שאלות", href: "#faq" },
+  ],
   nextLabel: "המוצג הבא",
   exhibits: [
     { slug: "brushstroke-cube", medium: "קובייה, צבע וחלל לבן · הרגע שבו רעיון מקבל צורה" },
@@ -36,6 +47,9 @@ export const hero = {
 
 export const servicesHall = {
   eyebrow: "שירותים",
+  room: "אולם 01",
+  /** The plaque line under the room number. */
+  plaque: "שישה חדרים, אותה הקפדה",
   title: "מה אנחנו בונים לעסקים",
   lede: "שישה כיווני עבודה, אותה הקפדה. כל אחד מהם מתחיל באפיון ומסתיים באתר שעובד בשביל העסק.",
   rows: [
@@ -81,6 +95,7 @@ export const servicesHall = {
 
 export const processSteps = {
   eyebrow: "התהליך",
+  room: "אולם 02",
   title: "איך נבנה אתר אצלנו",
   lede: "ארבעה שלבים ברורים. בכל אחד מהם אתם רואים, מאשרים ויודעים מה הלאה.",
   steps: [
@@ -109,36 +124,65 @@ export const processSteps = {
 
 export const collection = {
   eyebrow: "עבודות",
+  room: "אולם 03",
   title: "מהאוסף שלנו",
   lede: "אתרים אמיתיים של עסקים אמיתיים. כל אחד מהם נבנה מאפס, לפי העסק שעומד מאחוריו.",
   visit: "לאתר",
+  /** Museum-label words. */
+  fieldLabel: "תחום",
+  pairNote: "מחשב ונייד",
   allLink: { label: "לכל העבודות", href: "/projects/" },
 };
 
 export const manifesto = {
   eyebrow: "מניפסט",
+  room: "אולם 04",
   /** One sentence, split for the composition; the last word is the accent. */
   lead: "אתר טוב נבנה כמו יצירה: מתכננים, מוחקים, מדייקים, ותולים על הקיר רק כשכל פרט",
+  /** The same sentence as set lines (the kinetic composition). Joined, they equal `lead`. */
+  lines: ["אתר טוב נבנה כמו יצירה:", "מתכננים, מוחקים, מדייקים,", "ותולים על הקיר", "רק כשכל פרט"],
   accent: "במקומו.",
   signature: "צבי משה",
+  signatureRole: "מייסד",
+  /** A detail of one piece, hung beside the sentence. */
+  detail: {
+    slug: "embroidered-comet",
+    prefix: "פרט",
+    medium: "רקמה על בד · מה שעובר מיד ליד, בזהירות",
+  },
 };
 
 export const magazine = {
   eyebrow: "מגזין",
+  room: "אולם 06",
   title: "מהמגזין",
   lede: "מדריכים קצרים וברורים על אתרים, קידום וכלים לעסקים.",
+  /** Masthead line beside the title. */
+  masthead: "המגזין של NZ-web",
+  leadLabel: "המאמר האחרון",
+  readMore: "לקריאה",
   allLink: { label: "לכל המאמרים", href: "/blog/" },
   readTime: (m: number) => `${m} דקות קריאה`,
 };
 
 export const faqBlock = {
   eyebrow: "שאלות נפוצות",
+  room: "אולם 07",
   title: "שאלות על התהליך וההצעה",
   allLink: { label: "לכל השאלות", href: "/faq/" },
+  /** A small piece hung beside the questions. */
+  art: { slug: "ceramic-handsets", prefix: "מוצג", medium: "קרמיקה וזכוכית · שיחה אחת עושה סדר" },
+  nudge: {
+    title: "לא מצאתם את התשובה?",
+    body: "כתבו לנו בוואטסאפ, ונחזור אליכם עם תשובה ברורה.",
+    cta: "לשאול בוואטסאפ",
+    message: "היי, הגעתי מהאתר של NZ-web ויש לי שאלה:",
+  },
 };
 
 export const finalCta = {
   eyebrow: "המסך עולה",
+  room: "אולם 08",
   title: "הקיר הבא בגלריה שמור לעסק שלכם.",
   body: "ספרו לנו בכמה מילים על העסק ועל מה שאתם צריכים. נחזור אליכם עם רעיון ראשון והצעה מסודרת.",
   cta: "לשיחה בוואטסאפ",

@@ -4,12 +4,12 @@
    the page (e.g. src/components/home/home.css), never here.
 
    Fonts (Frank Ruhl Libre + Heebo) are self-hosted and declared inline in
-   index.html (<style id="nz-fonts">) so they are known at first byte.
+   src/layouts/BaseLayout.astro (<style id="nz-fonts">) so they are known at first byte.
 
-   Motion gate: html.nz-motion is set by src/lib/motion.ts only when motion is
-   allowed (no prefers-reduced-motion, a11y "pause animations" off, not a
-   pre-render/automation browser). Every hidden start state lives under it, so
-   no-JS visitors and the pre-rendered HTML always show the final state.
+   Motion gate: html.nz-motion is set before first paint by BaseLayout's boot script
+   and kept in sync by src/lib/motion.ts, only when motion is allowed (no
+   prefers-reduced-motion, a11y "pause animations" off, not an automation browser).
+   Every hidden start state lives under it, so no-JS visitors always see the final state.
    ══════════════════════════════════════════════════════════════════════════ */
 
 @tailwind base;

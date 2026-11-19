@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import { Cookie } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -50,20 +48,17 @@ const CookieConsent = () => {
   const handleAccept = () => persist("accepted");
   const handleDecline = () => persist("declined");
 
+  if (!showBanner) return null;
+
+  /* Entrance: a CSS slide-up (tailwindcss-animate), none under reduced motion. */
   return (
-    <AnimatePresence>
-      {showBanner && (
-        <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 100, opacity: 0 }}
-          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        <div
           /* 152px clears the whole bottom-left FAB stack (WhatsApp ends at 80px,
              the accessibility launcher at 140px) at EVERY breakpoint. It must not
              be relaxed to `md:bottom-4` — on desktop the banner is ~158px tall,
              so a 16px offset puts it straight over both buttons, and the
              accessibility launcher has to stay reachable at all times. */
-          className="fixed bottom-[152px] left-4 right-4 z-[10000] md:right-auto md:max-w-md"
+          className="fixed bottom-[152px] left-4 right-4 z-[10000] duration-300 animate-in fade-in slide-in-from-bottom-8 motion-reduce:animate-none md:right-auto md:max-w-md"
           dir="rtl"
           role="dialog"
           aria-modal="false"
@@ -78,7 +73,7 @@ const CookieConsent = () => {
                 <p className="text-sm text-foreground leading-relaxed">
                   אנחנו משתמשים בעוגיות חיוניות להפעלת האתר, ובעוגיות סטטיסטיקה רק אם תאשרו.
                   אפשר לקרוא עוד ב
-                  <Link to="/privacy/" className="text-primary hover:underline">מדיניות הפרטיות</Link>
+                  <a href="/privacy/" className="text-primary hover:underline">מדיניות הפרטיות</a>
                   {" "}שלנו.
                 </p>
                 <div className="flex gap-2">
@@ -97,9 +92,7 @@ const CookieConsent = () => {
               </div>
             </div>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </div>
   );
 };
 

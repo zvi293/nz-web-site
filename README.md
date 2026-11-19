@@ -1,6 +1,8 @@
 # NZ-web
 
-React + Vite + TypeScript frontend for the NZ-web studio site.
+Static multi-page site (Astro + React islands + TypeScript + Tailwind) for the NZ-web studio.
+Every URL is a complete HTML page generated at build time; React runs only in interactive
+"islands". Architecture and rules: `SITE-PLAYBOOK.md` §4.
 
 **Frontend only.** There is no backend, no database and no API keys — every piece
 of content (text, images, projects, blog posts, settings) ships inside the bundle.
@@ -9,7 +11,7 @@ of content (text, images, projects, blog posts, settings) ships inside the bundl
 
 ```sh
 npm install
-npm run dev
+npm run dev        # astro dev on http://localhost:8080
 ```
 
 ## Build
@@ -18,8 +20,9 @@ npm run dev
 npm run build
 ```
 
-`npm run build` also pre-renders every route to static HTML for SEO
-(`scripts/prerender.mjs`) and regenerates `dist/sitemap.xml`.
+`npm run build` = `astro build` (every page → `dist/<path>/index.html`) + `scripts/postbuild.mjs`
+(`dist/sitemap.xml` with image entries, and `dist/_headers` with the CSP incl. inline-script
+hashes). `npm run preview` serves `dist/` on http://localhost:8080.
 
 ## Editing content
 

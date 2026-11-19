@@ -1,0 +1,32 @@
+---
+/**
+ * /services/landing-pages/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import LandingPages from "@/views/services/LandingPages";
+import { FAQS } from "@/views/services/LandingPages";
+import { faqPage, service, webPage } from "@/lib/schema";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/services/landing-pages/";
+const title = "בניית דפי נחיתה שממירים | דף נחיתה לקמפיינים | NZ-web";
+const description =
+  "בניית דפי נחיתה מהירים, ממירים ומחוברים למערכות שיווק. UX מוכח לדפי מכירה, טעינה מתחת ל-2 שניות ו-SEO מובנה. דף נחיתה שמכפיל את ה-ROI של הקמפיין.";
+const seo: PageSeo = {
+  path: PATH,
+  title,
+  description,
+  breadcrumb: { name: "בניית דפי נחיתה", path: PATH, parent: { name: "שירותים", path: "/services/" } },
+  jsonLd: [
+    webPage({ path: PATH, title, description }),
+    service({ path: PATH, name: "בניית דפי נחיתה שממירים", description, serviceType: "Landing Page Development" }),
+    faqPage(FAQS.map((f) => ({ question: f.q, answer: f.a })), PATH),
+  ],
+};
+---
+
+<BaseLayout seo={seo}>
+  <LandingPages client:load />
+</BaseLayout>

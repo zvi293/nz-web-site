@@ -24,7 +24,7 @@
  *   Tailwind equivalents: font-display, text-display-xl|display-l|h2|h3|lede|body|label.
  *
  *  ACTIONS
- *   <Button to="/projects/">           internal (react-router <Link>)
+ *   <Button to="/projects/">           internal page (plain <a href>; Astro prefetches it on hover)
  *   <Button href="https://…">          external: new tab + rel="noopener noreferrer" + sr note
  *   <Button onClick>                   <button type="button">
  *      variant: "primary" (vermilion pill) | "secondary" (outline pill) | "quiet" (text link,
@@ -40,7 +40,10 @@
  *   <Reveal variant="rise|fade|curtain|stagger" delay={i * 60}>…</Reveal>
  *      IntersectionObserver entrance. Hidden start states exist ONLY under html.nz-motion
  *      (set by initMotionGate() in src/lib/motion.ts — off for reduced motion, the a11y
- *      widget's pause, and pre-render), so no-JS / reduced-motion always shows content.
+ *      widget's pause, and automation browsers), so no-JS / reduced-motion always shows content.
+ *      Reveal renders only markup (data-reveal); the global script (src/scripts/global.ts,
+ *      loaded by BaseLayout on every page) observes every [data-reveal] and marks it [data-in],
+ *      so it works inside static (non-hydrated) Astro sections AND inside islands.
  *   Hooks (src/lib/motion.ts): useInView(ref), useActiveIndex(getEls, deps), useMotionAllowed().
  *   Motion rules: animate transform / opacity / clip-path only; ease var(--ease-gallery);
  *   nothing loops; one or two scroll moments per page.

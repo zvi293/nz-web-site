@@ -102,9 +102,9 @@ export function getArtPreloadAttrs(slug: string, sizes: string) {
 }
 
 /**
- * Injects (once) a preload link for an LCP artwork into <head>. Because the site is
- * pre-rendered, the link is baked into that route's static HTML, so the browser
- * starts fetching the hero image before any JS runs.
+ * Injects (once) a preload link for an LCP artwork into <head> at runtime — a fallback only.
+ * The real preload is printed at build time by BaseLayout (PageSeo.lcpArt, same id
+ * "nz-preload-<slug>"), so this finds it and does nothing.
  */
 export function preloadArt(slug: string, sizes: string): void {
   if (typeof document === "undefined") return;

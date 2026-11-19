@@ -1,0 +1,34 @@
+---
+/**
+ * /projects/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import AllProjects from "@/views/AllProjects";
+import { collectionPage, OG_IMAGES } from "@/lib/schema";
+import { publishedProjects } from "@/content/projects";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/projects/";
+const title = "פורטפוליו | פרויקטי בניית אתרים ופיתוח | NZ-web";
+const description =
+  "גלו פרויקטי בניית אתרים ופיתוח אתרים שביצענו ללקוחות בישראל. אתרי תדמית, חנויות אונליין, מערכות ניהול תורים ודפי נחיתה — כל פרויקט עם תוצאות מדידות.";
+const seo: PageSeo = {
+  path: PATH,
+  title,
+  description,
+  ogImage: OG_IMAGES.projects,
+  breadcrumb: { name: "פרויקטים", path: PATH },
+  jsonLd: collectionPage({
+    path: PATH,
+    title,
+    description,
+    items: publishedProjects.map((p) => ({ name: p.title, url: p.link, description: p.description, image: p.image })),
+  }),
+};
+---
+
+<BaseLayout seo={seo}>
+  <AllProjects client:load />
+</BaseLayout>

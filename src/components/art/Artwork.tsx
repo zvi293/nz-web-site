@@ -7,7 +7,8 @@ export interface ArtworkProps {
   slug: string;
   /** `sizes` for the srcset — be honest, it decides which file is downloaded. Default "100vw". */
   sizes?: string;
-  /** LCP image: eager + fetchpriority=high + a <link rel=preload> baked into the pre-rendered HTML. */
+  /** LCP image: eager + fetchpriority=high. Also set the page's `lcpArt` (frontmatter SEO) with the
+   *  SAME slug + sizes, so BaseLayout prints the <link rel=preload> in the static <head>. */
   priority?: boolean;
   /** Load now (no lazy) without the LCP treatment — e.g. a piece about to be revealed under a clip-path,
    *  which a lazy image would never "see" (lazy loading ignores fully clipped elements). */

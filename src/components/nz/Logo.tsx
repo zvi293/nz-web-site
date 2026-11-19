@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 /**
@@ -29,9 +28,9 @@ export const Logo = ({ to = "/", className, onClick }: LogoProps) =>
   to === null ? (
     <Wordmark className={className} />
   ) : (
-    <Link to={to} className={cn("inline-flex items-center", className)} aria-label="NZ-web, לדף הבית" onClick={onClick}>
+    <a href={to} className={cn("inline-flex items-center", className)} aria-label="NZ-web, לדף הבית" onClick={onClick}>
       <Wordmark />
-    </Link>
+    </a>
   );
 
 /**

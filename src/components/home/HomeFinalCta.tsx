@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Artwork } from "@/components/art";
-import { Eyebrow, Display, WhatsAppCta, Reveal } from "@/components/nz";
+import { Eyebrow, Display, WhatsAppCta } from "@/components/nz";
 import { contactInfo, getTelHref } from "@/lib/contact-utils";
 import { useInView } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { finalCta } from "@/content/home";
 
+// Signature component: המסך עולה — scroll-opened curtain
 /**
  * "The curtain rises" — the emerald-curtain piece opens from the centre (clip-path)
- * as it scrolls into view; the invitation sits on the dark green side of the work.
+ * as it scrolls into view; the invitation sits on the dark green side of the work
+ * (desktop) or rises over the foot of a tall crop of it (mobile).
+ * Client JS: opens the curtain when in view. Without JS / reduced motion it is open.
  */
 const HomeFinalCta = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -39,25 +42,21 @@ const HomeFinalCta = () => {
             />
           </div>
           <div className="hm-final__text">
-            <Eyebrow index={8} rule>
+            <Eyebrow index={finalCta.room} rule>
               {finalCta.eyebrow}
             </Eyebrow>
-            <Reveal>
-              <Display id="hm-final-title" size="h2" className="hm-final__title">
-                {finalCta.title}
-              </Display>
-            </Reveal>
-            <Reveal delay={80}>
-              <p className="hm-final__body">{finalCta.body}</p>
-            </Reveal>
-            <Reveal delay={140} className="hm-final__ctas">
+            <Display id="hm-final-title" size="h2" className="hm-final__title hm-sd">
+              {finalCta.title}
+            </Display>
+            <p className="hm-final__body hm-sd">{finalCta.body}</p>
+            <div className="hm-final__ctas hm-sd">
               <WhatsAppCta size="lg" label={finalCta.cta} message={finalCta.message} />
               <a href={getTelHref(contactInfo.phone)} className="nz-link">
                 <span className="nz-link__text">
                   או בטלפון <bdi dir="ltr">{contactInfo.phone}</bdi>
                 </span>
               </a>
-            </Reveal>
+            </div>
           </div>
         </div>
       </div>

@@ -6,9 +6,11 @@ import { useEffect, useState, type RefObject } from "react";
  * Sets `html.nz-motion` only when motion is allowed:
  *   - the visitor has no `prefers-reduced-motion: reduce`,
  *   - the accessibility widget's "pause animations" (body.a11y-pause-animations) is off,
- *   - the page is not running in an automation browser (navigator.webdriver) — the
- *     pre-render step snapshots the DOM with puppeteer, and the class must never be
- *     baked into the static HTML (no-JS visitors would get hidden start states).
+ *   - the page is not running in an automation browser (navigator.webdriver) — QA
+ *     screenshots (npm run shoot) then show every final state.
+ *
+ * BaseLayout's inline boot script sets the class before first paint (same rules);
+ * initMotionGate() (src/scripts/global.ts) keeps it in sync afterwards.
  *
  * All hidden start states in CSS live under `html.nz-motion`, so without JS (or with
  * motion off) every element simply renders in its final state.

@@ -1,0 +1,56 @@
+---
+/**
+ * /blog/<slug>/ — one static page per post in src/content/blog.ts (getStaticPaths).
+ * LEGACY view rendered as one island (client:load) until the magazine is redesigned.
+ * An unknown slug is simply not built → Netlify serves the real 404.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import BlogPost from "@/views/BlogPost";
+import { getBlogPosts, type BlogPost as Post } from "@/lib/blog";
+import { article, webPage } from "@/lib/schema";
+import { getAbsoluteAssetUrl } from "@/lib/site-url";
+import type { PageSeo } from "@/lib/seo";
+
+export function getStaticPaths() {
+  return getBlogPosts().map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Post };
+const PATH = `/blog/${post.slug}/`;
+const title = `${post.seo_title ?? post.title} | NZ-web`;
+const description = post.excerpt;
+const cover = getAbsoluteAssetUrl(post.cover_image);
+const modified = post.updated_at ?? post.published_at;
+
+const seo: PageSeo = {
+  path: PATH,
+  title,
+  description,
+  ogImage: cover || undefined,
+  ogImageWidth: cover ? post.cover_width : undefined,
+  ogImageHeight: cover ? post.cover_height : undefined,
+  ogImageAlt: cover ? `תמונת שער למאמר: ${post.title}` : undefined,
+  article: { publishedTime: post.published_at, modifiedTime: modified, section: post.category },
+  lcpImage: post.cover_image ? { href: post.cover_image } : undefined,
+  breadcrumb: { name: post.title, path: PATH, parent: { name: "בלוג", path: "/blog/" } },
+  jsonLd: [
+    webPage({ path: PATH, title, description, datePublished: post.published_at, dateModified: modified }),
+    article({
+      path: PATH,
+      headline: post.title,
+      description,
+      image: cover || "https://nz-web.com/og/blog.jpg",
+      datePublished: post.published_at,
+      dateModified: modified,
+      section: post.category,
+      keywords: post.category,
+      wordCount: post.content ? post.content.split(/\s+/).length : undefined,
+      readMinutes: post.read_time,
+    }),
+  ],
+};
+---
+
+<BaseLayout seo={seo}>
+  <BlogPost client:load slug={post.slug} />
+</BaseLayout>

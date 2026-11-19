@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   CheckCircle,
   MessageCircle,
@@ -72,13 +71,11 @@ const contactSchema = z
 type ContactForm = z.infer<typeof contactSchema>;
 
 const ContactSection = () => {
-  const navigate = useNavigate();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const termsRef = useRef<HTMLDivElement>(null);
-  const [searchParams] = useSearchParams();
 
   /* Decorative animated fog behind the form.
      Six full-canvas radial-gradient fills per frame is not cheap, so it only
@@ -235,7 +232,7 @@ const ContactSection = () => {
 
   /* Pre-fill the form when arriving from a pricing CTA (e.g. /contact/?plan=premium). */
   useEffect(() => {
-    const planLabel = getPlanLabel(searchParams.get("plan"));
+    const planLabel = getPlanLabel(new URLSearchParams(window.location.search).get("plan"));
     if (!planLabel) return;
     setValue("inquiryType", "אתר תדמית לעסק", { shouldDirty: false, shouldValidate: true });
     setValue(
@@ -243,7 +240,7 @@ const ContactSection = () => {
       `אני מעוניין/ת בחבילת ${planLabel} לאתר תדמית. אשמח לפרטים ולהצעה.`,
       { shouldDirty: true, shouldValidate: true },
     );
-  }, [searchParams, setValue]);
+  }, [setValue]);
 
   const onSubmit = (data: ContactForm) => {
     try {
@@ -271,7 +268,7 @@ const ContactSection = () => {
         subject: "",
       });
       // Navigate to thank-you page after short delay (let confetti play)
-      setTimeout(() => { navigate("/thank-you/"); }, 1800);
+      setTimeout(() => { window.location.assign("/thank-you/"); }, 1800);
 
       confetti({
         particleCount: 120,
@@ -569,23 +566,23 @@ const ContactSection = () => {
                     className="cursor-pointer leading-relaxed text-muted-foreground text-sm"
                   >
                     קראתי ואני מאשר/ת את{" "}
-                    <Link
-                      to="/terms/"
+                    <a
+                      href="/terms/"
                       className="font-medium text-primary hover:underline"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       תנאי השימוש
-                    </Link>{" "}
+                    </a>{" "}
                     /{" "}
-                    <Link
-                      to="/privacy/"
+                    <a
+                      href="/privacy/"
                       className="font-medium text-primary hover:underline"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       מדיניות ופרטיות
-                    </Link>
+                    </a>
                   </Label>
                 </motion.div>
 

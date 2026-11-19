@@ -1,0 +1,32 @@
+---
+/**
+ * /services/website-performance/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import WebsitePerformance from "@/views/services/WebsitePerformance";
+import { FAQS } from "@/views/services/WebsitePerformance";
+import { faqPage, service, webPage } from "@/lib/schema";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/services/website-performance/";
+const title = "שיפור מהירות אתרים | אופטימיזציית Core Web Vitals | NZ-web";
+const description =
+  "שיפור ביצועי אתרים וציוני Core Web Vitals. אופטימיזציה לתמונות, קיצור זמני טעינה ושיפור דירוג בגוגל. audit מלא עם דוח לפני ואחרי.";
+const seo: PageSeo = {
+  path: PATH,
+  title,
+  description,
+  breadcrumb: { name: "שיפור מהירות אתרים", path: PATH, parent: { name: "שירותים", path: "/services/" } },
+  jsonLd: [
+    webPage({ path: PATH, title, description }),
+    service({ path: PATH, name: "שיפור מהירות אתרים", description, serviceType: "Website Performance Optimization" }),
+    faqPage(FAQS.map((f) => ({ question: f.q, answer: f.a })), PATH),
+  ],
+};
+---
+
+<BaseLayout seo={seo}>
+  <WebsitePerformance client:load />
+</BaseLayout>

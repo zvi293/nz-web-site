@@ -1,19 +1,13 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import { ArrowLeft, Check, ChevronDown, type LucideIcon } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import BackToHome from "@/components/BackToHome";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import BackToTopButton from "@/components/BackToTopButton";
-import AccessibilityWidget from "@/components/AccessibilityWidget";
 import AmbientShapes from "@/components/AmbientShapes";
 import PricingSection from "@/components/PricingSection";
 import MarqueeRibbon from "@/components/MarqueeRibbon";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { useSeoMeta } from "@/hooks/useSeoMeta";
-import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 import { withTrailingSlash } from "@/lib/site-url";
 
 /* ─────────────── Types ─────────────── */
@@ -148,68 +142,18 @@ const FaqItem = ({ faq, index }: { faq: ServiceFaq; index: number }) => {
 
 /* ─────────────── Main Template ─────────────── */
 const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
-  useSeoMeta(config.seo);
-  useBreadcrumb(config.breadcrumb);
   const resultsRef = useRef<HTMLDivElement>(null);
   const resultsInView = useInView(resultsRef, { once: true, margin: "-60px" });
 
-  useEffect(() => {
-    /* ── Service schema ── */
-    const script = document.createElement("script");
-    script.type = "application/ld+json";
-    script.id = config.schemaId;
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Service",
-      "@id": `${withTrailingSlash(config.schemaUrl)}#service`,
-      serviceType: config.schemaServiceType,
-      name: config.seo.title,
-      description: config.seo.description,
-      /* Reference the single business entity declared in index.html rather than
-         re-describing it — one provider entity, not one per service page. */
-      provider: { "@id": "https://nz-web.com/#organization" },
-      areaServed: { "@type": "Country", name: "Israel" },
-      availableLanguage: "he",
-      url: withTrailingSlash(config.schemaUrl),
-    });
-    document.getElementById(config.schemaId)?.remove();
-    document.head.appendChild(script);
-
-    /* ── FAQPage schema — makes the FAQ eligible for rich results in Google ── */
-    const faqSchemaId = `${config.schemaId}-faq`;
-    let faqScript: HTMLScriptElement | null = null;
-    if (config.faqs && config.faqs.length > 0) {
-      faqScript = document.createElement("script");
-      faqScript.type = "application/ld+json";
-      faqScript.id = faqSchemaId;
-      faqScript.textContent = JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: config.faqs.map((faq) => ({
-          "@type": "Question",
-          name: faq.q,
-          acceptedAnswer: { "@type": "Answer", text: faq.a },
-        })),
-      });
-      document.getElementById(faqSchemaId)?.remove();
-      document.head.appendChild(faqScript);
-    }
-
-    return () => {
-      document.getElementById(config.schemaId)?.remove();
-      document.getElementById(faqSchemaId)?.remove();
-    };
-  }, [config]);
 
   const BadgeIcon = config.hero.badgeIcon;
 
   return (
     <div className="relative bg-background pt-[68px] md:pt-[84px]" dir="rtl">
       <AmbientShapes />
-      <Header />
       <BackToHome />
 
-      <main id="page-content">
+      <div id="page-content">
 
       {/* ── Hero ── */}
       <section className="nz-brand-dark nz-grain relative overflow-hidden py-20 md:py-28">
@@ -259,19 +203,19 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
               ))}
             </div>
             <div className="flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
-              <Link
-                to="/contact/"
+              <a
+                href="/contact/"
                 className="btn-brand group inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-base font-bold transition-all duration-300 hover:scale-[1.04]"
               >
                 {config.hero.ctaText}
                 <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
-              </Link>
-              <Link
-                to="/projects/"
+              </a>
+              <a
+                href="/projects/"
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20"
               >
                 ראו דוגמאות עבודה
-              </Link>
+              </a>
             </div>
           </motion.div>
         </div>
@@ -476,13 +420,13 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.05, duration: 0.45 }}
                 >
-                  <Link
-                    to={it.href}
+                  <a
+                    href={it.href}
                     className="group flex h-full flex-col rounded-2xl border border-border/40 bg-card p-5 text-right transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
                   >
                     <h3 className="mb-1 text-base font-bold text-foreground transition-colors group-hover:text-primary">{it.label}</h3>
                     {it.desc && <p className="text-sm leading-relaxed text-muted-foreground">{it.desc}</p>}
-                  </Link>
+                  </a>
                 </motion.div>
               ))}
             </div>
@@ -608,9 +552,9 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
           <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
               יש שאלה שלא ענינו עליה?{" "}
-              <Link to="/contact/" className="font-semibold text-primary hover:underline">
+              <a href="/contact/" className="font-semibold text-primary hover:underline">
                 דברו איתנו ישירות
-              </Link>
+              </a>
             </p>
           </div>
         </div>
@@ -639,13 +583,13 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
               .filter((s) => s.href !== config.schemaUrl.replace("https://nz-web.com", ""))
               .slice(0, 6)
               .map((s) => (
-                <Link
+                <a
                   key={s.href}
-                  to={s.href}
+                  href={s.href}
                   className="rounded-xl border border-border/40 bg-card px-4 py-3 text-center text-sm font-medium text-muted-foreground transition-all hover:border-primary/30 hover:bg-primary/[0.05] hover:text-primary"
                 >
                   {s.label}
-                </Link>
+                </a>
               ))}
           </div>
         </div>
@@ -670,22 +614,20 @@ const ServicePageTemplate = ({ config }: { config: ServicePageConfig }) => {
             {config.cta.title}
           </h2>
           <p className="text-lede mb-10 text-pretty text-white/65">{config.cta.subtitle}</p>
-          <Link
-            to="/contact/"
+          <a
+            href="/contact/"
             className="btn-brand group inline-flex items-center gap-2.5 rounded-2xl px-10 py-5 text-lg font-bold transition-all duration-300 hover:scale-[1.04]"
           >
             {config.cta.buttonText}
             <ArrowLeft className="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" />
-          </Link>
+          </a>
         </motion.div>
       </section>
 
-      </main>
+      </div>
 
-      <Footer />
       <WhatsAppButton />
       <BackToTopButton />
-      <AccessibilityWidget />
     </div>
   );
 };

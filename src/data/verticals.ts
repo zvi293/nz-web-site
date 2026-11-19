@@ -4,7 +4,8 @@
  * Each industry page (lawyer, accountant, clinic, …) is pure DATA here. A single
  * route component (`VerticalBusinessWebsite.tsx`) looks up the slug and renders
  * the shared `ServicePageTemplate`, so adding a new vertical = add one object to
- * `VERTICALS` + add its path to `scripts/prerender.mjs` STATIC_ROUTES. The layout
+ * `VERTICALS` (src/pages/services/business-website/[vertical].astro builds a static page
+ * for every key, and scripts/postbuild.mjs lists it in the sitemap). The layout
  * is reused; every page's COPY is genuinely unique (no spun/duplicated text).
  *
  * Hub-and-spoke: every vertical links UP to the business-website hub and across
@@ -241,7 +242,7 @@ export function buildVerticalConfig(slug: string): ServicePageConfig | null {
   };
 }
 
-/** All vertical paths (trailing slash), used by the hub page + prerender list. */
+/** All vertical paths (trailing slash), used by the hub page. */
 export const VERTICAL_PATHS = Object.values(VERTICALS).map(
   (v) => `/services/business-website/${v.slug}/`,
 );

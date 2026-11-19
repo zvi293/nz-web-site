@@ -1,0 +1,28 @@
+---
+/**
+ * /contact/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Contact from "@/views/Contact";
+import { contactPage, OG_IMAGES } from "@/lib/schema";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/contact/";
+const title = "צרו קשר | קבלו הצעת מחיר לבניית אתר | NZ-web";
+const description =
+  "צרו קשר עם NZ-web לקבלת הצעת מחיר לבניית אתר, פיתוח אתרים או מערכת ניהול תורים. שיחת ייעוץ ראשונית חינם. נחזור אליכם תוך 24 שעות.";
+const seo: PageSeo = {
+  path: PATH,
+  title,
+  description,
+  ogImage: OG_IMAGES.contact,
+  breadcrumb: { name: "צרו קשר", path: PATH },
+  jsonLd: [contactPage({ path: PATH, title, description })],
+};
+---
+
+<BaseLayout seo={seo}>
+  <Contact client:load />
+</BaseLayout>

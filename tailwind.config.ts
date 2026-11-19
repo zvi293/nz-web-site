@@ -17,7 +17,7 @@ import tailwindcssAnimate from "tailwindcss-animate";
  * are not redesigned yet keep rendering. Do not use them in new code.
  */
 export default {
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx,astro}"],
   prefix: "",
   theme: {
     container: {

@@ -1,0 +1,69 @@
+---
+/**
+ * / — the home page. Sections come from src/components/home (owned by the home designer).
+ * Island policy: static HTML unless the section has real interactivity —
+ *   HomeHero      client:load     the exhibit switcher (LCP section, hydrate at once)
+ *   HomeServices  client:visible  hover/focus preview of the services hall
+ *   HomeProcess   client:visible  scroll-driven sticky art
+ *   HomeOffer     client:visible  the offer configurator
+ *   HomeFinalCta  client:visible  the curtain opens when it enters the viewport
+ *   the rest      static          (<Reveal> entrances + art fade-in run from src/scripts/global.ts)
+ * If a static section gains state/effects, give it client:visible here.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import HomeHero from "@/components/home/HomeHero";
+import HomeServices from "@/components/home/HomeServices";
+import HomeProcess from "@/components/home/HomeProcess";
+import HomeCollection from "@/components/home/HomeCollection";
+import HomeManifesto from "@/components/home/HomeManifesto";
+import HomeOffer from "@/components/home/HomeOffer";
+import HomeMagazine from "@/components/home/HomeMagazine";
+import HomeFaq from "@/components/home/HomeFaq";
+import HomeFinalCta from "@/components/home/HomeFinalCta";
+import "@/components/home/home.css";
+import { homeSeo, hero, processSteps } from "@/content/home";
+import { offerFaq } from "@/content/offer";
+import { webPage, faqPage, howTo, OG_IMAGES } from "@/lib/schema";
+import { heroImage, type PageSeo } from "@/lib/seo";
+
+const PATH = "/";
+const heroSlug = hero.exhibits[0].slug;
+/* Must equal SIZES in HomeHero.tsx (the <Artwork priority sizes>), or the hero downloads twice. */
+const HERO_SIZES = "(min-width: 1440px) 760px, (min-width: 1024px) 54vw, 100vw";
+
+const seo: PageSeo = {
+  path: PATH,
+  title: homeSeo.title,
+  description: homeSeo.description,
+  ogImage: OG_IMAGES.home,
+  lcpArt: { slug: heroSlug, sizes: HERO_SIZES },
+  jsonLd: [
+    webPage({
+      path: PATH,
+      title: homeSeo.title,
+      description: homeSeo.description,
+      primaryImage: heroImage(heroSlug, PATH),
+      speakable: ["h1", ".hm-hero__lede"],
+    }),
+    faqPage(offerFaq, PATH),
+    howTo({
+      path: PATH,
+      name: processSteps.title,
+      description: processSteps.lede,
+      steps: processSteps.steps.map((s) => ({ name: s.name, text: s.body, url: "#process" })),
+    }),
+  ],
+};
+---
+
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <HomeHero client:load />
+  <HomeServices client:visible />
+  <HomeProcess client:visible />
+  <HomeCollection />
+  <HomeManifesto />
+  <HomeOffer client:visible />
+  <HomeMagazine />
+  <HomeFaq />
+  <HomeFinalCta client:visible />
+</BaseLayout>

@@ -1,0 +1,23 @@
+---
+/**
+ * /accessibility/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Accessibility from "@/views/Accessibility";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/accessibility/";
+const seo: PageSeo = {
+  path: PATH,
+  title: "הצהרת נגישות | NZ-web",
+  description:
+    'הצהרת הנגישות של NZ-web – עמידה בתקן WCAG 2.1 ברמת AA ובת"י 5568, תפריט נגישות מובנה ותמיכה מלאה בכלל המשתמשים.',
+  breadcrumb: { name: "הצהרת נגישות", path: PATH },
+};
+---
+
+<BaseLayout seo={seo}>
+  <Accessibility client:load />
+</BaseLayout>

@@ -4,8 +4,8 @@
  *
  *   npm run shoot -- [options] [/path1/ /path2/ …]
  *
- *   --base <url>        site origin (default http://localhost:8080 — the Vite dev server;
- *                       use http://localhost:4173 after `npm run preview` to test the built dist/)
+ *   --base <url>        site origin (default http://localhost:8080 — `npm run dev` (astro dev) or,
+ *                       after `npm run build`, `npm run preview` (serves dist/ on the same port))
  *   --widths 390,1440   viewport widths (default 390,1440). < 768 = phone emulation
  *                       (isMobile, hasTouch, DPR 2, Android Chrome UA); otherwise desktop DPR 1
  *   --out <dir>         output folder (default .qa/shots — git-ignored)

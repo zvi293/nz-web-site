@@ -1,0 +1,32 @@
+---
+/**
+ * /services/react-development/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ReactDevelopment from "@/views/services/ReactDevelopment";
+import { FAQS } from "@/views/services/ReactDevelopment";
+import { faqPage, service, webPage } from "@/lib/schema";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/services/react-development/";
+const title = "פיתוח React מתקדם | אפליקציות ואתרים מהירים | NZ-web";
+const description =
+  "פיתוח אפליקציות ואתרים מבוססי React עם TypeScript. ביצועים גבוהים, ארכיטקטורה נקייה, SEO מובנה ושילוב עם מערכות backend. פיתוח React מקצועי בישראל.";
+const seo: PageSeo = {
+  path: PATH,
+  title,
+  description,
+  breadcrumb: { name: "פיתוח React", path: PATH, parent: { name: "שירותים", path: "/services/" } },
+  jsonLd: [
+    webPage({ path: PATH, title, description }),
+    service({ path: PATH, name: "פיתוח אתרי React מתקדמים", description, serviceType: "React Development" }),
+    faqPage(FAQS.map((f) => ({ question: f.q, answer: f.a })), PATH),
+  ],
+};
+---
+
+<BaseLayout seo={seo}>
+  <ReactDevelopment client:load />
+</BaseLayout>

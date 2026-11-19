@@ -16,6 +16,23 @@ export interface ScopeGroup {
   items: string[];
 }
 
+/** "כרטיס הכניסה" — the admission ticket that explains the model (home signature). */
+export interface OfferTicket {
+  admit: string;
+  venue: string;
+  /** Decorative serial printed on the ticket (not a count of anything). */
+  serial: string;
+  main: { kicker: string; title: string; stages: string[]; note: string };
+  stub: { kicker: string; title: string; items: string[]; note: string };
+  stamp: string;
+  tearHint: string;
+  tearButton: string;
+  reattachButton: string;
+  tornNote: string;
+  announceTorn: string;
+  announceAttached: string;
+}
+
 export interface OfferFaqItem {
   question: string;
   answer: string;
@@ -43,6 +60,36 @@ export const offer = {
       body: "מספרים לנו בכמה מילים על העסק ועל מה שאתם צריכים, ואנחנו חוזרים אליכם עם הצעה מסודרת לפי ההיקף.",
     },
   ] satisfies OfferPart[],
+  /** The admission ticket (home): the main ticket is the setup, the tear-off stub is the optional subscription. */
+  ticket: {
+    admit: "כרטיס כניסה",
+    venue: "הגלריה · NZ-web",
+    serial: "0001",
+    main: {
+      kicker: "הקמה · תשלום חד־פעמי",
+      title: "בניית האתר שלכם",
+      stages: ["אפיון", "עיצוב", "פיתוח", "השקה"],
+      note: "ההיקף שבחרתם קובע את ההצעה. אין רכיבים שנכנסים בלי שביקשתם.",
+    },
+    stub: {
+      kicker: "ספח · לבחירתכם",
+      title: "מנוי חודשי",
+      items: ["אחסון", "תחזוקה שוטפת", "עדכוני אבטחה", "גיבויים", "מענה לשאלות"],
+      note: "שומר על האתר מהיר, מאובטח ותקין אחרי ההשקה.",
+    },
+    stamp: "הצעה אישית",
+    tearHint: "משכו את הספח הצידה: המנוי לבחירתכם",
+    tearButton: "לתלוש את הספח",
+    reattachButton: "להחזיר את הספח",
+    tornNote: "הספח נתלש. המנוי הוא לבחירתכם, ואת הפרטים המדויקים נסגור יחד בהצעה.",
+    announceTorn: "הספח של המנוי החודשי נתלש מהכרטיס. ההקמה נשארת.",
+    announceAttached: "הספח של המנוי החודשי חזר לכרטיס.",
+  } satisfies OfferTicket,
+  /** The line beside the ticket: how you get one. */
+  howTo: {
+    title: "איך מקבלים כרטיס?",
+    body: "מספרים לנו בכמה מילים על העסק ועל מה שאתם צריכים, ואנחנו חוזרים אליכם עם הצעה מסודרת לפי ההיקף.",
+  },
   scopeTitle: "אבני הבניין שאפשר לבחור",
   scopeNote: "בוחרים רק את מה שהעסק צריך עכשיו. אפשר להוסיף עוד בהמשך.",
   scope: [

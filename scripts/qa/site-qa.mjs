@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * NZ-web static site QA — checks the prerendered dist/ against SITE-PLAYBOOK.md.
+ * NZ-web static site QA — checks the built dist/ (Astro static pages) against SITE-PLAYBOOK.md.
  *
- *   npm run build          (vite + prerender; this tool never builds)
+ *   npm run build          (astro build + scripts/postbuild.mjs; this tool never builds)
  *   npm run qa             (= node scripts/qa/site-qa.mjs)
  *   npm run qa -- --quiet                 errors only, no warnings
  *   npm run qa -- --page /services/       report only pages whose URL starts with this prefix
@@ -13,7 +13,7 @@
  *
  * Per HTML page (dist/**\/*.html):
  *   - parsed with jsdom (scripts never run); exactly one <h1>; <html lang="he" dir="rtl">
- *   - no duplicated <title> / description / canonical / robots tags (prerender drift)
+ *   - no duplicated <title> / description / canonical / robots tags (head drift)
  *   - <title> present, <= 65 chars (warn > 60), ends with "| NZ-web" (warn)
  *   - indexable pages only: meta description 110–165 chars (warn outside 140–160); titles and
  *     descriptions unique; canonical = https://nz-web.com/<path>/ (absolute, trailing slash, matches

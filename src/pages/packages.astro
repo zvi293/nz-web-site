@@ -1,0 +1,33 @@
+---
+/**
+ * /packages/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Packages from "@/views/Packages";
+import { faqPage, webPage, OG_IMAGES } from "@/lib/schema";
+import { PACKAGES_PAGE, PACKAGES_FAQS } from "@/data/pricing";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/packages/";
+const title = PACKAGES_PAGE.seoTitle;
+const description = PACKAGES_PAGE.seoDescription;
+/* The legacy OfferCatalog/Offer nodes were dropped on purpose: SITE-PLAYBOOK §1.2 forbids
+   offers in JSON-LD. The page is being redesigned as "ההצעה" (one tailored offer). */
+const seo: PageSeo = {
+  path: PATH,
+  title,
+  description,
+  ogImage: OG_IMAGES.packages,
+  breadcrumb: { name: "חבילות אתר תדמית", path: PATH },
+  jsonLd: [
+    webPage({ path: PATH, title, description }),
+    faqPage(PACKAGES_FAQS.map((f) => ({ question: f.q, answer: f.a })), PATH),
+  ],
+};
+---
+
+<BaseLayout seo={seo}>
+  <Packages client:load />
+</BaseLayout>

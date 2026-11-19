@@ -1,0 +1,28 @@
+---
+/**
+ * /about/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import About from "@/views/About";
+import { aboutPage, OG_IMAGES } from "@/lib/schema";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/about/";
+const title = "מי אנחנו | NZ-web – סטודיו לבניית אתרים ופיתוח אתרים בישראל";
+const description =
+  "NZ-web – סטודיו מוביל לבניית אתרים ופיתוח אתרים בישראל בניהול צבי משה. 50+ פרויקטים, 5+ שנות ניסיון, 100% שביעות רצון. Perfect in every Pixel.";
+const seo: PageSeo = {
+  path: PATH,
+  title,
+  description,
+  ogImage: OG_IMAGES.about,
+  breadcrumb: { name: "מי אנחנו", path: PATH },
+  jsonLd: [aboutPage({ path: PATH, title, description })],
+};
+---
+
+<BaseLayout seo={seo}>
+  <About client:load />
+</BaseLayout>

@@ -46,7 +46,7 @@ export function buildLandingConfig(slug: string): ServicePageConfig | null {
   };
 }
 
-/** All landing paths (trailing slash) — used by the hub page + prerender list. */
+/** All landing paths (trailing slash) — used by the hub page. */
 export const LANDING_PATHS = Object.values(LANDINGS).map(
   (v) => `/services/landing-page-development/${v.slug}/`,
 );

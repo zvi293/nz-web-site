@@ -23,7 +23,10 @@
 - תמונות: המקורות בתיקייה `תמונות תדמית/`, שלא נכנסת ל-git. ממירים אותן עם `npm run art` (הרשימה ב-`scripts/art/registry.mjs`).
 - בדיקות: קודם `npm run build`, אחר כך `npm run qa` עד שמופיע NO PROBLEMS, ובסוף `npm run shoot`.
 - push רק באישור של צבי, כי כל push עולה קרדיטים בנטליפי.
-- שרת מקומי: `npm run dev`, בכתובת http://localhost:8080.
+- האתר בנוי ב-Astro כאתר סטטי מרובה עמודים (לא SPA): כל כתובת היא קובץ HTML מלא, ו-React רץ רק ב"איים" אינטראקטיביים. ה-SEO של כל עמוד נכתב בראש קובץ ה-`.astro` שלו (פירוט ב-`SITE-PLAYBOOK.md` §4).
+- שרת פיתוח: `npm run dev` (astro dev), בכתובת http://localhost:8080.
+- בנייה: `npm run build` (astro build ואחריו `scripts/postbuild.mjs`, שמייצר sitemap ו-CSP ב-`dist/_headers`).
+- תצוגת הבנייה: `npm run preview`, גם היא בכתובת http://localhost:8080.
 
 ## יצירתיות: רכיב חתימה לכל עמוד ולכל מאמר
 לכל עמוד ולכל מאמר יש רכיב חתימה מקורי, אינטראקטיבי ומונפש, שנולד מהנושא של העמוד. הוא לא חוזר על רכיב שכבר קיים באתר.

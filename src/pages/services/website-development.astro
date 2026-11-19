@@ -1,0 +1,18 @@
+---
+/**
+ * /services/website-development/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import WebsiteDevelopment from "@/views/services/WebsiteDevelopment";
+import { config } from "@/views/services/WebsiteDevelopment";
+import { servicePageSeo } from "@/lib/page-seo";
+import type { PageSeo } from "@/lib/seo";
+
+const seo: PageSeo = servicePageSeo(config);
+---
+
+<BaseLayout seo={seo}>
+  <WebsiteDevelopment client:load />
+</BaseLayout>

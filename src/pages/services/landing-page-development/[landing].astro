@@ -1,0 +1,22 @@
+---
+/**
+ * /services/landing-page-development/<landing>/ — one static page per entry in LANDINGS
+ * (src/data/landings*, getStaticPaths). LEGACY ServicePageTemplate as one island (client:load).
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import LandingPageVertical from "@/views/services/LandingPageVertical";
+import { LANDINGS, buildLandingConfig } from "@/data/landings";
+import { servicePageSeo } from "@/lib/page-seo";
+import type { PageSeo } from "@/lib/seo";
+
+export function getStaticPaths() {
+  return Object.keys(LANDINGS).map((landing) => ({ params: { landing } }));
+}
+
+const { landing } = Astro.params as { landing: string };
+const seo: PageSeo = servicePageSeo(buildLandingConfig(landing)!);
+---
+
+<BaseLayout seo={seo}>
+  <LandingPageVertical client:load landing={landing} />
+</BaseLayout>

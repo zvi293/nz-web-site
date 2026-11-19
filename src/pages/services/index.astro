@@ -1,0 +1,25 @@
+---
+/**
+ * /services/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ServicesIndex from "@/views/services/ServicesIndex";
+import { OG_IMAGES } from "@/lib/schema";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/services/";
+const seo: PageSeo = {
+  path: PATH,
+  title: "שירותי בניית אתרים ופיתוח | NZ-web – ישראל",
+  description:
+    "כל שירותי בניית האתרים ופיתוח האתרים של NZ-web. בניית אתר תדמית, פיתוח אתרים, מערכת ניהול תורים, דפי נחיתה ובניית אתר מכירות לעסקים בישראל.",
+  ogImage: OG_IMAGES.services,
+  breadcrumb: { name: "שירותים", path: PATH },
+};
+---
+
+<BaseLayout seo={seo}>
+  <ServicesIndex client:load />
+</BaseLayout>

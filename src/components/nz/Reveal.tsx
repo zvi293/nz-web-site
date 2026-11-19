@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties, type ElementType, type ReactNode } from "react";
+import type { CSSProperties, ElementType, ReactNode } from "react";
 
 interface RevealProps {
   as?: ElementType;
@@ -11,7 +11,7 @@ interface RevealProps {
   variant?: "rise" | "fade" | "curtain" | "stagger";
   /** Extra delay in ms (use i * 60 for manual staggering). */
   delay?: number;
-  /** IntersectionObserver rootMargin. */
+  /** IntersectionObserver rootMargin (default "0px 0px -8% 0px"). */
   margin?: string;
   className?: string;
   style?: CSSProperties;
@@ -20,47 +20,28 @@ interface RevealProps {
 }
 
 /**
- * Scroll-triggered entrance. No-JS safe: the hidden start state only exists under
- * html.nz-motion (src/lib/motion.ts), and the element is marked [data-in] the moment
- * it scrolls into view (or immediately when IntersectionObserver is missing).
+ * Scroll-triggered entrance — markup only, no hooks, so it renders the same in a static
+ * Astro section and inside a hydrated island.
+ *
+ * The behaviour lives in src/scripts/global.ts (bundled on every page by BaseLayout): one
+ * IntersectionObserver marks each [data-reveal] element [data-in] when it scrolls into view
+ * (immediately when IntersectionObserver is missing); a MutationObserver picks up elements an
+ * island renders later. No-JS safe: the hidden start state only exists under html.nz-motion.
  */
 export const Reveal = ({
   as: Tag = "div",
   variant = "rise",
   delay = 0,
-  margin = "0px 0px -8% 0px",
+  margin,
   className,
   style,
   id,
   children,
 }: RevealProps) => {
-  const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const show = () => el.setAttribute("data-in", "");
-    if (typeof IntersectionObserver === "undefined") {
-      show();
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          show();
-          io.disconnect();
-        }
-      },
-      { rootMargin: margin, threshold: 0 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [margin]);
-
   const mergedStyle = delay ? ({ ...style, "--reveal-delay": `${delay}ms` } as CSSProperties) : style;
 
   return (
-    <Tag ref={ref} id={id} data-reveal={variant} className={className} style={mergedStyle}>
+    <Tag id={id} data-reveal={variant} data-reveal-margin={margin} className={className} style={mergedStyle}>
       {children}
     </Tag>
   );

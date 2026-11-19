@@ -1,0 +1,23 @@
+---
+/**
+ * /terms/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Terms from "@/views/Terms";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/terms/";
+const seo: PageSeo = {
+  path: PATH,
+  title: "תנאי שימוש | NZ-web",
+  description:
+    "תנאי השימוש של אתר NZ-web – זכויות, אחריות ומדיניות השימוש בשירותי הפיתוח, עיצוב ה-UI/UX ופתרונות ה-AI שלנו.",
+  breadcrumb: { name: "תנאי שימוש", path: PATH },
+};
+---
+
+<BaseLayout seo={seo}>
+  <Terms client:load />
+</BaseLayout>

@@ -1,11 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { 
   X, RotateCcw, Eye, Type, Palette, Navigation, 
   MousePointer, Link2, Focus, Minus, Plus, 
   Heading, SunMoon, Moon, Sun, Contrast
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import accessibilityIcon from "@/assets/accessibility-icon.png";
 
 interface AccessibilitySettings {
@@ -40,16 +38,12 @@ const defaultSettings: AccessibilitySettings = {
 
 const AccessibilityWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [settings, setSettings] = useState<AccessibilitySettings>(() => {
-    try {
-      const saved = localStorage.getItem("a11y-settings-v2");
-      return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
-    } catch {
-      return defaultSettings;
-    }
-  });
+  /* Server render + first client render use the defaults (identical markup → clean hydration);
+     the saved settings are read right after mounting. BaseLayout's boot script has already
+     applied them to <html>/<body> before first paint, so nothing flashes. */
+  const [settings, setSettings] = useState<AccessibilitySettings>(defaultSettings);
+  const [ready, setReady] = useState(false);
   const [readingGuideY, setReadingGuideY] = useState(0);
-  const navigate = useNavigate();
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -96,12 +90,26 @@ const AccessibilityWidget = () => {
     // Focus outline
     body.classList.toggle("a11y-focus-outline", s.focusOutline);
 
-    localStorage.setItem("a11y-settings-v2", JSON.stringify(s));
+    try {
+      localStorage.setItem("a11y-settings-v2", JSON.stringify(s));
+    } catch {
+      /* storage blocked — settings last for this page only */
+    }
   }, []);
 
   useEffect(() => {
-    applySettings(settings);
-  }, [settings, applySettings]);
+    try {
+      const saved = localStorage.getItem("a11y-settings-v2");
+      if (saved) setSettings({ ...defaultSettings, ...JSON.parse(saved) });
+    } catch {
+      /* keep the defaults */
+    }
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (ready) applySettings(settings);
+  }, [settings, ready, applySettings]);
 
   // Reading guide mouse tracking
   useEffect(() => {
@@ -228,32 +236,24 @@ const AccessibilityWidget = () => {
       )}
 
       {/* Panel */}
-      <AnimatePresence>
-        {isOpen && (
+      {isOpen && (
           <>
             {/* Overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[10030] bg-black/50 backdrop-blur-sm"
+            <div
+              className="fixed inset-0 z-[10030] bg-black/50 backdrop-blur-sm duration-200 animate-in fade-in motion-reduce:animate-none"
               onClick={() => setIsOpen(false)}
               aria-hidden="true"
             />
 
             {/* Side Panel */}
-            <motion.div
+            <div
               ref={panelRef}
               id="accessibility-panel"
               role="dialog"
               aria-modal="true"
               aria-label="תפריט נגישות"
               data-a11y-exclude="true"
-              initial={{ x: -400, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -400, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 left-0 bottom-0 z-[10040] w-[380px] max-w-[92vw] bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 shadow-2xl overflow-y-auto"
+              className="duration-300 animate-in slide-in-from-left fade-in motion-reduce:animate-none fixed top-0 left-0 bottom-0 z-[10040] w-[380px] max-w-[92vw] bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 shadow-2xl overflow-y-auto"
               dir="rtl"
             >
               {/* Header */}
@@ -401,17 +401,15 @@ const AccessibilityWidget = () => {
 
                 {/* Accessibility Statement Link */}
                 <div className="pt-4 border-t border-slate-700">
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      navigate("/accessibility/");
-                    }}
+                  <a
+                    href="/accessibility/"
+                    onClick={() => setIsOpen(false)}
                     className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
                     aria-label="עבור לדף הצהרת הנגישות"
                   >
                     <span>📄</span>
                     הצהרת נגישות
-                  </button>
+                  </a>
                 </div>
 
                 {/* Footer */}
@@ -419,10 +417,9 @@ const AccessibilityWidget = () => {
                   תפריט נגישות תואם WCAG 2.1 AA
                 </p>
               </div>
-            </motion.div>
+            </div>
           </>
         )}
-      </AnimatePresence>
     </>
   );
 };

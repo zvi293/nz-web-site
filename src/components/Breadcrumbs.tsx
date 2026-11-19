@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 
 export interface Crumb {
@@ -10,7 +9,7 @@ export interface Crumb {
 /**
  * Visible breadcrumb trail.
  *
- * The site already emits BreadcrumbList JSON-LD (see `useBreadcrumb`), but
+ * The site already emits BreadcrumbList JSON-LD (PageSeo.breadcrumb in the page's .astro frontmatter), but
  * Google's guidance is that structured data should describe something the
  * visitor can actually see. This renders that same trail, and gives deep pages
  * a cheap, descriptive internal link back up the hierarchy.
@@ -33,9 +32,9 @@ const Breadcrumbs = ({ items, className = "" }: { items: Crumb[]; className?: st
                   {crumb.label}
                 </span>
               ) : (
-                <Link to={crumb.href} className="transition-colors hover:text-primary">
+                <a href={crumb.href} className="transition-colors hover:text-primary">
                   {crumb.label}
-                </Link>
+                </a>
               )}
             </li>
           );

@@ -1,8 +1,8 @@
 # NZ-web — Site Playbook (the binding rulebook)
 
 nz-web.com — a Hebrew (RTL) web design & development studio site for businesses in Israel.
-Owner: צבי משה. Stack: React 18 + Vite + TypeScript + Tailwind, prerendered to static HTML
-(`scripts/prerender.mjs`), deployed on Netlify from GitHub `zvi293/nz-web-site` (branch `main`).
+Owner: צבי משה. Stack: Astro (static multi-page site) + React 18 islands + TypeScript + Tailwind 3,
+deployed on Netlify from GitHub `zvi293/nz-web-site` (branch `main`). NOT an SPA (see §4).
 
 Sister sites by the same owner (different brands, different looks — never copy their visual identity):
 - zstore-ai.co.il (Hebrew, violet, Leon font) and zstore-ai.com (English, orange ceramic Z, "Tactile Play").
@@ -170,21 +170,82 @@ except one deliberate CTA moment. No gradients as decoration (a subtle radial "g
 
 ---
 
-## 4. Components & code conventions
+## 4. Architecture, components & code conventions
 
+### 4.1 Architecture — Astro static MPA (never an SPA)
+- Every URL is a complete HTML document generated at build time: `astro build` →
+  `dist/<path>/index.html` (`trailingSlash: "always"`, `build.format: "directory"`), plus `dist/404.html`.
+  URLs keep their trailing slash forever (SEO equity). No client router, no SPA fallback, no runtime
+  `<head>` changes. Navigation = plain `<a href>`; Astro prefetches internal links on hover/focus.
+- **Zero JS by default.** React runs only in *islands* (`client:*` directives). Everything else is static HTML.
+- Files:
+  - `src/pages/**.astro` — routes ONLY (one file per URL; `[slug].astro` + `getStaticPaths` for data-driven pages:
+    blog posts from `src/content/blog.ts`, verticals from `src/data/verticals*`, landings from `src/data/landings*`).
+  - `src/layouts/BaseLayout.astro` — the one document shell: full `<head>`, boot script, skip link, `<Header>`
+    (island, fully server-rendered), `<main id="main-content">`, `<Footer>` (static), global islands
+    (cookie banner, accessibility widget), and `src/scripts/global.ts`.
+  - `src/views/**` — React page bodies (legacy pages still render one whole view as one island).
+  - `src/components/nz/` (kit primitives), `src/components/art/` (`Artwork`), `src/components/home/` (home sections).
+  - `src/lib/seo.ts` (`PageSeo` → head), `src/lib/schema.ts` (JSON-LD builders), `src/lib/site-graph.ts`
+    (#organization / #founder / #website stubs), `src/scripts/global.ts` (motion gate, `<Reveal>`, art fade-in,
+    skip link, analytics after consent).
+- **SEO lives in the page's frontmatter** → `<BaseLayout seo={…}>`, computed at build time: title, description,
+  canonical, robots/noindex, OG/Twitter (`OG_IMAGES`), breadcrumb, the LCP preload (`lcpArt`) and the page's
+  JSON-LD nodes. One `@graph` per page. Islands never touch `<head>`.
+- **Adding a page:** create `src/pages/<route>.astro` (that alone creates the URL and its sitemap entry):
+  ```astro
+  ---
+  import BaseLayout from "@/layouts/BaseLayout.astro";
+  import MyHero from "@/components/<page>/MyHero";          // React or .astro sections
+  import MySignature from "@/components/<page>/MySignature";
+  import "@/styles/pages/<page>.css";
+  import { webPage, faqPage, OG_IMAGES } from "@/lib/schema";
+  import { heroImage, type PageSeo } from "@/lib/seo";
+  const PATH = "/my-page/";
+  const title = "מילת מפתח ראשית … | NZ-web";
+  const description = "…140–160 תווים…";
+  const HERO_SIZES = "(min-width: 1024px) 50vw, 100vw";      // same string as <Artwork priority sizes>
+  const seo: PageSeo = {
+    path: PATH, title, description, ogImage: OG_IMAGES.services,
+    lcpArt: { slug: "darkroom-glow", sizes: HERO_SIZES },
+    breadcrumb: { name: "שם העמוד", path: PATH, parent: { name: "שירותים", path: "/services/" } },
+    jsonLd: [webPage({ path: PATH, title, description, primaryImage: heroImage("darkroom-glow", PATH), speakable: true }),
+             faqPage(faqItems, PATH)],
+  };
+  ---
+  <BaseLayout seo={seo}>
+    <MyHero />                          <!-- static: no directive -->
+    <MySignature client:visible />      <!-- interactive, below the fold -->
+  </BaseLayout>
+  ```
+  `npm run build` then lists it in `sitemap.xml` (with its hero image) automatically; `noindex: true` keeps it out.
+- **Island policy:** static by default (no directive) — `<Reveal>`, artwork fade-in and the motion gate work without
+  React (global script). `client:visible` for below-the-fold interactivity (signature components, hover previews,
+  scroll moments). `client:load` only for an interactive above-the-fold element (e.g. the home hero switcher).
+  `client:idle` for global chrome (header menus, cookie banner, a11y widget). Island props must be serialisable
+  (strings/numbers/plain objects — pass a slug, never icon components or functions). Island code must not touch
+  `window`/`document` during render (only in effects/handlers), because islands are server-rendered too.
+- **CSP:** `scripts/postbuild.mjs` hashes every inline executable `<script>` in `dist/` (Astro's island runtime +
+  BaseLayout's boot script) into `dist/_headers` (`script-src 'self' 'sha256-…'`). Never add `unsafe-inline`; never
+  add a `<meta>` CSP. New behaviour goes in a bundled module (`<script>` in .astro, or an island), not `is:inline`.
+- Images in TS/TSX: `import x from "@/assets/…/file.webp"` gives the hashed URL string (astro.config.mjs plugin).
+- Legacy pages (still old visuals) render their whole view as one `client:load` island and still use
+  framer-motion/gsap — when you redesign a page, replace it with static sections + small islands.
+
+### 4.2 Components & code conventions
 - Shared design-system code lives in `src/components/nz/` (primitives) and `src/components/art/` (`Artwork`).
-  Global tokens + base styles in `src/index.css`. **Page-specific CSS** goes in its own file next to the page
-  (e.g. `src/pages/About.css` or `src/styles/pages/<name>.css`) with a class prefix per page — do not grow
+  Global tokens + base styles in `src/index.css`. **Page-specific CSS** goes in its own file
+  (e.g. `src/styles/pages/<name>.css`, imported by the page's .astro file) with a class prefix per page — do not grow
   `index.css` with page styles.
-- Tailwind is available; prefer token-based utilities / semantic classes over ad-hoc colours.
-- Every page keeps `useSeoMeta` + `useBreadcrumb`, exactly one `<h1>`, landmark structure
-  (`header`, `main#main-content`, `footer`), skip link.
+- Tailwind is available (content globs include `.astro`); prefer token-based utilities / semantic classes over ad-hoc colours.
+- Every page: SEO in frontmatter (above), exactly one `<h1>`, landmark structure from BaseLayout
+  (`header`, `main#main-content`, `footer`, skip link) — page views must NOT render their own `<main>`.
 - **Every page AND every article has its own signature component** — an original interaction or composition
   invented for that page's subject (see §9). Never copy one page's signature to another, never reuse the same
   interaction model (e.g. if one page has a drag-to-compare, no other page gets a drag-to-compare). The shared
   kit (buttons, sections, Artwork, labels) is the brand; the signature is the page's own voice.
 - RTL: use logical properties (`ms-`/`me-`, `inset-inline-start`, `padding-inline`), never left/right for layout.
-- New routes: add to `src/App.tsx` AND `scripts/prerender.mjs` STATIC_ROUTES.
+- Commands: `npm run dev` (astro dev, :8080) · `npm run build` (astro build + postbuild) · `npm run preview` (dist on :8080).
 
 ## 5. SEO / GEO / AEO checklist (every indexable page)
 
@@ -196,18 +257,19 @@ except one deliberate CTA moment. No gradients as decoration (a subtle radial "g
 - FAQ blocks: visible Q&A matches FAQPage schema exactly.
 - Internal links: hub-and-spoke (services ↔ verticals ↔ articles), descriptive Hebrew anchor text.
 - `public/llms.txt` + `public/llms-full.txt` kept in sync with pages/articles; robots allows AI crawlers.
-- Sitemap generated by prerender (with `lastmod`; image entries for the hero art).
+- Sitemap generated by `scripts/postbuild.mjs` from the built pages (real `lastmod`; image entries for the hero art).
 - After an approved push: IndexNow fires (Netlify function), then sitemap/indexing in Search Console and Bing.
 
 ## 6. Security
 
-- Strict CSP in `netlify.toml` (no `unsafe-inline` for scripts unless proven necessary; GA/Meta only after
-  cookie consent), HSTS preload, nosniff, frame-ancestors, Referrer/Permissions/COOP/CORP policies.
+- Strict CSP generated into `dist/_headers` by `scripts/postbuild.mjs` (inline scripts allowed only by sha256 hash, no
+  `unsafe-inline` for scripts; GA/Meta only after cookie consent). HSTS preload, nosniff, frame-ancestors,
+  Referrer/Permissions/COOP/CORP policies stay in `netlify.toml`.
 - No third-party CDNs, no external fonts. Fonts self-hosted in `public/fonts`.
 
 ## 7. QA process
 
-1. `npm run build` (vite + prerender) must pass.
+1. `npm run build` (astro build + postbuild: sitemap + CSP `_headers`) must pass.
 2. `npm run qa` — static checks over `dist/` (titles, descriptions, canonicals, one H1, alt text, JSON-LD parses,
    banned words/prices/numbers, retired email, internal links resolve, sitemap matches routes).
 3. `npm run shoot -- / /services/ …` — 390px + 1440px full-page screenshots; look at them.
@@ -355,3 +417,5 @@ Rules for a signature component:
 | /privacy/ /terms/ | קבוצת הכוכבים (planned) | tap constellation points | key points as stars; tap a star for the plain-language summary |
 | 404 | השערים (planned) | portal tunnel | portals recede; each opens to a suggested room |
 | /thank-you/ | השביט (planned) | stitched path animation | a golden comet is stitched from one hand to the other |
+| / (home) | כרטיס הכניסה | tear-off ticket stub | the offer as a museum admission ticket: main ticket = הקמה, perforated stub = optional monthly subscription; pull the stub sideways (touch/mouse) or press the button to tear it off / reattach (aria-live); paper texture, cube stamp, 3D tilt on fine pointers |
+| / (home) | שורות נגדיות | scroll-linked counter-drift | manifesto set as huge serif lines that slide in opposite directions while the ink room passes (CSS scroll-driven, no JS); a vermilion brush paints under "במקומו" |

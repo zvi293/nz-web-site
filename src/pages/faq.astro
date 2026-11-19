@@ -1,0 +1,33 @@
+---
+/**
+ * /faq/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import FAQ from "@/views/FAQ";
+import { faqPage, webPage, OG_IMAGES } from "@/lib/schema";
+import { visibleFaqItems } from "@/content/faq";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/faq/";
+const title = "שאלות נפוצות על בניית אתרים ופיתוח | NZ-web";
+const description =
+  "כמה זמן לוקח לבנות אתר? מה כולל השירות? איך מקבלים הצעה? תשובות לכל השאלות על בניית אתרים ופיתוח אתרים — כל מה שצריך לדעת לפני שמתחילים.";
+const seo: PageSeo = {
+  path: PATH,
+  title,
+  description,
+  ogImage: OG_IMAGES.faq,
+  breadcrumb: { name: "שאלות נפוצות", path: PATH },
+  jsonLd: [
+    webPage({ path: PATH, title, description }),
+    /* Same items, same order as the visible accordion. */
+    faqPage(visibleFaqItems.map((i) => ({ question: i.question, answer: i.answer })), PATH),
+  ],
+};
+---
+
+<BaseLayout seo={seo}>
+  <FAQ client:load />
+</BaseLayout>

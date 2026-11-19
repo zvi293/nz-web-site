@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
-import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { contactInfo, getTelHref, getWhatsAppHref } from "@/lib/contact-utils";
 import { Artwork, MuseumLabel, getArt } from "@/components/art";
@@ -50,8 +49,8 @@ const ServicesPanel = ({
           <ul className="nz-mega__list">
             {serviceNav.map((svc, i) => (
               <li key={svc.href}>
-                <Link
-                  to={svc.href}
+                <a
+                  href={svc.href}
                   className={cn("nz-mega__item", i === active && "is-active")}
                   onPointerEnter={() => activate(i)}
                   onFocus={() => activate(i)}
@@ -62,15 +61,15 @@ const ServicesPanel = ({
                   </span>
                   <span className="nz-mega__name">{svc.label}</span>
                   <span className="nz-mega__desc">{svc.desc}</span>
-                </Link>
+                </a>
               </li>
             ))}
           </ul>
           <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-2 border-t border-line pt-4">
-            <Link to="/services/" className="nz-link" onClick={onNavigate}>
+            <a href="/services/" className="nz-link" onClick={onNavigate}>
               <span className="nz-link__text">לכל השירותים</span>
               <ArrowIcon className="nz-link__arrow" />
-            </Link>
+            </a>
             <span className="text-sm text-graphite">לא בטוחים מה מתאים? כתבו לנו בוואטסאפ ונכוון אתכם.</span>
           </div>
         </div>
@@ -163,8 +162,8 @@ const MobileMenu = ({
           <ul className="nz-mobile-menu__list">
             {mobileNav.map((item, i) => (
               <li key={item.href} style={{ ["--i" as string]: i }}>
-                <Link
-                  to={item.href}
+                <a
+                  href={item.href}
                   className="nz-mobile-menu__link"
                   aria-current={samePath(pathname, item.href) ? "page" : undefined}
                   onClick={onClose}
@@ -173,7 +172,7 @@ const MobileMenu = ({
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <span className="nz-mobile-menu__name">{item.label}</span>
-                </Link>
+                </a>
               </li>
             ))}
           </ul>
@@ -196,9 +195,11 @@ const MobileMenu = ({
   );
 };
 
-/* ── Header ───────────────────────────────────────────────────────────── */
-const Header = () => {
-  const { pathname } = useLocation();
+/* ── Header ───────────────────────────────────────────────────────────────
+   An Astro island (BaseLayout: <Header client:idle pathname={Astro.url.pathname} />). The whole
+   bar, the nav links and the services panel are server-rendered into the static HTML (crawlable);
+   hydration only adds the panel / mobile-menu behaviour. `pathname` marks the current link. */
+const Header = ({ pathname = "/" }: { pathname?: string }) => {
   const panelId = useId();
   const menuId = useId();
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -217,12 +218,6 @@ const Header = () => {
     io.observe(el);
     return () => io.disconnect();
   }, []);
-
-  /* Close everything on navigation. */
-  useEffect(() => {
-    setPanelOpen(false);
-    setMenuOpen(false);
-  }, [pathname]);
 
   /* Escape closes the panel and returns focus to its trigger. */
   useEffect(() => {
@@ -289,13 +284,13 @@ const Header = () => {
               </li>
               {mainNav.map((item) => (
                 <li key={item.href}>
-                  <Link
-                    to={item.href}
+                  <a
+                    href={item.href}
                     className="nz-nav__link"
                     aria-current={samePath(pathname, item.href) ? "page" : undefined}
                   >
                     {item.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>

@@ -28,3 +28,6 @@ dist-ssr
 
 # QA output (npm run shoot)
 .qa/
+
+# Astro generated types / cache
+.astro/

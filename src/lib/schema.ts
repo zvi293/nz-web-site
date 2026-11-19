@@ -2,42 +2,44 @@
  * schema.ts — page-level JSON-LD builders for NZ-web (schema.org, one @graph per page).
  *
  * ── How the graph is put together ──────────────────────────────────────────────────────────
- * index.html carries the site-wide stubs, in every page's HTML:
- *     https://nz-web.com/#organization  (Organization + ProfessionalService, "NZ-web")
- *     https://nz-web.com/#website       (WebSite, publisher → #organization)
- *     https://nz-web.com/#founder       (Person, צבי משה, worksFor → #organization)
- * Page nodes built here only REFERENCE those stubs by @id ({ "@id": ORG_ID }) and never
- * redefine them. Page node ids are the canonical URL + a fragment:
+ * Every page's HTML carries ONE <script type="application/ld+json"> {"@context","@graph"}, built
+ * at BUILD time by BaseLayout (src/layouts/BaseLayout.astro → resolveHead() in src/lib/seo.ts):
+ *     the site-wide stubs (src/lib/site-graph.ts)
+ *       https://nz-web.com/#organization  (Organization + ProfessionalService, "NZ-web")
+ *       https://nz-web.com/#website       (WebSite, publisher → #organization)
+ *       https://nz-web.com/#founder       (Person, צבי משה, worksFor → #organization)
+ *   + the page nodes built here, which only REFERENCE those stubs by @id ({ "@id": ORG_ID }).
+ * Page node ids are the canonical URL + a fragment:
  *     <canonical>#webpage  #breadcrumb  #faq  #service  #article  #itemlist  #howto  #primaryimage
  *
- * ── Usage in a page ───────────────────────────────────────────────────────────────────────
- *     import { useMemo } from "react";
- *     import { useSeoMeta } from "@/hooks/useSeoMeta";
- *     import { useBreadcrumb } from "@/hooks/useBreadcrumb";
- *     import { webPage, service, faqPage, imageObject, OG_IMAGES } from "@/lib/schema";
- *     import heroUrl from "@/assets/art/darkroom-glow-1080.webp";   // hashed URL from Vite
- *
+ * ── Usage in a page (src/pages/<route>.astro frontmatter) ─────────────────────────────────
+ *     ---
+ *     import BaseLayout from "@/layouts/BaseLayout.astro";
+ *     import { webPage, service, faqPage, OG_IMAGES } from "@/lib/schema";
+ *     import { heroImage, type PageSeo } from "@/lib/seo";
  *     const PATH = "/services/";
- *     const jsonLd = useMemo(() => {
- *       const hero = imageObject("darkroom-glow", heroUrl, { path: PATH, variant: 1080 });
- *       return [
- *         webPage({ path: PATH, title, description, primaryImage: hero, dateModified: "2026-11-19" }),
- *         service({ path: PATH, name: "בניית אתרים לעסקים", description, image: hero.url as string }),
+ *     const seo: PageSeo = {
+ *       path: PATH, title, description, ogImage: OG_IMAGES.services,
+ *       lcpArt: { slug: "darkroom-glow", sizes: HERO_SIZES },
+ *       breadcrumb: { name: "שירותים", path: PATH },
+ *       jsonLd: [
+ *         webPage({ path: PATH, title, description, primaryImage: heroImage("darkroom-glow", PATH),
+ *                   dateModified: "2026-11-19", speakable: true }),
+ *         service({ path: PATH, name: "בניית אתרים לעסקים", description }),
  *         faqPage(faqItems, PATH),            // the SAME items, same order, as the visible <details>
- *       ];
- *     }, []);
- *     useSeoMeta({ title, description, ogImage: OG_IMAGES.services, ogImageAlt: "…", jsonLd });
- *     useBreadcrumb({ name: "שירותים", path: PATH });
+ *       ],
+ *     };
+ *     ---
+ *     <BaseLayout seo={seo}> … </BaseLayout>
  *
- *   - Memoise `jsonLd` (useMemo / module constant): useSeoMeta compares it by reference.
- *   - useSeoMeta merges `jsonLd`, the legacy `schema` prop and the breadcrumb from useBreadcrumb
- *     into ONE <script type="application/ld+json" id="page-jsonld"> {"@context", "@graph": [...]}.
- *   - If no node with id <canonical>#webpage is passed, useSeoMeta adds a plain WebPage itself
- *     (indexable pages only), so every page has one. Pass webPage()/aboutPage()/contactPage()/
- *     collectionPage() to control it (speakable, primary image, dates).
- *   - Duplicate @ids are merged by useSeoMeta: a node that appears twice (e.g. the same licensed
- *     ImageObject inside both WebPage and BlogPosting) is emitted in full once, then by reference,
- *     so keys such as `creator` are never duplicated.
+ *   - resolveHead() merges the stubs, `jsonLd` and the breadcrumb into one @graph (buildGraph).
+ *   - If no node with id <canonical>#webpage is passed, a plain WebPage is added (indexable pages
+ *     only), so every page has one. Pass webPage()/aboutPage()/contactPage()/collectionPage() to
+ *     control it (speakable, primary image, dates).
+ *   - Duplicate @ids are merged: a node that appears twice (e.g. the same licensed ImageObject
+ *     inside both WebPage and BlogPosting) is emitted in full once, then by reference, so keys
+ *     such as `creator` are never duplicated.
+ *   - Nothing writes JSON-LD at runtime; React islands never touch <head>.
  *
  * ── Builders (all return plain objects; `path` is a site path like "/about" or "/about/") ──
  *   pageUrl(path)                       absolute canonical URL with trailing slash
@@ -61,7 +63,7 @@
  *             licensing fields (license, acquireLicensePage, creditText, copyrightNotice, creator ONCE)
  *   imageObject(slug, url, { path?, variant? })  licensedImage from src/content/art-manifest.json
  *             (caption = exhibit title, description = alt). `url` is the HASHED asset URL
- *             (import x from "@/assets/art/<slug>-1080.webp"); it is made absolute here.
+ *             (getArt(slug).src, or heroImage(slug, path) from src/lib/seo.ts); made absolute here.
  *   OG_IMAGES / OG_IMAGE_SIZE           per-page social cards (re-exported from site-url.ts)
  *   SITE_LAST_UPDATED                   a fixed date to use as dateModified when a page has none
  *
@@ -553,7 +555,7 @@ export function definedTermSet({
   });
 }
 
-/* ─────────────────────────── Graph assembly (used by useSeoMeta) ─────────────────────────── */
+/* ─────────────────────────── Graph assembly (used by resolveHead in src/lib/seo.ts) ─────────────────────────── */
 
 /**
  * Flattens nodes (and nested "@graph" arrays), strips per-node "@context", and de-duplicates

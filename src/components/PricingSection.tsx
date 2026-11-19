@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Check, Crown, ArrowLeft, MessageCircle } from "lucide-react";
 import FaqAccordionItem from "@/components/FaqAccordionItem";
@@ -128,13 +127,13 @@ const PlanCard = ({ plan, index }: { plan: PricingPlan; index: number }) => {
     </a>
 
     {/* secondary link — the full breakdown of this package */}
-    <Link
-      to={getPlanDetailsHref(plan.slug)}
+    <a
+      href={getPlanDetailsHref(plan.slug)}
       className="mt-3 inline-flex items-center justify-center gap-1.5 text-sm font-semibold text-primary transition-all duration-200 hover:gap-2.5 hover:underline"
     >
       לכל הפרטים של החבילה
       <ArrowLeft className="h-3.5 w-3.5" />
-    </Link>
+    </a>
   </motion.div>
   );
 };
@@ -157,25 +156,6 @@ const PricingSection = ({ id = "pricing", withFaqSchema = true }: PricingSection
   );
 
   /* FAQPage JSON-LD for the pricing FAQ (Google rich results). */
-  useEffect(() => {
-    if (!withFaqSchema) return;
-    const id = "pricing-faq-schema";
-    const script = document.createElement("script");
-    script.type = "application/ld+json";
-    script.id = id;
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: PRICING_FAQS.map((f) => ({
-        "@type": "Question",
-        name: f.q,
-        acceptedAnswer: { "@type": "Answer", text: f.a },
-      })),
-    });
-    document.getElementById(id)?.remove();
-    document.head.appendChild(script);
-    return () => document.getElementById(id)?.remove();
-  }, [withFaqSchema]);
 
   return (
     <section

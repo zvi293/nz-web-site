@@ -1,0 +1,23 @@
+---
+/**
+ * /privacy/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Privacy from "@/views/Privacy";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/privacy/";
+const seo: PageSeo = {
+  path: PATH,
+  title: "מדיניות פרטיות | NZ-web",
+  description:
+    "מדיניות הפרטיות של NZ-web – כיצד אנו אוספים, מנהלים ומגינים על המידע שלכם בהתאם לחוק הגנת הפרטיות הישראלי.",
+  breadcrumb: { name: "מדיניות פרטיות", path: PATH },
+};
+---
+
+<BaseLayout seo={seo}>
+  <Privacy client:load />
+</BaseLayout>

@@ -1,0 +1,23 @@
+---
+/**
+ * /services/business-website/<vertical>/ — one static page per entry in VERTICALS
+ * (src/data/verticals*, getStaticPaths). LEGACY ServicePageTemplate as one island (client:load).
+ * The island gets only the slug (configs hold icon components, which are not serialisable).
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import VerticalBusinessWebsite from "@/views/services/VerticalBusinessWebsite";
+import { VERTICALS, buildVerticalConfig } from "@/data/verticals";
+import { servicePageSeo } from "@/lib/page-seo";
+import type { PageSeo } from "@/lib/seo";
+
+export function getStaticPaths() {
+  return Object.keys(VERTICALS).map((vertical) => ({ params: { vertical } }));
+}
+
+const { vertical } = Astro.params as { vertical: string };
+const seo: PageSeo = servicePageSeo(buildVerticalConfig(vertical)!);
+---
+
+<BaseLayout seo={seo}>
+  <VerticalBusinessWebsite client:load vertical={vertical} />
+</BaseLayout>

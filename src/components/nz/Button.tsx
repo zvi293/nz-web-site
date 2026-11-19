@@ -1,5 +1,4 @@
 import type { MouseEventHandler, ReactNode } from "react";
-import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { contactInfo, getWhatsAppHref } from "@/lib/contact-utils";
 import { ArrowIcon, ExternalIcon, WhatsAppIcon } from "./icons";
@@ -39,7 +38,7 @@ function Glyph({ icon }: { icon: Icon }) {
 }
 
 /**
- * <Button to="/projects/">…</Button>            internal (react-router Link)
+ * <Button to="/projects/">…</Button>            internal page link (plain <a href>, prefetched by Astro)
  * <Button href="https://…">…</Button>           external — opens in a new tab, rel="noopener noreferrer"
  * <Button onClick={…}>…</Button>                <button type="button">
  */
@@ -73,9 +72,9 @@ export const Button = (props: ButtonProps) => {
 
   if (to) {
     return (
-      <Link to={to} className={cls} onClick={onClick} {...aria}>
+      <a href={to} className={cls} onClick={onClick} {...aria}>
         {content}
-      </Link>
+      </a>
     );
   }
   if (href) {

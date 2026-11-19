@@ -1,0 +1,21 @@
+---
+/**
+ * 404 — built to dist/404.html; Netlify serves it with a real HTTP 404 for any unmatched path.
+ * noindex, never in the sitemap. LEGACY view as one island until it is redesigned.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import NotFound from "@/views/NotFound";
+import type { PageSeo } from "@/lib/seo";
+
+const seo: PageSeo = {
+  path: "/404/",
+  title: "404 — הדף לא נמצא | NZ-web",
+  description: "הדף שחיפשתם לא נמצא. חזרו לדף הבית של NZ-web או צרו איתנו קשר.",
+  noindex: true,
+  canonical: false,
+};
+---
+
+<BaseLayout seo={seo}>
+  <NotFound client:load />
+</BaseLayout>

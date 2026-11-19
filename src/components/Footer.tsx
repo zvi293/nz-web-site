@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { contactInfo, getMailtoHref, getTelHref } from "@/lib/contact-utils";
 import { Wordmark, WhatsAppCta, serviceNav, studioNav, legalNav, studio } from "@/components/nz";
 
@@ -7,6 +6,7 @@ import { Wordmark, WhatsAppCta, serviceNav, studioNav, legalNav, studio } from "
  * wordmark set huge across the bottom like the signature on a canvas.
  * The Zstore AI credit pill (white, fully rounded, logo only) stays exactly as the
  * owner wants it.
+ * Rendered as static HTML by BaseLayout (no client directive, zero JS).
  */
 const Footer = () => {
   const year = new Date().getFullYear();
@@ -40,11 +40,11 @@ const Footer = () => {
             <ul className="nz-footer__links">
               {serviceNav.map((s) => (
                 <li key={s.href}>
-                  <Link to={s.href}>{s.label}</Link>
+                  <a href={s.href}>{s.label}</a>
                 </li>
               ))}
               <li>
-                <Link to="/services/">כל השירותים</Link>
+                <a href="/services/">כל השירותים</a>
               </li>
             </ul>
           </nav>
@@ -56,7 +56,7 @@ const Footer = () => {
             <ul className="nz-footer__links">
               {studioNav.map((s) => (
                 <li key={s.href}>
-                  <Link to={s.href}>{s.label}</Link>
+                  <a href={s.href}>{s.label}</a>
                 </li>
               ))}
             </ul>
@@ -69,7 +69,7 @@ const Footer = () => {
             <ul className="nz-footer__links">
               {legalNav.map((s) => (
                 <li key={s.href}>
-                  <Link to={s.href}>{s.label}</Link>
+                  <a href={s.href}>{s.label}</a>
                 </li>
               ))}
             </ul>

@@ -1,0 +1,25 @@
+---
+/**
+ * /thank-you/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
+ * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
+ * (frontmatter → BaseLayout), never in the view.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ThankYou from "@/views/ThankYou";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/thank-you/";
+/* Transactional page: a real static file (refresh works) but never indexed (also Disallow-ed
+   in robots.txt) and left out of the sitemap. */
+const seo: PageSeo = {
+  path: PATH,
+  title: "תודה על הפנייה | NZ-web",
+  description: "תודה שפנית אלינו! קיבלנו את הפנייה שלך ונחזור אליך בהקדם.",
+  noindex: true,
+  breadcrumb: { name: "תודה על הפנייה", path: PATH },
+};
+---
+
+<BaseLayout seo={seo}>
+  <ThankYou client:load />
+</BaseLayout>
