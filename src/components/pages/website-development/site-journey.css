@@ -473,7 +473,7 @@ html.nz-motion.js .sj-panel:not(.is-on) .sj-d__l {
   flex: 1 1 180px;
   margin: 0;
   max-width: 34ch;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   line-height: 1.55;
   color: var(--fg-muted);
 }

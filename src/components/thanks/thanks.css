@@ -46,9 +46,24 @@
   position: relative;
   overflow: hidden;
 }
-/* phones: a square crop around the two hands (the overlay uses the same xMidYMid slice) */
+/* phones: a tall 4/5 canvas; once the island runs it crops in around the two hands and the comet
+   (ThanksComet sets --ty-art-tf so the picture follows the overlay's crop). Without JS: the whole work. */
 .ty-canvas .nz-art__canvas {
-  aspect-ratio: 1 / 1 !important;
+  aspect-ratio: 4 / 5 !important;
+}
+.ty-canvas .nz-art__img {
+  transform-origin: 0 0;
+  transform: var(--ty-art-tf, none);
+}
+/* with JS the phone crop is there from the first paint (the same numbers ThanksComet computes for a
+   4/5 canvas and PHONE_VIEW), and the overlay waits for hydration, so nothing jumps */
+@media (max-width: 639.98px) {
+  html.js .ty-canvas .nz-art__img {
+    transform: var(--ty-art-tf, translate(-35.6%, -14.6667%) scale(1.36533));
+  }
+  html.js .ty-comet:not(.is-live) .ty-comet__svg {
+    opacity: 0;
+  }
 }
 @media (min-width: 640px) {
   .ty-canvas .nz-art__canvas {
@@ -56,17 +71,31 @@
   }
 }
 
+/* phones: the island's box is the canvas' flow, so its caption and button sit UNDER the picture
+   (on the navy mat) and never cover the canvas; from 640px they float on the canvas */
 .ty-comet {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
+  position: static;
 }
 .ty-comet__svg {
   position: absolute;
-  inset: 0;
+  inset: 0 0 auto;
   inline-size: 100%;
-  block-size: 100%;
+  block-size: auto;
+  aspect-ratio: 4 / 5;
   pointer-events: none;
+  z-index: 3;
+}
+@media (min-width: 640px) {
+  .ty-comet {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+  }
+  .ty-comet__svg {
+    inset: 0;
+    block-size: 100%;
+    aspect-ratio: auto;
+  }
 }
 .ty-comet__palm {
   fill: rgba(242, 200, 120, 0.06);
@@ -88,10 +117,18 @@
 }
 .ty-comet__thread {
   fill: none;
-  stroke: #f0b84a;
-  stroke-width: 8;
+  stroke: #ffe39a;
+  stroke-width: 9;
   stroke-linecap: round;
-  stroke-dasharray: 18 11;
+  stroke-dasharray: 18 10;
+}
+/* the visitor's own thread glows, so it reads apart from the embroidered gold orbits */
+.ty-comet__halo {
+  fill: none;
+  stroke: rgba(255, 214, 120, 0.3);
+  stroke-width: 24;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .ty-comet__shadow {
   fill: none;
@@ -117,6 +154,7 @@
 }
 /* before hydration (motion on) the thread waits, so the visitor can sew it */
 html.nz-motion .ty-comet:not(.is-live) .ty-comet__thread,
+html.nz-motion .ty-comet:not(.is-live) .ty-comet__halo,
 html.nz-motion .ty-comet:not(.is-live) .ty-comet__shadow,
 html.nz-motion .ty-comet:not(.is-live) .ty-comet__knot {
   opacity: 0;
@@ -206,32 +244,56 @@ html.nz-motion .ty-comet.is-live:not(.is-done) .ty-needle {
   }
 }
 
-/* the caption written on the canvas: which step the thread has reached */
+/* the caption: which step the thread has reached (phones: under the canvas, on the mat) */
 .ty-comet__caption {
-  position: absolute;
-  inset-block-start: 10px;
-  inset-inline: 10px;
   display: flex;
+  justify-content: center;
+  min-block-size: 3em;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding-inline: 0.5rem;
+  text-align: center;
   pointer-events: none;
-  z-index: 5;
 }
 .ty-comet__caption span {
   max-inline-size: 100%;
-  padding: 0.4rem 0.8rem;
-  border-radius: 999px;
-  background: rgba(12, 11, 26, 0.8);
-  border: 1px solid rgba(242, 200, 120, 0.35);
   color: #fbe6b8;
-  font-size: 0.875rem;
-  line-height: 1.35;
+  font-size: 1rem;
+  line-height: 1.45;
+  text-wrap: balance;
 }
 .ty-comet__bar {
-  position: absolute;
-  inset-block-end: 12px;
-  inset-inline: 0;
   display: flex;
   justify-content: center;
-  z-index: 5;
+  padding-block: 0.35rem 0.4rem;
+}
+@media (min-width: 640px) {
+  .ty-comet__caption {
+    position: absolute;
+    inset-block-start: 10px;
+    inset-inline: 10px;
+    justify-content: flex-start;
+    min-block-size: 0;
+    margin: 0;
+    padding: 0;
+    text-align: start;
+    z-index: 5;
+  }
+  .ty-comet__caption span {
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(12, 11, 26, 0.8);
+    border: 1px solid rgba(242, 200, 120, 0.35);
+    font-size: 0.9375rem;
+    line-height: 1.35;
+  }
+  .ty-comet__bar {
+    position: absolute;
+    inset-block-end: 12px;
+    inset-inline: 0;
+    padding: 0;
+    z-index: 5;
+  }
 }
 .ty-comet__btn {
   display: inline-flex;
@@ -243,7 +305,7 @@ html.nz-motion .ty-comet.is-live:not(.is-done) .ty-needle {
   border-radius: 999px;
   background: rgba(12, 11, 26, 0.78);
   color: #fbe6b8;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   white-space: nowrap;
   cursor: pointer;
   -webkit-backdrop-filter: blur(2px);
@@ -341,21 +403,28 @@ html.nz-motion .ty-comet.is-live:not(.is-done) .ty-needle {
   .ty-hero__grid {
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: 2rem;
-    align-items: start;
+    align-items: center;
   }
   .ty-hero__text {
     grid-column: 1 / span 5;
-    padding-top: 2rem;
   }
   .ty-hero__art {
     grid-column: 6 / span 7;
-    grid-row: 1 / span 2;
     margin: 0;
   }
+  /* "what happens now" runs as one row of three under the text and the canvas */
   .ty-steps-wrap {
-    grid-column: 1 / span 5;
-    grid-row: 2;
-    margin-top: 3rem;
+    grid-column: 1 / -1;
+    margin-top: 4.5rem;
+  }
+  .ty-steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 2.5rem;
+  }
+  .ty-step {
+    padding-block: 1.5rem 0;
+    border-bottom: 0;
   }
 }
 
@@ -365,18 +434,30 @@ html.nz-motion .ty-comet.is-live:not(.is-done) .ty-needle {
 }
 .ty-rooms {
   display: grid;
-  gap: 2.5rem;
   list-style: none;
-  margin: 2.5rem 0 0;
+  margin: 2rem 0 0;
   padding: 0;
+  border-top: 1px solid var(--line);
+}
+/* phones: compact rows (a small framed thumbnail, the door plate, an arrow); large frames from 640px */
+.ty-room {
+  border-bottom: 1px solid var(--line);
 }
 .ty-room__link {
-  display: block;
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 1rem;
+  padding-block: 1rem;
   color: inherit;
   text-decoration: none;
 }
 .ty-room__art {
   display: block;
+}
+.ty-room__art .nz-art__frame {
+  padding: 5px;
+  border-width: 3px;
 }
 .ty-room__link:hover .nz-art__frame,
 .ty-room__link:focus-visible .nz-art__frame {
@@ -385,11 +466,8 @@ html.nz-motion .ty-comet.is-live:not(.is-done) .ty-needle {
 .ty-room__plate {
   position: relative;
   display: grid;
-  gap: 0.25rem;
-  margin-top: 1rem;
-  padding: 0.85rem 0 0;
-  padding-inline-end: 2.5rem;
-  border-top: 1px solid var(--line);
+  gap: 0.2rem;
+  padding-inline-end: 2rem;
 }
 .ty-room__label {
   display: flex;
@@ -405,7 +483,7 @@ html.nz-motion .ty-comet.is-live:not(.is-done) .ty-needle {
 }
 .ty-room__title {
   font-family: var(--font-display);
-  font-size: 1.625rem;
+  font-size: 1.375rem;
   font-weight: 500;
   line-height: 1.2;
 }
@@ -415,7 +493,7 @@ html.nz-motion .ty-comet.is-live:not(.is-done) .ty-needle {
 }
 .ty-room__arrow {
   position: absolute;
-  inset-block-start: 1.1rem;
+  inset-block-start: calc(50% - 10px);
   inset-inline-end: 0;
   inline-size: 20px;
   block-size: 20px;
@@ -427,7 +505,7 @@ html.nz-motion .ty-comet.is-live:not(.is-done) .ty-needle {
 }
 .ty-room__link:focus-visible {
   outline: 2px solid var(--focus);
-  outline-offset: 6px;
+  outline-offset: 4px;
 }
 .ty-contact {
   display: grid;
@@ -437,6 +515,10 @@ html.nz-motion .ty-comet.is-live:not(.is-done) .ty-needle {
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 6px;
+}
+.ty-contact__head {
+  display: grid;
+  gap: 0.35rem;
 }
 .ty-contact__title {
   font-family: var(--font-display);
@@ -480,6 +562,31 @@ html.nz-motion .ty-comet.is-live:not(.is-done) .ty-needle {
   .ty-rooms {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.75rem;
+    margin-top: 2.5rem;
+    border-top: 0;
+  }
+  .ty-room {
+    border-bottom: 0;
+  }
+  .ty-room__link {
+    display: block;
+    padding: 0;
+  }
+  .ty-room__art .nz-art__frame {
+    padding: clamp(10px, 1.8vw, 22px);
+    border-width: clamp(5px, 0.7vw, 9px);
+  }
+  .ty-room__plate {
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    padding-inline-end: 2.5rem;
+    border-top: 1px solid var(--line);
+  }
+  .ty-room__title {
+    font-size: 1.625rem;
+  }
+  .ty-room__arrow {
+    inset-block-start: 1.1rem;
   }
 }
 @media (min-width: 1024px) {
@@ -494,8 +601,6 @@ html.nz-motion .ty-comet.is-live:not(.is-done) .ty-needle {
     padding: 2rem 2.25rem;
   }
   .ty-contact__list {
-    grid-column: 2;
-    grid-row: 1 / span 2;
     margin: 0;
   }
 }

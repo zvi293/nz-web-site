@@ -24,6 +24,17 @@ const planned = new Set(WALL_ROWS.flat().map((h) => h.w));
 const extraRow: Hang[] = works.map((_, i) => i).filter((i) => !planned.has(i)).map((i) => ({ w: i, d: 18, m: 5.6, o: "dm" as const }));
 const ROWS = extraRow.length ? [...WALL_ROWS.slice(0, -1), extraRow, WALL_ROWS[WALL_ROWS.length - 1]] : WALL_ROWS;
 
+/* The DOM (tab and reading order, and the phone column) runs 01 → last, then the reserved frame.
+   The desktop salon composition places each hang by its row and slot in the plan (CSS order inside a
+   wrapping row, with a break element closing every row) — the visual hang, not the reading order. */
+type Placed = Hang & { order: number };
+const PLACED: Placed[] = ROWS.flatMap((row, ri) => row.map((h, pi) => ({ ...h, order: ri * 10 + pi })));
+const HANGS: Placed[] = [
+  ...PLACED.filter((h) => h.w >= 0).sort((a, b) => a.w - b.w),
+  ...PLACED.filter((h) => h.w < 0),
+];
+const BREAKS = ROWS.slice(0, -1).map((_, ri) => ri * 10 + 9);
+
 /* ── body scroll pin without layout shift ── */
 function pinScroll(on: boolean) {
   const html = document.documentElement;
@@ -216,48 +227,47 @@ const SalonWall = () => {
   return (
     <>
       <div className="pj-wall">
-        {ROWS.map((row, ri) => (
-          <div key={ri} className="pj-row">
-            {row.map((h) => {
-              if (h.w < 0) {
-                return (
-                  <div key="reserved" className="pj-hang pj-hang--reserved" style={{ "--d": h.d } as CSSProperties}>
-                    <a href="#next" className="pj-frame pj-frame--reserved" aria-label={c.reservedLabel}>
-                      <span className="pj-frame__mat">
-                        <span className="pj-reserved__plus" aria-hidden="true" />
-                        <span className="pj-reserved__text">{c.reserved}</span>
-                      </span>
-                    </a>
-                  </div>
-                );
-              }
-              const w = works[h.w];
-              if (!w) return null;
-              const cyc = PHONE_CYCLE[h.w % PHONE_CYCLE.length];
-              const style = {
-                "--d": h.d,
-                "--m": h.m,
-                "--d-sm": cyc.d,
-                "--m-sm": cyc.m,
-                "--j": cyc.j === "start" ? "flex-start" : cyc.j === "end" ? "flex-end" : "center",
-                "--order": h.w,
-              } as CSSProperties;
-              const frames = [
-                <WallFrame key="d" work={w} view="desktop" onOpen={open} />,
-                <WallFrame key="m" work={w} view="mobile" onOpen={open} />,
-              ];
-              const phoneFirst = h.w % 2 === 1;
-              return (
-                <div key={w.id} className={`pj-hang${h.o === "md" ? " pj-hang--md" : ""}${phoneFirst ? " pj-hang--sm-md" : ""}`} style={style}>
-                  {frames}
-                  <p className="pj-plaque">
-                    <span className="pj-plaque__n">{String(w.n).padStart(2, "0")}</span>
-                    <span className="pj-plaque__t">{w.title}</span>
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+        {HANGS.map((h) => {
+          if (h.w < 0) {
+            return (
+              <div key="reserved" className="pj-hang pj-hang--reserved" style={{ "--d": h.d, "--order": h.order } as CSSProperties}>
+                <a href="#next" className="pj-frame pj-frame--reserved" aria-label={c.reservedLabel}>
+                  <span className="pj-frame__mat">
+                    <span className="pj-reserved__plus" aria-hidden="true" />
+                    <span className="pj-reserved__text">{c.reserved}</span>
+                  </span>
+                </a>
+              </div>
+            );
+          }
+          const w = works[h.w];
+          if (!w) return null;
+          const cyc = PHONE_CYCLE[h.w % PHONE_CYCLE.length];
+          const style = {
+            "--d": h.d,
+            "--m": h.m,
+            "--d-sm": cyc.d,
+            "--m-sm": cyc.m,
+            "--j": cyc.j === "start" ? "flex-start" : cyc.j === "end" ? "flex-end" : "center",
+            "--order": h.order,
+          } as CSSProperties;
+          /* phones alternate which frame comes first; the DOM follows the phone, desktop flips where its plan differs */
+          const phoneFirst = h.w % 2 === 1;
+          const flipOnDesktop = (h.o === "md") !== phoneFirst;
+          const desk = <WallFrame key="d" work={w} view="desktop" onOpen={open} />;
+          const phone = <WallFrame key="m" work={w} view="mobile" onOpen={open} />;
+          return (
+            <div key={w.id} className={`pj-hang${flipOnDesktop ? " pj-hang--flip" : ""}`} style={style}>
+              {phoneFirst ? [phone, desk] : [desk, phone]}
+              <p className="pj-plaque">
+                <span className="pj-plaque__n">{String(w.n).padStart(2, "0")}</span>
+                <span className="pj-plaque__t">{w.title}</span>
+              </p>
+            </div>
+          );
+        })}
+        {BREAKS.map((o) => (
+          <span key={o} className="pj-wall__break" style={{ "--order": o } as CSSProperties} aria-hidden="true" />
         ))}
       </div>
 

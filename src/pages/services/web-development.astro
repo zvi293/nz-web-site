@@ -3,18 +3,19 @@
  * /services/web-development/ — בניית אתרים מקצועיים (room 02, art mobius-brick).
  * Service system sections (src/components/service) + page-local pieces in
  * src/components/pages/web-development/. Content: data.ts there.
- * A lean page on purpose: hero → the signature → the materials board → "שני קירות" → FAQ.
+ * A lean page on purpose: hero → the signature → "על הגב של האתר" (the materials as labels on the
+ * canvas's back, page-born; the kit's specimen board stays on /services/ only) → "שני קירות" → FAQ.
  * ONE island: the signature "הקוד מאחורי הקיר" (turn the canvas over, client:visible).
  * `wd-page` on <main> lets web-development.css hang the hero work first on phones.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import ServiceHero from "@/components/service/ServiceHero.astro";
 import SignatureSlot from "@/components/service/SignatureSlot.astro";
-import ServiceFeatures from "@/components/service/ServiceFeatures.astro";
 import ServiceFaq from "@/components/service/ServiceFaq.astro";
 import ServiceRelated from "@/components/service/ServiceRelated.astro";
 import ServiceCta from "@/components/service/ServiceCta.astro";
 import TemplateVsCode from "@/components/pages/web-development/TemplateVsCode.astro";
+import VersoLabels from "@/components/pages/web-development/VersoLabels.astro";
 import CodeBehindWall from "@/components/pages/web-development/CodeBehindWall";
 import { webDevelopment as page } from "@/components/pages/web-development/data";
 import { serviceSeo } from "@/lib/page-seo";
@@ -38,16 +39,7 @@ const seo = serviceSeo(page);
     <CodeBehindWall client:visible />
   </SignatureSlot>
 
-  <ServiceFeatures
-    title={page.features!.title}
-    lede={page.features!.lede}
-    items={page.features!.items}
-    variant="specimens"
-    tone="paper"
-    opener="numeral"
-    index="01"
-    label="מה נכנס לאתר"
-  />
+  <VersoLabels title={page.features!.title} lede={page.features!.lede} items={page.features!.items} index="01" />
 
   <TemplateVsCode index="02" />
 

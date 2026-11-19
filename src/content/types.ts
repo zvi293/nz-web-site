@@ -65,7 +65,6 @@ export interface BlogPost {
   cover_width?: number;
   cover_height?: number;
   author: string;
-  read_time: number;
   published_at: string;
   /** Optional shorter <title> (without the "| NZ-web" suffix) when `title` is too long for search results. */
   seo_title?: string;

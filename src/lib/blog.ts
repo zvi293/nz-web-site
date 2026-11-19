@@ -91,33 +91,7 @@ export function departmentCounts(): Record<string, number> {
   return out;
 }
 
-/* ───────────────────────── issues (גיליונות) ─────────────────────────
- * Every publishing month is one issue, numbered from the first month (oldest = 01).
- */
-const monthKey = (iso: string) => iso.slice(0, 7);
-const ISSUE_MONTHS = [...new Set(posts.map((p) => monthKey(p.published_at)))].sort();
-
-export interface Issue {
-  number: number;
-  /** "03" */
-  index: string;
-  /** "נובמבר 2026" */
-  month: string;
-  /** "2026-11" */
-  key: string;
-}
-
-export function getIssue(post: BlogPost): Issue {
-  const key = monthKey(post.published_at);
-  const number = ISSUE_MONTHS.indexOf(key) + 1;
-  return { number, index: String(number).padStart(2, "0"), month: formatMonth(post.published_at), key };
-}
-
-/** The posts of the newest issue (the "current issue" on the magazine hub). */
-export function getCurrentIssuePosts(): BlogPost[] {
-  const newest = ISSUE_MONTHS[ISSUE_MONTHS.length - 1];
-  return posts.filter((p) => monthKey(p.published_at) === newest);
-}
+/* Issues (גיליונות) and reading times are computed in src/components/blog/magazine-meta.ts. */
 
 /* ───────────────────────── article content renderer ─────────────────────────
  * Article `content` is a small, safe markdown subset:

@@ -1,12 +1,14 @@
 ---
 /**
- * "אולמות סמוכים" — the other legal rooms as tall arched doorways (the current page is left out),
- * plus a short contact note. Shared by /accessibility/, /privacy/ and /terms/.
+ * "אולמות סמוכים" — the other legal rooms as arched doorways (the current page is left out), each
+ * with a glimpse of the work that hangs in that room through the arch, plus a short contact note.
+ * Shared by /accessibility/, /privacy/ and /terms/.
  */
 import { WhatsAppCta } from "@/components/nz";
+import { Artwork } from "@/components/art";
 import { getMailtoHref } from "@/lib/contact-utils";
 import { studio } from "@/components/nz/nav";
-import { roomFor } from "@/components/Breadcrumbs";
+import { roomFor } from "@/components/nz/nav";
 
 interface Props {
   current: string;
@@ -16,9 +18,9 @@ interface Props {
 }
 const { current, title, line, message } = Astro.props;
 const doors = [
-  { href: "/accessibility/", name: "הצהרת נגישות", line: "מה עשינו כדי שכל אחד יוכל לגלוש, ולוח בקרה לנסות בעצמכם." },
-  { href: "/privacy/", name: "מדיניות פרטיות", line: "איזה מידע נאסף, למה, ומה הזכויות שלכם." },
-  { href: "/terms/", name: "תנאי שימוש", line: "השימוש באתר, זכויות יוצרים ורישוי תמונות." },
+  { href: "/accessibility/", art: "thermal-hand", pos: "50% 50%", name: "הצהרת נגישות", line: "מה עשינו כדי שכל אחד יוכל לגלוש, ולוח בקרה לנסות בעצמכם." },
+  { href: "/privacy/", art: "ice-constellation", pos: "50% 50%", name: "מדיניות פרטיות", line: "איזה מידע נאסף, למה, ומה הזכויות שלכם." },
+  { href: "/terms/", art: "handbag-ice", pos: "60% 50%", name: "תנאי שימוש", line: "השימוש באתר, זכויות יוצרים ורישוי תמונות." },
 ].filter((d) => d.href !== current);
 ---
 
@@ -43,6 +45,9 @@ const doors = [
           doors.map((d) => (
             <li>
               <a href={d.href} class="lg-arch">
+                <div class="lg-arch__view" aria-hidden="true">
+                  <Artwork slug={d.art} alt="" ratio="4 / 3" position={d.pos} sizes="(min-width: 1024px) 300px, 46vw" />
+                </div>
                 <span class="lg-arch__room">אולם {String(roomFor(d.href) ?? "").padStart(2, "0")}</span>
                 <span class="lg-arch__name">{d.name}</span>
                 <span class="lg-arch__line">{d.line}</span>

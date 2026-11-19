@@ -6,8 +6,8 @@ const c = projectsCopy.next;
 
 /**
  * Closing room (ink): an empty frame hangs from a nail on a wire, its mat dashed, waiting —
- * "the next wall is reserved for your business". The CTA sits inside the frame; under it a
- * museum label numbered after the last real work. The wire swings in once on reveal. Static.
+ * "the next wall is reserved for your business", numbered after the last real work. The CTA sits
+ * inside the frame. The wire swings in once on reveal. Static.
  */
 const ProjectsNext = () => (
   <section id="next" className="nz-section nz-section--space-default pj-next" data-tone="ink" aria-labelledby="pj-next-title">
@@ -35,13 +35,6 @@ const ProjectsNext = () => (
             </div>
           </div>
         </div>
-      </div>
-      <div className="nz-museum pj-next__label">
-        <span className="nz-museum__head">
-          <span className="nz-museum__index">עבודה {String(works.length + 1).padStart(2, "0")}</span>
-          <span className="nz-museum__title">{c.labelTitle}</span>
-        </span>
-        <span className="nz-museum__medium">{c.labelMedium}</span>
       </div>
     </div>
   </section>

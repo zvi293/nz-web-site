@@ -46,8 +46,11 @@ const parseKey = (k: string) => {
   return { gi: Number(k.slice(0, i)), item: k.slice(i + 1) };
 };
 
-/** Bubble diameter in cqmin of the stage: its AREA follows the number of blocks (honest scaling). */
-const diameter = (n: number) => 48 + 44 * Math.sqrt(n / TOTAL);
+/** Bubble diameter in cqmin of the stage: its AREA follows the number of blocks (honest scaling).
+    Full scope stays inside the stage (84cqmin, the stage is taller than wide on phones). */
+const diameter = (n: number) => 46 + 38 * Math.sqrt(n / TOTAL);
+/** "סוג האתר" (group 0) holds one site type: tossing another one swaps it. */
+const SINGLE_GROUP = 0;
 const GOLDEN = Math.PI * (3 - Math.sqrt(5));
 const sizeWord = (n: number) => c.sizeWords[n <= 3 ? 1 : n <= 6 ? 2 : n <= 9 ? 3 : 4];
 /** Stage geometry shared by CSS and the flight maths: bubble centre (fraction of the stage box). */
@@ -229,27 +232,34 @@ const ScopeBubble = () => {
   /* ── state changes ────────────────────────────────────────────────────── */
   const land = (key: string) => {
     if (pickedRef.current.includes(key)) return;
-    const next = [...pickedRef.current, key];
+    const single = parseKey(key).gi === SINGLE_GROUP;
+    const next = [...pickedRef.current.filter((k) => !(single && parseKey(k).gi === SINGLE_GROUP)), key];
     pickedRef.current = next;
     setPicked(next);
-    setAnnounce(c.announceAdd(parseKey(key).item, next.length));
+    setAnnounce((a) => (single && a.startsWith(c.announceSwapPrefix) ? a : c.announceAdd(parseKey(key).item, next.length)));
     setGulp((g) => g + 1);
   };
 
   const throwIn = (key: string, from: Pt | null) => {
     if (pickedRef.current.includes(key) || pending.has(key)) return;
+    /* one site type: the one inside flies back to the shelf as the new one is tossed */
+    if (parseKey(key).gi === SINGLE_GROUP) {
+      const old = pickedRef.current.find((k) => parseKey(k).gi === SINGLE_GROUP);
+      if (old) takeOut(old, parseKey(key).item);
+    }
     if (!motion || !from) return land(key);
     const to = beadPx([...pickedRef.current, key], key);
     setFlights((fs) => [...fs, { id: ++seq.current, gi: parseKey(key).gi, from, to, kind: "in", key }]);
   };
 
-  const takeOut = (key: string) => {
+  /** `swapFor`: the site type that replaces it (one announcement for the swap). */
+  const takeOut = (key: string, swapFor?: string) => {
     const { item, gi } = parseKey(key);
     const from = motion ? beadPx(pickedRef.current, key) : null;
     const next = pickedRef.current.filter((p) => p !== key);
     pickedRef.current = next;
     setPicked(next);
-    setAnnounce(c.announceRemove(item, next.length));
+    setAnnounce(swapFor ? c.announceSwap(item, swapFor) : c.announceRemove(item, next.length));
     const to = motion ? stoneAt(key) : null;
     if (from && to) setFlights((fs) => [...fs, { id: ++seq.current, gi, from, to, kind: "out", key }]);
   };
@@ -439,12 +449,6 @@ const ScopeBubble = () => {
           <span className="of-stage__caption">{c.chairLabel}</span>
         </div>
 
-        <button type="button" className="of-bub__pop" onClick={pop} disabled={n === 0 && !care}>
-          <span className="of-bub__pin" aria-hidden="true" />
-          <span aria-hidden="true">{c.popShort}</span>
-          <span className="nz-sr">{c.pop}</span>
-        </button>
-
         <div className="of-bub__reading">
           <p className="of-bub__count">
             {n === 0 ? (
@@ -458,6 +462,11 @@ const ScopeBubble = () => {
               </>
             )}
           </p>
+          <button type="button" className="of-bub__pop" onClick={pop} disabled={n === 0 && !care}>
+            <span className="of-bub__pin" aria-hidden="true" />
+            <span aria-hidden="true">{c.popShort}</span>
+            <span className="nz-sr">{c.pop}</span>
+          </button>
         </div>
 
         <div className="of-shelf">
@@ -467,6 +476,7 @@ const ScopeBubble = () => {
               <span id={`of-shelf-${g.gi}`} className="of-shelf__title">
                 <span className={`of-bead of-bead--key of-bead--g${g.gi}`} aria-hidden="true" />
                 {g.title}
+                {g.gi === SINGLE_GROUP && <span className="of-shelf__one">{c.oneOnly}</span>}
               </span>
               {g.items.map((item) => {
                 const key = keyOf(g.gi, item);
@@ -489,6 +499,7 @@ const ScopeBubble = () => {
                   >
                     <span className={`of-drop__bead of-bead--g${g.gi}`} aria-hidden="true" />
                     <span className="of-drop__name">{short(item)}</span>
+                    <span className="of-drop__check" aria-hidden="true" />
                   </button>
                 );
               })}
@@ -514,7 +525,14 @@ const ScopeBubble = () => {
           <span className="of-bub__chairmark" aria-hidden="true" />
           {FOUNDATIONS.title} · {c.foundationsNote}
         </span>
-        <span>{FOUNDATIONS.items.join(" · ")}</span>
+        <span>
+          {FOUNDATIONS.items.map((it, i) => (
+            <span key={it}>
+              {i > 0 && " · "}
+              <span className="of-bub__fixed-item">{it}</span>
+            </span>
+          ))}
+        </span>
       </p>
 
       <div className="of-bub__send">

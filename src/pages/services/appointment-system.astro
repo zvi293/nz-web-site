@@ -9,12 +9,12 @@ import ServiceHero from "@/components/service/ServiceHero.astro";
 import SignatureSlot from "@/components/service/SignatureSlot.astro";
 import ServiceFeatures from "@/components/service/ServiceFeatures.astro";
 import ServiceProcess from "@/components/service/ServiceProcess.astro";
-import ServiceOutcomes from "@/components/service/ServiceOutcomes.astro";
 import ServiceFaq from "@/components/service/ServiceFaq.astro";
 import ServiceRelated from "@/components/service/ServiceRelated.astro";
 import ServiceCta from "@/components/service/ServiceCta.astro";
 import MessageTrail from "@/components/pages/appointment-system/MessageTrail.astro";
 import WeekPlanner from "@/components/pages/appointment-system/WeekPlanner.astro";
+import OutcomeStubs from "@/components/pages/appointment-system/OutcomeStubs.astro";
 import TimeDial from "@/components/pages/appointment-system/TimeDial";
 import { appointmentSystem as page } from "@/components/pages/appointment-system/data";
 import { serviceSeo } from "@/lib/page-seo";
@@ -31,7 +31,7 @@ const seo = serviceSeo(page);
     name="חוגת הזמן"
     title="קבעו תור, כמו שמחייגים"
     lede="כך הלקוחות שלכם יקבעו: בוחרים יום, מסובבים את החוגה עד השעה הפנויה, ומקבלים אישור חתום. שעות תפוסות כהות, והחוגה מדלגת עליהן."
-    hint="בחרו יום, ואז סובבו את החוגה באצבע או הקישו על שעה. כשהשעה מתחת לחץ האדום, הקישו על לקבוע את התור."
+    hint="בחרו יום, ואז סובבו את החוגה עם כיוון השעון, כמו בטלפון ישן, או הקישו על שעה. כשהשעה מתחת לחץ האדום, הקישו על לקבוע את התור."
     keys="במקלדת: חיצים על הימים ועל החוגה, Home ו-End לשעה הראשונה והאחרונה."
     opener="rule"
     index="02"
@@ -46,7 +46,7 @@ const seo = serviceSeo(page);
     items={page.features!.items}
     variant="specimens"
     tone="bone"
-    opener="numeral"
+    opener="stacked"
     index="03"
     label="מה במערכת"
     id="ap-features"
@@ -59,14 +59,14 @@ const seo = serviceSeo(page);
     lede={page.process!.lede}
     steps={page.process!.steps}
     tone="bone"
-    opener="stacked"
+    opener="split"
     index="05"
     art={["book-garden", "turquoise-fans", "marble-maze", "emerald-curtain"]}
     avoid={[page.hero.art, "indigo-loom", "titanium-ribbon", "shell-staircases"]}
     id="ap-process"
   />
 
-  <ServiceOutcomes title={page.outcomes!.title} items={page.outcomes!.items} index="06" opener="split" id="ap-outcomes" />
+  <OutcomeStubs title={page.outcomes!.title} items={page.outcomes!.items} index="06" id="ap-outcomes" />
 
   <ServiceFaq items={page.faqs} title="שאלות על מערכת ניהול תורים" index="07" card="plaque" id="ap-faq" />
 

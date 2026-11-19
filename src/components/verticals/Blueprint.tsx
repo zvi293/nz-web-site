@@ -102,17 +102,22 @@ const Blueprint = () => {
   const [on, setOn] = useState<boolean[]>(ALL);
   const [live, setLive] = useState(false);
   const [say, setSay] = useState("");
+  /* Until the first tap, sheet 02 (walls) peeks down once and its tab nudges: the first move. */
+  const [hint, setHint] = useState(false);
 
-  /* The visitor starts from the grid; SSR (no JS) keeps the finished building. */
+  /* The visitor starts from the grid; SSR (no JS) keeps the finished building. The island
+     hydrates when it scrolls into view, so the grid draws in then (not off-screen on load). */
   useEffect(() => {
     setOn([true, false, false, false, false]);
     setLive(true);
+    setHint(true);
   }, []);
 
   const count = on.filter(Boolean).length;
   const built = count === N;
 
   const toggle = (k: number) => {
+    setHint(false);
     const next = on.map((v, i) => (i === k ? !v : v));
     setOn(next);
     const c = next.filter(Boolean).length;
@@ -121,13 +126,14 @@ const Blueprint = () => {
     else setSay(`גיליון ${LAYERS[k].name} ירד על השרטוט. ${LAYERS[k].line}`);
   };
   const all = () => {
+    setHint(false);
     const to = !built;
     setOn(Array(N).fill(to));
     setSay(to ? "כל הגיליונות ירדו. השרטוט נהיה אתר פורטפוליו גמור." : "כל הגיליונות הורמו. נשארה המסגרת הריקה.");
   };
 
   return (
-    <div className={cn("vl-bp", live && "is-live", built && "is-built")}>
+    <div className={cn("vl-bp", live && "is-live", built && "is-built", hint && "is-hint")}>
       <div className="vl-bp__table">
         <div className="vl-bp__board">
           <svg className="vl-bp__svg vl-bp__base" viewBox="0 0 400 320" role="img" aria-label={`שרטוט של אתר פורטפוליו, ${count} מתוך ${N} שכבות מונחות`}>
@@ -153,7 +159,7 @@ const Blueprint = () => {
         </div>
         <div className="vl-bp__tabs" role="group" aria-label="גיליונות השקף">
           {LAYERS.map((l, k) => (
-            <button key={l.name} type="button" className={cn("vl-bp__tab", on[k] && "is-on")} aria-pressed={on[k]} onClick={() => toggle(k)}>
+            <button key={l.name} type="button" data-k={k} className={cn("vl-bp__tab", on[k] && "is-on")} aria-pressed={on[k]} onClick={() => toggle(k)}>
               <span className="vl-bp__tab-no">{pad(k)}</span>
               <span className="vl-bp__tab-name">{l.name}</span>
             </button>

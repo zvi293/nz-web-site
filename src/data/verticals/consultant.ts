@@ -20,7 +20,7 @@ export const consultant: VerticalPage = {
     lead:
       "בניית אתר תדמית ליועץ ולמאמן היא תכנון המהלך הראשון מול לקוח שעוד לא מכיר אתכם. NZ-web בונה ליועצים עסקיים ולמאמנים אתר שמבהיר למי אתם עוזרים ואיך, מציג את השיטה בלי סיסמאות, ומאפשר לקבוע פגישת היכרות ישירות מהאתר, כך שעניין הופך לשיחה.",
     art: "chess-pawn",
-    medium: "רגלי שחמט מזכוכית על גבעה משובצת: המהלך שמכינים מראש",
+    medium: "רגלי שחמט מזכוכית על גבעה משובצת: המהלך שמכינים\u00a0מראש",
     cta: { label: "לשיחה בוואטסאפ", message: "היי, הגעתי מעמוד האתר ליועצים ומאמנים ואשמח לשמוע פרטים" },
     facts: ["מיצוב ברור", "השיטה שלכם בעמוד", "פגישת היכרות אונליין"],
   },
@@ -85,7 +85,7 @@ export const consultant: VerticalPage = {
     items: [
       { word: "ממוצבים", title: "מבינים במה אתם שונים", body: "משפט מיצוב ברור ועמוד שיטה מבדילים אתכם מעוד יועץ." },
       { word: "נקראים", title: "התוכן עובד בשבילכם", body: "מאמרים שעונים על שאלות אמיתיות מביאים קוראים ששואלים בדיוק אותן." },
-      { word: "נקבעים", title: "פגישות במקום הודעות", body: "לקוח שבחר מועד ביומן כבר עשה את הצעד הראשון." },
+      { word: "נפגשים", title: "פגישות במקום הודעות", body: "לקוח שבחר מועד ביומן כבר עשה את הצעד הראשון." },
     ],
   },
   faqs: [
@@ -99,7 +99,7 @@ export const consultant: VerticalPage = {
     },
     {
       q: "אני לא כותב טוב. מי כותב את התוכן של האתר?",
-      a: "אנחנו כותבים את הטקסטים של העמודים יחד איתכם, מתוך שיחה על העבודה שלכם, ואתם מאשרים כל נוסח. את המאמרים אפשר להמשיך לכתוב בעצמכם, ונבנה לכם מבנה שמקל על זה.",
+      a: "את מבנה העמודים ואת הכותרות מנסחים יחד איתכם, מתוך שיחה על העבודה שלכם, ואתם מאשרים כל נוסח. אם צריך כתיבה מלאה של כל העמודים, מגדירים את זה מראש כחלק מההיקף. את המאמרים אפשר להמשיך לכתוב בעצמכם, ונבנה לכם מבנה שמקל על זה.",
     },
     {
       q: "איך האתר עוזר להסביר את הערך של הליווי?",
@@ -115,7 +115,7 @@ export const consultant: VerticalPage = {
     },
   ],
   related: [
-    { label: "אתר תדמית לעסקים: כל התחומים", href: "/services/business-website/" },
+    { label: "אתר תדמית לעסקים: כל\u00a0התחומים", href: "/services/business-website/" },
     { label: "מערכת ניהול תורים", href: "/services/appointment-system/" },
     { label: "אתר תדמית לעורך דין", href: "/services/business-website/lawyer/" },
     { label: "אתר תדמית לרואה חשבון", href: "/services/business-website/accountant/" },
@@ -128,11 +128,11 @@ export const consultant: VerticalPage = {
     message: "היי, אשמח לשמוע על בניית אתר ליועץ או מאמן",
   },
   sections: [
-    { kind: "intro", tone: "paper", opener: "numeral", label: "מבוא · אתם המוצר" },
-    { kind: "trade", variant: "whiteboard", tone: "bone", opener: "rule", label: "הלוח במשרד" },
+    { kind: "intro", tone: "paper", opener: "rule", label: "מבוא · אתם המוצר" },
+    { kind: "trade", variant: "whiteboard", tone: "bone", opener: "stacked", label: "הלוח במשרד" },
     { kind: "signature", tone: "ink", opener: "split" },
-    { kind: "deepDive", variant: "ledger", tone: "paper", opener: "stacked", label: "שלושה עמודים" },
-    { kind: "outcomes", tone: "ink", opener: "quote" },
+    { kind: "deepDive", variant: "ledger", tone: "paper", opener: "rule", label: "שלושה עמודים" },
+    { kind: "outcomes", tone: "ink", opener: "split" },
     {
       kind: "faq",
       card: "plaque",

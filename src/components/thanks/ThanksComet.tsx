@@ -13,6 +13,14 @@ const ART_H = 1024;
 const START: Pt = [742, 318];
 const PALM: Pt = [872, 642];
 const ARRIVE = 72;
+/** The part of the artwork the canvas shows: all of it on wide canvases; on phones (a tall 4/5 canvas)
+    a crop around the two hands and the comet, so the route is long enough to draw with a finger
+    (it must stay inside the 4/5 cover crop of the picture, x 358–1178, since the image is scaled, not re-cropped).
+    The crop is used whenever the canvas is taller than wide (the 4/5 phone canvas in thanks.css). */
+type View = { x: number; y: number; w: number; h: number };
+const FULL_VIEW: View = { x: 0, y: 0, w: ART_W, h: ART_H };
+/* thanks.css repeats this crop as the pre-hydration image transform (keep the two in sync) */
+const PHONE_VIEW: View = { x: 572, y: 110, w: 600, h: 750 };
 /** The suggested route (also the stitched thread without JS / with reduced motion): out around the comet and down. */
 const SEGMENTS: [Pt, Pt, Pt, Pt][] = [
   [START, [905, 292], [1090, 372], [1040, 492]],
@@ -79,19 +87,23 @@ const ThanksComet = () => {
   const [sewing, setSewing] = useState(false);
   const [box, setBox] = useState({ w: 0, h: 0 });
   const rootRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
   const ptsRef = useRef<Pt[]>(ROUTE);
   const stepRef = useRef(3);
   const knotsRef = useRef<Knot[]>(DEFAULT_KNOTS);
   const drag = useRef<number | null>(null);
+  /** the press point of the current pointer gesture; `dragged` = it really moved (then its click is not "sew for me") */
+  const press = useRef<{ x: number; y: number; dragged: boolean } | null>(null);
   const raf = useRef(0);
 
   const needle = pts[pts.length - 1];
   const done = step >= 3;
 
-  /* art px ⇄ screen px (xMidYMid slice) */
-  const scale = box.w ? Math.max(box.w / ART_W, box.h / ART_H) : 0;
-  const offX = (box.w - ART_W * scale) / 2;
-  const offY = (box.h - ART_H * scale) / 2;
+  /* art px ⇄ screen px (the view rect drawn xMidYMid slice): screen = art × scale + off */
+  const view = box.w && box.h > box.w ? PHONE_VIEW : FULL_VIEW;
+  const scale = box.w ? Math.max(box.w / view.w, box.h / view.h) : 0;
+  const offX = (box.w - view.w * scale) / 2 - view.x * scale;
+  const offY = (box.h - view.h * scale) / 2 - view.y * scale;
   const toArt = (x: number, y: number): Pt => {
     /* keep the needle on the visible part of the canvas */
     const minX = -offX / scale + 20, maxX = (box.w - offX) / scale - 20;
@@ -169,9 +181,12 @@ const ThanksComet = () => {
 
   /* Hydrated: measure the canvas; with motion, hand the needle to the visitor (an empty canvas). */
   useLayoutEffect(() => {
-    const el = rootRef.current;
+    const el = svgRef.current;
     if (!el) return;
-    const measure = () => setBox({ w: el.clientWidth, h: el.clientHeight });
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      setBox({ w: r.width, h: r.height });
+    };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
@@ -181,8 +196,22 @@ const ThanksComet = () => {
       ro.disconnect();
       cancelAnimationFrame(raf.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /* the artwork image follows the same crop (it is drawn object-fit: cover of the whole work) */
+  useLayoutEffect(() => {
+    const canvas = rootRef.current?.closest<HTMLElement>(".ty-canvas");
+    if (!canvas || !box.w) return;
+    if (view === FULL_VIEW) {
+      canvas.style.removeProperty("--ty-art-tf");
+      return;
+    }
+    const s0 = Math.max(box.w / ART_W, box.h / ART_H);
+    const k = scale / s0;
+    const tx = offX - k * ((box.w - ART_W * s0) / 2);
+    const ty = offY - k * ((box.h - ART_H * s0) / 2);
+    canvas.style.setProperty("--ty-art-tf", `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${k.toFixed(4)})`);
+  }, [box.w, box.h, view, scale, offX, offY]);
 
   /* mark the static "what happens now" list (full contrast always; only the knots fill in) */
   useEffect(() => {
@@ -196,10 +225,13 @@ const ThanksComet = () => {
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
     drag.current = e.pointerId;
+    press.current = { x: e.clientX, y: e.clientY, dragged: false };
   };
   const onMove = (e: ReactPointerEvent<HTMLButtonElement>) => {
     if (drag.current !== e.pointerId) return;
-    const r = rootRef.current!.getBoundingClientRect();
+    const pr = press.current;
+    if (pr && !pr.dragged && Math.hypot(e.clientX - pr.x, e.clientY - pr.y) > 8) pr.dragged = true;
+    const r = svgRef.current!.getBoundingClientRect();
     addPoint(toArt(e.clientX - r.left, e.clientY - r.top));
   };
   const onUp = (e: ReactPointerEvent<HTMLButtonElement>) => {
@@ -220,8 +252,12 @@ const ThanksComet = () => {
     addPoint(to);
   };
   const onNeedleClick = () => {
-    /* a click without a drag (or Enter / Space) sews the rest */
-    if (drag.current === null && ptsRef.current.length <= 1) sewForMe();
+    /* Enter / Space, or a tap that did not drag, sews the rest from wherever the needle is;
+       the click that ends a real drag does nothing */
+    const pr = press.current;
+    press.current = null;
+    if (pr?.dragged || done || sewing) return;
+    sewForMe();
   };
 
   const headX = needle[0] * scale + offX;
@@ -231,7 +267,13 @@ const ThanksComet = () => {
 
   return (
     <div ref={rootRef} className={`ty-comet${live ? " is-live" : ""}${done ? " is-done" : ""}`}>
-      <svg className="ty-comet__svg" viewBox={`0 0 ${ART_W} ${ART_H}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <svg
+        ref={svgRef}
+        className="ty-comet__svg"
+        viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
         <defs>
           <radialGradient id="ty-glow">
             <stop offset="0" stopColor="#ffe7a6" stopOpacity="0.95" />
@@ -244,6 +286,7 @@ const ThanksComet = () => {
         {threadD && (
           <>
             <path className="ty-comet__shadow" d={threadD} transform="translate(2 4)" />
+            <path className="ty-comet__halo" d={threadD} />
             <path className="ty-comet__thread" d={threadD} />
           </>
         )}

@@ -13,6 +13,10 @@ import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPoi
  *            jumps), the "book" button is a <div> that focus never reaches, a field with no label.
  * The demo elements are tabbable only while a run is active, so keyboard users reading the article
  * are not forced through them; there is no focus trap (Tab simply leaves at the end).
+ * The trail runs BEHIND the sample's elements (they are opaque), so it only shows in the gaps
+ * between stops and never strikes through a label; the stop numbers sit on the outer corner of
+ * each focus ring. The sample's links point at the exhibit itself (#signature): they are demo
+ * stops, and a crawler or a no-JS reader never meets a dead anchor.
  * No JS: a static list of both walks is shown instead (html:not(.js)).
  */
 
@@ -242,15 +246,15 @@ const KeyboardRun = () => {
           </a>
         )}
         <div className="as-kb__bar">
-          <a href="#kb-home" data-stop="logo" tabIndex={tab} className={cls("logo")} onClick={noGo}>
+          <a href="#signature" data-stop="logo" tabIndex={tab} className={cls("logo")} onClick={noGo}>
             <span className="as-kb__logo-cube" aria-hidden="true" />
             קליניקה לדוגמה{badge("logo")}
           </a>
           <span className="as-kb__nav">
-            <a href="#kb-treat" data-stop="nav1" tabIndex={tab} className={cls("nav1")} onClick={noGo}>
+            <a href="#signature" data-stop="nav1" tabIndex={tab} className={cls("nav1")} onClick={noGo}>
               טיפולים{badge("nav1")}
             </a>
-            <a href="#kb-contact" data-stop="nav2" tabIndex={tab} className={cls("nav2")} onClick={noGo}>
+            <a href="#signature" data-stop="nav2" tabIndex={tab} className={cls("nav2")} onClick={noGo}>
               צרו קשר{badge("nav2")}
             </a>
           </span>
@@ -258,7 +262,7 @@ const KeyboardRun = () => {
         {/* broken build: the footer link sits here in the code, so Tab reaches it before the content */}
         {bad && (
           <div className="as-kb__foot as-kb__foot--early">
-            <a href="#kb-a11y" data-stop="footer" tabIndex={tab} className={cls("footer")} onClick={noGo}>
+            <a href="#signature" data-stop="footer" tabIndex={tab} className={cls("footer")} onClick={noGo}>
               הצהרת נגישות{badge("footer")}
             </a>
           </div>
@@ -308,7 +312,7 @@ const KeyboardRun = () => {
         </div>
         {!bad && (
           <div className="as-kb__foot">
-            <a href="#kb-a11y" data-stop="footer" tabIndex={tab} className={cls("footer")} onClick={noGo}>
+            <a href="#signature" data-stop="footer" tabIndex={tab} className={cls("footer")} onClick={noGo}>
               הצהרת נגישות{badge("footer")}
             </a>
           </div>

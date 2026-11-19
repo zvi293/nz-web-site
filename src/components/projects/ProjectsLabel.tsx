@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { projectsCopy } from "./copy";
 
 const c = projectsCopy.label;
@@ -43,14 +44,14 @@ const ProjectsLabel = () => (
         <p className="pj-materials__title">{c.materialsTitle}</p>
         <p className="pj-materials__line">
           {c.materials.map((m, i) => (
-            <span key={m}>
+            <Fragment key={m}>
               {i > 0 && (
                 <span className="pj-materials__sep" aria-hidden="true">
-                  ·
+                  {" · "}
                 </span>
               )}
-              {m}
-            </span>
+              <span className="pj-materials__item">{m}</span>
+            </Fragment>
           ))}
         </p>
       </div>

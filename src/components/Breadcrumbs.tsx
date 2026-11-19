@@ -1,21 +1,10 @@
 import "@/components/legal/floating-ui.css";
-import { mobileNav, legalNav } from "@/components/nz/nav";
+import { roomFor } from "@/components/nz/nav";
 
 export interface Crumb {
   label: string;
   /** Omit on the current page — the last crumb is never a link. */
   href?: string;
-}
-
-/** Room numbers — the order of the site map (mobile menu, then the legal pages). */
-const ROOMS = [...mobileNav.slice(1), ...legalNav].map((item) => item.href);
-
-/** "/privacy/" → 10 (01-based), or undefined for pages outside the map. */
-export function roomFor(path?: string): number | undefined {
-  if (!path) return undefined;
-  const top = `/${path.split("/").filter(Boolean)[0] ?? ""}/`;
-  const i = ROOMS.indexOf(top);
-  return i >= 0 ? i + 1 : undefined;
 }
 
 interface BreadcrumbsProps {

@@ -315,26 +315,45 @@ html.nz-motion .fsec__step {
   padding-top: 2px;
 }
 
-/* ── done: both pages side by side ────────────────────────────────────── */
+/* ── done: both pages side by side, each under its label; the frame fits them ── */
+.fsec--done .fsec__frame,
+.fsec__frame--still {
+  aspect-ratio: auto;
+}
+.fsec--done .fsec__screen {
+  position: relative;
+}
 .fsec__pair {
-  position: absolute;
-  inset: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  padding: 8px;
+  gap: 10px;
+  padding: 12px 10px 12px;
   background: var(--bone-2);
+}
+.fsec__pair-i {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.fsec__pair-k {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+  text-align: center;
+}
+.fsec__pair-i:last-child .fsec__pair-k {
+  color: var(--vermilion-deep);
+  font-weight: 500;
 }
 .fsec__mini {
   position: relative;
   container-type: inline-size;
   background: #fff;
   overflow: hidden;
-  align-self: center;
   aspect-ratio: 4 / 5;
   box-shadow: 0 8px 18px -10px rgba(18, 17, 16, 0.45);
 }
-.fsec__mini:first-child::after {
+.fsec__pair-i:first-child .fsec__mini::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -548,6 +567,27 @@ html.nz-motion .fsec__step {
 
 /* ── phones: while the page is closed, the frame folds to a shutter strip ── */
 @media (max-width: 1023px) {
+  .fsec--intro .fsec__frame {
+    aspect-ratio: auto;
+    height: 150px;
+  }
+  .fsec--intro .fsec__shutter-plate {
+    grid-auto-flow: column;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 22px;
+  }
+  .fsec--intro .fsec__shutter-n {
+    font-size: 3.25rem;
+  }
+  .fsec--intro .fsec__plane {
+    width: 40px;
+    top: 12%;
+    inset-inline-end: 8%;
+  }
+  .fsec--intro .fsec__shutter::after {
+    bottom: 8px;
+  }
   .fsec--ask .fsec__frame,
   .fsec--verdict:not(.is-open) .fsec__frame {
     aspect-ratio: auto;
@@ -582,7 +622,6 @@ html.nz-motion .fsec__step {
   gap: 22px;
 }
 .fsec__frame--still {
-  aspect-ratio: 8 / 5;
   max-width: 640px;
 }
 html:not(.js) .fsec__static {

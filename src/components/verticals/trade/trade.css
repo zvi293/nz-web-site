@@ -160,7 +160,7 @@ html.nz-motion .vl-cf__tape {
 .vl-lg__head,
 .vl-lg__row {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) 30px;
+  grid-template-columns: 34px minmax(0, 1fr);
   column-gap: 12px;
   align-items: start;
 }
@@ -185,7 +185,7 @@ html.nz-motion .vl-cf__tape {
   position: relative;
   padding-block: 14px;
   border-bottom: 1px solid rgba(46, 96, 160, 0.22);
-  grid-template-areas: "no who tick" "no what tick";
+  grid-template-areas: "no who" "no what";
 }
 /* the red double margin rule */
 .vl-lg__row::before,
@@ -225,18 +225,6 @@ html.nz-motion .vl-cf__tape {
   color: var(--graphite);
   text-wrap: pretty;
 }
-.vl-lg__tick {
-  grid-area: tick;
-  width: 26px;
-  height: 26px;
-  margin-top: 2px;
-  fill: none;
-  stroke: var(--vermilion-deep);
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 1;
-}
 .vl-lg__total {
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr);
@@ -262,7 +250,7 @@ html.nz-motion .vl-cf__tape {
   }
   .vl-lg__head,
   .vl-lg__row {
-    grid-template-columns: 44px minmax(0, 0.9fr) minmax(0, 1.4fr) 36px;
+    grid-template-columns: 44px minmax(0, 0.9fr) minmax(0, 1.4fr);
     grid-template-areas: none;
     column-gap: 22px;
   }
@@ -271,8 +259,7 @@ html.nz-motion .vl-cf__tape {
   }
   .vl-lg__row .vl-lg__c-no,
   .vl-lg__row .vl-lg__c-who,
-  .vl-lg__row .vl-lg__c-what,
-  .vl-lg__tick {
+  .vl-lg__row .vl-lg__c-what {
     grid-area: auto;
   }
   .vl-lg__row .vl-lg__c-what {
@@ -293,15 +280,6 @@ html.nz-motion .vl-cf__tape {
     max-width: 1080px;
     margin-inline: auto;
   }
-}
-html.nz-motion .vl-lg__tick path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 0;
-  transition: stroke-dashoffset 0.6s var(--ease-gallery);
-  transition-delay: calc(300ms + var(--i) * 160ms);
-}
-html.nz-motion .vl-lg[data-reveal]:not([data-in]) .vl-lg__tick path {
-  stroke-dashoffset: 1;
 }
 html.nz-motion .vl-lg__total {
   transition: clip-path 1s var(--ease-gallery) 1.2s;
@@ -510,7 +488,7 @@ html.nz-motion .vl-mp[data-reveal]:not([data-in]) .vl-mp__pin-in {
   margin: 6px 0 0;
   padding-top: 8px;
   border-top: 1px solid var(--line);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.05em;
   color: var(--graphite);
 }
@@ -551,7 +529,7 @@ html.nz-motion .vl-mp[data-reveal]:not([data-in]) .vl-mp__pin-in {
   bottom: -9px;
 }
 .vl-ap__stub-label {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
   color: var(--graphite);
   text-align: center;
@@ -565,7 +543,7 @@ html.nz-motion .vl-mp[data-reveal]:not([data-in]) .vl-mp__pin-in {
   display: grid;
   place-items: center;
   height: 22px;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: var(--graphite);
 }
 .vl-ap__day.is-on {
@@ -662,7 +640,7 @@ html.nz-motion .vl-ap[data-reveal]:not([data-in]) .vl-ap__card {
   font-variant-numeric: tabular-nums;
 }
 .vl-dy__floor-label {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   letter-spacing: 0.12em;
   color: #cfc7b9;
 }
@@ -1047,7 +1025,7 @@ html.nz-motion .vl-mn[data-reveal]:not([data-in]) .vl-mn__leader {
   border-bottom: 1px solid var(--line);
 }
 .vl-ss__role {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   color: var(--graphite);

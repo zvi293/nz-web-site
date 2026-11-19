@@ -109,18 +109,55 @@ html.nz-motion .as-fq__fold {
 .as-fq__flag-dot[data-on] {
   background: var(--vermilion);
 }
+.as-fq__fold.is-open .as-fq__flag-dot[data-on] {
+  opacity: 0.35;
+}
+/* an accordion chevron: points down, turns up when the fold is open (physical borders: no RTL flip) */
 .as-fq__chev {
   width: 9px;
   height: 9px;
-  border-inline-end: 1.5px solid var(--graphite);
+  border-right: 1.5px solid var(--graphite);
   border-bottom: 1.5px solid var(--graphite);
   rotate: 45deg;
   translate: 0 -2px;
-  transition: rotate 0.4s var(--ease-gallery);
+  transition: rotate 0.4s var(--ease-gallery), translate 0.4s var(--ease-gallery);
 }
 .as-fq__fold.is-open .as-fq__chev {
   rotate: 225deg;
   translate: 0 2px;
+}
+.as-fq__legend {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: -6px 0 0;
+  font-size: 0.875rem;
+  color: var(--ash);
+}
+.as-fq__legend-dot {
+  flex: none;
+  align-self: flex-start;
+  margin-top: 0.5em;
+  width: 8px;
+  height: 8px;
+  background: var(--vermilion);
+}
+/* "not written": two blank ruled lines under the stamp */
+.as-fq__blank {
+  display: grid;
+  gap: 12px;
+  margin: 6px 0 0;
+  min-height: 2.2em;
+}
+.as-fq__blank::before,
+.as-fq__blank::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: rgba(18, 17, 16, 0.22);
+}
+.as-fq__blank::after {
+  width: 62%;
 }
 .as-fq__panel {
   display: grid;
@@ -220,6 +257,31 @@ html:not(.js) .as-fq__static-title {
 }
 .as-fq__lesson.is-on {
   border-inline-start-color: var(--vermilion);
+}
+/* wide (≥1100px, the plate spans the rail too): the two covers stand beside the concertina */
+@media (min-width: 1100px) {
+  .as-fq {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+    gap: 18px 36px;
+    align-items: start;
+  }
+  .as-fq__covers {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .as-fq__covers,
+  .as-fq__intro,
+  .as-fq__legend {
+    grid-column: 1;
+  }
+  .as-fq__sheet,
+  .as-fq__foot,
+  .as-fq__lesson {
+    grid-column: 2;
+  }
+  .as-fq__sheet {
+    grid-row: 1 / span 4;
+  }
 }
 @media (min-width: 768px) {
   .as-fq__cols {

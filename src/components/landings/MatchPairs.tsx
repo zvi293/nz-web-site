@@ -9,9 +9,12 @@ import "./match-pairs.css";
  * ad's picture, or a button that asks for something else. Pick an ad, then the page you would
  * send its click to: each check (כותרת · מראה · פעולה) is scored on its own, so the verdict says
  * which thread broke and what the visitor thinks at that moment.
- * Phones / tablets: the ad on top (switch ads with א · ב · ג), the six pages as a choice sheet
- * under it, and the verdict right under the sheet — it scrolls into view after each pick, and
- * shows the pair itself (mini ad — thread — mini page). Paired pages carry the ad's letter.
+ * Phones / tablets: the ad switch (א · ב · ג, each with its topic) is a bar that stays under the
+ * header while the board is on screen; the ad on top, the six pages as a choice sheet under it.
+ * A pick never scrolls the page: a verdict chip pins to the bottom of the sheet (title + the
+ * three checks), right where the thumb is, and tapping it brings the full verdict (the pair as
+ * mini ad — thread — mini page, the reasons) into view. The chip steps aside while the full
+ * verdict is on screen. Paired pages carry the ad's letter.
  * Desktop: the workbook — ads and pages in two columns with threads drawn between them, the
  * verdict as a sticky card beside them.
  * Keyboard: every card is a button (aria-pressed); a separate sr-only line announces each
@@ -30,6 +33,8 @@ interface Ad {
   body: string;
   cta: string;
   look: Look;
+  /** One word for the ad switch on phones. */
+  short: string;
   /** "המשלוח עד הבית" — the thing the visitor looks for. */
   what: string;
   /** "יביאו לי עציץ עד הבית" — what the visitor expected to do. */
@@ -56,6 +61,7 @@ const ADS: Ad[] = [
     body: "בוחרים עציץ, ואנחנו מביאים ושותלים במקום.",
     cta: "להזמנת משלוח",
     look: "leaf",
+    short: "משלוח",
     what: "המשלוח עד הבית",
     want: "יביאו לי עציץ עד הבית",
   },
@@ -66,6 +72,7 @@ const ADS: Ad[] = [
     body: "שעה וחצי של אדמה וזרעים, ועציץ שלוקחים הביתה.",
     cta: "להרשמה לסדנה",
     look: "sun",
+    short: "סדנה",
     what: "הסדנה לילדים",
     want: "ארשום את הילדים לסדנה",
   },
@@ -76,6 +83,7 @@ const ADS: Ad[] = [
     body: "ביקור אחד, ותוכנית שתילה שמתאימה לאור ולמקום.",
     cta: "לתיאום ביקור",
     look: "clay",
+    short: "ייעוץ",
     what: "ביקור הגנן",
     want: "יבוא גנן לראות את המרפסת",
   },
@@ -185,11 +193,13 @@ const MatchPairs = () => {
   const [lines, setLines] = useState<Line[]>([]);
   const [fresh, setFresh] = useState<AdId | null>(null);
   const [said, setSaid] = useState("");
+  /** The full verdict is on screen (phones: the chip steps aside). */
+  const [verdictSeen, setVerdictSeen] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
   const verdictRef = useRef<HTMLDivElement>(null);
   const adRefs = useRef<Partial<Record<AdId, HTMLButtonElement | null>>>({});
   const pageRefs = useRef<Partial<Record<string, HTMLButtonElement | null>>>({});
-  const scrollAfter = useRef<"verdict" | "ad" | null>(null);
+  const scrollAfter = useRef<"ad" | null>(null);
 
   /* Desktop threads: measured from the cards' facing edges (works in RTL and LTR). */
   const measure = useCallback(() => {
@@ -227,14 +237,25 @@ const MatchPairs = () => {
     return () => ro.disconnect();
   }, [measure]);
 
-  /* Phones: after a pick the answer scrolls into view; after "next ad" the ad does. */
+  /* Phones: after "next ad" the ad scrolls into view (a pick stays put: the chip answers it). */
   useEffect(() => {
     const what = scrollAfter.current;
     scrollAfter.current = null;
     if (!what || !isPhoneLayout()) return;
-    const el = what === "verdict" ? verdictRef.current : adRefs.current[sel];
-    el?.scrollIntoView({ block: what === "verdict" ? "nearest" : "start", behavior: motionOn() ? "smooth" : "instant" });
+    adRefs.current[sel]?.scrollIntoView({ block: "start", behavior: motionOn() ? "smooth" : "instant" });
   }, [pairs, sel, solved]);
+
+  /* The chip hides once the full verdict has risen a little into view. */
+  useEffect(() => {
+    const el = verdictRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setVerdictSeen(e.isIntersecting), { rootMargin: "0px 0px -56px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const toVerdict = () =>
+    verdictRef.current?.scrollIntoView({ block: "nearest", behavior: motionOn() ? "smooth" : "instant" });
 
   const pick = (pageId: string) => {
     const ad = adById(sel);
@@ -243,7 +264,6 @@ const MatchPairs = () => {
     setLast(sel);
     setSolved(false);
     setFresh(motionOn() ? sel : null);
-    scrollAfter.current = "verdict";
     setSaid(
       `מודעה ${ad.letter} לדף ${pageById(pageId).num}: ${v.title}. ${v.checks.map((c) => `${c.name}: ${c.ok ? "נשמר" : "נשבר"}`).join(", ")}. מה הגולש חושב: ${v.thought}`,
     );
@@ -265,7 +285,6 @@ const MatchPairs = () => {
     setLast(null);
     setSolved(true);
     setFresh(null);
-    scrollAfter.current = "verdict";
     setSaid("כל מודעה חוברה לדף שממשיך אותה: מודעה א לדף 6, מודעה ב לדף 4, מודעה ג לדף 2.");
   };
   const reset = () => {
@@ -303,10 +322,7 @@ const MatchPairs = () => {
           ))}
         </svg>
 
-        <div className="lpm__col lpm__col--ads">
-          <p className="lpm__colhead" aria-hidden="true">
-            <span className="lpm__colnum">01</span> המודעה
-          </p>
+        <div className="lpm__bar">
           <div className="lpm__tabs" role="group" aria-label="בחירת מודעה">
             {ADS.map((ad) => {
               const to = pairs[ad.id];
@@ -316,15 +332,24 @@ const MatchPairs = () => {
                   type="button"
                   className="lpm__tab"
                   aria-pressed={sel === ad.id}
+                  aria-label={`מודעה ${ad.letter}: ${ad.short}`}
                   data-fit={to ? fitOf(ad.id, to) : undefined}
                   onClick={() => choose(ad.id)}
                 >
-                  <span className="lpm__tabmark" aria-hidden="true" />
-                  מודעה {ad.letter}
+                  <span className="lpm__tabmark" aria-hidden="true">
+                    {ad.letter}
+                  </span>
+                  {ad.short}
                 </button>
               );
             })}
           </div>
+        </div>
+
+        <div className="lpm__col lpm__col--ads">
+          <p className="lpm__colhead lpm__colhead--ads" aria-hidden="true">
+            <span className="lpm__colnum">01</span> המודעה
+          </p>
           {ADS.map((ad) => {
             const to = pairs[ad.id];
             return (
@@ -404,6 +429,36 @@ const MatchPairs = () => {
                 </button>
               );
             })}
+          </div>
+          <div className="lpm__pin" data-hide={!v || verdictSeen ? "" : undefined}>
+            {v && lastAd && lastPage && (
+              <button
+                type="button"
+                className="lpm__chip"
+                data-fit={v.fit}
+                tabIndex={verdictSeen ? -1 : undefined}
+                aria-label={`${v.title}: מודעה ${lastAd.letter} לדף ${lastPage.num}. לפרטים`}
+                onClick={toVerdict}
+                key={`${lastAd.id}-${lastPage.id}`}
+              >
+                <span className="lpm__chiphead">
+                  <span className="lpm__chipmark" aria-hidden="true" />
+                  <span className="lpm__chiptitle">{v.title}</span>
+                  <span className="lpm__chippair" aria-hidden="true">
+                    {lastAd.letter} ← {lastPage.num}
+                  </span>
+                </span>
+                <span className="lpm__chipchecks" aria-hidden="true">
+                  {v.checks.map((c) => (
+                    <span key={c.name} data-ok={c.ok ? "" : undefined}>
+                      <span className="lpm__chipicon">{c.ok ? "✓" : "✕"}</span>
+                      {c.name}
+                    </span>
+                  ))}
+                  <span className="lpm__chipmore">פרטים ↓</span>
+                </span>
+              </button>
+            )}
           </div>
         </div>
       </div>

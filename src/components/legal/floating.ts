@@ -7,7 +7,10 @@
  *                                     ("avoid") the text of a block marked [data-float-avoid]
  *                                     (key facts that must never be covered).
  *  watchWhileScrolling(fn)            runs `fn` ~10×/s only while the page is scrolling (+ once
- *                                     after it settles and on resize). Not an animation driver:
+ *                                     after it settles, on resize, and once the first screen has
+ *                                     settled: fonts loaded, page loaded, entrance animations
+ *                                     done — so a bead that lands on key facts at load moves
+ *                                     without waiting for a scroll). Not an animation driver:
  *                                     the beads only flip a class; CSS does the motion.
  *  setSheetLift(px)                   the cookie sheet publishes its height as --nz-sheet-h on
  *                                     <html>, so the corner beads ride above it on phones.
@@ -55,10 +58,16 @@ export function probeCovers(rect: DOMRect, kinds: CoverKind[], inset = 4): Cover
   return null;
 }
 
-/** Calls `fn` about 10×/s while scrolling, once when scrolling settles, and on resize. */
+/** Calls `fn` about 10×/s while scrolling, once when scrolling settles, on resize, and a few
+ *  times while the first screen settles (fonts, load, entrance animations). */
 export function watchWhileScrolling(fn: () => void, hz = 10): () => void {
   let timer = 0;
   let idle = 0;
+  let live = true;
+  const settle = [1200, 2400].map((ms) => window.setTimeout(() => live && fn(), ms));
+  const onLoad = () => live && fn();
+  document.fonts?.ready.then(onLoad).catch(() => {});
+  if (document.readyState !== "complete") window.addEventListener("load", onLoad, { once: true });
   const period = Math.round(1000 / hz);
   const tick = () => fn();
   const onScroll = () => {
@@ -76,6 +85,9 @@ export function watchWhileScrolling(fn: () => void, hz = 10): () => void {
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", onScroll, { passive: true });
   return () => {
+    live = false;
+    settle.forEach((t) => window.clearTimeout(t));
+    window.removeEventListener("load", onLoad);
     window.removeEventListener("scroll", onScroll);
     window.removeEventListener("resize", onScroll);
     window.clearInterval(timer);
@@ -90,13 +102,36 @@ export function setSheetLift(px: number): void {
   else root.style.removeProperty("--nz-sheet-h");
 }
 
-/** True when any "primary" call to action would sit inside `zone` (viewport coordinates). */
+/** True when any "primary" call to action would sit inside `zone` (viewport coordinates):
+ *  a kit button, anything marked [data-cta], or any WhatsApp / phone link in <main>. */
 export function ctaInZone(zone: { top: number; left: number; right: number; bottom: number }): boolean {
-  const ctas = document.querySelectorAll<HTMLElement>("main .nz-btn, main [data-cta]");
+  const ctas = document.querySelectorAll<HTMLElement>(
+    'main .nz-btn, main [data-cta], main a[href^="https://wa.me"], main a[href^="tel:"]',
+  );
   for (const el of Array.from(ctas)) {
     const r = el.getBoundingClientRect();
     if (r.width === 0 || r.height === 0) continue;
     if (r.bottom > zone.top && r.top < zone.bottom && r.right > zone.left && r.left < zone.right) return true;
+  }
+  return false;
+}
+
+/** True while the header's own WhatsApp pill is rendered (it is on every width except a very
+ *  narrow / zoomed header, where the menu carries the CTA). */
+export function headerWhatsAppVisible(): boolean {
+  return Array.from(document.querySelectorAll<HTMLElement>(".nz-header__wa")).some(
+    (el) => el.offsetWidth > 0 && el.offsetHeight > 0,
+  );
+}
+
+/** True while a WhatsApp link inside <main> is on screen (an in-section CTA already offers it). */
+export function whatsAppCtaInView(): boolean {
+  const vh = window.innerHeight;
+  const links = document.querySelectorAll<HTMLElement>('main a[href^="https://wa.me"], main a[href*="api.whatsapp.com"]');
+  for (const el of Array.from(links)) {
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) continue;
+    if (r.bottom > 0 && r.top < vh) return true;
   }
   return false;
 }

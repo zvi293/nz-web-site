@@ -20,12 +20,12 @@ export const architect: VerticalPage = {
   heroPosition: "center 45%",
   hero: {
     kicker: "פורטפוליו לאדריכלים ומעצבים",
-    title: "בניית אתר תדמית לאדריכל ומעצב פנים",
-    accent: "לאדריכל ומעצב פנים",
+    title: "בניית אתר תדמית לאדריכל ומעצב\u00a0פנים",
+    accent: "לאדריכל ומעצב\u00a0פנים",
     lead:
       "בניית אתר תדמית לאדריכל ולמעצב פנים היא בניית תערוכה של העבודות שלכם. NZ-web בונה פורטפוליו אונליין בשפה שקטה שלא מתחרה בפרויקטים: גלריות לפי סוג שנטענות מהר גם בנייד, סיפור קצר לכל פרויקט, ומסלול פנייה אלגנטי שמוביל לשיחה על הפרויקט הבא.",
     art: "emerald-staircase",
-    medium: "גרם מדרגות ירוק שעולה אל חלל בהיר: מהשרטוט אל הבניין",
+    medium: "גרם מדרגות ירוק שעולה אל חלל בהיר: מהשרטוט אל\u00a0הבניין",
     cta: { label: "לשיחה בוואטסאפ", message: "היי, הגעתי מעמוד האתר לאדריכלים ואשמח לשמוע פרטים" },
     facts: ["גלריות שנטענות מהר", "סיפור לכל פרויקט", "עיצוב שמשאיר במה"],
   },
@@ -39,7 +39,7 @@ export const architect: VerticalPage = {
     keys: "במקלדת: Tab בין הלשוניות, Enter או רווח כדי להוריד ולהרים.",
   },
   intro: {
-    title: "למה אדריכל ומעצב פנים צריכים פורטפוליו אונליין משלהם",
+    title: "למה אדריכל ומעצב\u00a0פנים צריכים פורטפוליו אונליין משלהם",
     paragraphs: [
       "בתחום שבו מוכרים חלל ואסתטיקה, האתר הוא העבודה הראשונה שהלקוח רואה. אתר עמוס או מיושן מספר לו משהו על העיצוב שהוא יקבל, ואתר שקט ומדויק אומר: כך אנחנו עובדים.",
       "בעלי בתים, יזמים ועסקים מחפשים אדריכל או מעצב פנים בגוגל, ורוצים לראות פרויקטים מסודרים לפי סוג: מגורים, מסחר, שימור. אינסטגרם מצוין להשראה, אבל הוא לא שלכם, קשה לסדר בו פרויקטים, והוא כמעט לא מופיע בחיפוש.",
@@ -126,7 +126,7 @@ export const architect: VerticalPage = {
     },
   ],
   related: [
-    { label: "אתר תדמית לעסקים: כל התחומים", href: "/services/business-website/" },
+    { label: "אתר תדמית לעסקים: כל\u00a0התחומים", href: "/services/business-website/" },
     { label: "אתר תדמית למתווך נדל״ן", href: "/services/business-website/real-estate/" },
     { label: "אתר לבעלי מקצוע", href: "/services/business-website/contractor/" },
     { label: "שיפור מהירות אתר", href: "/services/website-performance/" },
@@ -139,16 +139,16 @@ export const architect: VerticalPage = {
     message: "היי, אשמח לשמוע על בניית אתר פורטפוליו לאדריכל",
   },
   sections: [
-    { kind: "signature", tone: "paper", opener: "rule" },
-    { kind: "intro", tone: "bone", opener: "quote", label: "מבוא · העבודה הראשונה" },
-    { kind: "trade", variant: "directory", tone: "paper", opener: "split", label: "לוח הדיירים" },
-    { kind: "deepDive", variant: "ledger", tone: "bone", opener: "numeral", label: "עקרונות" },
-    { kind: "process", tone: "paper", opener: "stacked" },
+    { kind: "signature", tone: "paper", opener: "split" },
+    { kind: "intro", tone: "bone", opener: "rule", label: "מבוא · העבודה הראשונה" },
+    { kind: "trade", variant: "directory", tone: "paper", opener: "stacked", label: "לוח הדיירים" },
+    { kind: "deepDive", variant: "ledger", tone: "bone", opener: "split", label: "עקרונות" },
+    { kind: "process", tone: "paper", opener: "rule" },
     {
       kind: "faq",
       card: "book",
       tone: "bone",
-      opener: "rule",
+      opener: "split",
       title: "שאלות על פורטפוליו לאדריכל",
       note: {
         title: "רוצים לשאול על הפרויקטים שלכם?",

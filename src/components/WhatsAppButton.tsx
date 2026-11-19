@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import "@/components/legal/floating-ui.css";
 import { getWhatsAppHref, contactInfo } from "@/lib/contact-utils";
 import { WhatsAppIcon } from "@/components/nz/icons";
-import { probeCovers, watchWhileScrolling } from "@/components/legal/floating";
+import { headerWhatsAppVisible, probeCovers, watchWhileScrolling, whatsAppCtaInView } from "@/components/legal/floating";
 
 /**
  * The floating WhatsApp bead (global chrome).
  *
- * Mount ONCE in BaseLayout, after <AccessibilityWidget>:  <WhatsAppButton client:idle />
- * (Legacy page views still render their own <WhatsAppButton />; only the first bead on a page
- *  stays — any later instance renders nothing, so the global mount never doubles it.)
+ * Mounted ONCE, globally, in BaseLayout after <AccessibilityWidget>:  <WhatsAppButton client:idle />
+ * Do not render it inside pages. (Should a second instance ever appear, only the first bead on a
+ * page stays — any later instance renders nothing.)
  *
  *  - Docked bottom-end (bottom-left in RTL), inside the safe-area insets; rides above the
  *    cookie sheet on phones (--nz-sheet-h).
@@ -18,6 +18,9 @@ import { probeCovers, watchWhileScrolling } from "@/components/legal/floating";
  *  - Politely ducks away while it would cover text, a form field or a tap target: while the
  *    page scrolls it probes the spot ~10×/s with elementsFromPoint, hides at once when covered
  *    and returns only after the spot has been clear for ~200ms (no flicker).
+ *  - Never doubles a WhatsApp button already on screen: hidden on phones (< 768px) while the
+ *    header shows its WhatsApp pill (always, unless the header is zoomed too narrow for it), and
+ *    on every width while a WhatsApp link inside <main> (an in-section CTA) is in view.
  *  - Reduced motion / the widget's pause: it simply appears and disappears, no spring.
  */
 let mounted = 0;
@@ -67,7 +70,9 @@ const WhatsAppButton = () => {
     const probe = () => {
       const dock = dockRef.current;
       if (!dock) return;
-      const hit = probeCovers(dock.getBoundingClientRect(), ["field", "target", "text"]);
+      const redundant =
+        (window.innerWidth < 768 && headerWhatsAppVisible()) || whatsAppCtaInView();
+      const hit = redundant || probeCovers(dock.getBoundingClientRect(), ["field", "target", "text"]);
       if (hit) {
         clear = 0;
         setDucked(true);

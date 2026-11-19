@@ -123,7 +123,7 @@
   filter: brightness(1);
 }
 .hb-door__cond {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--accent-text);
 }
@@ -132,7 +132,7 @@
   gap: 2px;
 }
 .hb-door__num {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
   color: var(--fg-muted);
 }
@@ -143,9 +143,10 @@
   line-height: 1.15;
 }
 .hb-door__why {
-  font-size: 0.8125rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.5;
   color: var(--fg-muted);
+  text-wrap: pretty;
 }
 
 /* the compact index of the industry pages */
@@ -222,7 +223,7 @@
     border-top: 1px solid var(--rule);
   }
   .hb-fork {
-    grid-template-columns: minmax(0, 4fr) 72px minmax(0, 7fr);
+    grid-template-columns: minmax(0, 4fr) 56px minmax(0, 8fr);
     align-items: center;
     padding-block: 44px;
     border-bottom: 1px solid var(--rule);
@@ -237,17 +238,20 @@
   }
   .hb-fork__svg--side {
     display: block;
-    width: 72px;
+    width: 56px;
     height: 100%;
-    min-height: 260px;
+    min-height: 300px;
   }
   .hb-fork__ends {
     gap: clamp(24px, 3vw, 48px);
   }
   .hb-door {
-    grid-template-columns: minmax(170px, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(200px, 1.15fr) minmax(0, 1fr);
     column-gap: 20px;
     align-items: end;
+  }
+  .hb-door__why {
+    font-size: 1.0625rem;
   }
   .hb-door__way {
     grid-row: 1 / span 3;

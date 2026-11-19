@@ -1,5 +1,5 @@
 // Signature component: המבט המפורק — pull a layer out of the stack (Jenga) and watch what breaks
-import { useRef, useState, type MouseEvent as RMouseEvent, type PointerEvent as RPointerEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent as RMouseEvent, type PointerEvent as RPointerEvent } from "react";
 import "./ExplodedStack.css";
 
 /**
@@ -73,19 +73,22 @@ const SUMMARY = {
 
 /* the drawing: LTR svg coordinates; plates on the left, the label column on the right (RTL start) */
 const W = 340;
-const H = 500;
 const CX = 92;
 const HW = 78; /* half width of a plate */
 const HH = 29; /* half height (isometric) */
 const LABEL_X = W * 0.54;
-const PULL = 120; /* how far a plate slides out, in svg units */
+const DRAG = 120; /* how far a finger drags for a full pull, in svg units */
+const SLIDE = 13; /* how far the plate itself slides: it stays inside the stage (its edge sits at x = 14) */
 const SINK = 0.36; /* how far the plates above settle into the gap, in gaps (labels stay put) */
+/* the stage is as tall as its stack needs (no empty bands), so what breaks shows just under it */
+const GAP = 46; /* ≥ 44px tap height for each label at 340 css px */
 
 function geometry(n: number) {
-  const gap = Math.min(68, (H - 2 * HH - 30) / (n - 1));
+  const gap = GAP;
   const total = (n - 1) * gap;
+  const H = Math.round(total + 2 * HH + 44);
   const base = H / 2 + total / 2 - 2;
-  return { gap, ys: Array.from({ length: n }, (_, i) => base - i * gap) };
+  return { gap, H, ys: Array.from({ length: n }, (_, i) => base - i * gap) };
 }
 
 /* glyphs drawn in a unit square, mapped onto the plate's top face by an isometric matrix */
@@ -305,15 +308,32 @@ const ExplodedStack = () => {
   const [out, setOut] = useState<number | null>(null);
   const [pull, setPull] = useState<{ i: number; t: number } | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const sideRef = useRef<HTMLDivElement>(null);
+  const shownOnce = useRef(false);
   const gesture = useRef<{ i: number; x0: number; y0: number; moved: boolean; id: number; scale: number } | null>(null);
   const layers = STACKS[tech];
-  const { gap, ys } = geometry(layers.length);
+  const { gap, H, ys } = geometry(layers.length);
 
   /* which plate is moving out, and how far (0..1) */
   const active = pull ?? (out !== null ? { i: out, t: 1 } : null);
   const shown = active && active.t >= 0.5 ? active.i : null;
   const current = shown !== null ? layers[shown] : null;
   const hurt = new Set(shown !== null ? (layers[shown].hurts ?? []) : []);
+
+  /* phones: the first time a layer comes out, bring the top of the broken site into view under the
+     stack (once only; instant under reduced motion) */
+  useEffect(() => {
+    if (out === null || shownOnce.current) return;
+    shownOnce.current = true;
+    const el = sideRef.current;
+    if (!el || window.innerWidth >= 768) return;
+    const top = el.getBoundingClientRect().top;
+    const room = window.innerHeight - 240;
+    if (top > room) {
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollBy({ top: top - room, behavior: reduce ? "auto" : "smooth" });
+    }
+  }, [out]);
 
   const choose = (t: "wp" | "react") => {
     setTech(t);
@@ -364,7 +384,7 @@ const ExplodedStack = () => {
     }
     /* pulling the plate that is already out pushes it back in */
     const start = out === g.i ? 1 : 0;
-    const d = Math.min(1, dx / g.scale / PULL);
+    const d = Math.min(1, dx / g.scale / DRAG);
     setPull({ i: g.i, t: start ? 1 - d : d });
   };
 
@@ -421,6 +441,7 @@ const ExplodedStack = () => {
         <div className="as-xs__grid">
           <div
             className="as-xs__stage"
+            style={{ aspectRatio: `${W} / ${H}` }}
             ref={stageRef}
             onPointerDown={onDown}
             onPointerMove={onMove}
@@ -433,7 +454,12 @@ const ExplodedStack = () => {
                   <path d="M0 0 V6" />
                 </pattern>
               </defs>
-              {layers.map((l, i) => {
+              {/* the plate being pulled is painted last: it comes out towards the reader, in front of the
+                  plates that sink into its gap, and never leaves the stage */}
+              {[...layers.keys()]
+                .sort((p, q) => (active && p === active.i ? 1 : 0) - (active && q === active.i ? 1 : 0))
+                .map((i) => {
+                const l = layers[i];
                 const t = l.thin ? 5 : 10;
                 const a = active && active.i === i ? active.t : 0;
                 const sinkT = active && i > active.i ? active.t : 0;
@@ -448,7 +474,7 @@ const ExplodedStack = () => {
                     key={`${tech}-${i}`}
                     data-i={i}
                     className={`as-xs__plate${shown === i ? " is-out" : ""}${l.dashed ? " is-dashed" : ""}${l.thin ? " is-thin" : ""}${broken && sinkT >= 0.5 ? " is-broken" : ""}`}
-                    style={{ transform: `translate(${-a * PULL}px, ${y}px) rotate(${rot}deg)`, opacity: 1 - a * 0.55 }}
+                    style={{ transform: `translate(${-a * SLIDE}px, ${y + a * 12}px) rotate(${rot}deg)`, opacity: 1 - a * 0.12 }}
                   >
                     <polygon className="as-xs__l" points={left} />
                     <polygon className="as-xs__r" points={right} />
@@ -484,7 +510,7 @@ const ExplodedStack = () => {
             </ol>
           </div>
 
-          <div className="as-xs__side">
+          <div className="as-xs__side" ref={sideRef}>
             <MiniSite broken={current ? current.breaks : null} tech={tech} />
             <div className={`as-xs__card${current ? " is-on" : ""}`} aria-live="polite">
               {current ? (

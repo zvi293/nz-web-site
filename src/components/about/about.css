@@ -74,8 +74,10 @@ html.nz-motion .ab-line__in {
     clip-path: circle(75% at 50% 50%);
   }
 }
+/* backwards only: a clip-path held at the end would cut the frame's cast shadow into a
+   hard-edged disc on the wall */
 html.nz-motion .ab-kilndoor {
-  animation: ab-kilndoor 1.4s var(--ease-gallery) 0.15s both;
+  animation: ab-kilndoor 1.4s var(--ease-gallery) 0.15s backwards;
 }
 html.nz-motion .ab-kilndoor .nz-art__img {
   animation: ab-settle 1.8s var(--ease-gallery) 0.15s both;
@@ -131,6 +133,7 @@ html.nz-motion .ab-kilndoor .nz-art__img {
 }
 .ab-colophon dd {
   margin: 4px 0 0;
+  text-wrap: balance;
   font-family: var(--font-display);
   font-size: 1.0625rem;
   line-height: 1.35;
@@ -216,12 +219,57 @@ html.nz-motion .ab-kilndoor .nz-art__img {
   margin: 16px 0 0;
   max-width: 40ch;
 }
+/* one centred unit: the readout, the wheel, the controls */
 .ab-wheel__stage {
   position: relative;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+.ab-wheel__readout {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin: 0;
+  pointer-events: none;
+}
+.ab-wheel__count {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
+}
+.ab-wheel__verb {
+  font-family: var(--font-display);
+  font-size: clamp(1.625rem, 1.2rem + 1.2vw, 2.25rem);
+  line-height: 1.15;
+  color: var(--bone);
+}
+/* every stage's line stacked in one cell: the tallest sets the height, only one is seen */
+.ab-wheel__lines {
+  display: grid;
+  max-width: 34ch;
+  margin-top: 6px;
+}
+.ab-wheel__line {
+  grid-area: 1 / 1;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ash);
+  text-wrap: balance;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.ab-wheel__line[data-on] {
+  visibility: visible;
+  opacity: 1;
 }
 .ab-wheel__fig {
   position: relative;
-  margin: 0;
+  width: 100%;
+  margin: 4px 0 0;
   touch-action: pan-y;
   cursor: grab;
   user-select: none;
@@ -234,76 +282,62 @@ html.nz-motion .ab-kilndoor .nz-art__img {
 .ab-wheel__svg {
   display: block;
   width: 100%;
-  max-width: 540px;
+  max-width: 500px;
   height: auto;
   margin-inline: auto;
   overflow: visible;
 }
-.ab-wheel__caption {
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  inset-inline-start: 0;
-  padding-inline: 4px;
-  display: grid;
-  gap: 4px;
-  margin: 0;
-  pointer-events: none;
-}
-.ab-wheel__count {
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  font-variant-numeric: tabular-nums;
-  color: var(--accent-text);
-}
-.ab-wheel__verb {
-  font-family: var(--font-display);
-  font-size: clamp(1.375rem, 1.1rem + 1vw, 2rem);
-  line-height: 1.15;
-  color: var(--bone);
+.ab-wheel__pan-side {
+  fill: #141210;
 }
 .ab-wheel__pan {
-  fill: #1c1a18;
+  fill: #1f1c19;
+  stroke: rgba(239, 234, 226, 0.1);
+  stroke-width: 1;
+}
+.ab-wheel__pan-in {
+  fill: #0d0c0b;
 }
 .ab-wheel__side {
-  fill: #26231f;
+  fill: #23201c;
 }
-.ab-wheel__head-top {
-  fill: #3a3631;
-}
-.ab-wheel__ticks {
+.ab-wheel__ring {
   fill: none;
-  stroke: rgba(239, 234, 226, 0.4);
-  stroke-width: 2.5;
-  stroke-dasharray: 1.4 10.6;
+  stroke: rgba(239, 234, 226, 0.07);
+  stroke-width: 1;
+}
+.ab-wheel__streaks path {
+  fill: none;
+  stroke: #efeae2;
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.4;
 }
 .ab-clay__glow {
   fill: #ff7a3c;
   filter: blur(18px);
   opacity: 0;
 }
-.ab-clay__specks rect {
-  fill: rgba(30, 20, 14, 0.55);
+.ab-clay__grog circle {
+  fill: rgba(30, 20, 14, 0.6);
   opacity: 0;
 }
-.ab-clay__mouth {
-  stroke: rgba(255, 255, 255, 0.22);
-  stroke-width: 1.5;
+.ab-clay__rim {
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 0.8;
 }
 .ab-wheel__controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 18px;
-  margin-top: 14px;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  margin-top: 18px;
 }
 .ab-wheel__spin {
   display: inline-flex;
   align-items: center;
   gap: 12px;
   min-height: 52px;
-  padding: 0 24px;
+  padding: 0 26px;
   border: 1px solid rgba(239, 234, 226, 0.55);
   border-radius: 999px;
   background: transparent;
@@ -348,7 +382,8 @@ html.nz-motion .ab-wheel__spin:active .ab-wheel__spin-icon {
 }
 .ab-wheel__hint {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
   color: var(--ash);
 }
 html:not(.js) .ab-wheel__controls {
@@ -429,21 +464,6 @@ html:not(.js) .ab-wheel__controls {
 .ab-log__item[data-state="current"] .ab-log__line {
   color: var(--bone);
 }
-.ab-wheel__sig {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px 16px;
-  margin: 22px 0 0;
-}
-.ab-wheel__name {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  color: var(--bone);
-}
-.ab-wheel__sig .nz-label {
-  align-items: center;
-}
 
 @media (min-width: 1024px) {
   .ab-wheel__grid {
@@ -460,13 +480,18 @@ html:not(.js) .ab-wheel__controls {
     grid-column: 1 / span 5;
     grid-row: 2;
   }
+  /* the stage is centred against the head + log column as one unit */
   .ab-wheel__stage {
     grid-column: 7 / span 6;
     grid-row: 1 / span 2;
     align-self: center;
   }
-  .ab-wheel__controls {
-    justify-content: center;
+  .ab-wheel__svg {
+    max-width: 560px;
+  }
+  /* the log beside it says the line; the readout keeps to the verb */
+  .ab-wheel__lines {
+    display: none;
   }
 }
 
@@ -920,11 +945,57 @@ html.nz-motion .ab-seal[data-reveal="stamp"][data-in] {
 }
 .ab-hands__cell--you {
   grid-area: you;
-  color: var(--ash);
+  color: var(--bone);
 }
 .ab-hands__cell--us {
   grid-area: us;
   color: var(--bone);
+}
+/* who says the line: a small tag (only shown when the rows stack, see below) */
+.ab-hands__tag {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 479.98px) {
+  /* each step reads top to bottom: the step, what you do, what צבי does, the hand-off */
+  .ab-hands__head {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .ab-hands__row {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "stage" "you" "us" "pass";
+    row-gap: 12px;
+  }
+  .ab-hands__cell {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    column-gap: 12px;
+    align-items: baseline;
+  }
+  .ab-hands__tag {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .ab-hands__cell--you .ab-hands__tag {
+    color: var(--ash);
+  }
+  .ab-hands__cell--us .ab-hands__tag {
+    color: #f3a48f;
+  }
 }
 /* the hand-off: a small cup crosses the table, from "you" to צבי */
 .ab-hands__pass {
@@ -1031,17 +1102,7 @@ html.nz-motion .ab-seal[data-reveal="stamp"][data-in] {
   gap: 32px;
 }
 .ab-stack .nz-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0;
-}
-.ab-stack__room {
-  color: var(--vermilion-deep);
-}
-.ab-stack__label {
-  margin-top: 4px !important;
-  margin-bottom: 18px !important;
+  margin: 0 0 18px;
 }
 .ab-stack h2 {
   margin: 0;

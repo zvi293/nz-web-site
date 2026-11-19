@@ -41,6 +41,25 @@ export function nobrParts(text: string): { t: string; nobr: boolean; ltr: boolea
     });
 }
 
+/**
+ * nobrParts + contact links: an email becomes a mailto: link and an Israeli phone number
+ * ("058-7292029") a tel: link, so a reader of the clause can act on it right there.
+ */
+export function linkParts(text: string): { t: string; nobr: boolean; ltr: boolean; long: boolean; href?: string }[] {
+  const phone = /(0\d{1,2}-\d{7})/;
+  return nobrParts(text).flatMap((p) => {
+    if (p.ltr) return [/^[\w.+-]+@[\w-]+(\.[\w-]+)+$/.test(p.t) ? { ...p, href: `mailto:${p.t}` } : p];
+    return p.t
+      .split(phone)
+      .filter(Boolean)
+      .map((t) =>
+        phone.test(t) && /^0\d{1,2}-\d{7}$/.test(t)
+          ? { t, ltr: true, nobr: true, long: false, href: `tel:+972${t.slice(1).replace("-", "")}` }
+          : { t, ltr: false, nobr: false, long: false },
+      );
+  });
+}
+
 /** Reading time in whole minutes (≈ 180 Hebrew words a minute). */
 export function readingMinutes(sections: LegalPageSection[]): number {
   const words = sections.reduce((n, s) => n + `${s.title} ${s.content}`.split(/\s+/).filter(Boolean).length, 0);

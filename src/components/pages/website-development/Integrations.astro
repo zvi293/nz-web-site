@@ -21,7 +21,7 @@ const { index = "01" } = Astro.props;
 const C = 200;
 const R = 150;
 const HUB = 62;
-const SAT = 36;
+const SAT = 42; /* room for the longest label ("חשבוניות", "וואטסאפ") with ≥6 units inside the ring */
 const nodes = LINKS.map((l, i) => {
   const a = ((-90 + 60 * i) * Math.PI) / 180;
   const [dx, dy] = [Math.cos(a), Math.sin(a)];
@@ -46,7 +46,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 <section class="nz-section nz-section--space-default wv-links" data-tone="paper" aria-labelledby="wv-links-title">
   <div class="nz-container">
     <ServiceOpener
-      variant="numeral"
+      variant="split"
       index={index}
       label="החיבורים"
       id="wv-links-title"

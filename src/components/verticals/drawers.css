@@ -33,7 +33,7 @@
   margin: 0 4px 14px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--line-ink);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
   color: var(--ash);
 }
@@ -136,7 +136,7 @@
   grid-column: 2;
   grid-row: 2;
   justify-self: center;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.05em;
   color: var(--graphite);
 }
@@ -170,7 +170,7 @@ html:not(.js) .vl-dr__tray[hidden] {
   padding: 3px 12px 2px;
   border-radius: 4px 4px 0 0;
   background: #c9b38e;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   color: #3d3323;
@@ -200,7 +200,7 @@ html:not(.js) .vl-dr__tray[hidden] {
   gap: 10px;
   margin: 0;
   padding-inline-start: 26px;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
   color: var(--graphite);
 }
@@ -230,7 +230,7 @@ html:not(.js) .vl-dr__tray[hidden] {
 }
 .vl-dr__items li::before {
   content: counter(dr);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: var(--vermilion-deep);
   font-variant-numeric: tabular-nums;
 }
@@ -243,7 +243,7 @@ html:not(.js) .vl-dr__tray[hidden] {
   border-bottom: 4px double var(--ink);
 }
 .vl-dr__total-label {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
   color: var(--graphite);
 }
@@ -343,7 +343,7 @@ html:not(.js) .vl-dr__tray[hidden] {
   background: var(--vermilion);
 }
 .vl-dr__tree-num {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   color: var(--fg-muted);
 }

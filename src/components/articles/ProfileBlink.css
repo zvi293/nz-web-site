@@ -295,11 +295,12 @@
 .as-pb__line.is-fixed .as-pb__value {
   cursor: default;
 }
+/* the ink ring hugs the value inside the button's own padding, so the card edge never cuts it */
 .as-pb__ring {
   position: absolute;
-  inset: -6px -10px;
-  width: calc(100% + 20px);
-  height: calc(100% + 12px);
+  inset: -2px -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 4px);
   overflow: visible;
   pointer-events: none;
 }

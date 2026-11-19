@@ -151,6 +151,8 @@ export const offerFaq: OfferFaqItem[] = [
 /** A row of the "conservation card" (what the monthly subscription covers). */
 export interface CareRow {
   name: string;
+  /** One-word name on the orbit diagram. */
+  orbit: string;
   body: string;
 }
 
@@ -238,6 +240,10 @@ export const offerPage = {
     messageEmpty: "היי NZ-web, אשמח לעזרה בבחירת ההיקף לאתר של העסק שלי ולהצעה אישית.",
     announceAdd: (name: string, n: number) => `${name} נכנסה לבועה. עכשיו ${n} אבני בניין.`,
     announceRemove: (name: string, n: number) => `${name} יצאה מהבועה. עכשיו ${n} אבני בניין.`,
+    /** "סוג האתר" holds one type: tossing another one swaps them. */
+    oneOnly: "אחד לבחירה",
+    announceSwapPrefix: "הוחלף סוג האתר",
+    announceSwap: (out: string, inn: string) => `הוחלף סוג האתר: ${inn} נכנס לבועה, ${out} חזר למדף.`,
     announceReset: "הבועה התפוצצה והתרוקנה. היסודות נשארו.",
     announceCare: (on: boolean) => (on ? "המנוי החודשי נוסף: מסלול מקיף את הבועה." : "המנוי החודשי הוסר."),
     seeWorks: { before: "רוצים לראות מה יוצא מבועה כזאת? ", label: "העבודות שתלויות באוסף", href: "/projects/", after: "." },
@@ -250,12 +256,12 @@ export const offerPage = {
     cardTitle: "כרטיס שימור",
     cardSub: "האתר שלכם · אחרי ההשקה",
     rows: [
-      { name: "אחסון", body: "האתר מתארח בתשתית ענן מהירה ומוגש בחיבור מוצפן. אין שרת או חשבון אחסון שצריך לנהל." },
-      { name: "תחזוקה שוטפת", body: "בודקים שהכול עובד, ומטפלים בתקלה כשהיא מופיעה." },
-      { name: "עדכוני אבטחה", body: "הספריות והתשתית מתעדכנות, כדי שהאתר לא יישאר מאחור." },
-      { name: "גיבויים", body: "יש עותק של האתר, כך שאפשר לחזור אחורה אם משהו משתבש." },
-      { name: "שינויים קטנים", body: "עדכון טקסט, החלפת תמונה או הוספת שירות: שולחים הודעה, והשינוי עולה לאתר." },
-      { name: "מענה לשאלות", body: "יש לכם כתובת אחת לכל שאלה על האתר, בוואטסאפ." },
+      { name: "אחסון", orbit: "אחסון", body: "האתר מתארח בתשתית ענן מהירה ומוגש בחיבור מוצפן. אין שרת או חשבון אחסון שצריך לנהל." },
+      { name: "תחזוקה שוטפת", orbit: "תחזוקה", body: "בודקים שהכול עובד, ומטפלים בתקלה כשהיא מופיעה." },
+      { name: "עדכוני אבטחה", orbit: "אבטחה", body: "הספריות והתשתית מתעדכנות, כדי שהאתר לא יישאר מאחור." },
+      { name: "גיבויים", orbit: "גיבויים", body: "יש עותק של האתר, כך שאפשר לחזור אחורה אם משהו משתבש." },
+      { name: "שינויים קטנים", orbit: "שינויים", body: "עדכון טקסט, החלפת תמונה או הוספת שירות: שולחים הודעה, והשינוי עולה לאתר." },
+      { name: "מענה לשאלות", orbit: "מענה", body: "יש לכם כתובת אחת לכל שאלה על האתר, בוואטסאפ." },
     ] satisfies CareRow[],
     outside: {
       title: "מה לא נכנס למנוי",

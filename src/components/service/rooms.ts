@@ -53,7 +53,7 @@ export const SERVICE_ROOMS: ServiceRoom[] = [
   {
     num: "04",
     name: "בניית דפי נחיתה",
-    short: "דפי נחיתה",
+    short: "דף לקמפיין",
     href: "/services/landing-pages/",
     art: "coral-ladders",
     line: "עמוד אחד, מסר אחד ופעולה אחת לכל קמפיין.",
@@ -62,7 +62,7 @@ export const SERVICE_ROOMS: ServiceRoom[] = [
   {
     num: "05",
     name: "פיתוח דף נחיתה",
-    short: "דף נחיתה",
+    short: "לפי מטרה",
     href: "/services/landing-page-development/",
     art: "paper-plane",
     line: "דפי נחיתה לפי מטרה: קמפיין, לידים ובעלי מקצוע.",

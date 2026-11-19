@@ -1,8 +1,17 @@
-import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { contactInfo, getTelHref, getWhatsAppHref } from "@/lib/contact-utils";
-import { Artwork, MuseumLabel, getArt } from "@/components/art";
 import {
   Logo,
   WhatsAppCta,
@@ -15,12 +24,19 @@ import {
   samePath,
 } from "@/components/nz";
 
+/* The panel's art (and with it the art manifest) is its own chunk, fetched on first intent. */
+const loadPanelArt = () => import("@/components/HeaderPanelArt");
+const HeaderPanelArt = lazy(loadPanelArt);
+const warmPanelArt = () => {
+  void loadPanelArt();
+};
+
 /* ── Services panel ("the mega panel") ─────────────────────────────────────
    A quiet bone room under the bar: the service pages as numbered serif rows,
    and — the signature touch — the hovered/focused service's artwork hung on
    the left with its museum label. Always in the DOM (hidden when closed) so
-   the service links are crawlable; hidden art is display:none, so nothing is
-   downloaded until the panel first opens. */
+   the service links are crawlable. The art + label are rendered only once the
+   panel has opened (never in the server HTML), from a lazily loaded chunk. */
 const ServicesPanel = ({
   id,
   open,
@@ -36,7 +52,6 @@ const ServicesPanel = ({
     setActive(i);
     setSeen((s) => (s.has(i) ? s : new Set(s).add(i)));
   };
-  const current = serviceNav[active];
 
   return (
     <div id={id} className="nz-mega" hidden={!open}>
@@ -75,16 +90,11 @@ const ServicesPanel = ({
         </div>
 
         <div className="nz-mega__preview" aria-hidden="true">
-          <div className="nz-mega__stack">
-            {serviceNav.map((svc, i) =>
-              seen.has(i) && open ? (
-                <div key={svc.art} aria-hidden={i !== active ? "true" : undefined}>
-                  <Artwork slug={svc.art} sizes="(min-width: 1440px) 520px, 36vw" frame alt="" />
-                </div>
-              ) : null,
-            )}
-          </div>
-          <MuseumLabel index={active + 1} prefix="מוצג" title={current.label} medium={`מתוך האוסף: ${getArt(current.art).title}`} />
+          {open && (
+            <Suspense fallback={null}>
+              <HeaderPanelArt active={active} seen={seen} />
+            </Suspense>
+          )}
         </div>
       </div>
     </div>
@@ -238,6 +248,7 @@ const Header = ({ pathname = "/" }: { pathname?: string }) => {
   }, []);
 
   const openSoon = (e: ReactPointerEvent) => {
+    warmPanelArt();
     if (e.pointerType !== "mouse") return;
     window.clearTimeout(closeTimer.current);
     setPanelOpen(true);
@@ -270,6 +281,7 @@ const Header = ({ pathname = "/" }: { pathname?: string }) => {
                   ref={triggerRef}
                   type="button"
                   className="nz-nav__link"
+                  onFocus={warmPanelArt}
                   aria-expanded={panelOpen}
                   aria-controls={panelId}
                   aria-current={servicesActive ? "page" : undefined}
@@ -296,17 +308,20 @@ const Header = ({ pathname = "/" }: { pathname?: string }) => {
             </ul>
           </nav>
 
+          {/* The actions adapt to the header's own width in rem (a container query, see index.css),
+              so a 200% text zoom or a 320px phone sheds the pill label, then the pill, before
+              anything is pushed off-screen. The menu button always stays. */}
           <div className="nz-header__actions">
-            <WhatsAppCta size="sm" className="hidden md:inline-flex" />
+            <WhatsAppCta size="sm" className="nz-header__wa nz-header__wa--long" />
             <a
               href={getWhatsAppHref(contactInfo)}
               target="_blank"
               rel="noopener noreferrer"
-              className="nz-btn nz-btn--primary nz-btn--sm md:hidden"
+              className="nz-btn nz-btn--primary nz-btn--sm nz-header__wa nz-header__wa--short"
               aria-label="לשיחה בוואטסאפ (נפתח בכרטיסייה חדשה)"
             >
               <WhatsAppIcon className="nz-btn__icon" />
-              <span>וואטסאפ</span>
+              <span className="nz-header__wa-text">וואטסאפ</span>
             </a>
             <button
               ref={menuBtnRef}
@@ -317,7 +332,7 @@ const Header = ({ pathname = "/" }: { pathname?: string }) => {
               aria-label="פתיחת התפריט"
               onClick={() => setMenuOpen(true)}
             >
-              <span className="hidden xs:inline" aria-hidden="true">
+              <span className="nz-menu-btn__label" aria-hidden="true">
                 תפריט
               </span>
               <span className="nz-menu-btn__lines" aria-hidden="true" />

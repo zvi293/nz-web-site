@@ -45,12 +45,12 @@ const seo = serviceSeo(page, { jsonLd: [itemList] });
 
   <SignatureSlot
     name="מבחן חמש השניות"
-    title="מה הדף הציע? יש לכם חמש שניות"
+    title={"מה הדף הציע? יש\u00a0לכם חמש שניות"}
     lede="מי שמגיע ממודעה מחליט מהר אם להישאר. פתחו דף נחיתה לחמש שניות, נסו לומר מה הוא הציע, ואז עשו את אותו הדבר עם דף אחר של אותו עסק."
     hint="הקישו על הכפתור, הסתכלו על הדף עד שהמסך נסגר, ובחרו תשובה. אחרי כל סבב אפשר לראות את הדף שוב."
     keys="במקלדת: Tab בין הכפתורים ו-Enter. אחרי כל שלב המיקוד עובר לשאלה או לתשובה."
     tone="bone"
-    opener="numeral"
+    opener="stacked"
     index="03"
     id="lpd-sig"
   >
@@ -82,7 +82,7 @@ const seo = serviceSeo(page, { jsonLd: [itemList] });
     id="lpd-process"
   />
 
-  <ServiceFaq items={page.faqs} title="שאלות על פיתוח דף נחיתה" index="06" opener="stacked" id="lpd-faq" />
+  <ServiceFaq items={page.faqs} title="שאלות על פיתוח דף נחיתה" index="06" opener="quote" id="lpd-faq" />
 
   <ServiceRelated currentPath={page.path} items={page.related} tone="paper" />
 

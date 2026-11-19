@@ -15,12 +15,12 @@ export const clinic: VerticalPage = {
   heroVariant: "split-ink",
   hero: {
     kicker: "אתר ותורים לקליניקות",
-    title: "בניית אתר תדמית לקליניקה ולרופא שיניים",
+    title: "בניית אתר תדמית לקליניקה ולרופא\u00a0שיניים",
     accent: "לקליניקה",
     lead:
       "בניית אתר תדמית לקליניקה היא בניית חדר המתנה שקט, עוד לפני שהמטופל מגיע. NZ-web בונה לקליניקות, לרופאי שיניים ולמטפלים אתר רגוע וברור: עמוד לכל טיפול שמסביר למה לצפות, קביעת תור אונליין עם תזכורות, פנייה דיסקרטית ונגישות לפי ת״י 5568.",
     art: "origami-lemon",
-    medium: "חדרים מנייר מקופל זה בתוך זה: מקום שקט שנפתח לאט",
+    medium: "חדרים מנייר מקופל זה בתוך זה: מקום שקט שנפתח\u00a0לאט",
     cta: { label: "לשיחה בוואטסאפ", message: "היי, הגעתי מעמוד האתר לקליניקות ואשמח לשמוע פרטים" },
     facts: ["עמוד לכל טיפול", "קביעת תור אונליין", "נגישות לפי ת״י 5568"],
   },
@@ -116,7 +116,7 @@ export const clinic: VerticalPage = {
     },
   ],
   related: [
-    { label: "אתר תדמית לעסקים: כל התחומים", href: "/services/business-website/" },
+    { label: "אתר תדמית לעסקים: כל\u00a0התחומים", href: "/services/business-website/" },
     { label: "מערכת ניהול תורים", href: "/services/appointment-system/" },
     { label: "אתר לעסק יופי", href: "/services/business-website/beauty/" },
     { label: "אתר תדמית ליועץ ומאמן", href: "/services/business-website/consultant/" },
@@ -132,13 +132,13 @@ export const clinic: VerticalPage = {
     { kind: "intro", tone: "paper", opener: "rule", label: "מבוא · אתר שמרגיע" },
     { kind: "signature", tone: "ink", opener: "split" },
     { kind: "trade", variant: "appointments", tone: "bone", opener: "stacked", label: "כרטיסי התור" },
-    { kind: "features", variant: "specimens", tone: "paper", opener: "numeral", label: "מה כלול" },
-    { kind: "deepDive", variant: "spine", tone: "bone", opener: "quote", label: "מה חשוב שיהיה" },
+    { kind: "features", variant: "specimens", tone: "paper", opener: "rule", label: "מה כלול" },
+    { kind: "deepDive", variant: "spine", tone: "bone", opener: "split", label: "מה חשוב שיהיה" },
     {
       kind: "faq",
       card: "plaque",
       tone: "paper",
-      opener: "split",
+      opener: "rule",
       title: "שאלות על אתר לקליניקה",
       note: {
         title: "שאלה שלא מופיעה כאן?",

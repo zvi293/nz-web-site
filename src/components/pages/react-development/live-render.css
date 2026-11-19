@@ -526,7 +526,7 @@ html.nz-motion .lr-node__flash {
   visibility: hidden;
   margin: 0;
   max-width: 60ch;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.65;
   color: var(--fg-muted);
   text-wrap: pretty;

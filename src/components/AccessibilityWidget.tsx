@@ -20,11 +20,11 @@ import A11yGlyph from "@/components/legal/A11yGlyph";
 /**
  * The accessibility widget (global chrome — BaseLayout: <AccessibilityWidget client:idle />).
  *
- *  - The bead: a compact 44px ink disc docked bottom-start (bottom-right in RTL) inside the
- *    safe-area insets, riding above the cookie sheet (--nz-sheet-h). While the page scrolls it
- *    probes what it sits on (~10×/s); over a link, button, form field or a block marked
- *    [data-float-avoid] (e.g. a hero's key facts) it docks as a half-disc tab on the edge so it
- *    never covers a call to action, and comes back as soon as the spot is clear.
+ *  - The bead: a compact ink disc docked bottom-right on desktop and bottom-left on phones (where
+ *    RTL lines end ragged, so it covers the least text), inside the safe-area insets, riding above
+ *    the cookie sheet (--nz-sheet-h). While the page scrolls it probes what it sits on (~10×/s);
+ *    over text, a link, a button or a form field it docks as a half-disc tab on the edge so it
+ *    never covers copy or a call to action, and comes back as soon as the spot is clear.
  *    It is never hidden: the control stays reachable at all times (legal requirement).
  *  - The panel: a native <dialog> (focus trap, Escape, top layer) — a bottom sheet on phones,
  *    a side panel on desktop. Opening adds one history entry so the phone BACK button closes it;
@@ -96,13 +96,13 @@ const AccessibilityWidget = () => {
     };
   }, [show]);
 
-  /* ── the bead tucks into the edge while it would cover a link, button or field ── */
+  /* ── the bead tucks into the edge while it would cover text, a link, a button or a field ── */
   useEffect(() => {
     let clear = 0;
     const probe = () => {
       const dock = dockRef.current;
       if (!dock) return;
-      const hit = probeCovers(dock.getBoundingClientRect(), ["field", "target", "avoid"]);
+      const hit = probeCovers(dock.getBoundingClientRect(), ["field", "target", "avoid", "text"]);
       if (hit) {
         clear = 0;
         setTucked(true);

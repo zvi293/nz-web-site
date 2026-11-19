@@ -1,5 +1,6 @@
 // Signature component: הכתב הקטן — bar magnifier (drag a lens over the fine print)
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as RPointerEvent } from "react";
+import { nobrParts } from "./content";
 
 /**
  * /terms/ — "הכתב הקטן". The terms are set as what they look like in real life: a sheet of fine
@@ -170,7 +171,18 @@ const FinePrint = ({ clauses }: Props) => {
             <span className="lg-fine__num">§ {two(i + 1)}</span> {cl.title}
           </p>
           <div className="lg-fine__cell">
-            <p className="lg-fine__legal">{cl.text}</p>
+            <p className="lg-fine__legal">
+              {/* a brand / domain never splits at its hyphen ("NZ-" | "web") */}
+              {nobrParts(cl.text).map((p, k) =>
+                p.ltr ? (
+                  <bdi key={k} dir="ltr" className={p.nobr ? "lg-nobr" : undefined}>
+                    {p.t}
+                  </bdi>
+                ) : (
+                  p.t
+                ),
+              )}
+            </p>
             <p className="lg-fine__plain">{cl.plain}</p>
           </div>
         </div>
@@ -183,6 +195,16 @@ const FinePrint = ({ clauses }: Props) => {
       <div ref={sheetRef} className="lg-fine__sheet" style={vars}>
         {layer("print")}
         {layer("lens")}
+
+        {/* the foot of the sheet: where the stamp lands once every clause was under the lens */}
+        <p className="lg-fine__foot" aria-hidden="true">
+          <span>אישור קריאה</span>
+          <span className="lg-fine__foot-line" />
+          <span className="lg-fine__stamp">
+            <span>נקרא</span>
+            <small>עד הסוף</small>
+          </span>
+        </p>
 
         <div
           ref={barRef}
@@ -213,10 +235,6 @@ const FinePrint = ({ clauses }: Props) => {
           </span>
         </div>
 
-        <span className="lg-fine__stamp" aria-hidden="true">
-          <span>נקרא</span>
-          <small>עד הסוף</small>
-        </span>
       </div>
 
       <div className="lg-fine__panel">

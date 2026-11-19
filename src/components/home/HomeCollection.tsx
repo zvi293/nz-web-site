@@ -116,11 +116,6 @@ const HomeCollection = () => (
           {collection.title}
         </h2>
         <p className="hm-index-head__lede">{collection.lede}</p>
-        <p className="hm-index-head__count" aria-hidden="true">
-          <span>01</span>
-          <span className="hm-index-head__dash" />
-          <span>{String(works.length).padStart(2, "0")}</span>
-        </p>
       </header>
 
       <ol className="hm-works">

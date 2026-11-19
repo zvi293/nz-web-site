@@ -1,0 +1,27 @@
+---
+/**
+ * One line of legal copy: Latin runs in <bdi dir="ltr"> (names and domains never break, a long
+ * email may on a narrow phone), emails and phone numbers as mailto:/tel: links.
+ */
+import { linkParts } from "./content";
+
+interface Props {
+  text: string;
+}
+const { text } = Astro.props;
+const cls = (p: { nobr: boolean; long: boolean }) => (p.nobr ? (p.long ? "lg-nobr lg-nobr--long" : "lg-nobr") : undefined);
+---
+
+{
+  linkParts(text).map((p) =>
+    p.href ? (
+      <a href={p.href} class="lg-sec__contact">
+        <bdi dir="ltr" class={cls(p)}>{p.t}</bdi>
+      </a>
+    ) : p.ltr ? (
+      <bdi dir="ltr" class={cls(p)}>{p.t}</bdi>
+    ) : (
+      p.t
+    ),
+  )
+}

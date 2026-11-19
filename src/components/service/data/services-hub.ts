@@ -19,12 +19,12 @@ export const servicesHub: ServicePageData = {
     title: "שירותי בניית אתרים ופיתוח לעסקים",
     accent: "לעסקים",
     lead:
-      "NZ-web מעצבת ובונה אתרים לעסקים בישראל: אתרי תדמית, דפי נחיתה, מערכות לקביעת תורים, פיתוח מותאם ב-React ושיפור מהירות לאתרים קיימים. כל שירות מתחיל בשיחת היכרות קצרה, נבנה לעסק אחד ומגיע עם נגישות, מהירות ו-SEO כחלק מהעבודה. ההצעה תמיד אחת: הקמה חד-פעמית ומנוי חודשי אופציונלי.",
+      "NZ-web מעצבת ובונה אתרים לעסקים בישראל: אתרי תדמית, דפי נחיתה, מערכות תורים, פיתוח React ושיפור מהירות. כל שירות נבנה לעסק אחד, ונגישות, מהירות ו-SEO הם חלק מהעבודה.",
     art: "darkroom-glow",
     medium: "תצלומים שמתפתחים באור כתום: כל שירות מתחיל בטיוטה ונגמר בעבודה שתלויה על הקיר",
     cta: { label: "לשיחה בוואטסאפ", message: "היי, אשמח לשמוע איזה שירות מתאים לעסק שלי" },
     secondary: { label: "למפת האולמות", href: "#sv-signature" },
-    facts: ["שמונה חדרים, סטודיו אחד", "הצעה אחת לכל עסק", "בלי חבילות"],
+    facts: ["שמונה חדרים, סטודיו אחד", "הצעה אחת לכל עסק", "הצעה אישית בוואטסאפ"],
   },
   features: {
     title: "מה מקבלים בכל חדר באגף",
@@ -66,6 +66,18 @@ export const servicesHub: ServicePageData = {
     button: "לשיחה בוואטסאפ",
     message: "היי, אשמח לעזרה בבחירת שירות לעסק שלי",
   },
+};
+
+/**
+ * Rooms 04 and 05 are both about landing pages; their kit names ("בניית דפי נחיתה" / "פיתוח דף
+ * נחיתה") read as the same thing twice on the hub. Here, where a visitor picks a room, each one is
+ * named by what it is for: 04 = one page for one campaign, 05 = a page built around a goal.
+ * Used by the floor plan (index.astro) and the guide doors (HubGuide). The short plan names
+ * ("דף לקמפיין" / "לפי מטרה") live in rooms.ts, so every page tells the two apart.
+ */
+export const HUB_ROOM_NAMES: Record<string, { name: string }> = {
+  "04": { name: "דף נחיתה לקמפיין" },
+  "05": { name: "דפי נחיתה לפי מטרה" },
 };
 
 /** "Three questions" guide: each answer points at a room (by href). */

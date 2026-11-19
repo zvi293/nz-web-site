@@ -76,11 +76,6 @@ html.nz-motion .vl-ks__centring {
   stroke: #8a7d6d;
   stroke-width: 1;
 }
-.vl-ks__slot.is-weak .vl-ks__stone path:first-child {
-  fill: #e6ddd0;
-  stroke: #a3978a;
-  stroke-dasharray: 2 2;
-}
 .vl-ks__crack {
   fill: none;
   stroke: #5b5148;
@@ -95,16 +90,13 @@ html.nz-motion .vl-ks__centring {
   stroke: rgba(205, 191, 174, 0.45);
   stroke-width: 1.5;
 }
+/* 14 viewBox units ≈ 13.6px at 390, 12.4px at 360 */
 .vl-ks__stone-label {
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   fill: #2a241e;
   pointer-events: none;
-}
-.vl-ks__slot.is-weak .vl-ks__stone-label {
-  font-weight: 500;
-  fill: #5b5148;
 }
 .vl-ks__slot.is-key.is-recut .vl-ks__stone path:first-child {
   fill: #e9d4c4;
@@ -149,7 +141,7 @@ html.nz-motion .vl-ks__slot.is-recut .vl-ks__stone {
 }
 .vl-ks__crate-label {
   font-family: var(--font-sans);
-  font-size: 8.5px;
+  font-size: 13px;
   font-weight: 700;
   fill: #fff;
 }
@@ -311,6 +303,21 @@ html.nz-motion .vl-ks.is-locked .vl-ks__seal {
   color: var(--fg-muted);
 }
 .vl-ks__item.is-idle .vl-ks__item-now {
+  display: none;
+}
+/* with JS the report lists a stone only after the load broke it (no spoilers before the test) */
+html.js .vl-ks__item.is-idle {
+  display: none;
+}
+.vl-ks__blank {
+  padding: 14px;
+  border: 1px dashed var(--rule);
+  border-radius: 4px;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--fg-muted);
+}
+html:not(.js) .vl-ks__blank {
   display: none;
 }
 .vl-ks__item-state {

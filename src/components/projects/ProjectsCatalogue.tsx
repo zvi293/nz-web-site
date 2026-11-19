@@ -1,12 +1,12 @@
 import { ExternalIcon } from "@/components/nz";
 import { projectsCopy } from "./copy";
-import { wallKey, works, type KeyRect } from "./works";
+import { wallKey, works } from "./works";
 
 const c = projectsCopy.catalogue;
 const KEY = wallKey();
 
-/** The wall drawn as a schematic: every frame a rectangle, numbered; `focus` highlights one work. */
-const WallKeySvg = ({ focus, numbers = false, className }: { focus?: number; numbers?: boolean; className?: string }) => {
+/** The wall drawn as a schematic: every frame a rectangle, numbered (shown where the salon hang is, ≥ 1024px). */
+const WallKeySvg = ({ numbers = false, className }: { numbers?: boolean; className?: string }) => {
   const pad = 16;
   const vb = `${-pad} ${-pad} ${1000 + pad * 2} ${KEY.height + pad * 2}`;
   /* one number per work, in the middle of its desktop frame */
@@ -25,7 +25,7 @@ const WallKeySvg = ({ focus, numbers = false, className }: { focus?: number; num
           y={r.y}
           width={r.w}
           height={r.h}
-          className={`pj-key__r pj-key__r--${r.kind}${focus !== undefined && r.work === focus ? " is-focus" : ""}`}
+          className={`pj-key__r pj-key__r--${r.kind}`}
         />
       ))}
       {[...labels].map(([w, p]) => (
@@ -77,7 +77,7 @@ const ProjectsCatalogue = () => (
         <span className="pj-cat__swipe-line" />
       </p>
       <ol className="pj-cat__list">
-        {works.map((w, i) => (
+        {works.map((w) => (
           <li key={w.id} id={`work-${w.id}`} className="pj-entry">
             <div className="pj-entry__pair">
               <div className="pj-entry__shot">
@@ -108,7 +108,6 @@ const ProjectsCatalogue = () => (
             <div className="pj-entry__label">
               <div className="pj-entry__top">
                 <p className="pj-entry__index">עבודה {String(w.n).padStart(2, "0")}</p>
-                <WallKeySvg focus={i} className="pj-entry__key" />
               </div>
               <h3 className="pj-entry__title">{w.title}</h3>
               <dl className="pj-entry__meta">

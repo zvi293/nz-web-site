@@ -34,6 +34,26 @@
   width: 52px;
   height: 52px;
 }
+/* Phones: the accessibility bead moves to the bottom-LEFT corner (inline-end). Hebrew lines start
+   on the right and end ragged on the left, so the left corner covers far less text; the WhatsApp
+   bead is not shown on phones while the header's own WhatsApp pill is (WhatsAppButton.tsx), and
+   when it is (a zoomed header without the pill) it stacks above the accessibility bead. */
+@media (max-width: 767.98px) {
+  .nzc-dock--start {
+    --nzc-tuck: -1;
+    inset-inline-start: auto;
+    inset-inline-end: calc(12px + env(safe-area-inset-left, 0px));
+    width: 44px;
+    height: 44px;
+  }
+  .nzc-dock--start .nzc-bead__dot {
+    inset-inline-end: auto;
+    inset-inline-start: 1px;
+  }
+  .nzc-dock--wa {
+    bottom: calc(var(--nzc-gap) + 56px + env(safe-area-inset-bottom, 0px) + var(--nz-sheet-h, 0px));
+  }
+}
 @media (min-width: 768px) {
   .nzc-dock {
     --nzc-gap: 24px;
@@ -96,21 +116,22 @@
   border: 2px solid var(--ink);
 }
 
-/* a11y bead: while it would cover a link, a button, a field or a marked text block it docks as a
-   half-disc tab on the screen edge — the glyph slides into the visible half, the dot stays whole */
+/* a11y bead: while it would cover text, a link, a button or a field it docks as a half-disc tab
+   on the screen edge — the glyph slides into the visible half, the dot stays whole. --nzc-tuck is
+   1 on the right edge (desktop) and -1 on the left edge (phones). */
 .nzc-dock[data-tucked] .nzc-bead--a11y {
-  transform: translateX(calc(50% + 12px));
-  box-shadow: -2px 1px 6px rgba(18, 17, 16, 0.28);
+  transform: translateX(calc((50% + 12px) * var(--nzc-tuck, 1)));
+  box-shadow: calc(-2px * var(--nzc-tuck, 1)) 1px 6px rgba(18, 17, 16, 0.28);
 }
 .nzc-bead--a11y .nzc-bead__glyph,
 .nzc-bead--a11y .nzc-bead__dot {
   transition: transform 0.55s var(--ease-gallery);
 }
 .nzc-dock[data-tucked] .nzc-bead--a11y .nzc-bead__glyph {
-  transform: translateX(-9px) scale(0.8);
+  transform: translateX(calc(-9px * var(--nzc-tuck, 1))) scale(0.8);
 }
 .nzc-dock[data-tucked] .nzc-bead--a11y .nzc-bead__dot {
-  transform: translate(2px, 3px);
+  transform: translate(calc(2px * var(--nzc-tuck, 1)), 3px);
 }
 .nzc-dock[data-tucked] .nzc-bead--a11y:focus-visible,
 .nzc-dock[data-tucked] .nzc-bead--a11y:hover {
@@ -525,103 +546,94 @@ html.nz-motion .nzc-a11y[open] .nzc-a11y__sheet {
   cursor: not-allowed;
 }
 
-/* ── Cookie sheet (non-modal <dialog>) ──────────────────────────────────── */
+/* ── Cookie card (non-modal <dialog>) ───────────────────────────────────
+   Phones: a slim floating card 8px off the edges (one line + two pills, ~100px).
+   ≥768px: one ~64px row, bottom-centre, narrowed so it never reaches the corner beads.
+   [data-phase="measure"]: laid out but invisible, so CookieConsent can measure its real
+   height before deciding whether it may appear (it never covers a primary CTA). */
 .nzc-cookies {
   position: fixed;
-  inset: auto 0 0 0;
+  inset: auto 0 calc(8px + env(safe-area-inset-bottom, 0px)) 0;
   z-index: 10015;
-  width: 100%;
+  width: auto;
   max-width: none;
-  margin: 0;
+  margin: 0 calc(8px + env(safe-area-inset-left, 0px)) 0 calc(8px + env(safe-area-inset-right, 0px));
   padding: 0;
   border: 0;
   background: transparent;
   color: var(--ink);
   font-family: var(--font-sans);
+  pointer-events: none;
 }
 .nzc-cookies:not([open]) {
   display: none;
 }
-.nzc-cookies__card {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px 10px;
-  padding: 16px 20px calc(14px + env(safe-area-inset-bottom, 0px));
-  background: var(--paper);
-  border-top: 1px solid var(--line);
-  border-radius: 14px 14px 0 0;
-  box-shadow: 0 -18px 44px -30px rgba(18, 17, 16, 0.55);
+.nzc-cookies[data-phase="measure"] {
+  visibility: hidden;
 }
-html.nz-motion .nzc-cookies[open] .nzc-cookies__card {
+.nzc-cookies__card {
+  pointer-events: auto;
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(18, 17, 16, 0.08), 0 18px 40px -22px rgba(18, 17, 16, 0.55);
+}
+html.nz-motion .nzc-cookies:not([data-phase]) .nzc-cookies__card {
   animation: nzc-sheet-up 0.6s var(--ease-gallery) both;
 }
-.nzc-cookies__title {
-  grid-column: 1 / -1;
+.nzc-cookies__text {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 10px;
   margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--graphite);
-}
-.nzc-cookies__text {
-  grid-column: 1 / -1;
-  margin: 0 0 8px;
-  font-size: 0.9375rem;
-  line-height: 1.55;
+  font-size: 0.875rem;
+  line-height: 1.5;
   color: var(--ink);
   text-wrap: pretty;
+}
+.nzc-cookies__text .nzc-cube {
+  transform: translateY(-1px);
 }
 .nzc-cookies__more {
   color: var(--vermilion-deep);
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
+  white-space: nowrap;
 }
 .nzc-cookies__actions {
-  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 .nzc-cookies__actions .nzc-pill {
   width: 100%;
+  padding-inline: 12px;
 }
 @media (min-width: 768px) {
   .nzc-cookies {
-    bottom: 20px;
-    inset-inline: 0;
-    pointer-events: none;
+    /* clear of both corner beads: 24px edge + 52px bead + 16px air on each side */
+    inset: auto 0 calc(20px + env(safe-area-inset-bottom, 0px)) 0;
+    margin-inline: auto;
+    width: min(680px, 100vw - 184px);
   }
   .nzc-cookies__card {
-    pointer-events: auto;
-    max-width: 760px;
-    margin-inline: auto;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 1fr auto;
     align-items: center;
     gap: 20px;
-    padding: 14px 16px 14px 20px;
-    padding-inline: 24px 14px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    box-shadow: 0 24px 50px -30px rgba(18, 17, 16, 0.55);
-  }
-  .nzc-cookies__title,
-  .nzc-cookies__text,
-  .nzc-cookies__actions {
-    grid-column: auto;
-  }
-  .nzc-cookies__text {
-    margin: 0;
+    padding: 10px 10px 10px 10px;
+    padding-inline-start: 20px;
+    border-radius: 999px;
   }
   .nzc-cookies__actions {
     display: flex;
   }
   .nzc-cookies__actions .nzc-pill {
     width: auto;
-    min-width: 124px;
+    min-width: 116px;
   }
 }
 
@@ -689,19 +701,6 @@ html.nz-motion .nzc-cookies[open] .nzc-cookies__card {
 }
 .nzc-crumbs[data-tone="ink"] {
   color: var(--ash);
-}
-
-/* ── Back to the lobby (legacy views) ──────────────────────────────────── */
-.nzc-back {
-  padding-top: 12px;
-}
-.nzc-back__link {
-  font-size: 0.9375rem;
-  color: var(--graphite);
-}
-.nzc-back__arrow {
-  width: 1em;
-  height: 1em;
 }
 
 /* ── Colour filters on <html>, not <body> ──────────────────────────────────

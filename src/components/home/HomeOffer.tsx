@@ -4,9 +4,10 @@ import { Button, WhatsAppCta } from "@/components/nz";
 import { motionAllowed } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { offer } from "@/content/offer";
+import { offerHome } from "@/content/home";
 import { Plate } from "./OfferPlates";
 
-const TEAR_AT = 76; // px of sideways pull that tears the stub
+const TEAR_AT = 76; // px of pull (sideways, or down from the grip) that tears the stub
 
 /** The vermilion cube stamp, pressed onto the ticket. */
 const Stamp = ({ text }: { text: string }) => (
@@ -42,7 +43,9 @@ const Guilloche = () => (
 /**
  * The ticket. Main part = הקמה (one-time setup), perforation, stub = the optional monthly
  * subscription. Pull the stub sideways (touch or mouse) past the tear line to tear it off;
- * the button does the same for keyboard / screen-reader users and reattaches it.
+ * on phones, where the stub hangs under the ticket, the grip row can also be pulled down
+ * (it alone takes touch-action: none, so the rest of the stub still scrolls the page).
+ * The button does the same for keyboard / screen-reader users and reattaches it.
  * Desktop with a fine pointer: a subtle 3D tilt. SSR: renders the whole, attached ticket.
  */
 const AdmissionTicket = () => {
@@ -51,7 +54,15 @@ const AdmissionTicket = () => {
   const [announce, setAnnounce] = useState("");
   const tiltRef = useRef<HTMLDivElement>(null);
   const stubRef = useRef<HTMLDivElement>(null);
-  const drag = useRef<{ id: number; x: number; y: number; dx: number; active: boolean } | null>(null);
+  const drag = useRef<{
+    id: number;
+    x: number;
+    y: number;
+    dx: number;
+    dy: number;
+    grip: boolean;
+    axis: "x" | "y" | null;
+  } | null>(null);
   const raf = useRef(0);
 
   const setTornState = (next: boolean) => {
@@ -90,50 +101,58 @@ const AdmissionTicket = () => {
   }, []);
 
   /* ── tear gesture ── */
-  const setPull = (dx: number) => {
+  const setPull = (dx: number, dy = 0) => {
     const el = stubRef.current;
     if (!el) return;
     el.style.setProperty("--pull", `${dx.toFixed(1)}px`);
-    el.style.setProperty("--pull-rot", `${(dx * 0.045).toFixed(2)}deg`);
+    el.style.setProperty("--pull-y", `${dy.toFixed(1)}px`);
+    el.style.setProperty("--pull-rot", `${(dx * 0.045 + dy * 0.02).toFixed(2)}deg`);
   };
 
   const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (torn || (e.pointerType === "mouse" && e.button !== 0)) return;
-    drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, active: false };
+    const grip = !!(e.target as Element).closest?.(".hm-ticket__grip");
+    drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, dy: 0, grip, axis: null };
   };
   const onMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     const dx = e.clientX - d.x;
     const dy = e.clientY - d.y;
-    if (!d.active) {
-      // a vertical gesture is a page scroll: let it go
-      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) {
-        drag.current = null;
-        return;
+    if (!d.axis) {
+      const vertical = Math.abs(dy) > Math.abs(dx);
+      if (vertical) {
+        // a vertical gesture is a page scroll, unless it pulls the grip down
+        if (Math.abs(dy) < 6) return;
+        if (!d.grip || dy < 0) {
+          drag.current = null;
+          return;
+        }
+        d.axis = "y";
+      } else {
+        if (Math.abs(dx) < 6) return;
+        d.axis = "x";
       }
-      if (Math.abs(dx) < 6) return;
-      d.active = true;
       e.currentTarget.setPointerCapture(e.pointerId);
       e.currentTarget.classList.add("is-pulling");
     }
     d.dx = dx;
+    d.dy = dy;
     // resistance: the paper gives a little, then more as it starts to tear
-    const eased = Math.sign(dx) * Math.min(Math.abs(dx), 140) * 0.75;
-    setPull(eased);
+    if (d.axis === "x") setPull(Math.sign(dx) * Math.min(Math.abs(dx), 140) * 0.75);
+    else setPull(0, Math.min(Math.max(dy, 0), 120) * 0.6);
   };
   const onUp = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = drag.current;
     drag.current = null;
-    if (!d || !d.active) return;
+    if (!d || !d.axis) return;
     e.currentTarget.classList.remove("is-pulling");
     if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
-    if (Math.abs(d.dx) >= TEAR_AT) {
-      e.currentTarget.style.setProperty("--tear-dir", d.dx < 0 ? "-1" : "1");
-      setPull(0);
+    const pulled = d.axis === "x" ? Math.abs(d.dx) : d.dy;
+    setPull(0);
+    if (pulled >= TEAR_AT) {
+      e.currentTarget.style.setProperty("--tear-dir", d.axis === "x" && d.dx > 0 ? "1" : "-1");
       setTornState(true);
-    } else {
-      setPull(0);
     }
   };
 
@@ -153,10 +172,12 @@ const AdmissionTicket = () => {
               <p className="hm-ticket__venue">{t.venue}</p>
               <p className="hm-ticket__kicker">{t.main.kicker}</p>
               <h3 className="hm-ticket__title">{t.main.title}</h3>
-              <ol className="hm-ticket__stages">
-                {t.main.stages.map((stage, i) => (
+              <p className="hm-ticket__field" id="hm-ticket-route">
+                {offerHome.stagesLabel}
+              </p>
+              <ol className="hm-ticket__stages" aria-labelledby="hm-ticket-route">
+                {t.main.stages.map((stage) => (
                   <li key={stage}>
-                    <span className="hm-ticket__field">שלב {String(i + 1).padStart(2, "0")}</span>
                     <span className="hm-ticket__value">{stage}</span>
                   </li>
                 ))}
@@ -189,7 +210,8 @@ const AdmissionTicket = () => {
                   <circle cx="6" cy="18" r="2.6" />
                   <path d="M8.2 7.6 20 17M8.2 16.4 20 7" />
                 </svg>
-                <span>{t.tearHint}</span>
+                <span className="hm-ticket__hint hm-ticket__hint--wide">{offerHome.tearHint}</span>
+                <span className="hm-ticket__hint hm-ticket__hint--phone">{offerHome.tearHintPhone}</span>
               </p>
             </div>
           </div>
@@ -213,8 +235,9 @@ const AdmissionTicket = () => {
 
 /**
  * "ההצעה" — one tailored offer, no prices, no tiers. The admission ticket explains the
- * model; the building blocks follow as a catalogue of drawn plates (one snap-scroll row
- * per group on mobile, a grid on desktop). Needs client JS for the ticket only.
+ * model; what a site can include follows as a catalogue: on phones a compact two-column
+ * index of names per group, from 768px a grid of drawn plates. Needs client JS for the
+ * ticket only.
  */
 const HomeOffer = () => (
   <section id="pricing" className="nz-section nz-section--space-default hm-offer" data-tone="paper" aria-labelledby="hm-offer-title">
@@ -222,7 +245,7 @@ const HomeOffer = () => (
       <div className="hm-offer__stage">
         <header className="hm-offer__head hm-sd">
           <p className="nz-label nz-label--rule">
-            <span className="nz-label__index">אולם 05</span>
+            <span className="nz-label__index">{offerHome.room}</span>
             <span>{offer.eyebrow}</span>
           </p>
           <h2 id="hm-offer-title" className="nz-display nz-display--h2 hm-offer__title">
@@ -248,33 +271,24 @@ const HomeOffer = () => (
 
       <div className="hm-catalog">
         <div className="hm-catalog__intro hm-sd">
-          <h3 className="hm-catalog__title">{offer.scopeTitle}</h3>
+          <h3 className="hm-catalog__title">{offerHome.scopeTitle}</h3>
           <p className="hm-catalog__note">{offer.scopeNote}</p>
         </div>
         {offer.scope.map((group, g) => (
           <section key={group.title} className="hm-catalog__group" aria-labelledby={`hm-catalog-g${g}`}>
             <h4 id={`hm-catalog-g${g}`} className="hm-catalog__group-title">
-              <span className="hm-catalog__group-num">{String(g + 1).padStart(2, "0")}</span>
-              <span>{group.title}</span>
-              <span className="hm-catalog__group-count">{group.items.length} לוחות</span>
+              {group.title}
             </h4>
-            <div className="hm-catalog__scroller" tabIndex={0} role="region" aria-label={group.title}>
-              <ul className="hm-catalog__row">
-                {group.items.map((item, i) => (
-                  <li key={item} className="hm-plate">
-                    <span className={cn("hm-plate__sheet", item === "עיצוב מותאם אישית" && "is-typeset")}>
-                      <Plate item={item} />
-                    </span>
-                    <span className="hm-plate__caption">
-                      <span className="hm-plate__index">
-                        לוח {g + 1}.{i + 1}
-                      </span>
-                      <span className="hm-plate__name">{item}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ul className="hm-catalog__row">
+              {group.items.map((item) => (
+                <li key={item} className="hm-plate">
+                  <span className={cn("hm-plate__sheet", item === "עיצוב מותאם אישית" && "is-typeset")}>
+                    <Plate item={item} />
+                  </span>
+                  <span className="hm-plate__name">{item}</span>
+                </li>
+              ))}
+            </ul>
           </section>
         ))}
       </div>

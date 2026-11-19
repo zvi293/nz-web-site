@@ -57,6 +57,25 @@
   color: var(--ash);
 }
 
+.as-rd__console {
+  display: grid;
+  gap: 14px;
+}
+@media (max-width: 767px) {
+  .as-rd__console {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 3;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 10px var(--gutter) 12px;
+    background: var(--ink);
+    border-bottom: 1px solid var(--line-ink);
+  }
+  .as-rd__console .as-rd__clock {
+    width: 64px;
+    height: 64px;
+  }
+}
 .as-rd__time {
   display: flex;
   align-items: center;
@@ -316,9 +335,8 @@ html.nz-motion .as-rd__slot {
     grid-row: 1 / span 5;
   }
   .as-rd__controls,
-  .as-rd__time,
+  .as-rd__console,
   .as-rd__story,
-  .as-rd__actions,
   .as-rd__verdict {
     grid-column: 2;
   }

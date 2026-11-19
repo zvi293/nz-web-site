@@ -3,26 +3,32 @@ import { offerPage } from "@/content/offer";
 
 const c = offerPage.care;
 
-/** Orbit diagram: the site (a bubble with the cube) and the subscription as a ring of care. */
+/** Orbit diagram: the site (a circle with the cube) and the subscription as a ring of care —
+    every node on the ring is numbered like the card's rows and named inside the ring. */
 const Orbit = () => {
   const n = c.rows.length;
   const R = 158;
+  const RL = 112;
   return (
     <svg className="of-orbit" viewBox="0 0 400 400" aria-hidden="true">
       <circle className="of-orbit__ring" cx="200" cy="200" r={R} pathLength={100} />
       <circle className="of-orbit__ring of-orbit__ring--faint" cx="200" cy="200" r={R + 22} />
-      <circle className="of-orbit__site" cx="200" cy="200" r="74" />
-      <path className="of-orbit__shine" d="M152 168a62 62 0 0 1 40-40" />
-      <rect className="of-orbit__cube" x="190" y="190" width="20" height="20" />
-      {Array.from({ length: n }, (_, i) => {
+      <circle className="of-orbit__site" cx="200" cy="200" r="62" />
+      <rect className="of-orbit__cube" x="191" y="191" width="18" height="18" />
+      {c.rows.map((row, i) => {
         const a = (i / n) * Math.PI * 2 - Math.PI / 2;
         const x = 200 - Math.cos(a) * R;
         const y = 200 + Math.sin(a) * R;
+        const lx = 200 - Math.cos(a) * RL;
+        const ly = 200 + Math.sin(a) * RL;
         return (
-          <g key={i} className="of-orbit__node" style={{ "--i": i } as React.CSSProperties}>
+          <g key={row.name} className="of-orbit__node" style={{ "--i": i } as React.CSSProperties}>
             <circle cx={x} cy={y} r="17" />
             <text x={x} y={y + 5} textAnchor="middle">
               {i + 1}
+            </text>
+            <text className="of-orbit__label" x={lx} y={ly + 6} textAnchor="middle">
+              {row.orbit}
             </text>
           </g>
         );

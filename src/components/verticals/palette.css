@@ -140,7 +140,7 @@
   justify-items: start;
 }
 .vl-pl__kicker {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
   color: var(--t-ink);
   opacity: 0.78;

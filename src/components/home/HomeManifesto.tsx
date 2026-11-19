@@ -17,13 +17,17 @@ const BrushStroke = () => (
  * The ink room with one sentence. Signature: "שורות נגדיות" — the sentence is set as
  * huge serif lines that slide in opposite directions while the room passes through the
  * viewport (CSS scroll-driven animation, no JS); a vermilion brush paints under "במקומו".
+ * The drift only ever moves a line inward from its aligned edge, so no line leaves the
+ * gutter. On phones each line splits into its segments (two or three words each), and
+ * the segments drift; from 768px the segments of a line join and whole lines drift.
  * A detail of one piece and the founder's signature close the room.
  * Fully static: no client JS. Without scroll-timeline support or with reduced motion,
  * the lines simply sit in their final, aligned places.
  */
 const HomeManifesto = () => {
   const detail = getArt(manifesto.detail.slug);
-  const last = manifesto.lines.length - 1;
+  const lastLine = manifesto.lines.length - 1;
+  let seg = 0;
   return (
     <section className="nz-section nz-section--space-default hm-manifesto" data-tone="ink" aria-labelledby="hm-manifesto-label">
       <div className="nz-container hm-manifesto__grid">
@@ -34,20 +38,26 @@ const HomeManifesto = () => {
 
         <blockquote className="hm-manifesto__quote">
           <p className="nz-display hm-manifesto__text">
-            {manifesto.lines.map((line, i) => (
-              <span key={line} className={`hm-drift hm-drift--${i % 2 === 0 ? "a" : "b"}`}>
-                <span className="hm-drift__inner">
-                  {line}
-                  {i === last && (
-                    <>
-                      {" "}
-                      <span className="hm-manifesto__accent">
-                        <span className="nz-accent">{manifesto.accent}</span>
-                        <BrushStroke />
-                      </span>
-                    </>
-                  )}
-                </span>{" "}
+            {manifesto.lines.map((segments, li) => (
+              <span key={segments.join(" ")} className={`hm-drift hm-drift--${li % 2 === 0 ? "a" : "b"}`}>
+                {segments.map((text, si) => {
+                  const parity = seg++ % 2 === 0 ? "a" : "b";
+                  const isLast = li === lastLine && si === segments.length - 1;
+                  return (
+                    <span key={text} className={`hm-drift__seg hm-drift__seg--${parity}`}>
+                      {text}
+                      {isLast && (
+                        <>
+                          {" "}
+                          <span className="hm-manifesto__accent">
+                            <span className="nz-accent">{manifesto.accent}</span>
+                            <BrushStroke />
+                          </span>
+                        </>
+                      )}{" "}
+                    </span>
+                  );
+                })}
               </span>
             ))}
           </p>
@@ -63,21 +73,17 @@ const HomeManifesto = () => {
         </blockquote>
 
         <figure className="hm-manifesto__detail">
-          <div className="hm-manifesto__loupe">
-            <Artwork
-              slug={manifesto.detail.slug}
-              sizes="(min-width: 1024px) 26vw, 56vw"
-              ratio="1 / 1"
-              position="58% 46%"
-              frame
-              alt={detail.alt}
-              className="hm-static-art"
-            />
-          </div>
+          <Artwork
+            slug={manifesto.detail.slug}
+            sizes="(min-width: 1024px) 30vw, 92vw"
+            frame
+            alt={detail.alt}
+            className="hm-static-art"
+          />
           <MuseumLabel
             as="figcaption"
-            index={1}
-            prefix={manifesto.detail.prefix}
+            index={manifesto.detail.prefix}
+            prefix=""
             title={detail.title}
             medium={manifesto.detail.medium}
           />

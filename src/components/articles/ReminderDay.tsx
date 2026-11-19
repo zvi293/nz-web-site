@@ -132,6 +132,9 @@ const ReminderDay = () => {
           </button>
         </div>
 
+        {/* the clock and the button that turns it travel together (sticky on phones), so the hands
+            always move in view while the diary below changes */}
+        <div className="as-rd__console">
         <div className="as-rd__time">
           <svg className="as-rd__clock" viewBox="0 0 64 64" aria-hidden="true">
             <circle cx="32" cy="32" r="29" className="as-rd__face" />
@@ -152,6 +155,19 @@ const ReminderDay = () => {
               ))}
             </ol>
           </div>
+        </div>
+
+        <div className="as-rd__actions">
+          <button ref={btnRef} type="button" className="as-btn as-btn--primary" onClick={advance}>
+            {last ? "שוב מהערב שלפני" : `הזיזו את השעון: ${MOMENTS[step + 1].label}`}
+          </button>
+          {seen[mode] && !seen[mode === "on" ? "off" : "on"] && last && (
+            <button type="button" className="as-btn" onClick={flip}>
+              {mode === "off" ? "עכשיו עם תזכורות" : "עכשיו בלי תזכורות"}
+            </button>
+          )}
+        </div>
+
         </div>
 
         <div className="as-rd__diary">
@@ -186,17 +202,6 @@ const ReminderDay = () => {
         <p className="as-rd__story" aria-live="polite">
           {STORY[mode][step]}
         </p>
-
-        <div className="as-rd__actions">
-          <button ref={btnRef} type="button" className="as-btn as-btn--primary" onClick={advance}>
-            {last ? "שוב מהערב שלפני" : `הזיזו את השעון: ${MOMENTS[step + 1].label}`}
-          </button>
-          {seen[mode] && !seen[mode === "on" ? "off" : "on"] && last && (
-            <button type="button" className="as-btn" onClick={flip}>
-              {mode === "off" ? "עכשיו עם תזכורות" : "עכשיו בלי תזכורות"}
-            </button>
-          )}
-        </div>
 
         {seen.on && seen.off && (
           <div className="as-rd__verdict">

@@ -5,6 +5,11 @@
  *            progress hairline (CSS scroll-driven where supported).
  *   <1100px  a floating pill "בעמוד הזה · 02/06" that appears after the summary and opens a
  *            bottom sheet (native <dialog>) with the chapters + how much has been read.
+ *            While reading (scrolling down) the pill steps out of the way; scrolling back up — the
+ *            gesture of someone looking for their place — brings it back. <html> carries
+ *            .ar-pill-on while it shows, so the shared floating chrome can make room.
+ *   ≥1100px  the rail fades out while a wide exhibit (#signature[data-wide]) takes its wall.
+ * The counters are isolated LTR ("02/06"), so the bidi algorithm never reads them backwards.
  *            The sheet takes ONE history entry, so the phone's BACK button closes it; jumping to a
  *            chapter re-uses that entry (replaceState) instead of adding another.
  * No-JS: the rail still works (plain links); the pill is hidden.
@@ -27,7 +32,7 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
         <div class="ar-rail__sticky">
           <p id="ar-rail-title" class="ar-rail__title">
             <span>בעמוד הזה</span>
-            <span class="ar-rail__count" aria-hidden="true">
+            <span class="ar-rail__count" aria-hidden="true" dir="ltr">
               <span data-toc-current>01</span>/{total}
             </span>
           </p>
@@ -57,12 +62,11 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
           </svg>
         </span>
         <span class="ar-pill__label">בעמוד הזה</span>
-        <span class="ar-pill__count">
-          <span class="nz-sr">פרק </span>
-          <span data-toc-current>01</span>
-          <span aria-hidden="true">/</span>
-          <span class="nz-sr"> מתוך </span>
-          {total}
+        <span class="nz-sr">, פרק </span>
+        <span class="nz-sr" data-toc-current>01</span>
+        <span class="nz-sr"> מתוך {total}</span>
+        <span class="ar-pill__count" aria-hidden="true" dir="ltr">
+          <span data-toc-current>01</span>/{total}
         </span>
       </button>
 
@@ -167,17 +171,48 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
     }
     setActive();
 
-    /* ── pill visibility: after the summary card, until the FAQ / related reading ── */
+    /* ── pill visibility: after the summary card, until the FAQ / related reading; hidden while
+       the reader scrolls down (reading), back on the way up (looking for a place) ── */
     let pastSummary = false;
     let atEnd = false;
     let overPlate = false;
-    const syncPill = () => pill.classList.toggle("is-visible", pastSummary && !atEnd && !overPlate);
-    /* step aside while the signature component (its own buttons sit low on the screen) is in view */
+    let reading = false;
+    const syncPill = () => {
+      const on = pastSummary && !atEnd && !overPlate && !reading;
+      pill.classList.toggle("is-visible", on);
+      html.classList.toggle("ar-pill-on", on);
+    };
+    let lastY = window.scrollY;
+    let ticking = false;
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          const y = window.scrollY;
+          const dy = y - lastY;
+          if (Math.abs(dy) < 10) return;
+          lastY = y;
+          const next = dy > 0;
+          if (next !== reading && !sheet.open && document.activeElement !== pill) {
+            reading = next;
+            syncPill();
+          }
+        });
+      },
+      { passive: true },
+    );
+    /* step aside while the signature component (its own buttons sit low on the screen) is in view;
+       on wide screens the rail does the same for a wide exhibit, which spans the rail's wall */
     const plate = document.getElementById("signature");
+    const rail = document.querySelector<HTMLElement>(".ar-rail");
     if (plate && "IntersectionObserver" in window)
       new IntersectionObserver(([e]) => {
         overPlate = e.isIntersecting;
         syncPill();
+        if (rail && plate.hasAttribute("data-wide")) rail.classList.toggle("is-yielding", e.isIntersecting);
       }, { rootMargin: "0px 0px -10% 0px" }).observe(plate);
     if ("IntersectionObserver" in window && summary) {
       new IntersectionObserver(([e]) => {

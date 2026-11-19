@@ -50,7 +50,7 @@
   position: relative;
   width: 100%;
   max-width: 440px;
-  aspect-ratio: 340 / 500;
+  aspect-ratio: 340 / 470; /* the exact ratio is set inline from the stack's height */
   margin-inline: auto;
   overflow: hidden;
   touch-action: pan-y;
@@ -104,6 +104,9 @@ html.nz-motion .as-xs.is-pulling .as-xs__plate {
 }
 .as-xs__plate.is-dashed .as-xs__glyph {
   stroke: var(--bone);
+}
+.as-xs__plate.is-out {
+  filter: drop-shadow(-6px 10px 8px rgba(0, 0, 0, 0.55));
 }
 .as-xs__plate.is-out .as-xs__t {
   fill: #f6c9bc;

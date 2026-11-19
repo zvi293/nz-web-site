@@ -289,7 +289,9 @@
     line-height: 1.65;
     color: var(--fg-muted);
     text-wrap: pretty;
-    max-width: 38ch;
+    /* em, not ch: "ch" is the width of "0", which differs between Heebo and its metric fallback,
+       so a ch measure re-wraps the lede when the font swaps (CLS). 21.25em = 38ch in Heebo. */
+    max-width: 21.25em;
   }
 
   /* Buttons — pills. Min height 48px (44px tap target + air). */
@@ -500,7 +502,9 @@
     pointer-events: none;
     box-shadow: inset 0 2px 6px rgba(18, 17, 16, 0.25);
   }
-  /* gallery light: a soft spot from above on the wall behind the piece */
+  /* gallery light: a soft spot from above on the wall behind the piece. Its brightest point is
+     the top edge of its box (14% above the frame), which drew a hard pale line across the wall and
+     bleached the line of text above a stacked piece: the mask fades it in from nothing. */
   .nz-art--lit::before {
     content: "";
     position: absolute;
@@ -509,6 +513,12 @@
     z-index: -1;
     pointer-events: none;
     background: radial-gradient(ellipse 50% 60% at 50% 0%, rgba(255, 251, 240, 0.85), transparent 72%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 55%);
+    mask-image: linear-gradient(to bottom, transparent, #000 55%);
+  }
+  /* the contrast modes repaint every element but not pseudo-elements: no grey glow on black/white */
+  :is(.a11y-high-contrast-dark, .a11y-high-contrast-light) .nz-art--lit::before {
+    display: none;
   }
   .nz-art--frame.nz-art--hover:hover .nz-art__frame,
   a:hover > .nz-art--frame .nz-art__frame,
@@ -554,8 +564,17 @@
     font-weight: 500;
     letter-spacing: 0;
   }
+  /* the medium line is a sentence, not a label: readable on phones, never a one-word last line */
   .nz-museum__medium {
     max-width: 52ch;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+  @media (min-width: 768px) {
+    .nz-museum__medium {
+      font-size: 0.875rem;
+    }
   }
 
   /* Reveal — hidden start states ONLY under the motion gate */
@@ -614,6 +633,11 @@
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 60;
+    /* The bar's layout follows the header's width in rem (container queries below), not the
+       viewport: a 200% text zoom / large default font behaves like a narrower screen, so the
+       actions never get pushed off-screen. (Safe on this fixed box: it already is the
+       containing block of the services panel.) */
+    container: nzh / inline-size;
     height: var(--header-h);
     background: var(--bone);
     color: var(--ink);
@@ -628,23 +652,25 @@
     height: 100%;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: min(1.5rem, 4cqi);
   }
   .nz-header__logo {
-    font-size: 1.625rem;
+    font-size: min(1.625rem, 8.5cqi);
     min-height: 44px;
+    min-width: 0;
+    flex-shrink: 1;
     align-items: center;
     display: inline-flex;
   }
   @media (min-width: 768px) {
     .nz-header__logo {
-      font-size: 1.875rem;
+      font-size: min(1.875rem, 8.5cqi);
     }
   }
   .nz-nav {
     display: none;
   }
-  @media (min-width: 1024px) {
+  @container nzh (min-width: 64rem) {
     .nz-nav {
       display: flex;
       align-items: center;
@@ -704,8 +730,44 @@
   .nz-header__actions {
     margin-inline-start: auto;
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     gap: 0.5rem;
+  }
+  /* WhatsApp in the bar: the full pill on a wide header, "וואטסאפ" on a phone, the glyph alone
+     on a very narrow / zoomed header, and nothing below that (the menu carries the CTA). */
+  .nz-header__wa--long {
+    display: none;
+  }
+  @container nzh (min-width: 48rem) {
+    .nz-header__wa--long {
+      display: inline-flex;
+    }
+    .nz-header__wa--short {
+      display: none;
+    }
+  }
+  @container nzh (max-width: 21.5rem) {
+    .nz-header__wa-text {
+      display: none;
+    }
+    .nz-header__wa--short {
+      min-width: 44px;
+      padding-inline: 0.625rem;
+    }
+  }
+  @container nzh (max-width: 15rem) {
+    .nz-header__wa--short {
+      display: none;
+    }
+  }
+  .nz-menu-btn__label {
+    display: none;
+  }
+  @container nzh (min-width: 26.25rem) {
+    .nz-menu-btn__label {
+      display: inline;
+    }
   }
   .nz-menu-btn {
     display: inline-flex;
@@ -741,8 +803,8 @@
     bottom: 0;
     inset-inline-start: 7px;
   }
-  @media (min-width: 1024px) {
-    .nz-menu-btn {
+  @container nzh (min-width: 64rem) {
+    .nz-header .nz-menu-btn {
       display: none;
     }
   }
@@ -922,6 +984,9 @@
     background: var(--ink);
     color: var(--bone);
     overflow: hidden;
+    /* while the cookie card is open it publishes its footprint (CookieConsent → --nz-cookie-h):
+       the night room grows by that much, so the end of the page can always be scrolled clear */
+    padding-bottom: var(--nz-cookie-h, 0px);
   }
   .nz-footer a {
     color: inherit;
@@ -942,6 +1007,7 @@
     display: inline-flex;
     align-items: center;
     min-height: 44px;
+    min-width: 44px; /* short labels (עבודות, מגזין…) still get a 44×44 target */
     font-size: 0.9375rem;
     text-decoration: none;
     background-image: linear-gradient(currentColor, currentColor);
@@ -1115,143 +1181,4 @@
 
 .a11y-reading-guide-active {
   /* body class marker — the guide line is rendered in React */
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
-   LEGACY — remove after phase 2
-   Classes still used by pages that are not redesigned yet. They are re-pointed
-   to the gallery palette (no gradients, no glass, no glow, no loops) so those
-   pages read as part of the same site in the meantime. Do NOT use in new code.
-   ══════════════════════════════════════════════════════════════════════════ */
-@layer utilities {
-  .text-gradient-brand,
-  .text-gradient-static {
-    color: var(--vermilion-deep);
-    padding-block: 0.06em;
-  }
-  .nz-brand-dark .text-gradient-brand,
-  .nz-brand-dark .text-gradient-static {
-    color: #f07a5c;
-  }
-  .text-balance {
-    text-wrap: balance;
-  }
-  .text-pretty {
-    text-wrap: pretty;
-  }
-
-  .glass-card,
-  .glass-strong {
-    background: var(--paper);
-    border: 1px solid var(--line);
-  }
-  .glass-strong {
-    box-shadow: var(--shadow-lg);
-  }
-  .soft-shadow {
-    box-shadow: var(--shadow-md);
-  }
-  .soft-shadow-lg {
-    box-shadow: var(--shadow-lg);
-  }
-  .shadow-brand {
-    box-shadow: var(--shadow-md);
-  }
-  .ring-gradient {
-    position: relative;
-  }
-
-  .nz-aurora,
-  .nz-grid,
-  .nz-dots,
-  .animate-float,
-  .animate-float-slow {
-    display: none !important;
-  }
-  .nz-grain::after {
-    content: none;
-  }
-
-  .nz-brand-dark {
-    position: relative;
-    isolation: isolate;
-    background: var(--ink);
-    color: var(--bone);
-    --focus: #f3a48f;
-    --focus-halo: rgba(18, 17, 16, 0.9);
-  }
-
-  .btn-glow {
-    box-shadow: none;
-  }
-  .btn-brand {
-    position: relative;
-    background: var(--vermilion-fill);
-    color: #fff;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  .btn-brand:hover {
-    background: #c23417;
-  }
-  .btn-brand:active {
-    background: var(--vermilion-deep);
-    transform: translateY(1px);
-  }
-  .btn-ghost-glass {
-    background: transparent;
-    border: 1px solid currentColor;
-  }
-
-  .hover-lift {
-    transition: transform 0.5s var(--ease-gallery), box-shadow 0.5s var(--ease-gallery);
-  }
-  .hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-  }
-  .spotlight {
-    position: relative;
-  }
-
-  .nz-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    color: var(--vermilion-deep);
-  }
-  .nz-eyebrow::before {
-    content: "";
-    width: 6px;
-    height: 6px;
-    background: var(--vermilion);
-  }
-  .nz-brand-dark .nz-eyebrow {
-    color: #f07a5c;
-  }
-
-  .text-display {
-    font-family: var(--font-display);
-    font-size: clamp(2.4rem, 6vw + 0.4rem, 5.25rem);
-    line-height: 1.04;
-    letter-spacing: -0.02em;
-    font-weight: 500;
-  }
-  .text-section-title {
-    font-family: var(--font-display);
-    font-size: clamp(1.9rem, 4.4vw, 3.5rem);
-    line-height: 1.1;
-    letter-spacing: -0.015em;
-    font-weight: 500;
-  }
-  .text-lede {
-    font-size: clamp(1rem, 1.9vw, 1.2rem);
-    line-height: 1.8;
-  }
-
-  .nz-pulse-ring {
-    display: none;
-  }
 }

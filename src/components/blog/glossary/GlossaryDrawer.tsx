@@ -4,7 +4,8 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerE
 /**
  * "The card drawer" — the glossary's signature (/glossary/). A library card-catalogue drawer holds
  * one index card per term, standing in alphabetical order; guide cards with taller tabs carry the
- * letters, like a real catalogue. Run a thumb (or the mouse) along the card tops and the drawer
+ * letters, like a real catalogue — their tabs stand at three heights in turn (like guides cut in
+ * thirds), so neighbouring letters never collide even on a 360px phone. Run a thumb (or the mouse) along the card tops and the drawer
  * riffles: the card under the finger rises out of the drawer and is read on the large card above
  * (term, the other name, field, definition), its neighbours lift a little in a wave. "ראו גם" on
  * the card are cross-reference tabs: tap one and the drawer riffles to that card. The full entry in
@@ -39,6 +40,11 @@ const GlossaryDrawer = ({ terms }: Props) => {
   const t = terms[i];
   const index = useMemo(() => new Map(terms.map((x, k) => [x.slug, k])), [terms]);
   const guides = useMemo(() => terms.map((x, k) => k === 0 || terms[k - 1].letter !== x.letter), [terms]);
+  /* the tab height of each guide card: 0, 1, 2, 0, … in letter order */
+  const tiers = useMemo(() => {
+    let g = -1;
+    return guides.map((isGuide) => (isGuide ? ++g % 3 : 0));
+  }, [guides]);
 
   /* announce the card once the riffle settles (not on the first render) */
   const first = useRef(true);
@@ -173,7 +179,10 @@ const GlossaryDrawer = ({ terms }: Props) => {
               <span
                 key={x.slug}
                 className={`gl-cat__c${k === i ? " is-up" : ""}${guides[k] ? " is-guide" : ""}`}
-                style={{ ["--lift" as string]: String(Math.max(0, 3 - d)) }}
+                style={{
+                  ["--lift" as string]: String(Math.max(0, 3 - d)),
+                  ...(guides[k] ? { ["--tier" as string]: String(tiers[k]) } : {}),
+                }}
               >
                 {guides[k] && <b>{x.letter}</b>}
               </span>

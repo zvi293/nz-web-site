@@ -9,8 +9,8 @@ import { processSteps } from "@/content/home";
  * "The making of" — four steps in the ink room. Opener: the title over a hairline
  * "ruler" that names the four stations. Desktop: a scroll moment — the art hangs in a
  * sticky frame and changes (curtain wipe) as each step passes the middle of the viewport.
- * Mobile: each step is a framed piece with its wall card pinned over the frame's corner,
- * alternating sides along a hairline. SSR: step 01 active; JS only drives the desktop wipe.
+ * Mobile: each step is a framed piece, alternating sides, with its wall card beneath.
+ * One numbering only: "שלב 01 מתוך 04" above each step name. SSR: step 01 active; JS only drives the desktop wipe.
  */
 const HomeProcess = () => {
   const stepRefs = useRef<(HTMLLIElement | null)[]>([]);
@@ -36,7 +36,6 @@ const HomeProcess = () => {
         <ol className="hm-ruler" aria-label="ארבעת השלבים">
           {steps.map((step, i) => (
             <li key={step.name} className={cn("hm-ruler__stop", i === active && "is-active")}>
-              <span className="hm-ruler__num">{String(i + 1).padStart(2, "0")}</span>
               <span className="hm-ruler__name">{step.name}</span>
             </li>
           ))}
@@ -53,10 +52,6 @@ const HomeProcess = () => {
             >
               <div className="hm-step__art hm-sd">
                 <Artwork slug={step.art} sizes="(min-width: 768px) 70vw, 88vw" ratio="4 / 3" frame />
-                <span className="hm-step__pin" aria-hidden="true">
-                  <span className="hm-step__pin-num">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="hm-step__pin-of">/ {total}</span>
-                </span>
               </div>
               <div className="hm-step__body hm-sd">
                 <p className="nz-label">
@@ -83,8 +78,6 @@ const HomeProcess = () => {
               <span className="hm-process__meter-fill" style={{ ["--p" as string]: (active + 1) / steps.length }} />
             </div>
             <MuseumLabel
-              index={active + 1}
-              prefix="שלב"
               title={steps[active].name}
               medium={`מתוך האוסף: ${getArt(steps[active].art).title}`}
             />

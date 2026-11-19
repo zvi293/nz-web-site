@@ -12,6 +12,12 @@
  *   --format jpg|png    image format (default jpg, quality 85)
  *   --wait <ms>         extra settle time after load, before scrolling (default 400)
  *   --reduced-motion    emulate prefers-reduced-motion: reduce (final states, no transitions)
+ *   --motion            look like a real browser to the boot script: navigator.webdriver reads
+ *                       false (evaluateOnNewDocument, before any page script), so BaseLayout's
+ *                       boot script and initMotionGate() put html.nz-motion on and the motion
+ *                       start/end states are captured. Without it, headless runs show final
+ *                       states only (the motion gate stays closed for automation browsers).
+ *                       Ignored with --reduced-motion (that one wins, as on a real device).
  *   --cookie-banner     keep the first-visit cookie banner (default: pre-declined so it does not
  *                       cover the layout; the banner itself is still worth one shot now and then)
  *   --mode scroll|full  scroll (default): capture viewport by viewport while scrolling and stitch
@@ -47,7 +53,7 @@ const paths = [];
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
   if (a === "--help" || a === "-h") {
-    console.log("usage: npm run shoot -- [--base URL] [--widths 390,1440] [--out DIR] [--format jpg|png] [--wait MS] [--mode scroll|full] [--reduced-motion] [--cookie-banner] [--no-shots] /path/ …");
+    console.log("usage: npm run shoot -- [--base URL] [--widths 390,1440] [--out DIR] [--format jpg|png] [--wait MS] [--mode scroll|full] [--reduced-motion] [--motion] [--cookie-banner] [--no-shots] /path/ …");
     process.exit(0);
   }
   if (VALUE_FLAGS.has(a)) opts[a.slice(2)] = argv[++i];
@@ -183,6 +189,7 @@ function probe(isPhone) {
   const textOverflow = [];
   for (const el of document.body.querySelectorAll("*")) {
     if (["SCRIPT", "STYLE", "SVG", "svg", "IMG", "VIDEO", "CANVAS", "INPUT", "TEXTAREA", "SELECT", "IFRAME", "PICTURE"].includes(el.tagName)) continue;
+    if (el.closest("svg")) continue; // SVG <text>/<tspan> has no meaningful scrollWidth
     const hasText = [...el.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim().length > 1);
     if (!hasText) continue;
     const cs = getComputedStyle(el);
@@ -292,6 +299,10 @@ try {
     for (const width of WIDTHS) {
       const isPhone = width < 768;
       const tag = `${slug(url)}-w${width}`;
+      // the 404 page answers with HTTP 404 on purpose
+      const expect404 = /\/404(\.html|\/)?$/.test(new URL(url).pathname);
+      // one retry when a dev-server reload (HMR) kills the page mid-shot
+      for (let attempt = 0; attempt < 2; attempt++) {
       const page = await browser.newPage();
       const consoleErrors = [];
       const failed = [];
@@ -303,6 +314,7 @@ try {
         failed.push(`${err}  ${r.url().replace(BASE, "")}`);
       });
       page.on("response", (r) => {
+        if (expect404 && r.status() === 404 && r.request().isNavigationRequest()) return;
         if (r.status() >= 400) failed.push(`HTTP ${r.status()}  ${r.url().replace(BASE, "")}`);
       });
 
@@ -310,6 +322,12 @@ try {
         if (isPhone) await page.setUserAgent(MOBILE_UA);
         await page.setViewport({ width, height: isPhone ? 844 : 900, deviceScaleFactor: isPhone ? 2 : 1, isMobile: isPhone, hasTouch: isPhone });
         if (opts["reduced-motion"]) await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+        else if (opts.motion) {
+          // the boot script gates html.nz-motion on !navigator.webdriver — present a real browser
+          await page.evaluateOnNewDocument(() => {
+            Object.defineProperty(Navigator.prototype, "webdriver", { get: () => false, configurable: true });
+          });
+        }
         if (!opts["cookie-banner"]) {
           await page.evaluateOnNewDocument(() => {
             try { if (!localStorage.getItem("nz_web_cookie_consent")) localStorage.setItem("nz_web_cookie_consent", "declined"); } catch { /* blocked */ }
@@ -317,7 +335,7 @@ try {
         }
 
         const res = await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
-        if (!res || res.status() >= 400) throw new Error(`HTTP ${res ? res.status() : "no response"}`);
+        if (!res || (res.status() >= 400 && !(expect404 && res.status() === 404))) throw new Error(`HTTP ${res ? res.status() : "no response"}`);
         await page.waitForNetworkIdle({ idleTime: 500, concurrency: 0, timeout: 15000 }).catch(() => {});
         await page.evaluate(() => document.fonts.ready.then(() => true));
         await sleep(EXTRA_WAIT);
@@ -387,12 +405,18 @@ try {
         console.log(`${status} ${bold(`${new URL(url).pathname} @${width}${isPhone ? " (phone)" : ""}`)}  height ${info.height}px  → ${where}`);
         for (const e of errs) console.log("    " + red("ERROR") + " " + e);
         for (const w of warns) console.log("    " + yel("warn ") + " " + w);
+        break;
       } catch (e) {
+        if (attempt === 0 && /Execution context was destroyed|detached|Target closed/i.test(e.message)) {
+          console.log(`${yel("•")} ${bold(`${url} @${width}`)}  reloaded mid-shot (${short(e.message, 80)}), retrying once`);
+          continue;
+        }
         failedLoads++;
         console.log(`${red("✖")} ${bold(`${url} @${width}`)}  FAILED: ${e.message}`);
         for (const c of consoleErrors.slice(0, 5)) console.log("    console: " + short(c, 200));
       } finally {
         await page.close().catch(() => {});
+      }
       }
     }
   }

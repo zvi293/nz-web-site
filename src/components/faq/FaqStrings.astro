@@ -137,6 +137,11 @@ const miniStrings = (count: number) =>
     const ring: Ring = { raf: 0 };
     rings.set(d, ring);
     d.classList.add("is-ringing");
+    /* a real pluck (not the faint sympathetic answer) flashes the string for a moment */
+    if (amp >= 7) {
+      d.classList.add("is-struck");
+      window.setTimeout(() => d.classList.remove("is-struck"), 300);
+    }
     const step = (now: number) => {
       const t = (now - t0) / 1000;
       const y = amp * Math.exp(-t / 0.55) * Math.cos(2 * Math.PI * f * t);
@@ -171,7 +176,8 @@ const miniStrings = (count: number) =>
         mini?.classList.toggle("is-open", d.open);
         const x = lastX.get(d) ?? 500;
         lastX.delete(d);
-        pluck(d, x, d.open ? 21 : 7);
+        /* on a phone the pluck must read at a glance: a wider first swing */
+        pluck(d, x, d.open ? (coarse.matches ? 30 : 21) : 7);
         /* sympathetic resonance: the neighbouring strings ring faintly */
         if (d.open && motionOn()) {
           const i = strings.indexOf(d);

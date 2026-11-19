@@ -38,6 +38,7 @@ html.nz-motion .fq-enter {
 }
 .fq-hero__title {
   margin: 0;
+  text-wrap: balance;
   font-size: clamp(2.625rem, 1.5rem + 4vw, 5.75rem);
   line-height: 1.02;
   letter-spacing: -0.02em;
@@ -61,8 +62,9 @@ html.nz-motion .fq-enter {
     clip-path: inset(0 0 0 0);
   }
 }
+/* backwards only: once revealed, nothing clips the frame's cast shadow */
 html.nz-motion .fq-hero__frame {
-  animation: fq-strings-in 1.3s var(--ease-gallery) 0.1s both;
+  animation: fq-strings-in 1.3s var(--ease-gallery) 0.1s backwards;
 }
 .fq-jump {
   border-top: 1px solid var(--rule);
@@ -79,7 +81,7 @@ html.nz-motion .fq-hero__frame {
 }
 .fq-jump__link {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) auto 20px;
+  grid-template-columns: 34px minmax(0, 1fr) 20px;
   align-items: baseline;
   gap: 10px;
   min-height: 52px;
@@ -98,10 +100,14 @@ html.nz-motion .fq-hero__frame {
   font-size: 1.375rem;
   line-height: 1.2;
 }
-.fq-jump__count {
-  font-size: 0.8125rem;
+.fq-jump__text {
+  display: grid;
+  gap: 2px;
+}
+.fq-jump__note {
+  font-size: 0.9375rem;
+  line-height: 1.45;
   color: var(--graphite);
-  font-variant-numeric: tabular-nums;
 }
 .fq-jump__arrow {
   width: 18px;
@@ -188,7 +194,7 @@ html.nz-motion .fq-hero__frame {
 }
 .fq-octave__note {
   margin: 10px 0 0;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   color: var(--graphite);
 }
 .fq-octave__strings {
@@ -273,9 +279,8 @@ html.nz-motion .fq-mini__string.is-open {
 .fq-q__sum {
   position: relative;
   display: grid;
-  /* the +/− sits right after the question, not at the far end of the line */
-  grid-template-columns: 30px fit-content(calc(100% - 78px)) 24px;
-  justify-content: start;
+  /* number | question | +/−: the toggles stand in one straight column, at the line's end */
+  grid-template-columns: 28px minmax(0, 1fr) 24px;
   align-items: start;
   gap: 12px;
   min-height: 64px;
@@ -310,7 +315,8 @@ html.nz-motion .fq-mini__string.is-open {
   font-weight: 400;
   line-height: 1.3;
   color: var(--ink);
-  text-wrap: balance;
+  /* pretty, not balance: a question that fits on one line stays on one line */
+  text-wrap: pretty;
   transition: color 0.3s ease;
 }
 .fq-q__sum:hover .fq-q__text,
@@ -323,7 +329,7 @@ html.nz-motion .fq-mini__string.is-open {
   width: 18px;
   height: 18px;
   margin-top: 0.45em;
-  justify-self: start;
+  justify-self: end;
 }
 .fq-q__icon::before,
 .fq-q__icon::after {
@@ -345,7 +351,7 @@ html.nz-motion .fq-mini__string.is-open {
 .fq-q__string {
   position: absolute;
   inset-inline-start: -16px;
-  inset-inline-end: var(--short, 0%);
+  inset-inline-end: calc(var(--short, 0%) * 0.2);
   bottom: 0;
   height: 28px;
   pointer-events: none;
@@ -367,8 +373,18 @@ html.nz-motion .fq-mini__string.is-open {
 .fq-q.is-ringing .fq-q__string path {
   stroke: var(--vermilion);
 }
+@media (pointer: coarse) {
+  .fq-q__string path {
+    stroke-width: calc(var(--w) * 1px + 1px);
+  }
+}
 .fq-q:not(.fq-q--c)[open] .fq-q__string path {
   stroke: var(--ink);
+}
+/* the first instant of a pluck: the struck string flashes deep vermilion and thickens */
+.fq-harp .fq-q.is-struck .fq-q__string path {
+  stroke: var(--vermilion-deep);
+  stroke-width: calc(var(--w) * 1px + 1.5px);
 }
 /* the tuning pin (start) and the bridge pin (end) */
 .fq-q__string::before,
@@ -394,8 +410,8 @@ html.nz-motion .fq-mini__string.is-open {
   background: var(--graphite);
 }
 .fq-q__a {
+  /* on phones the answer uses the whole width between the pillar and the gutter */
   padding: 4px 0 30px;
-  padding-inline-start: 42px;
 }
 .fq-q__sum:hover .fq-q__icon,
 .fq-q[open] .fq-q__icon {
@@ -457,10 +473,15 @@ html.nz-motion .fq-q[open] .fq-q__a p {
     grid-column: 5 / span 8;
     margin-top: 0;
   }
+  /* the question column is set to a reading measure; the toggles stand at its end, where
+     the shortest (top) strings end */
   .fq-q__sum {
-    grid-template-columns: 44px fit-content(calc(100% - 108px)) 24px;
+    grid-template-columns: 44px minmax(0, 31rem) 32px;
     gap: 20px;
     padding: 24px 0 36px;
+  }
+  .fq-q__string {
+    inset-inline-end: var(--short, 0%);
   }
   .fq-q__a {
     padding-inline-start: 60px;

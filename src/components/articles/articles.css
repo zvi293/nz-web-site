@@ -27,6 +27,19 @@
     box-shadow: 0 30px 60px -40px rgba(18, 17, 16, 0.7);
   }
 }
+/* a wide exhibit takes the TOC rail's wall as well (the rail fades out while it is in view):
+   the prose column + the gap + the 240px rail (article.css .ar-layout) */
+@media (min-width: 1100px) {
+  .ar-prose .as-plate[data-wide] {
+    margin-inline-end: calc(-1 * (64px + 240px));
+    padding: 40px 44px 44px;
+  }
+}
+@media (min-width: 1360px) {
+  .ar-prose .as-plate[data-wide] {
+    margin-inline-end: calc(-1 * (56px + 240px));
+  }
+}
 .as-plate__cap {
   display: grid;
   gap: 6px;
@@ -225,6 +238,7 @@ html:not(.js) .as-live {
   user-select: none;
   overflow: hidden;
 }
+/* the trail runs under the elements (they are opaque, z-index 1): it shows only between stops */
 .as-kb__trail {
   position: absolute;
   inset: 0;
@@ -232,8 +246,22 @@ html:not(.js) .as-live {
   height: 100%;
   pointer-events: none;
   color: var(--vermilion);
-  z-index: 3;
+  z-index: 0;
   overflow: visible;
+}
+.as-kb__h,
+.as-kb__p,
+.as-kb__label {
+  position: relative;
+  z-index: 1;
+}
+.as-kb__h,
+.as-kb__p {
+  background: var(--paper);
+}
+.as-kb__label {
+  justify-self: start;
+  background: var(--bone-2);
 }
 .as-kb__bar {
   display: flex;
@@ -245,7 +273,7 @@ html:not(.js) .as-live {
 }
 .as-kb__nav {
   display: flex;
-  gap: 6px;
+  gap: 22px; /* room for each stop's number on its outer corner */
   white-space: nowrap;
 }
 .as-kb__logo-cube {
@@ -295,12 +323,15 @@ html:not(.js) .as-live {
 }
 .as-kb__el {
   position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   min-height: 30px;
   padding: 4px 8px;
   border-radius: 3px;
+  background: var(--paper);
+  white-space: nowrap;
   transition: box-shadow 0.25s ease, background-color 0.25s ease;
 }
 .as-kb__el--cta,
@@ -325,7 +356,7 @@ html:not(.js) .as-live {
   position: absolute;
   top: 6px;
   inset-inline-start: 10px;
-  z-index: 2;
+  z-index: 3;
   background: var(--ink);
   color: var(--bone);
   opacity: 0;
@@ -397,7 +428,7 @@ html:not(.js) .as-live {
   opacity: 1;
 }
 .as-kb__el.is-unreachable {
-  background: transparent;
+  background: var(--paper);
   color: var(--ink);
   border: 1px dashed rgba(18, 17, 16, 0.5);
 }
@@ -412,8 +443,8 @@ html:not(.js) .as-live {
 }
 .as-kb__badge {
   position: absolute;
-  top: -9px;
-  inset-inline-end: -9px;
+  top: -13px;
+  inset-inline-end: -13px;
   display: grid;
   place-items: center;
   min-width: 19px;
@@ -502,17 +533,24 @@ html.nz-motion .as-kb__badge {
   cursor: default;
 }
 @media (min-width: 768px) {
+  .as-kb__sketch {
+    font-size: 0.875rem;
+    padding: 22px 20px 18px;
+  }
+}
+/* side by side only when the plate is wide enough (the wide exhibit, ≥1100px): the sample keeps
+   ≥420px and the three controls stay on one row */
+@media (min-width: 1100px) {
   .as-kb {
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    gap: 18px 28px;
+    gap: 18px 32px;
     align-items: start;
   }
   .as-kb__modes {
     grid-column: 1 / -1;
   }
-  .as-kb__sketch {
-    font-size: 0.875rem;
-    padding: 20px 18px 16px;
+  .as-kb__controls {
+    flex-wrap: nowrap;
   }
 }
 

@@ -148,7 +148,7 @@
   display: block;
   min-height: 44px;
   border-radius: 3px;
-  background: repeating-linear-gradient(to left, rgba(239, 234, 226, 0.06) 0 1px, transparent 1px calc(100% / 7.4));
+  background: repeating-linear-gradient(to left, rgba(239, 234, 226, 0.06) 0 1px, transparent 1px calc(100% / 6.9));
   touch-action: pan-y;
   cursor: grab;
   -webkit-tap-highlight-color: transparent;
@@ -274,11 +274,16 @@ html.nz-motion .as-wf__row.is-nudge .as-wf__bar.is-ghost--to {
     background: rgba(224, 64, 31, 0.4);
   }
 }
+/* the file name sits on a small ink tab above its bar, so the target line and the flag never run
+   through the letters */
 .as-wf__file {
   position: absolute;
-  top: 0;
-  z-index: 1;
-  font: 500 0.75rem/14px ui-monospace, Menlo, monospace;
+  top: -2px;
+  z-index: 4;
+  padding-inline: 3px;
+  border-radius: 2px;
+  background: var(--ink);
+  font: 500 0.8125rem/15px ui-monospace, Menlo, monospace;
   color: var(--bone);
   white-space: nowrap;
   pointer-events: none;

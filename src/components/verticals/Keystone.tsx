@@ -15,9 +15,12 @@ import "./keystone.css";
  * customer did not find. Fallen stones wait in the rubble below: tap one to re-cut it (it rises
  * back as the right part of the site). Run the load again; when every stone holds, the keystone
  * (call / WhatsApp in one tap) locks the arch and the centring is struck. aria-live narrates.
- * SSR / no JS: the arch with its weak stones marked and the full test report (what fails, what
- * replaces it). Reduced motion: no fall / rise animation, the cart jumps.
+ * SSR / no JS: the whole arch and the full test report (what fails, what replaces it). With JS
+ * the report lists a stone only once the load has broken it. Reduced motion: no fall / rise animation, the cart jumps.
  */
+/* A stone's `short` is what is carved on it ("|" breaks the line). Weak stones carry a neutral
+   name, like the part of the site the visitor sees: before the test the arch looks whole and
+   every stone is drawn the same; the crack appears only when the load breaks it. */
 type Stone = {
   id: string;
   slot: number; // 0 = left end … 6 = right end (the cart starts on the right)
@@ -31,26 +34,26 @@ const STONES: Stone[] = [
   {
     id: "jobs",
     slot: 2,
-    weak: { short: "הכול יחד", label: "כל העבודות בעמוד אחד", why: "מי שחיפש החלפת לוח חשמל נבלע ברשימה ארוכה, ולא מצא את העבודה שלו." },
-    solid: { short: "עבודות", label: "עמוד לכל סוג עבודה", desc: "מטבח, חשמל, ריצוף: כל אחד בעמוד משלו." },
+    weak: { short: "עבודות", label: "כל העבודות בעמוד אחד", why: "מי שחיפש החלפת לוח חשמל נבלע ברשימה ארוכה, ולא מצא את העבודה שלו." },
+    solid: { short: "סוגי|עבודה", label: "עמוד לכל סוג עבודה", desc: "מטבח, חשמל, ריצוף: כל אחד בעמוד משלו." },
   },
   {
     id: "key",
     slot: 3,
-    weak: { short: "טלפון למטה", label: "מספר טלפון בתחתית העמוד", why: "הלקוח השתכנע, אבל המספר קבור בסוף העמוד, בכתב קטן. הוא סגר את הדף." },
-    solid: { short: "חיוג", label: "חיוג או וואטסאפ בלחיצה", desc: "אבן הראשה: שיחה בלחיצה אחת, בכל מסך." },
+    weak: { short: "טלפון", label: "מספר טלפון בתחתית העמוד", why: "הלקוח השתכנע, אבל המספר קבור בסוף העמוד, בכתב קטן. הוא סגר את הדף." },
+    solid: { short: "חיוג|בלחיצה", label: "חיוג או וואטסאפ בלחיצה", desc: "אבן הראשה: שיחה בלחיצה אחת, בכל מסך." },
   },
   { id: "process", slot: 4, solid: { short: "תהליך", label: "איך העבודה מתנהלת", desc: "מהביקור הראשון ועד הניקיון בסוף." } },
   {
     id: "before",
     slot: 5,
-    weak: { short: "מאגר", label: "תמונות מאגר", why: "הלקוח זיהה תמונות שראה באתרים אחרים, ולא ראה אף עבודה שלכם." },
-    solid: { short: "לפני/אחרי", label: "לפני ואחרי", desc: "תמונות מעבודות אמיתיות, מאותה זווית." },
+    weak: { short: "תמונות", label: "תמונות מאגר", why: "הלקוח זיהה תמונות שראה באתרים אחרים, ולא ראה אף עבודה שלכם." },
+    solid: { short: "לפני|ואחרי", label: "לפני ואחרי", desc: "תמונות מעבודות אמיתיות, מאותה זווית." },
   },
   {
     id: "licence",
     slot: 6,
-    weak: { short: "בלי פרטים", label: "בלי שם עסק ורישיון", why: "הלקוח לא ידע מי יגיע אליו הביתה, ואין דבר שמראה שהעסק אמיתי." },
+    weak: { short: "אודות", label: "בלי שם עסק ורישיון", why: "הלקוח לא ידע מי יגיע אליו הביתה, ואין דבר שמראה שהעסק אמיתי." },
     solid: { short: "רישיון", label: "רישיון ופרטי העסק", desc: "שם העסק, מספר רישום ותמונה שלכם בעבודה." },
   },
 ];
@@ -85,9 +88,10 @@ const crack = (slot: number) => {
   const [x3, y3] = pt(RI + 4, a - 1.5);
   return `M${x0.toFixed(1)} ${y0.toFixed(1)}L${x1.toFixed(1)} ${y1.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}L${x3.toFixed(1)} ${y3.toFixed(1)}`;
 };
-/** progress p (0 = right end, 1 = left end) ↔ x on the deck. */
-const xOf = (p: number) => CX + RO - p * 2 * RO;
-const pAtX = (x: number) => (CX + RO - x) / (2 * RO);
+/** progress p (0 = right end, 1 = left end) ↔ x on the deck (the cart stays inside the viewBox). */
+const RUN = RO - 10;
+const xOf = (p: number) => CX + RUN - p * 2 * RUN;
+const pAtX = (x: number) => (CX + RUN - x) / (2 * RUN);
 const pOf = (slot: number) => pAtX(mid(slot)[0]);
 
 const Keystone = () => {
@@ -169,7 +173,7 @@ const Keystone = () => {
     if (!d.on && Math.abs(dx) < 5) return;
     d.on = true;
     // moving left = forward (RTL); scene px → viewBox units → p
-    roll(d.p0 - (dx * 360) / d.w / (2 * RO));
+    roll(d.p0 - (dx * 360) / d.w / (2 * RUN));
   };
   const onUp = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = drag.current;
@@ -225,7 +229,8 @@ const Keystone = () => {
   /* the cart rides the deck over the arch */
   const cx = xOf(p);
   const under = STONES.reduce((best, s) => (Math.abs(pOf(s.slot) - p) < Math.abs(pOf(best.slot) - p) ? s : best), STONES[0]);
-  const underName = under.weak && !recut.includes(under.id) ? under.weak.label : under.solid.label;
+  /* a weak stone is named neutrally until the load breaks it (no spoiler before the test) */
+  const underName = !under.weak || recut.includes(under.id) ? under.solid.label : fallen.includes(under.id) ? `חסרה: ${under.weak.label}` : under.weak.short.replace("|", " ");
   const waiting = fallen.filter((id) => !recut.includes(id));
 
   return (
@@ -246,7 +251,7 @@ const Keystone = () => {
         onPointerCancel={onUp}
         onKeyDown={onKey}
       >
-        <svg className="vl-ks__svg" viewBox="0 0 360 250" aria-hidden="true">
+        <svg className="vl-ks__svg" viewBox="0 -22 360 272" aria-hidden="true">
           {/* the wooden centring */}
           <g className="vl-ks__centring">
             <path d={`M${CX - RI + 2} ${CY}A${RI - 2} ${RI - 2} 0 0 1 ${CX + RI - 2} ${CY}Z`} className="vl-ks__form" />
@@ -266,8 +271,9 @@ const Keystone = () => {
             const isRecut = recut.includes(s.id);
             const isWeak = !!s.weak && !isRecut;
             const [mx, my] = mid(s.slot);
+            const words = (isWeak ? s.weak!.short : s.solid.short).split("|");
             return (
-              <g key={s.id} className={cn("vl-ks__slot", isWeak && "is-weak", isFallen && "is-fallen", isRecut && "is-recut", s.id === "key" && "is-key")}>
+              <g key={s.id} className={cn("vl-ks__slot", isFallen && "is-fallen", isRecut && "is-recut", s.id === "key" && "is-key")}>
                 <path d={wedge(s.slot)} className="vl-ks__hole" />
                 <g
                   className="vl-ks__stone"
@@ -278,9 +284,13 @@ const Keystone = () => {
                   }}
                 >
                   <path d={wedge(s.slot)} />
-                  {isWeak && <path d={crack(s.slot)} className="vl-ks__crack" />}
-                  <text x={mx} y={my + 3.5} textAnchor="middle" className="vl-ks__stone-label">
-                    {isWeak ? s.weak!.short : s.solid.short}
+                  {isFallen && <path d={crack(s.slot)} className="vl-ks__crack" />}
+                  <text x={mx} y={my + 5 - (words.length - 1) * 7.5} textAnchor="middle" className="vl-ks__stone-label">
+                    {words.map((w, i) => (
+                      <tspan key={w} x={mx} dy={i ? 15 : 0}>
+                        {w}
+                      </tspan>
+                    ))}
                   </text>
                 </g>
               </g>
@@ -297,12 +307,12 @@ const Keystone = () => {
           </g>
           {/* the cart: a crate on two wheels */}
           <g className="vl-ks__cart" transform={`translate(${cx.toFixed(1)} ${DECK})`}>
-            <rect x="-19" y="-27" width="38" height="20" rx="2" className="vl-ks__crate" />
-            <text x="0" y="-13" textAnchor="middle" className="vl-ks__crate-label">
+            <rect x="-28" y="-40" width="56" height="29" rx="2.5" className="vl-ks__crate" />
+            <text x="0" y="-21" textAnchor="middle" className="vl-ks__crate-label">
               לקוח
             </text>
-            <circle cx="-11" cy="-4.5" r="4.5" className="vl-ks__wheel" />
-            <circle cx="11" cy="-4.5" r="4.5" className="vl-ks__wheel" />
+            <circle cx="-16" cy="-6" r="6" className="vl-ks__wheel" />
+            <circle cx="16" cy="-6" r="6" className="vl-ks__wheel" />
           </g>
         </svg>
         <span className="vl-ks__seal" aria-hidden="true">
@@ -322,9 +332,18 @@ const Keystone = () => {
         </p>
         <p className="vl-ks__head">
           <span>דוח הבדיקה</span>
-          <span>{locked ? "כל האבנים מחזיקות" : waiting.length ? `${waiting.length} למטה` : `${recut.length} מתוך ${WEAK.length} סותתו`}</span>
+          <span>
+            {locked
+              ? "כל האבנים מחזיקות"
+              : waiting.length
+                ? `${waiting.length === 1 ? "אבן אחת" : `${waiting.length} אבנים`} למטה`
+                : fallen.length
+                  ? `${recut.length} מתוך ${fallen.length} סותתו`
+                  : "לפני הבדיקה"}
+          </span>
         </p>
         <ul className="vl-ks__report">
+          {!fallen.length && <li className="vl-ks__blank">הדוח מתמלא כשהעגלה עוברת: כל אבן שלא תחזיק תופיע כאן, עם מה שהלקוח לא מצא.</li>}
           {WEAK.map((s) => {
             const isFallen = fallen.includes(s.id);
             const isRecut = recut.includes(s.id);

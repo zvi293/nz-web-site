@@ -25,9 +25,6 @@ const Footer = () => {
           </p>
           <div className="flex flex-col items-start gap-1 md:col-span-4 md:col-start-9 md:justify-end">
             <WhatsAppCta variant="quiet" label="לשיחה בוואטסאפ" />
-            <p className="text-sm text-ash">
-              מענה בימים {studio.days} <bdi dir="ltr">{studio.time}</bdi>
-            </p>
           </div>
         </div>
 

@@ -5,14 +5,14 @@
  * the zipper's behaviour is its own bundled script.
  */
 import MagazineZipper from "./MagazineZipper.astro";
-import { DEPARTMENTS, getBlogPosts, getCurrentIssuePosts, getIssue } from "@/lib/blog";
+import { DEPARTMENTS, getBlogPosts } from "@/lib/blog";
+import { currentIssue } from "./magazine-meta";
 
 interface Props {
   sizes: string;
 }
 const { sizes } = Astro.props;
-const current = getCurrentIssuePosts();
-const issue = getIssue(current[0]);
+const { issue } = currentIssue();
 const total = getBlogPosts().length;
 ---
 

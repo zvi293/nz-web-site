@@ -12,7 +12,7 @@ import ServiceFeatures from "@/components/service/ServiceFeatures.astro";
 import ServiceFaq from "@/components/service/ServiceFaq.astro";
 import ServiceCta from "@/components/service/ServiceCta.astro";
 import FloorPlan from "@/components/service/signatures/FloorPlan";
-import { servicesHub as page, hubGuide } from "@/components/service/data/services-hub";
+import { servicesHub as page, hubGuide, HUB_ROOM_NAMES } from "@/components/service/data/services-hub";
 import { SERVICE_ROOMS, SERVICES_WING } from "@/components/service";
 import { VERTICAL_CARDS } from "@/data/verticals";
 import { collectionPage, SITE_LAST_UPDATED } from "@/lib/schema";
@@ -30,9 +30,10 @@ const [collection, itemList] = collectionPage({
 });
 const seo = serviceSeo(page, { webPageNode: collection, jsonLd: [itemList], noService: true });
 
-/* The plan's rooms: the 8 services + the conversation room at the end of the hall. */
+/* The plan's rooms: the 8 services + the conversation room at the end of the hall.
+   Rooms 04/05 (both landing pages) carry the hub's purpose names so they never read as one room twice. */
 const rooms = [
-  ...SERVICE_ROOMS.map(({ num, name, short, href, art, line, medium }) => ({ num, name, short, href, art, line, medium })),
+  ...SERVICE_ROOMS.map(({ num, name, short, href, art, line, medium }) => ({ num, name, short, href, art, line, medium, ...HUB_ROOM_NAMES[num] })),
   {
     num: "09",
     name: "חדר השיחה",
@@ -69,7 +70,7 @@ const fields = VERTICAL_CARDS.map((v) => ({ label: v.label, href: v.href }));
     items={page.features!.items}
     variant="specimens"
     tone="paper"
-    opener="numeral"
+    opener="rule"
     index="02"
     label="בכל שירות"
   />

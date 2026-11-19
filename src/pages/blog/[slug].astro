@@ -27,7 +27,6 @@ import {
   getBlogPosts,
   getArticleHeadings,
   getDepartment,
-  getIssue,
   getRelatedPosts,
   renderArticleSegments,
   renderInline,
@@ -35,6 +34,14 @@ import {
   countWords,
   type BlogPost as Post,
 } from "@/lib/blog";
+import {
+  magazineIssue,
+  readMinutes,
+  stripChapterNumber,
+  stripChapterNumbersHtml,
+  typesetHtml,
+  typesetText,
+} from "@/components/blog/magazine-meta";
 import { article, faqPage, webPage } from "@/lib/schema";
 import { getAbsoluteAssetUrl } from "@/lib/site-url";
 import { heroImage, type PageSeo } from "@/lib/seo";
@@ -56,11 +63,16 @@ const art = getArt(artSlug);
 const COVER_SIZES = "(min-width: 1440px) 640px, (min-width: 1024px) 46vw, 100vw";
 
 const dept = getDepartment(post.category);
-const issue = getIssue(post);
+const issue = magazineIssue(post);
+const minutes = readMinutes(post);
 const { summary, body } = splitSummary(post.content);
-const headings = getArticleHeadings(body).filter((h) => h.level === 2);
+const headings = getArticleHeadings(body)
+  .filter((h) => h.level === 2)
+  .map((h) => ({ ...h, text: typesetText(stripChapterNumber(h.text)) }));
 const signature = getSignatureMeta(post.signature);
-const segments = renderArticleSegments(body, !!signature);
+const segments = renderArticleSegments(body, !!signature).map((seg) =>
+  seg.kind === "html" ? { ...seg, html: typesetHtml(stripChapterNumbersHtml(seg.html)) } : seg,
+);
 const related = getRelatedPosts(post.slug, 3);
 const faq = post.faq ?? [];
 const cover = heroImage(artSlug, PATH);
@@ -100,7 +112,7 @@ const seo: PageSeo = {
       section: post.category,
       keywords: post.category,
       wordCount: countWords(post.content),
-      readMinutes: post.read_time,
+      readMinutes: minutes,
     }),
     ...(faq.length ? [faqPage(faq, PATH)] : []),
   ],
@@ -109,14 +121,14 @@ const seo: PageSeo = {
 
 <BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
   <article class="ar" aria-labelledby="ar-title">
-    <ArticleHead post={post} dept={dept} issue={issue} artSlug={artSlug} sizes={COVER_SIZES}>
+    <ArticleHead post={post} dept={dept} issue={issue} minutes={minutes} artSlug={artSlug} sizes={COVER_SIZES}>
       <section class="ar-summary" aria-label="בקצרה" slot="summary">
         <div class="ar-summary__card">
           <p class="ar-summary__label">
             <span class="ar-cube" aria-hidden="true"></span>
             <span>בקצרה</span>
           </p>
-          {summary && <p class="lead ar-summary__text" set:html={renderInline(summary)} />}
+          {summary && <p class="lead ar-summary__text" set:html={typesetHtml(renderInline(summary))} />}
           <nav class="ar-inside" aria-label="מה בפנים">
             <p class="ar-inside__label" aria-hidden="true">
               <span>מה בפנים</span>
@@ -179,6 +191,6 @@ const seo: PageSeo = {
 
     {faq.length > 0 && <ArticleFaq items={faq} title={post.title} />}
     <ArticleRelated posts={related} />
-    <ArticleColophon post={post} dept={dept} issue={issue} />
+    <ArticleColophon post={post} dept={dept} issue={issue} minutes={minutes} />
   </article>
 </BaseLayout>

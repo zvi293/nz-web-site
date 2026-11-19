@@ -67,7 +67,7 @@
 }
 .wp-row__kind {
   font-family: var(--font-sans);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
   color: var(--graphite);
   padding: 2px 8px;
@@ -112,7 +112,7 @@
   background: repeating-linear-gradient(135deg, #8d857b 0 5px, #c9c1b6 5px 9px);
 }
 .wp-row__note {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--graphite);
   text-wrap: pretty;
@@ -122,7 +122,7 @@
   align-items: baseline;
   gap: 6px;
   justify-self: start;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--ink);
 }
@@ -349,7 +349,7 @@ html.nz-motion .wp-fall__chart[data-in] .wp-row__track::after {
   font-weight: 500;
 }
 .wp-plate__what {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.65;
   color: var(--graphite);
   text-wrap: pretty;
@@ -380,7 +380,7 @@ html.nz-motion .wp-fall__chart[data-in] .wp-row__track::after {
   grid-template-columns: 2fr 1.4fr 1.6fr;
   gap: 3px;
   margin-top: 6px;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.04em;
   color: var(--graphite);
 }
@@ -398,7 +398,7 @@ html.nz-motion .wp-fall__chart[data-in] .wp-row__track::after {
   margin-top: auto;
   padding-top: 12px;
   border-top: 1px dashed var(--line);
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.55;
 }
 .wp-plate__fix-k {
@@ -410,7 +410,7 @@ html.nz-motion .wp-fall__chart[data-in] .wp-row__track::after {
 }
 .wp-vitals__src {
   margin-top: 20px;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   color: var(--graphite);
   max-width: 48rem;
 }

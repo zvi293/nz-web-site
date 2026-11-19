@@ -20,7 +20,18 @@ interface Props {
   idPrefix: string;
 }
 
-/* A fixed scatter of faint background stars (deterministic → same markup on server and client). */
+/* Where the star labels sit on a wide sky (01/06 right of the star, 02/03 left, 04/05 under it):
+   no dust there. On a phone the 03–06 labels move inside the padlock's body. */
+const QUIET = [
+  { x1: 64, x2: 92, y1: 27, y2: 37 },
+  { x1: 8, x2: 36, y1: 27, y2: 37 },
+  { x1: 4, x2: 25, y1: 49, y2: 59 },
+  { x1: 75, x2: 96, y1: 49, y2: 59 },
+  { x1: 10, x2: 40, y1: 85, y2: 96 },
+  { x1: 60, x2: 90, y1: 85, y2: 96 },
+];
+/* A fixed scatter of faint background stars (deterministic → same markup on server and client).
+   Dust that would sit on a label is dropped (inside the padlock's body it is hidden anyway). */
 const DUST = Array.from({ length: 52 }, (_, i) => {
   const a = Math.sin(i * 12.9898) * 43758.5453;
   const b = Math.sin(i * 78.233) * 12543.1234;
@@ -30,7 +41,7 @@ const DUST = Array.from({ length: 52 }, (_, i) => {
   const rad = Math.sqrt(fy) * 45;
   const r2 = (n: number) => Math.round(n * 100) / 100;
   return { x: r2(50 + rad * Math.cos(ang)), y: r2(50 + rad * Math.sin(ang)), r: i % 7 === 0 ? 0.42 : i % 3 === 0 ? 0.3 : 0.2, o: 0.16 + ((i * 37) % 10) / 32 };
-});
+}).filter((d) => !QUIET.some((q) => d.x > q.x1 && d.x < q.x2 && d.y > q.y1 && d.y < q.y2));
 
 /* Planisphere rim: a tick every 5°, a longer one every 30°. */
 const TICKS = Array.from({ length: 72 }, (_, i) => {
@@ -259,6 +270,7 @@ const PrivacyLock = ({ data, idPrefix }: Props) => {
                 aria-controls={`${idPrefix}-card`}
                 className="lg-lstar"
                 data-side={st.side}
+                data-corner={i > 1 ? `${st.y === body.y1 ? "t" : "b"}${st.x === body.x1 ? "l" : "r"}` : undefined}
                 data-shackle={i === 0 || i === 1 ? "" : undefined}
                 data-active={active === i ? "" : undefined}
                 style={{ left: `${st.x}%`, top: `${st.y}%`, transitionDelay: inView && !tracing ? `${240 + i * 70}ms` : undefined }}
@@ -278,7 +290,7 @@ const PrivacyLock = ({ data, idPrefix }: Props) => {
         </ul>
       </div>
 
-      <div className="lg-lock__card" id={`${idPrefix}-card`} aria-live="polite">
+      <div className="lg-lock__card" id={`${idPrefix}-card`} aria-live="polite" data-float-avoid="">
         {locked ? (
           <div className="lg-lock__done">
             <p className="lg-lock__meta">

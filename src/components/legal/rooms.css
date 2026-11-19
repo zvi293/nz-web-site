@@ -102,6 +102,16 @@ html.nz-motion .lg-enter {
 .lg-hero__trail {
   grid-area: trail;
 }
+/* the text sits above the artwork's gallery light (.nz-art--lit::before rises ~14% above the
+   frame, inside the figure's own stacking context, and would bleach the lead's last line on
+   phones, where the art stacks right under it) */
+.lg-hero__trail,
+.lg-hero__title,
+.lg-hero__lead,
+.lg-facts {
+  position: relative;
+  z-index: 1;
+}
 .lg-hero__title {
   grid-area: title;
   margin: 8px 0 0;
@@ -131,9 +141,9 @@ html.nz-motion .lg-enter {
   border-top: 1px solid var(--line);
 }
 .lg-facts dt {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--graphite);
 }
 .lg-facts dd {
@@ -151,6 +161,12 @@ html.nz-motion .lg-enter {
   text-decoration: underline;
   text-underline-offset: 4px;
   text-decoration-thickness: 1px;
+}
+@media (min-width: 640px) {
+  /* a portrait work never grows into a full-width tower on tablets */
+  .lg-hero--sheet .lg-hero__art {
+    width: min(100%, 440px);
+  }
 }
 @media (min-width: 768px) {
   .lg-hero {
@@ -466,35 +482,63 @@ html.nz-motion .lg-enter {
   }
 }
 
-/* the monitor — sticky inside the board, so the readout is always in view */
+/* the monitor. Phones / tablets: only the readout strip is sticky (a compact ~72px line under the
+   header), the specimen scrolls with the page, so nothing tall floats over the switches. The
+   monitor box dissolves (display: contents) and the readout and the specimen become rows of the
+   board's grid, so the strip stays stuck for the whole console. Desktop: the whole monitor is
+   sticky in its own column beside the console. Not sticky at 150%+ text. */
 .lg-monitor {
+  display: contents;
+}
+.lg-monitor__readout {
   position: sticky;
   top: calc(var(--header-h) + 6px);
   z-index: 2;
-  display: grid;
-  gap: 8px;
-  padding: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  /* title + two lines of explanation: the strip never changes height while you work the switches */
+  min-height: 4.5rem;
+  padding: 9px 12px;
   border: 1px solid #3a3632;
   border-radius: 6px;
   background: #0b0a09;
   box-shadow: 0 14px 24px -14px rgba(0, 0, 0, 0.9);
 }
-.lg-board[data-big] .lg-monitor {
+.lg-board[data-big] .lg-monitor__readout {
   position: relative;
   top: auto;
 }
+.lg-console :is(button, input) {
+  scroll-margin-top: calc(var(--header-h) + 6rem);
+}
 @media (min-width: 1024px) {
   .lg-monitor {
+    position: sticky;
     top: calc(var(--header-h) + 24px);
+    z-index: 2;
+    display: grid;
     gap: 18px;
     padding: 20px;
+    border: 1px solid #3a3632;
+    border-radius: 6px;
+    background: #0b0a09;
+    box-shadow: 0 14px 24px -14px rgba(0, 0, 0, 0.9);
   }
-}
-.lg-monitor__readout {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  min-height: 44px;
+  .lg-board[data-big] .lg-monitor {
+    position: relative;
+    top: auto;
+  }
+  .lg-monitor__readout {
+    position: static;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .lg-console :is(button, input) {
+    scroll-margin-top: calc(var(--header-h) + 24px);
+  }
 }
 .lg-monitor__lamp {
   flex: none;
@@ -514,12 +558,13 @@ html.nz-motion .lg-enter {
   min-width: 0;
 }
 .lg-monitor__title {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 700;
+  line-height: 1.4;
   color: var(--bone);
 }
 .lg-monitor__line {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.45;
   color: var(--ash);
 }
@@ -676,6 +721,42 @@ html.nz-motion .lg-monitor__runner {
     --lg-run: 200px;
   }
 }
+/* The picture and the moving part keep drawing in the contrast modes (they are excluded from the
+   global override, which would paint every part white or black and leave an empty box): they get
+   a high-contrast version of the same sun scene instead. */
+.a11y-high-contrast-light .lg-monitor__pic {
+  border-color: #000;
+  background: #fff;
+}
+.a11y-high-contrast-light .lg-monitor__pic span:nth-child(1) {
+  background: repeating-linear-gradient(-45deg, #000 0 2px, #fff 2px 6px);
+}
+.a11y-high-contrast-light .lg-monitor__pic span:nth-child(2),
+.a11y-high-contrast-light .lg-monitor__pic span:nth-child(3),
+.a11y-high-contrast-light .lg-monitor__runner {
+  background: #000;
+}
+.a11y-high-contrast-light .lg-monitor__track {
+  background: #000;
+  height: 1px;
+}
+.a11y-high-contrast-dark .lg-monitor__pic {
+  border-color: #ffff00;
+  background: #000;
+}
+.a11y-high-contrast-dark .lg-monitor__pic span:nth-child(1) {
+  background: repeating-linear-gradient(-45deg, #ffff00 0 2px, #000 2px 6px);
+}
+.a11y-high-contrast-dark .lg-monitor__pic span:nth-child(2),
+.a11y-high-contrast-dark .lg-monitor__pic span:nth-child(3),
+.a11y-high-contrast-dark .lg-monitor__runner {
+  background: #ffff00;
+}
+.a11y-high-contrast-dark .lg-monitor__track {
+  background: #ffff00;
+  height: 1px;
+}
+
 /* mirror the global switches on the specimen's stand-ins (they are spans, not real links/headings) */
 .a11y-highlight-links .lg-monitor__a {
   outline: 2px solid currentColor;
@@ -2078,7 +2159,7 @@ html:not(.js) .lg-board__nojs {
 .lg-lock__seal {
   position: absolute;
   left: 50%;
-  top: 92%;
+  top: 90.5%;
   margin: 0;
   transform: translate(-50%, -50%) rotate(-4deg) scale(0.6);
   opacity: 0;
@@ -2134,9 +2215,13 @@ html:not(.js) .lg-board__nojs {
 html.nz-motion .lg-lock:not([data-in]) .lg-lstar {
   opacity: 0;
 }
+/* the focus ring hugs the star (a ring on the 48px button would cover the label's number) */
 .lg-lstar:focus-visible {
+  outline: none;
+}
+.lg-lstar:focus-visible .lg-lstar__dot {
   outline: 2px solid var(--focus);
-  outline-offset: 0;
+  outline-offset: 5px;
 }
 .lg-lstar__dot {
   position: relative;
@@ -2228,6 +2313,35 @@ html.nz-motion .lg-lock[data-in][data-fresh] li:first-child .lg-lstar__dot::afte
   left: calc(100% - 8px);
   top: 50%;
   transform: translateY(-50%);
+}
+/* A phone-sized sky: the four body labels move inside the padlock's body, one in each corner
+   around the keyhole (outside, they ran over the rim and to the screen edge, wrapped, and met
+   the seal). Number next to the star, the name wrapping toward the middle. */
+@container (max-width: 520px) {
+  .lg-lstar[data-corner] .lg-lstar__name {
+    inset: auto;
+    flex-direction: column;
+    gap: 1px;
+    max-width: 21cqi;
+    transform: none;
+    font-size: min(0.8125rem, 3.7cqi);
+  }
+  .lg-lstar[data-corner^="t"] .lg-lstar__name {
+    top: calc(50% + 7px);
+  }
+  .lg-lstar[data-corner^="b"] .lg-lstar__name {
+    bottom: calc(50% + 7px);
+  }
+  .lg-lstar[data-corner$="l"] .lg-lstar__name {
+    left: calc(50% + 9px);
+    align-items: flex-end;
+    text-align: left;
+  }
+  .lg-lstar[data-corner$="r"] .lg-lstar__name {
+    right: calc(50% + 9px);
+    align-items: flex-start;
+    text-align: right;
+  }
 }
 
 /* the card */
@@ -2421,6 +2535,8 @@ html:not(.nz-motion) .lg-lock-wrap * {
 }
 .lg-fine__sheet {
   position: relative;
+  /* inset from the gutter, so the brass hardware (bar ends, grip) stays inside the screen */
+  margin-inline: 10px;
   padding: 22px 20px 30px;
   background: var(--paper);
   color: var(--ink);
@@ -2496,9 +2612,13 @@ html:not(.nz-motion) .lg-lock-wrap * {
   margin: 0;
 }
 .lg-fine__legal {
+  /* centred in its cell (the cell is as tall as the bigger plain sentence), ragged edge: justified
+     fine print in a narrow RTL column opens rivers between the words */
+  align-self: center;
   font-size: clamp(0.625rem, 0.6rem + 0.15vw, 0.75rem);
   line-height: 1.55;
-  text-align: justify;
+  text-align: start;
+  text-wrap: pretty;
   color: #3d3934;
 }
 .lg-fine__plain {
@@ -2525,8 +2645,8 @@ html:not(.nz-motion) .lg-lock-wrap * {
 .lg-fine__bar {
   position: absolute;
   top: 0;
-  left: -10px;
-  right: -10px;
+  left: -8px;
+  right: -8px;
   height: var(--h, 0px);
   transform: translateY(var(--t, 0px));
   visibility: hidden;
@@ -2565,7 +2685,7 @@ html:not(.nz-motion) .lg-lock-wrap * {
 .lg-fine__grip {
   position: absolute;
   top: 50%;
-  left: -8px;
+  left: 0;
   display: grid;
   gap: 3px;
   place-content: center;
@@ -2594,11 +2714,46 @@ html:not(.nz-motion) .lg-lock-wrap * {
   color: #2b2115;
 }
 
-/* the stamp once every clause has been under the lens */
+/* the foot of the sheet (a signature line) and the stamp that lands on it once every clause has
+   been under the lens: at the bottom, near the last clause, where the reader's eyes are */
+.lg-fine__foot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  min-height: 84px;
+  margin: 6px 0 0;
+  padding-top: 12px;
+  border-top: 1.5px solid var(--ink);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+}
+.lg-fine__foot-line {
+  flex: 1;
+  margin-bottom: 4px;
+  border-bottom: 1px dashed rgba(18, 17, 16, 0.4);
+}
+/* the empty place of the stamp: a faint dashed ring until every clause was read */
+.lg-fine__foot::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: -2px;
+  width: 84px;
+  aspect-ratio: 1;
+  border: 1.5px dashed rgba(18, 17, 16, 0.2);
+  border-radius: 50%;
+  transition: opacity 0.3s ease;
+}
+.lg-fine[data-done] .lg-fine__foot::after {
+  opacity: 0;
+}
 .lg-fine__stamp {
   position: absolute;
-  top: 10px;
-  left: 14px;
+  bottom: -10px;
+  left: -2px;
   display: grid;
   place-items: center;
   width: 84px;
@@ -2609,7 +2764,8 @@ html:not(.nz-motion) .lg-lock-wrap * {
   line-height: 1.1;
   text-align: center;
   opacity: 0;
-  transform: rotate(-14deg) scale(1.6);
+  transform: rotate(-10deg) scale(1.6);
+  mix-blend-mode: multiply;
   pointer-events: none;
   transition: opacity 0.25s ease, transform 0.45s cubic-bezier(0.3, 1.5, 0.6, 1);
 }
@@ -2626,7 +2782,7 @@ html:not(.nz-motion) .lg-lock-wrap * {
 }
 .lg-fine[data-done] .lg-fine__stamp {
   opacity: 0.92;
-  transform: rotate(-14deg) scale(1);
+  transform: rotate(-10deg) scale(1);
 }
 
 /* under the sheet: where the lens is, step buttons, how much was read */
@@ -2725,6 +2881,7 @@ html:not(.nz-motion) .lg-lock-wrap * {
 /* no JS: no lens; every clause shows its plain sentence under the fine print */
 html:not(.js) .lg-fine__layer--lens,
 html:not(.js) .lg-fine__bar,
+html:not(.js) .lg-fine__foot,
 html:not(.js) .lg-fine__panel {
   display: none;
 }
@@ -2869,6 +3026,22 @@ html:not(.nz-motion) .lg-fine * {
 }
 .lg-sec__body p {
   margin: 0 0 14px;
+}
+/* a paragraph that carries an unbreakable email: greedy wrapping fills each line ("pretty"
+   balancing left short ragged lines around the long address) */
+.lg-sec__body .lg-sec__p--contact {
+  text-wrap: wrap;
+}
+/* an email / a phone number inside a clause is a link you can act on right there */
+.lg-sec__contact {
+  color: var(--vermilion-deep);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  padding-block: 6px;
+}
+.lg-sec__contact:hover {
+  text-decoration-thickness: 2px;
 }
 .lg-sec__body ul {
   display: grid;
@@ -3412,8 +3585,7 @@ bdi.lg-exit__k {
   flex-direction: column;
   gap: 8px;
   height: 100%;
-  min-height: 248px;
-  padding: 72px 16px 18px;
+  padding: 6px 6px 18px;
   border: 1px solid var(--ink);
   border-radius: 999px 999px 4px 4px;
   color: var(--ink);
@@ -3421,16 +3593,21 @@ bdi.lg-exit__k {
   background: var(--bone);
   transition: background-color 0.45s var(--ease-gallery), color 0.45s var(--ease-gallery), transform 0.5s var(--ease-gallery);
 }
-.lg-arch::before {
-  /* the inner moulding */
-  content: "";
-  position: absolute;
-  inset: 6px 6px auto;
-  height: 50%;
-  border: 1px solid var(--line);
-  border-bottom: 0;
+/* through the arch: a glimpse of the work that hangs in the next room */
+.lg-arch__view {
+  overflow: hidden;
+  margin-bottom: 8px;
   border-radius: 999px 999px 0 0;
-  pointer-events: none;
+  background: var(--ink);
+}
+.lg-arch__view .nz-art__img {
+  transition: transform 0.9s var(--ease-gallery);
+}
+.lg-arch:hover .lg-arch__view .nz-art__img {
+  transform: scale(1.05);
+}
+.lg-arch > :not(.lg-arch__view) {
+  margin-inline: 10px;
 }
 .lg-arch:hover {
   background: var(--ink);
@@ -3494,8 +3671,10 @@ bdi.lg-exit__k {
     gap: 24px;
   }
   .lg-arch {
-    min-height: 340px;
-    padding: 120px 28px 28px;
+    padding: 8px 8px 26px;
+  }
+  .lg-arch > :not(.lg-arch__view) {
+    margin-inline: 20px;
   }
   .lg-arch__name {
     font-size: 1.75rem;

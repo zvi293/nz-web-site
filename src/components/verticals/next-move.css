@@ -53,7 +53,7 @@
   position: absolute;
   bottom: 3px;
   inset-inline-end: 5px;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   color: rgb(18 17 16 / 0.55);
 }
 .vl-nm__sq.is-target {

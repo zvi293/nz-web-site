@@ -60,7 +60,7 @@
   box-shadow: 0 0 0 1px var(--line), 0 16px 28px -22px rgba(18, 17, 16, 0.5);
 }
 .ap-msg__ch {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
   color: var(--graphite);
 }
@@ -70,14 +70,14 @@
   line-height: 1.1;
 }
 .ap-msg__b {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--ink);
   text-wrap: pretty;
 }
 .ap-msg__link {
   justify-self: start;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--vermilion-deep);
   text-decoration: underline;
@@ -293,7 +293,7 @@ html.nz-motion .ap-trail[data-in] .ap-msg {
 }
 .apw__hour {
   grid-column: 1;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   line-height: 1;
   color: var(--graphite);
   font-variant-numeric: tabular-nums;
@@ -371,12 +371,12 @@ html.nz-motion .ap-trail[data-in] .ap-msg {
   border-radius: 999px;
   background: var(--vermilion);
   color: #fff;
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   line-height: 1.5;
 }
 .apw__cap {
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   color: var(--graphite);
   text-align: center;
   text-wrap: balance;
@@ -425,7 +425,7 @@ html.nz-motion .apw__sheet:not([data-in]) .apw__blk {
   color: var(--ink);
 }
 .apw__note {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--graphite);
   text-wrap: pretty;
@@ -466,5 +466,169 @@ html.nz-motion .apw__sheet:not([data-in]) .apw__blk {
   .apw__sheet {
     max-width: 640px;
     padding: 34px 20px 20px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OutcomeStubs (ink): three appointment-book stubs, torn along a perforation; the stub end
+   carries the outcome as a rubber stamp. Phone: stacked, stamp end on the start side.
+   Desktop: three in a row, stamp end on top.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ap-out__stubs {
+  list-style: none;
+  margin: clamp(32px, 5vw, 64px) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+.ap-stub {
+  position: relative;
+  display: grid;
+  grid-template-columns: 104px 0 minmax(0, 1fr);
+  color: var(--ink);
+  filter: drop-shadow(0 22px 26px rgba(0, 0, 0, 0.45));
+}
+.ap-stub__end,
+.ap-stub__slip {
+  background: var(--paper);
+}
+.ap-stub__end {
+  position: relative;
+  display: grid;
+  align-content: space-between;
+  justify-items: center;
+  gap: 10px;
+  padding: 14px 8px 16px;
+  border-start-start-radius: 4px;
+  border-end-start-radius: 4px;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 21px, rgba(18, 17, 16, 0.06) 21px 22px),
+    var(--bone-2);
+}
+.ap-stub__no {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--graphite);
+  font-variant-numeric: tabular-nums;
+}
+.ap-stub__stamp {
+  display: grid;
+  place-items: center;
+  min-width: 80px;
+  padding: 8px 8px 6px;
+  border: 2px solid var(--vermilion-deep);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 3px var(--bone-2), inset 0 0 0 4.5px var(--vermilion-deep);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.375rem;
+  line-height: 1.1;
+  color: var(--vermilion-deep);
+  transform: rotate(-8deg);
+  mix-blend-mode: multiply;
+}
+.ap-stub:nth-child(2) .ap-stub__stamp {
+  transform: rotate(5deg);
+}
+.ap-stub:nth-child(3) .ap-stub__stamp {
+  transform: rotate(-3deg);
+}
+/* the perforation: a dashed tear with two half-moon notches */
+.ap-stub__tear {
+  position: relative;
+  z-index: 1;
+  width: 0;
+  border-inline-start: 2px dashed rgba(18, 17, 16, 0.28);
+}
+.ap-stub__tear::before,
+.ap-stub__tear::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: -9px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.ap-stub__tear::before {
+  top: -8px;
+}
+.ap-stub__tear::after {
+  bottom: -8px;
+}
+.ap-stub__slip {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 16px 18px 18px;
+  border-start-end-radius: 4px;
+  border-end-end-radius: 4px;
+}
+.ap-stub__t {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.375rem;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.ap-stub__b {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--graphite);
+  text-wrap: pretty;
+}
+/* the stamps press in once the stubs are in view */
+html.nz-motion .ap-out__stubs .ap-stub__stamp {
+  transition: opacity 0.35s var(--ease-gallery), scale 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+  transition-delay: calc(0.35s + var(--i) * 0.18s);
+}
+html.nz-motion .ap-out__stubs:not([data-in]) .ap-stub__stamp {
+  opacity: 0;
+  scale: 1.6;
+}
+
+@media (min-width: 900px) {
+  .ap-out__stubs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(20px, 2.4vw, 36px);
+  }
+  .ap-stub {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 150px 0 auto;
+  }
+  .ap-stub__end {
+    padding: 18px 16px 22px;
+    border-radius: 4px 4px 0 0;
+  }
+  .ap-stub__stamp {
+    min-width: 120px;
+    font-size: 1.875rem;
+  }
+  .ap-stub__tear {
+    width: auto;
+    height: 0;
+    border-inline-start: 0;
+    border-top: 2px dashed rgba(18, 17, 16, 0.28);
+  }
+  .ap-stub__tear::before,
+  .ap-stub__tear::after {
+    top: -9px;
+    bottom: auto;
+  }
+  .ap-stub__tear::before {
+    inset-inline-start: -8px;
+  }
+  .ap-stub__tear::after {
+    inset-inline-start: auto;
+    inset-inline-end: -8px;
+  }
+  .ap-stub__slip {
+    padding: 20px 22px 24px;
+    border-radius: 0 0 4px 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ap-stub__stamp {
+    transition: none !important;
   }
 }

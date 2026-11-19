@@ -37,8 +37,8 @@ const p = aboutProcess;
               <span class="ab-hands__name">{row.stage}</span>
             </div>
             <p class="ab-hands__cell ab-hands__cell--you" role="cell">
-              <span class="nz-sr">{p.youLabel}: </span>
-              {row.you}
+              <span class="ab-hands__tag">{p.youLabel}<span class="nz-sr">: </span></span>
+              <span>{row.you}</span>
             </p>
             <div class="ab-hands__pass" aria-hidden="true">
               <span class="ab-hands__track"></span>
@@ -51,8 +51,8 @@ const p = aboutProcess;
               </span>
             </div>
             <p class="ab-hands__cell ab-hands__cell--us" role="cell">
-              <span class="nz-sr">{p.usLabel}: </span>
-              {row.us}
+              <span class="ab-hands__tag">{p.usLabel}<span class="nz-sr">: </span></span>
+              <span>{row.us}</span>
             </p>
           </div>
         ))

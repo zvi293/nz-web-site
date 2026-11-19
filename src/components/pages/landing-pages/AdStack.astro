@@ -2,8 +2,10 @@
 /**
  * AdStack — "למי מתאים דף נחיתה", told as what actually happens: each situation is a sponsored
  * result (ממומן) and every one of them sends its click down the same coral thread into ONE
- * landing page at the bottom. The ads hang staggered like cuttings pinned to a board; the target
- * page is a small framed sheet with the coral light. The audiences are the content (a real list:
+ * landing page at the bottom. Phone: one straight column, the thread runs down the start edge and
+ * every ad is pinned to it. Desktop: two aligned columns (the last ad spans both), thread in the
+ * middle. The target page is a small framed sheet with the coral light. Each ad says only
+ * "ממומן" (no network: the situations are not tied to one ad platform). The audiences are the content (a real list:
  * each ad's headline = who, its line = why); the thread and the target are drawn (aria-hidden).
  * The thread draws itself once in view (html.nz-motion + [data-in]). Prefix lnd-ads.
  */
@@ -18,7 +20,6 @@ interface Props {
   index?: string;
 }
 const { title, lede, items, index = "02" } = Astro.props;
-const SOURCES = ["Google", "Meta", "Google", "Meta", "Google"];
 ---
 
 <section class="nz-section nz-section--space-default lnd-ads" data-tone="paper" aria-labelledby="lnd-ads-title">
@@ -37,7 +38,6 @@ const SOURCES = ["Google", "Meta", "Google", "Meta", "Google"];
             <li class="lnd-ads__ad" style={`--i:${i}`}>
               <p class="lnd-ads__meta">
                 <span class="lnd-ads__tag">ממומן</span>
-                <span dir="ltr" class="lnd-ads__src">{SOURCES[i % SOURCES.length]}</span>
               </p>
               <p class="lnd-ads__h">{it.title}</p>
               <p class="lnd-ads__d"><Nb text={it.description} /></p>

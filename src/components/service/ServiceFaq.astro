@@ -42,6 +42,12 @@ const {
     cta: "לשאול בוואטסאפ",
   },
 } = Astro.props;
+/* the count is said in words at label size (a big serif numeral here read as one more "05/06"
+   opener next to the numbered section labels) */
+const WORDS: Record<number, string> = {
+  2: "שתי", 3: "שלוש", 4: "ארבע", 5: "חמש", 6: "שש", 7: "שבע", 8: "שמונה", 9: "תשע", 10: "עשר",
+};
+const count = items.length === 1 ? "שאלה אחת בעמוד הזה" : `${WORDS[items.length] ?? items.length} שאלות בעמוד הזה`;
 ---
 
 <section class="nz-section nz-section--space-default sv-faq" data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
@@ -69,17 +75,7 @@ const {
       </ol>
       <aside class:list={["sv-book", `sv-book--${card}`]} aria-labelledby={`${id}-book`}>
         <div class="sv-book__card" data-tone={card === "plaque" ? "ink" : undefined}>
-          {card === "plaque" ? (
-            <p class="sv-book__count" aria-hidden="true">
-              <span class="sv-book__count-num">{String(items.length).padStart(2, "0")}</span>
-              <span>שאלות בעמוד הזה</span>
-            </p>
-          ) : (
-            <p class="nz-label sv-book__label">
-              <span class="nz-label__index">{String(items.length).padStart(2, "0")}</span>
-              <span>שאלות בעמוד הזה · ספר המבקרים פתוח</span>
-            </p>
-          )}
+          <p class:list={["nz-label sv-book__label", card === "plaque" && "sv-book__count"]}>{count}</p>
           <p id={`${id}-book`} class="sv-book__title">{note.title}</p>
           <p class="sv-book__body">{note.body}</p>
           <WhatsAppCta label={note.cta ?? "לשאול בוואטסאפ"} message={note.message} size="md" />

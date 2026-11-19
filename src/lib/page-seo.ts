@@ -6,11 +6,7 @@
  *                             Service (#service, provider #organization, NO offers/prices),
  *                             FAQPage (#faq, the same q/a objects the visible <details> render),
  *                             BreadcrumbList, the LCP preload of the hero art and the OG card.
- *
- *   servicePageSeo(config)    LEGACY — pages still rendering src/components/ServicePageTemplate.tsx.
- *                             Delete it (and its import) when the last of them is migrated.
  */
-import type { ServicePageConfig } from "@/components/ServicePageTemplate";
 import { HERO_SIZES } from "@/components/service";
 import type { ServicePageData } from "@/components/service/types";
 import { faqPage, service, webPage, OG_IMAGES, SITE_LAST_UPDATED } from "@/lib/schema";
@@ -70,29 +66,5 @@ export function serviceSeo(data: ServicePageData, opts: ServiceSeoOptions = {}):
     lcpArt: { slug: hero.art, sizes },
     breadcrumb: { name: data.crumb.name, path, parent, trail: data.crumb.trail },
     jsonLd: nodes,
-  };
-}
-
-/** @deprecated LEGACY ServicePageTemplate pages only — use serviceSeo(). */
-export function servicePageSeo(config: ServicePageConfig, extra: Partial<PageSeo> = {}): PageSeo {
-  const path = config.breadcrumb.path;
-  const { title, description } = config.seo;
-  return {
-    path,
-    title,
-    description,
-    breadcrumb: {
-      name: config.breadcrumb.name,
-      path,
-      parent: config.breadcrumb.parent,
-    },
-    jsonLd: [
-      webPage({ path, title, description }),
-      service({ path, name: title, description, serviceType: config.schemaServiceType }),
-      ...(config.faqs?.length
-        ? [faqPage(config.faqs.map((f) => ({ question: f.q, answer: f.a })), path)]
-        : []),
-    ],
-    ...extra,
   };
 }

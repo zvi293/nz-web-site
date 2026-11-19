@@ -14,7 +14,7 @@ import A11yLimits from "@/components/legal/A11yLimits.astro";
 import A11yContact from "@/components/legal/A11yContact.astro";
 import LegalDoors from "@/components/legal/LegalDoors.astro";
 import Switchboard from "@/components/legal/Switchboard";
-import { roomFor } from "@/components/Breadcrumbs";
+import { roomFor } from "@/components/nz/nav";
 import "@/components/legal/rooms.css";
 import { siteSettings } from "@/content/site-settings";
 import { webPage } from "@/lib/schema";
@@ -104,8 +104,8 @@ const seo: PageSeo = {
   />
   <LegalDoors
     current={PATH}
-    title="עוד חדרים במסמך"
-    line="המדיניות והתנאים של האתר, באותה שפה פשוטה. שאלה על נגישות שאינה תקלה? אפשר גם לכתוב לנו."
+    title="שאלה על נגישות?"
+    line="תקלה בנגישות? כתבו לרכז הנגישות, הפרטים שלו מופיעים למעלה. כל שאלה אחרת: בוואטסאפ או במייל של הסטודיו."
     message="שלום צבי, יש לי שאלה על הנגישות באתר NZ-web:"
   />
 </BaseLayout>

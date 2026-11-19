@@ -195,13 +195,13 @@ html.nz-motion .fp-walk {
 }
 .fp-label__line {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.0625rem);
   line-height: 1.6;
   color: var(--fg);
 }
 .fp-label__medium {
   margin: 8px 0 0;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   line-height: 1.55;
   color: var(--fg-muted);
 }
@@ -210,7 +210,7 @@ html.nz-motion .fp-walk {
 }
 .fp-label__go {
   margin-top: 8px;
-  font-size: 0.9375rem;
+  font-size: 1rem;
 }
 
 /* the directory (no-JS fallback + crawlable links) */

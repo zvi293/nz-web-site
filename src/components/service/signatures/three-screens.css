@@ -22,7 +22,8 @@
 }
 @media (min-width: 1024px) {
   .ts {
-    --vh: 700;
+    /* the whole exhibit (stops, stage, ruler) fits one laptop screen under the header */
+    --vh: 560;
   }
 }
 
@@ -555,8 +556,8 @@
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr);
   gap: 8px;
-  font-size: 0.8125rem;
-  line-height: 1.45;
+  font-size: 0.9375rem;
+  line-height: 1.4;
   color: var(--fg);
 }
 .ts__notes-num {
@@ -624,4 +625,44 @@ html.nz-motion .ts__notes.is-on li {
 }
 [data-tone="paper"] .ts__notes {
   background: var(--paper);
+}
+
+/* the same notes under the ruler, when the screen is too wide to leave a free wall beside it */
+.ts__under {
+  display: none;
+}
+.ts__under.is-on {
+  display: block;
+}
+.ts__under ol {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ts__under li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--fg);
+}
+html.nz-motion .ts__under.is-on li {
+  animation: ts-note 0.6s var(--ease-gallery) both;
+  animation-delay: calc(var(--k) * 70ms);
+}
+@media (min-width: 768px) {
+  .ts__under ol {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .ts__under li {
+    grid-template-columns: 28px minmax(0, 1fr);
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    line-height: 1.25;
+  }
 }

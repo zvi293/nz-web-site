@@ -156,6 +156,30 @@ html.nz-motion .sv-enter {
   color: var(--fg);
   font-weight: 500;
 }
+/* phones: the stacked label reads as one line — label first, then the wing/room lines inline */
+@media (max-width: 767.98px) {
+  .sv-op__stack {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+  }
+  .sv-op__stack > span {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+  }
+  .sv-op__stack-label {
+    order: -1;
+  }
+  .sv-op__stack > span:not(.sv-op__stack-label)::before {
+    content: "·";
+    margin-inline-end: 10px;
+    opacity: 0.5;
+  }
+}
 /* quote */
 .sv-op__quote {
   font-family: var(--font-display);
@@ -237,7 +261,11 @@ html.nz-motion .sv-enter {
   display: inline-flex;
   align-items: center;
 }
-.sv-crumbs li + li::before {
+/* the separator belongs to the crumb before it, so a wrapped trail never starts a line with "/" */
+.sv-crumbs li:not(:last-child) {
+  white-space: nowrap;
+}
+.sv-crumbs li:not(:last-child)::after {
   content: "/";
   margin-inline: 8px;
   opacity: 0.45;
@@ -375,6 +403,35 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   animation: sv-settle 1.8s var(--ease-gallery) both;
 }
 
+/* Phones and tablets: the work hangs FIRST, cropped wide, so the first screen is never text only
+   (the owner's rule) and the H1 still starts on it. One rule for every framed / split room. */
+@media (max-width: 1023.98px) {
+  .sv-hero__grid {
+    row-gap: 20px;
+  }
+  .sv-hero__exhibit {
+    order: -1;
+  }
+  .sv-hero--framed-right .sv-hero__wires {
+    height: 22px;
+  }
+  .sv-hero__frame .nz-art__canvas {
+    aspect-ratio: 16 / 10 !important;
+  }
+  .sv-hero__label {
+    margin-top: 12px;
+  }
+  .sv-hero--split-ink {
+    padding-top: 0;
+  }
+}
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .sv-hero__frame {
+    max-width: 560px;
+    margin-inline: auto;
+  }
+}
+
 /* framed-right */
 @media (min-width: 1024px) {
   .sv-hero--framed-right .sv-hero__grid,
@@ -403,7 +460,8 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   position: relative;
 }
 .sv-hero__bleed .nz-art__canvas {
-  aspect-ratio: 4 / 5 !important;
+  /* square on phones (was 4/5): the title card and the first lead line reach the first screen */
+  aspect-ratio: 1 / 1 !important;
 }
 .sv-hero__bleed::after {
   /* the room's floor: the work fades into the ink at its foot */
@@ -415,7 +473,7 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   background: linear-gradient(to top, var(--ink), rgba(18, 17, 16, 0));
 }
 .sv-hero--full-bleed .sv-hero__grid {
-  margin-top: -120px;
+  margin-top: -96px;
   z-index: 2;
 }
 .sv-hero--full-bleed .sv-hero__text {
@@ -468,7 +526,7 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 /* split-ink */
 .sv-hero--split-ink .sv-hero__exhibit {
   margin-inline: calc(var(--gutter) * -1);
-  padding: 40px var(--gutter) 32px;
+  padding: 18px var(--gutter) 16px;
   background: var(--ink);
   --fg: var(--bone);
   --fg-muted: var(--ash);
@@ -499,7 +557,9 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   }
   .sv-hero--split-ink .sv-hero__exhibit {
     margin: 0;
-    padding: 64px 0 64px clamp(0px, 3vw, 48px);
+    /* air on the seam side (inline-start), so the frame and its label never touch the bone half */
+    padding-block: 64px;
+    padding-inline: clamp(32px, 3.5vw, 56px) clamp(0px, 1vw, 16px);
     background: transparent;
   }
 }
@@ -923,8 +983,8 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 }
 .sv-feat__desc {
   margin: 0;
-  font-size: 0.9375rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.65;
   color: var(--fg-muted);
   max-width: 52ch;
 }
@@ -1031,8 +1091,8 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 }
 .sv-plate__desc {
   margin: 0;
-  font-size: 0.9375rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.65;
   color: var(--fg-muted);
 }
 @media (min-width: 768px) {
@@ -1082,7 +1142,7 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 .sv-names__line {
   margin: 0;
   max-width: 44ch;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.65;
   color: var(--fg-muted);
 }
@@ -1174,10 +1234,10 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 }
 .sv-proc__step {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 76px;
+  grid-template-columns: minmax(0, 1fr) 96px;
   column-gap: 18px;
   align-items: end;
-  padding-top: 26px;
+  padding-top: 48px;
   border-bottom: 1px solid var(--fg);
 }
 .sv-proc__text {
@@ -1196,24 +1256,29 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 .sv-proc__desc {
   margin: 0;
   max-width: 46ch;
-  font-size: 0.9375rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.65;
   color: var(--fg-muted);
 }
+/* phones: the work stands beside its step on a thin ledge that rises a little each step
+   (8 → 20px); the full plinths (with their number plates) stand in a row from 1024px */
 .sv-proc__plinth {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  height: calc(34px + var(--i) * 24px);
+  align-items: center;
+  gap: 6px;
 }
 .sv-proc__block {
   position: relative;
   display: flex;
+  flex: none;
+  align-self: stretch;
   align-items: flex-end;
   justify-content: center;
-  height: 100%;
-  padding-bottom: 8px;
+  height: calc(8px + var(--i) * 4px);
+  padding-bottom: 0;
   background: var(--ink);
   border-bottom: 0;
   transform-origin: bottom;
@@ -1230,7 +1295,8 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   box-shadow: inset 0 6px 0 #fffaf2, 0 18px 30px -20px rgba(0, 0, 0, 0.8);
 }
 .sv-proc__plate {
-  font-size: 0.6875rem;
+  display: none;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   color: var(--ash);
   font-variant-numeric: tabular-nums;
@@ -1277,6 +1343,15 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   }
   .sv-proc__plinth {
     height: calc(56px + var(--i) * 52px);
+    align-items: stretch;
+    gap: 0;
+  }
+  .sv-proc__block {
+    height: 100%;
+    padding-bottom: 8px;
+  }
+  .sv-proc__plate {
+    display: block;
   }
   .sv-proc__work {
     width: 32px;
@@ -1426,7 +1501,7 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   font-size: clamp(1.1875rem, 1.05rem + 0.55vw, 1.625rem);
   line-height: 1.3;
   color: var(--fg);
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 .sv-qa__icon {
   position: relative;
@@ -1511,8 +1586,8 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 }
 .sv-book__body {
   margin: 0 0 6px;
-  font-size: 0.9375rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.65;
   color: var(--fg-muted);
 }
 @media (min-width: 1024px) {
@@ -1605,13 +1680,15 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   font-weight: 400;
   font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
   line-height: 1.15;
+  text-wrap: balance;
 }
 .sv-sign__desc {
   grid-column: 1;
   margin-top: 6px;
-  font-size: 0.875rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.65;
   color: var(--fg-muted);
+  text-wrap: pretty;
 }
 .sv-sign__thumb {
   grid-column: 2;
@@ -1635,6 +1712,15 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 @media (min-width: 1280px) {
   .sv-way__list--4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .sv-way__list--2 .sv-sign__thumb,
+  .sv-way__list--3 .sv-sign__thumb {
+    width: 112px;
+  }
+  .sv-way__list--4 .sv-sign__thumb {
+    width: 88px;
   }
 }
 
@@ -1989,7 +2075,7 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 }
 .sv-spec__desc {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.65;
   color: var(--fg-muted);
   text-wrap: pretty;
@@ -2094,12 +2180,10 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 
 /* process: the works standing on the plinths */
 .sv-proc__piece {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  inset-inline: 0;
-  width: 58px;
+  position: relative;
+  width: 96px;
   margin-inline: auto;
-  padding: 3px;
+  padding: 4px;
   background: #0d0c0b;
   box-shadow: 0 14px 18px -12px rgba(18, 17, 16, 0.75);
 }
@@ -2112,15 +2196,12 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 }
 .sv-proc__dot {
   position: absolute;
-  bottom: -3px;
-  inset-inline-end: -16px;
+  top: -5px;
+  inset-inline-end: -5px;
   width: 11px;
   height: 11px;
   background: var(--vermilion);
   box-shadow: 0 6px 10px -4px rgba(184, 50, 26, 0.7);
-}
-.sv-proc__step:has(.sv-proc__piece) {
-  padding-top: 106px;
 }
 @supports (animation-timeline: view()) {
   html.nz-motion .sv-proc__piece {
@@ -2131,16 +2212,18 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 }
 @media (min-width: 1024px) {
   .sv-proc__piece {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    inset-inline: 0;
     width: min(132px, 62%);
     padding: 5px;
   }
   .sv-proc__dot {
+    top: auto;
+    bottom: -3px;
     width: 16px;
     height: 16px;
     inset-inline-end: -26px;
-  }
-  .sv-proc__step:has(.sv-proc__piece) {
-    padding-top: 0;
   }
   .sv-proc__step:has(.sv-proc__piece) .sv-proc__plinth {
     margin-top: 196px;
@@ -2157,7 +2240,7 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   }
 }
 
-/* FAQ side card, "plaque" variant: an ink plaque with the count in serif */
+/* FAQ side card, "plaque" variant: an ink plaque, the count on a hairline */
 .sv-book--plaque .sv-book__card {
   background: var(--ink);
   border-color: var(--ink);
@@ -2166,23 +2249,10 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 }
 .sv-book__count {
   display: flex;
-  align-items: baseline;
-  gap: 12px;
   margin: 0 0 4px;
   padding-bottom: 12px;
   width: 100%;
   border-bottom: 1px solid var(--rule);
-  font-size: 0.8125rem;
-  letter-spacing: 0.04em;
-  color: var(--fg-muted);
-}
-.sv-book__count-num {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: 3.5rem;
-  line-height: 0.85;
-  color: var(--vermilion);
-  font-variant-numeric: lining-nums;
 }
 
 /* CTA, "door" variant: the conversation room at the end of the hall */

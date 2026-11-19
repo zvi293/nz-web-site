@@ -47,7 +47,7 @@
 }
 .lpd-board__cols {
   display: none;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   letter-spacing: 0.08em;
   color: var(--ash);
 }
@@ -132,7 +132,7 @@
   text-wrap: balance;
 }
 .lpd-row__line {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--ash);
   text-wrap: pretty;
@@ -143,11 +143,11 @@
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--bone);
 }
 .lpd-row__from-k {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   color: var(--ash);
 }
@@ -197,7 +197,7 @@
   margin-top: 6px;
   padding: 14px 8px 0;
   border-top: 1px solid rgba(239, 234, 226, 0.1);
-  font-size: 0.9375rem;
+  font-size: 1rem;
   color: var(--ash);
 }
 .lpd-board__foot .nz-link {
@@ -248,6 +248,15 @@
   .lpd-row__from {
     flex-direction: column;
     gap: 4px;
+  }
+  /* the column header names it on desktop: the per-row label stays for screen readers only */
+  .lpd-row__from-k {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
 

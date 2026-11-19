@@ -1,7 +1,9 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    סולם ההמרה (ConversionLadder) — prefix ldr-. Lives on ink (SignatureSlot).
    Model: hand-over-hand climb — two thumb buttons, each pull with the other hand = one rung.
-   Phone: stage (ladder + sample page) → the two hands (fixed place, thumb row) → the card.
+   Phone: stage (ladder + sample page) → the two hands (fixed place, mid-screen thumb row) → the
+   card. All the cards share one grid cell (.ldr__deck), so the box never changes height and the
+   hands never move under the thumb; the slip note is a toast over the sheet (no layout shift).
    Desktop ≥1024: the stage on the end side, card + hands on the start side.
    Levels: --lv 0 (ground) … 6 (rungs) … 7 (the light). --hr / --hl = where each hand grips.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -22,7 +24,7 @@
 }
 .ldr__climb {
   display: grid;
-  grid-template-rows: 58px minmax(0, 1fr) 22px;
+  grid-template-rows: 58px minmax(0, 1fr) 38px; /* the ground row clears the climber at level 0 */
   min-height: 0;
 }
 .ldr__sun {
@@ -163,7 +165,7 @@ html.nz-motion .ldr__climber.is-slip {
 .ldr__ground {
   align-self: end;
   text-align: center;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   color: var(--ash);
   border-top: 1px solid var(--line-ink);
@@ -172,6 +174,7 @@ html.nz-motion .ldr__climber.is-slip {
 
 /* ── the sample page in its frame ─────────────────────────────────────── */
 .ldr__frame {
+  position: relative;
   margin: 0;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
@@ -287,15 +290,22 @@ html.nz-motion .ldr__climber.is-slip {
 }
 
 /* ── the card ──────────────────────────────────────────────────────────── */
-.ldr__card {
-  min-height: 15.5rem;
+.ldr__deck {
+  display: grid;
+}
+.ldr__deck > .ldr-card {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+.ldr__deck > .ldr-card.is-on {
+  visibility: visible;
 }
 .ldr-card {
   display: grid;
   gap: 10px;
   align-content: start;
 }
-html.nz-motion .ldr-card {
+html.nz-motion .ldr-card.is-on {
   animation: ldr-in 0.5s var(--ease-gallery) both;
 }
 @keyframes ldr-in {
@@ -340,16 +350,22 @@ html.nz-motion .ldr-card {
   margin-inline-end: 6px;
 }
 .ldr__slip {
-  margin-top: 12px;
-  padding: 8px 12px;
-  border-inline-start: 2px solid var(--ldr-coral);
-  font-size: 0.875rem;
+  position: absolute;
+  z-index: 2;
+  inset-inline: 14px;
+  bottom: 40px;
+  margin: 0;
+  padding: 10px 14px;
+  border-inline-start: 3px solid var(--ldr-coral);
+  border-radius: 2px;
+  font-size: 0.9375rem;
   line-height: 1.5;
   color: var(--bone);
-  background: rgba(255, 106, 69, 0.08);
+  background: rgba(18, 17, 16, 0.94);
+  box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.8);
 }
 html.nz-motion .ldr__slip {
-  animation: ldr-in 0.4s var(--ease-gallery) both;
+  animation: ldr-in 0.35s var(--ease-gallery) both;
 }
 
 /* the six principles as a list (recap at the top · the no-JS lesson) */
@@ -384,7 +400,7 @@ html.nz-motion .ldr__slip {
   font-weight: 500;
 }
 .ldr-all__body {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.65;
   color: var(--ash);
 }
@@ -547,7 +563,6 @@ html:not(.js) .ldr .ldr-pg__b {
   }
   .ldr__card {
     grid-area: card;
-    min-height: 17rem;
     align-self: end;
   }
   .ldr__hands {

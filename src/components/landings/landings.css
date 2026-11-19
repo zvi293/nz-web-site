@@ -197,8 +197,9 @@
 }
 
 @media (min-width: 1024px) {
+  /* the two caps get a fixed column of their own, so "הקמפיין הבא" never folds */
   .lp-path__map {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: 9rem minmax(0, 1fr) 9rem;
     column-gap: 28px;
     padding-inline-start: 0;
     padding-block-start: 0;
@@ -218,7 +219,9 @@
     align-items: flex-start;
     gap: 4px;
     padding: 40px 0 0;
-    max-width: 10ch;
+  }
+  .lp-path__tag {
+    white-space: nowrap;
   }
   .lp-path__end::before {
     inset-inline-start: 0;
@@ -327,7 +330,7 @@
 }
 .lp-after__fine {
   margin: 36px 0 0;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--fg-muted);
 }
 
@@ -796,8 +799,8 @@
 }
 .lp-crops__desc {
   margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.6;
   color: var(--fg-muted);
   text-wrap: pretty;
 }
@@ -1062,6 +1065,27 @@
   color: #fff;
   font-weight: 500;
 }
+/* Phones: a catalogue list — the small print on the start side, its caption beside it, so the
+   caption reads at full size (16px) in a real measure instead of a 3-word column. */
+@media (max-width: 599px) {
+  .lp-crops__wall {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+  }
+  .lp-crops__item {
+    grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    column-gap: 16px;
+    row-gap: 6px;
+  }
+  .lp-crops__frame {
+    grid-row: 1 / -1;
+    align-self: start;
+  }
+  .lp-crops__plate {
+    margin: 0;
+  }
+}
 @media (min-width: 768px) {
   .lp-crops__wall {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1161,10 +1185,37 @@
 }
 .lp-tools__desc {
   margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.6;
   color: var(--fg-muted);
   text-wrap: pretty;
+}
+/* Phones: one tool per row — the pegboard square on the start side, name + line beside it. */
+@media (max-width: 599px) {
+  .lp-tools__board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lp-tools__slot,
+  .lp-tools__slot:last-child:nth-child(odd) {
+    grid-column: auto;
+    grid-template-columns: minmax(0, 34%) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 16px;
+    row-gap: 6px;
+    padding: 16px 14px;
+  }
+  .lp-tools__peg,
+  .lp-tools__slot:last-child:nth-child(odd) .lp-tools__peg {
+    grid-row: 1 / -1;
+    align-self: start;
+    aspect-ratio: 1;
+    height: auto;
+    margin: 0;
+  }
+  .lp-tools__slot:last-child:nth-child(odd) .lp-tools__svg {
+    width: 78%;
+    height: auto;
+  }
 }
 @media (min-width: 768px) {
   /* six tracks: three tools on the first row, two wider ones under them */

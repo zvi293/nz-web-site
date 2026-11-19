@@ -8,8 +8,12 @@ import "./fewer-fields.css";
  * shorter, while "מה תדעו לפני השיחה" falls if you remove something you actually need (name,
  * phone, what they need, when). The verdict names the state; the balanced form is the goal.
  * Illustrative only: the gauges have no numbers, the field count is the demo's own.
- * Removed fields wait in a tray and come back with one tap. Keyboard: real buttons; focus moves
- * to the next field's × after a removal; the verdict is aria-live. SSR / no JS: the full form,
+ * Removed fields wait in a tray and come back with one tap. Keyboard: real buttons, the form
+ * first in the DOM (Tab reaches the × buttons before the "do it for me" action, whatever the
+ * visual order); focus moves to the next field's × after a removal; the verdict is aria-live.
+ * Phones: the full meter scrolls with the page; once it is gone above, a one-row mini meter
+ * (count · verdict · two thin gauges, ~64px) hangs under the header while the form is in view.
+ * SSR / no JS: the full form,
  * the verdict for it and the list of what a balanced form keeps. Reduced motion: no fades.
  */
 
@@ -136,7 +140,34 @@ const FewerFields = () => {
   const [leaving, setLeaving] = useState<string | null>(null);
   const [note, setNote] = useState<string>("");
   const formRef = useRef<HTMLDivElement>(null);
+  const meterRef = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLSpanElement>(null);
   const focusAfter = useRef<string | null>(null);
+  /* phones: the full meter has scrolled away above, and the form still runs below the mini meter */
+  const [meterGone, setMeterGone] = useState(false);
+  const [formLeft, setFormLeft] = useState(true);
+
+  useEffect(() => {
+    const meterEl = meterRef.current;
+    const endEl = endRef.current;
+    if (!meterEl || !endEl || typeof IntersectionObserver === "undefined") return;
+    const head = Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 68);
+    const io1 = new IntersectionObserver(
+      ([e]) => setMeterGone(!e.isIntersecting && e.boundingClientRect.top < (e.rootBounds?.top ?? head)),
+      { rootMargin: `-${head}px 0px 0px 0px` },
+    );
+    const io2 = new IntersectionObserver(
+      ([e]) => setFormLeft(e.isIntersecting || e.boundingClientRect.top > (e.rootBounds?.bottom ?? 0)),
+      { rootMargin: `-${head + 96}px 0px 0px 0px` },
+    );
+    io1.observe(meterEl);
+    io2.observe(endEl);
+    return () => {
+      io1.disconnect();
+      io2.disconnect();
+    };
+  }, []);
+  const mini = meterGone && formLeft;
 
   const kept = FIELDS.filter((f) => !removed.includes(f.id));
   const effort = kept.reduce((s, f) => s + f.effort, 0);
@@ -181,7 +212,7 @@ const FewerFields = () => {
   };
 
   const meter = (
-    <div className="lpf__meter">
+    <div className="lpf__meter" ref={meterRef}>
       <div className="lpf__count" aria-hidden="true">
         <span className="lpf__num">{kept.length}</span>
         <span className="lpf__numlabel">{kept.length === 1 ? "שדה" : "שדות"}</span>
@@ -218,28 +249,6 @@ const FewerFields = () => {
       <p className="sr-only" aria-live="polite">
         {note} {st.title}. {st.body}
       </p>
-      <div className="lpf__panel">
-        {meter}
-        <div className="lpf__side">
-          <p className="lpf__vbody" aria-hidden="true">
-            {st.body}
-          </p>
-          {note && <p className="lpf__note" aria-hidden="true">{note}</p>}
-          <div className="lpf__actions">
-            {st.key !== "balanced" && (
-              <button type="button" className="lpf__btn" onClick={balance}>
-                השאירו רק את מה שצריך
-              </button>
-            )}
-            {removed.length > 0 && (
-              <button type="button" className="lpf__btn lpf__btn--quiet lpf__restore" onClick={restoreAll}>
-                להחזיר הכול
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
       <div className="lpf__sheet" ref={formRef}>
         <p className="lpf__formhead">
           <span className="lpf__formtitle">בקשה להצעה</span>
@@ -283,6 +292,56 @@ const FewerFields = () => {
             </ul>
           </div>
         )}
+        <span className="lpf__end" ref={endRef} aria-hidden="true" />
+      </div>
+
+      <div className="lpf__panel">
+        {meter}
+        {/* phones only: a visual echo of the meter while the form scrolls (the live region speaks) */}
+        <div className="lpf__rail" aria-hidden="true">
+          <div className="lpf__mini" data-on={mini ? "" : undefined}>
+            <span className="lpf__mcount">
+              <span className="lpf__mnum">{kept.length}</span>
+              <span className="lpf__mlabel">{kept.length === 1 ? "שדה" : "שדות"}</span>
+            </span>
+            <span className="lpf__mtitle">
+              <span className="lpf__vmark" />
+              {st.title}
+            </span>
+            <span className="lpf__mgauges">
+              <span className="lpf__mgauge" data-kind="ease">
+                <span className="lpf__mname">קל למלא</span>
+                <span className="lpf__bar">
+                  <span className="lpf__fill" style={{ transform: `scaleX(${Math.max(0.04, ease)})` }} />
+                </span>
+              </span>
+              <span className="lpf__mgauge" data-kind="know">
+                <span className="lpf__mname">מה תדעו</span>
+                <span className="lpf__bar">
+                  <span className="lpf__fill" style={{ transform: `scaleX(${Math.min(1, know.fill)})` }} />
+                </span>
+              </span>
+            </span>
+          </div>
+        </div>
+        <div className="lpf__side">
+          <p className="lpf__vbody" aria-hidden="true">
+            {st.body}
+          </p>
+          {note && <p className="lpf__note" aria-hidden="true">{note}</p>}
+          <div className="lpf__actions">
+            {st.key !== "balanced" && (
+              <button type="button" className="lpf__btn" onClick={balance}>
+                השאירו רק את מה שצריך
+              </button>
+            )}
+            {removed.length > 0 && (
+              <button type="button" className="lpf__btn lpf__btn--quiet lpf__restore" onClick={restoreAll}>
+                להחזיר הכול
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       <p className="lpf__key">

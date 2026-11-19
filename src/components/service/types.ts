@@ -62,7 +62,7 @@ export interface ServiceIntroData {
 export type SketchKind =
   | "code" | "a11y" | "mobile" | "speed" | "seo" | "care"
   | "domain" | "materials" | "launch"
-  | "calendar" | "form" | "search" | "layers" | "chat";
+  | "calendar" | "form" | "search" | "layers" | "chat" | "type";
 
 export interface DeepDiveBlock {
   heading: string;

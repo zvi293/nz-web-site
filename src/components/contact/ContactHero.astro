@@ -1,6 +1,6 @@
 ---
 /**
- * /contact/ hero: the statement, the answer-first lead with every direct line in it, the
+ * /contact/ hero: the statement, a short answer-first lead (the number), the
  * ceramic handsets hung on the wall (LCP), and "the switchboard": one number (write / call),
  * the email and the hours. Static (no client JS).
  */
@@ -30,13 +30,10 @@ const wa = getWhatsAppHref(contactInfo);
       <h1 id="ct-title" class="nz-display ct-hero__title">
         <span class="ct-line"><span class="ct-line__in" style="--d:90ms">{h.h1[0]}</span></span>
         {" "}
-        <span class="ct-line"><span class="ct-line__in" style="--d:170ms">{h.h1[1]}</span></span>
-        {" "}
-        <span class="ct-line"><span class="ct-line__in" style="--d:250ms"><span class="nz-accent">{h.h1Accent}</span></span></span>
+        <span class="ct-line"><span class="ct-line__in" style="--d:190ms">{h.h1[1]}<span class="nz-accent">{h.h1Accent}</span></span></span>
       </h1>
       <p class="nz-lede lead ct-hero__lead ct-enter" style="--d:340ms">
-        {h.leadBefore}{" "}<bdi dir="ltr" class="ct-nowrap">{phone}</bdi>{h.leadMid}<bdi dir="ltr">{studio.email}</bdi>{h.leadHours}{" "}<span
-          class="ct-nowrap">{studio.days} <bdi dir="ltr">{studio.time}</bdi>.</span>{" "}{h.leadEnd}
+        {h.leadBefore}<bdi dir="ltr" class="ct-nowrap">{phone}</bdi>. {h.leadEnd}
       </p>
     </div>
 

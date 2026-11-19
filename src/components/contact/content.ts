@@ -13,14 +13,12 @@ export const contactSeo = {
 
 export const contactHero = {
   room: "אולם 00 · צור קשר",
-  h1: ["צרו קשר,", "ונדבר על"],
+  /** Two set lines; "על" is tied to "האתר" (no-break space) so it never ends a line. */
+  h1: ["צרו קשר, ונדבר", "על\u00A0"],
   h1Accent: "האתר שלכם.",
-  /** Answer-first lead (speakable, 40–70 words). The number, email and times are wrapped LTR. */
-  leadBefore: "הדרך הכי מהירה להגיע אלינו היא הודעת וואטסאפ למספר",
-  leadMid: ", ואפשר גם להתקשר לאותו מספר או לכתוב ל-",
-  leadHours: ". אנחנו זמינים בימים",
-  leadEnd:
-    "את ההודעה קורא צבי משה, מייסד NZ-web, שגם מעצב ובונה את האתר, כך שהתשובה מגיעה ישר ממי שיעבוד איתכם.",
+  /** Answer-first lead (speakable). The number is wrapped LTR; email and hours live in the switchboard below. */
+  leadBefore: "הדרך הכי מהירה היא הודעת וואטסאפ ל-",
+  leadEnd: "את ההודעה קורא צבי משה, שגם מעצב ובונה את האתר, כך שהתשובה מגיעה ישר ממי שיעבוד איתכם.",
   art: { slug: "ceramic-handsets", prefix: "מוצג", index: 1, medium: "קרמיקה וזכוכית · שתי שפופרות, שיחה אחת" },
 };
 
@@ -64,6 +62,8 @@ export const call = {
   who: "צבי משה · NZ-web",
   state: { idle: "על הכן", dialing: "מחייג…", live: "על הקו", typing: "מקליד…", done: "ההודעה מוכנה" },
   lift: "להרים את השפופרת",
+  started: "השיחה התחילה ·",
+  startedNote: "חמש שאלות קצרות. כל תשובה אפשר לשנות.",
   idleNote: "חמש שאלות, בערך דקה. שום דבר לא נשלח עד שתלחצו על שליחה בוואטסאפ.",
   idleTopics: ["סוג האתר", "המטרה", "מתי מתחילים", "מי אתם", "עוד משהו"],
   noJsCta: "לכתוב לצבי בוואטסאפ",
@@ -169,4 +169,10 @@ export const contactFaq = {
     },
   ],
   allLink: { label: "לכל השאלות הנפוצות", href: "/faq/" },
+  /** The page's closing action, under the slips. */
+  end: {
+    q: "שאלה אחרת? כתבו אותה.",
+    cta: "לכתוב לצבי בוואטסאפ",
+    message: "שלום צבי, הגעתי מעמוד צור קשר ויש לי שאלה:",
+  },
 };

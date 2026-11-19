@@ -25,11 +25,14 @@ interface Props {
   signature: string;
 }
 const meta = getSignatureMeta(Astro.props.signature);
+/* exhibits that need the room: ≥1100px they span the TOC rail's wall too (the rail steps aside) */
+const WIDE = new Set(["keyboard-run", "folded-quote"]);
+const wide = meta ? WIDE.has(meta.key) : false;
 ---
 
 {
   meta && (
-    <figure class="as-plate" id="signature" aria-labelledby="as-plate-name">
+    <figure class="as-plate" id="signature" aria-labelledby="as-plate-name" data-wide={wide ? "" : undefined}>
       <figcaption class="as-plate__cap">
         <span class="as-plate__kicker">
           <span class="as-plate__cube" aria-hidden="true" />

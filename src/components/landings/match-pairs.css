@@ -1,7 +1,9 @@
 /* ══════════════════════════════════════════════════════════════════════════
    ההתאמה (MatchPairs) — prefix lpm-. Sits in the ink signature room.
-   Phones / tablets (< 1024): one ad at a time (א · ב · ג switch), the six pages as a choice
-   sheet under it, the verdict under the sheet with the pair drawn as mini cards + a thread.
+   Phones / tablets (< 1024): one ad at a time — the א · ב · ג switch is a bar that stays under
+   the header while the board is on screen — the six pages as a choice sheet under it, a verdict
+   chip pinned to the bottom of the sheet (the answer where the thumb is), and the full verdict
+   under the sheet with the pair drawn as mini cards + a thread.
    Desktop: the workbook — ads | pages in two columns with threads between them, the verdict as
    a sticky card beside. Threads: vermilion + dot = continues, vermilion dashed + knot = near
    miss (one check broken), grey dashed + cut = broken.
@@ -128,24 +130,38 @@
   border-inline-start: 2px dashed var(--vermilion);
 }
 
-/* the ad switch (phones / tablets) */
+/* the ad switch (phones / tablets): stays under the header while the board is in view */
+.lpm__bar {
+  position: sticky;
+  inset-block-start: var(--header-h);
+  z-index: 4;
+  margin-block: -8px;
+  padding-block: 8px;
+  background: var(--ink);
+  /* the bar's ink runs to the screen edges without widening the page */
+  border-image: conic-gradient(var(--ink) 0 0) fill 0 / / 0 100vw;
+}
 .lpm__tabs {
   display: flex;
   gap: 6px;
 }
 .lpm__tab {
+  flex: 1 1 0;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
   min-height: 44px;
-  padding: 0 14px;
+  padding: 0 10px;
   border: 0;
   border-radius: 999px;
   background: var(--ink-2);
-  color: var(--ash);
+  color: var(--bone);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
+  white-space: nowrap;
   cursor: pointer;
   box-shadow: inset 0 0 0 1px var(--ink-3);
   -webkit-tap-highlight-color: transparent;
@@ -159,21 +175,38 @@
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
+/* the letter carries the pair's state: filled = continues, ring = near miss */
 .lpm__tabmark {
-  width: 9px;
-  height: 9px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  line-height: 1;
   box-shadow: inset 0 0 0 1.5px currentColor;
-  opacity: 0.6;
 }
 .lpm__tab[data-fit="ok"] .lpm__tabmark {
-  background: var(--vermilion);
+  background: var(--vermilion-fill);
+  color: #fff;
   box-shadow: none;
-  opacity: 1;
 }
 .lpm__tab[data-fit="near"] .lpm__tabmark {
-  box-shadow: inset 0 0 0 2px var(--vermilion);
-  opacity: 1;
+  box-shadow: inset 0 0 0 2.5px var(--vermilion);
+}
+.lpm__tab[data-fit="off"] .lpm__tabmark {
+  box-shadow: inset 0 0 0 1.5px var(--ash);
+  color: var(--ash);
+}
+.lpm__tab[aria-pressed="true"][data-fit="off"] .lpm__tabmark {
+  box-shadow: inset 0 0 0 1.5px var(--graphite);
+  color: var(--graphite);
+}
+.lpm__colhead--ads,
+.lpm__colhead--pages .lpm__colnum {
+  display: none;
 }
 
 /* shared card behaviour */
@@ -363,6 +396,137 @@
 .lpm__badge[data-fit="near"] {
   box-shadow: inset 0 0 0 2px var(--vermilion-deep);
   color: var(--vermilion-deep);
+}
+
+/* ── the verdict chip (phones / tablets): pinned to the bottom of the sheet ── */
+/* A zero-height sticky rail at the end of the sheet: the chip hangs above it, so it rides at the
+   bottom of the screen while the sheet is in view and lands under the last row, taking no room. */
+.lpm__pin {
+  position: sticky;
+  inset-block-end: calc(70px + env(safe-area-inset-bottom, 0px)); /* clears the floating beads */
+  z-index: 5;
+  height: 0;
+  margin-block-start: -10px;
+}
+.lpm__chip {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  display: grid;
+  gap: 6px;
+  min-height: 64px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--bone);
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 1px rgba(18, 17, 16, 0.08),
+    0 18px 36px -12px rgba(0, 0, 0, 0.75);
+  transition:
+    opacity 0.3s ease,
+    transform 0.4s var(--ease-gallery),
+    visibility 0s linear 0s;
+  -webkit-tap-highlight-color: transparent;
+}
+.lpm__chip:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.lpm__pin[data-hide] .lpm__chip {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    transform 0.3s var(--ease-gallery),
+    visibility 0s linear 0.3s;
+}
+html.nz-motion .lpm__pin[data-hide] .lpm__chip {
+  transform: translateY(12px);
+}
+@keyframes lpm-chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+}
+html.nz-motion .lpm__chip {
+  animation: lpm-chip-in 0.45s var(--ease-gallery) both;
+}
+.lpm__chiphead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.lpm__chipmark {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--vermilion);
+}
+.lpm__chip[data-fit="near"] .lpm__chipmark {
+  background: transparent;
+  box-shadow: inset 0 0 0 2.5px var(--vermilion);
+}
+.lpm__chip[data-fit="off"] .lpm__chipmark {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--graphite);
+}
+.lpm__chiptitle {
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  line-height: 1.15;
+}
+.lpm__chippair {
+  margin-inline-start: auto;
+  flex: none;
+  font-size: 0.8125rem;
+  color: var(--lpm-muted);
+  font-variant-numeric: tabular-nums;
+}
+.lpm__chipchecks {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--lpm-muted);
+}
+.lpm__chipchecks > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.lpm__chipchecks > span[data-ok] {
+  color: var(--ink);
+}
+.lpm__chipicon {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.6875rem;
+  box-shadow: inset 0 0 0 1.5px var(--graphite);
+}
+[data-ok] > .lpm__chipicon {
+  background: var(--vermilion-fill);
+  color: #fff;
+  box-shadow: none;
+}
+.lpm__chipchecks .lpm__chipmore {
+  margin-inline-start: auto;
+  color: var(--vermilion-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ── verdict ────────────────────────────────────────────────────────── */
@@ -660,7 +824,7 @@ html.nz-motion .lpm__strip[data-fresh] :is(.lpm__dot, .lpm__knot, .lpm__cut) {
 }
 .lpm__note {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--fg-muted);
 }
 
@@ -671,7 +835,8 @@ html:not(.js) .lpm__key {
 html:not(.js) .lpm__ad {
   display: grid;
 }
-html:not(.js) .lpm__tabs,
+html:not(.js) .lpm__bar,
+html:not(.js) .lpm__pin,
 html:not(.js) .lpm__verdict,
 html:not(.js) .lpm__ask,
 html:not(.js) .lpm__colhead--pages::before,
@@ -722,10 +887,18 @@ html:not(.js) .lpm__askwide {
     pointer-events: none;
     z-index: 2;
   }
-  .lpm__tabs,
+  .lpm__bar,
+  .lpm__pin,
   .lpm__ask,
   .lpm__colhead--pages::before {
     display: none;
+  }
+  .lpm__colhead--ads,
+  .lpm__colhead--pages .lpm__colnum {
+    display: inline;
+  }
+  .lpm__colhead--ads {
+    display: flex;
   }
   .lpm__askwide {
     display: inline;

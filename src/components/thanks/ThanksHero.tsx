@@ -3,8 +3,9 @@ import { Artwork, MuseumLabel, getArt } from "@/components/art";
 import { Button, WhatsAppCta } from "@/components/nz";
 import { thanksCopy } from "./copy";
 
-/** Must equal lcpArt.sizes in src/pages/thank-you.astro. */
-export const THANKS_ART_SIZES = "(min-width: 1440px) 780px, (min-width: 1024px) 54vw, 100vw";
+/** Must equal lcpArt.sizes in src/pages/thank-you.astro. Phones: the island zooms the picture ~1.4×
+    into a 4/5 crop (cover of a 3/2 work), so it is drawn about 2.1 × the viewport wide. */
+export const THANKS_ART_SIZES = "(min-width: 1440px) 780px, (min-width: 1024px) 54vw, (min-width: 640px) 100vw, 210vw";
 export const THANKS_ART_SLUG = "embroidered-comet";
 
 const h = thanksCopy.hero;

@@ -4,14 +4,16 @@
  * invitation (WhatsApp) tuned to the article's department, with the matching service link. Static.
  */
 import { WhatsAppCta } from "@/components/nz";
-import type { BlogPost, Department, Issue } from "@/lib/blog";
+import type { BlogPost, Department } from "@/lib/blog";
+import type { MagazineIssue } from "./magazine-meta";
 
 interface Props {
   post: BlogPost;
   dept: Department;
-  issue: Issue;
+  issue: MagazineIssue;
+  minutes: number;
 }
-const { post, dept, issue } = Astro.props;
+const { post, dept, issue, minutes } = Astro.props;
 
 const CALL: Record<string, { title: string; body: string }> = {
   build: {
@@ -58,7 +60,7 @@ const message = `שלום, קראתי במגזין את המאמר "${post.title
       <div><dt>גיליון</dt><dd>{issue.index} · {issue.month}</dd></div>
       <div><dt>מדור</dt><dd>{dept.name}</dd></div>
       <div><dt>כתיבה</dt><dd><a href="/about/">צבי משה</a></dd></div>
-      <div><dt>זמן קריאה</dt><dd>{post.read_time} דקות</dd></div>
+      <div><dt>זמן קריאה</dt><dd>{minutes} דקות</dd></div>
       <div><dt>עוד במגזין</dt><dd><a href="/glossary/">מילון המונחים</a></dd></div>
       </dl>
     </div>

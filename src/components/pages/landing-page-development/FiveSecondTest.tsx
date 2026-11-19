@@ -15,8 +15,11 @@ import "./five-second.css";
  *   2 / restart) the intro heading; aria-live announces the phase. After answering, "לראות את הדף
  *   שוב" opens the page with no timer.
  * - Phones: every phase change brings the exhibit's top under the header (scrollIntoView), and
- *   while the page is closed (question / verdict) the frame folds to a short shutter strip, so the
- *   four answers and the verdict sit in one screen with the shutter. Peeking unfolds it in view.
+ *   while the page is closed (intro / question / verdict) the frame folds to a short shutter
+ *   strip, so the round title and its button, the four answers or the verdict sit in one screen
+ *   with the shutter. Opening the page or peeking unfolds it in view.
+ * - Summary: the two pages side by side, each under its own label, in a frame that fits them
+ *   (no fixed height, no empty wall around them).
  * - SSR / no JS: the end state as a static figure (.fsec__static) — both pages side by side and
  *   the three lessons; the live test is hidden until JS runs (html.js).
  */
@@ -136,6 +139,26 @@ function ClearPage() {
   );
 }
 
+/** The two pages side by side, each under its label (summary and the no-JS still). */
+function Pair() {
+  return (
+    <div className="fsec__pair">
+      <div className="fsec__pair-i">
+        <span className="fsec__pair-k">סבב 1 · דף עמוס</span>
+        <div className="fsec__mini">
+          <BusyPage />
+        </div>
+      </div>
+      <div className="fsec__pair-i">
+        <span className="fsec__pair-k">סבב 2 · דף ברור</span>
+        <div className="fsec__mini">
+          <ClearPage />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const FiveSecondTest = () => {
   const [phase, setPhase] = useState<Phase>("intro");
   const [round, setRound] = useState(0);
@@ -239,14 +262,7 @@ const FiveSecondTest = () => {
         <div className="fsec__frame">
           <div className="fsec__screen" aria-hidden={!open}>
             {phase === "done" ? (
-              <div className="fsec__pair">
-                <div className="fsec__mini">
-                  <BusyPage />
-                </div>
-                <div className="fsec__mini">
-                  <ClearPage />
-                </div>
-              </div>
+              <Pair />
             ) : busy ? (
               <BusyPage />
             ) : (
@@ -281,7 +297,7 @@ const FiveSecondTest = () => {
               <span>{round === 0 ? "דף נחיתה של עסק" : "אותו עסק, דף אחר"}</span>
             </p>
             <h3 className="fsec__t" ref={introRef} tabIndex={-1}>
-              {round === 0 ? "יש לכם חמש שניות" : "עוד פעם, חמש שניות"}
+              {round === 0 ? "הדף נפתח לחמש שניות" : "עוד פעם, חמש שניות"}
             </h3>
             <p className="fsec__p">
               {round === 0
@@ -371,19 +387,12 @@ const FiveSecondTest = () => {
       {/* no JS: the end of the test as a still — both pages and what the clear one did */}
       <figure className="fsec__static">
         <div className="fsec__frame fsec__frame--still">
-          <div className="fsec__pair">
-            <div className="fsec__mini">
-              <BusyPage />
-            </div>
-            <div className="fsec__mini">
-              <ClearPage />
-            </div>
-          </div>
+          <Pair />
         </div>
         <figcaption className="fsec__step">
           <p className="fsec__k">
             <span className="fsec__k-n">שני דפים, עסק אחד</span>
-            <span>מימין הדף העמוס, משמאל הדף הברור</span>
+            <span>הדף העמוס והדף הברור, זה לצד זה</span>
           </p>
           <p className="fsec__t">מה עשה הדף הברור</p>
           {lessons}

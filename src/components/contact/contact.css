@@ -81,8 +81,9 @@ html.nz-motion .ct-line__in {
     clip-path: inset(0 0 0 0 round 0);
   }
 }
+/* backwards only: once open, nothing clips the frame's cast shadow */
 html.nz-motion .ct-ring {
-  animation: ct-ring 1.3s var(--ease-gallery) 0.15s both;
+  animation: ct-ring 1.3s var(--ease-gallery) 0.15s backwards;
 }
 
 /* the switchboard: one number (write / call), the email, the hours */
@@ -114,10 +115,12 @@ html.nz-motion .ct-ring {
 }
 .ct-line-item__v {
   grid-area: v;
+  /* an LTR value (number, address) still hangs from the RTL edge of its cell */
+  justify-self: start;
+  max-width: 100%;
   font-family: var(--font-display);
   font-size: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
   line-height: 1.2;
-  text-align: start;
   overflow-wrap: anywhere;
 }
 .ct-line-item--mail .ct-line-item__v {
@@ -263,8 +266,15 @@ html.nz-motion .ct-ring {
 }
 
 .ct-call {
+  /* the receiver never changes height: what the keys give up on the cradle, the line takes */
+  --wire-h: clamp(300px, 46svh, 380px);
+  --keys-h: 156px;
+  --wire-plus: 0px;
   display: grid;
   gap: 18px;
+}
+.ct-call:is([data-phase="idle"], [data-phase="dialing"]) {
+  --wire-plus: calc(var(--keys-h) - 68px + 48px);
 }
 /* the receiver: a ceramic handset resting on its cradle; lifted while the call is on */
 .ct-receiver {
@@ -275,6 +285,12 @@ html.nz-motion .ct-ring {
   box-shadow: inset 0 1px 0 #fff, inset 0 -3px 8px rgba(18, 17, 16, 0.08), 0 26px 50px -28px rgba(0, 0, 0, 0.85),
     0 2px 0 rgba(0, 0, 0, 0.3);
   color: var(--ink);
+  /* a light card inside the ink room: reset the tone tokens the kit reads (.nz-link, focus…) */
+  --fg: var(--ink);
+  --fg-muted: var(--graphite);
+  --rule: var(--line);
+  --focus: var(--vermilion-deep);
+  --accent-text: var(--vermilion-deep);
   transition: transform 0.7s var(--ease-gallery), box-shadow 0.7s var(--ease-gallery);
 }
 /* the cradle under it */
@@ -289,8 +305,13 @@ html.nz-motion .ct-ring {
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.5);
   transition: opacity 0.5s ease;
 }
+html.nz-motion .ct-call[data-phase="dialing"] .ct-receiver {
+  transform: translateY(-10px) rotate(-0.8deg);
+}
+html.nz-motion .ct-call:is([data-phase="live"], [data-phase="done"]) .ct-receiver {
+  transform: translateY(-8px);
+}
 html.nz-motion .ct-call:not([data-phase="idle"]) .ct-receiver {
-  transform: translateY(-8px) rotate(-0.8deg);
   box-shadow: inset 0 1px 0 #fff, inset 0 -3px 8px rgba(18, 17, 16, 0.08), 0 44px 70px -30px rgba(0, 0, 0, 0.9),
     0 2px 0 rgba(0, 0, 0, 0.3);
 }
@@ -389,7 +410,7 @@ html.nz-motion .ct-ear.is-speaking .ct-ear__hole {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: clamp(300px, 46svh, 380px);
+  height: calc(var(--wire-h) + var(--wire-plus));
   margin: 0;
   padding: 16px 12px;
   list-style: none;
@@ -404,8 +425,30 @@ html.nz-motion .ct-ear.is-speaking .ct-ear__hole {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
-.ct-wire > li:first-child {
-  margin-top: auto;
+/* the start of the call: a quiet system line at the top; the turns gather at the bottom,
+   next to the keys */
+.ct-wire__start {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  margin-bottom: auto;
+  padding: 8px 14px 9px;
+  align-self: center;
+  max-width: 30ch;
+  border-radius: 10px;
+  background: rgba(248, 246, 242, 0.75);
+  box-shadow: 0 1px 1px rgba(18, 17, 16, 0.08);
+  text-align: center;
+}
+.ct-wire__start-k {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+.ct-wire__start-v {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--graphite);
 }
 .ct-turn {
   display: grid;
@@ -518,21 +561,25 @@ html.nz-motion .ct-typing span:nth-child(3) {
 }
 .ct-draft__text {
   margin: 0;
-  font-size: 0.96875rem;
+  font-size: 1.0625rem;
   line-height: 1.65;
   white-space: pre-line;
   color: var(--ink);
 }
 /* on the cradle: what the call will cover */
 .ct-wire__idle {
+  /* fills the taller idle line: title, topics and note spread evenly, no empty band */
+  flex: 1 0 auto;
   display: grid;
-  gap: 12px;
-  padding: 4px 4px 2px;
+  align-content: space-evenly;
+  gap: 14px;
+  padding: 6px 6px 4px;
 }
 .ct-wire__idle-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.25rem;
+  font-size: 1.5rem;
+  line-height: 1.2;
   color: var(--ink);
 }
 .ct-topics {
@@ -546,9 +593,9 @@ html.nz-motion .ct-typing span:nth-child(3) {
   display: flex;
   align-items: baseline;
   gap: 12px;
-  padding-block: 8px;
+  padding-block: 11px;
   border-bottom: 1px solid var(--line);
-  font-size: 1rem;
+  font-size: 1.0625rem;
   color: var(--ink);
 }
 .ct-topic__n {
@@ -581,7 +628,13 @@ html:not(.js) .ct-nojs-wa {
 .ct-keys__main {
   display: grid;
   align-content: start;
-  min-height: 156px;
+  min-height: var(--keys-h);
+}
+.ct-call:is([data-phase="idle"], [data-phase="dialing"]) .ct-keys__main {
+  min-height: 68px;
+}
+.ct-call:is([data-phase="idle"], [data-phase="dialing"]) .ct-keys__undo {
+  display: none;
 }
 .ct-replies {
   display: grid;
@@ -762,7 +815,7 @@ html:not(.js) .ct-lift {
   border: 0;
   background: none;
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--graphite);
   text-decoration: underline;
   text-decoration-color: rgba(87, 82, 75, 0.45);
@@ -783,21 +836,29 @@ html:not(.js) .ct-lift {
 .ct-call__privacy {
   margin: 0;
   max-width: 48ch;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   line-height: 1.6;
   color: var(--ash);
 }
 
 @media (min-width: 640px) {
+  .ct-wire__idle-title {
+    font-size: 1.75rem;
+  }
+  .ct-topic {
+    padding-block: 13px;
+    font-size: 1.125rem;
+  }
   .ct-send {
     width: auto;
   }
-  .ct-replies {
-    display: flex;
-    flex-wrap: wrap;
+  .ct-call {
+    --keys-h: 136px;
   }
-  .ct-keys__main {
-    min-height: 136px;
+  /* six answers make a clean 3 × 2, five a 3 + 2, three one row */
+  .ct-replies {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 @media (min-width: 1024px) {
@@ -816,8 +877,8 @@ html:not(.js) .ct-lift {
   .ct-receiver {
     padding: 22px 20px 18px;
   }
-  .ct-wire {
-    height: 400px;
+  .ct-call {
+    --wire-h: 400px;
   }
 }
 
@@ -920,12 +981,25 @@ html:not(.js) .ct-lift {
     stroke-dashoffset: 0;
   }
 }
+/* the horizontal coil runs left → right in the path, so it draws from its end (step 01, RTL) */
+@keyframes ct-draw-rtl {
+  from {
+    stroke-dashoffset: -1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
 @supports (animation-timeline: view()) {
   html.nz-motion .ct-cord__svg path {
     stroke-dasharray: 1;
     animation: ct-draw linear both;
     animation-timeline: view();
     animation-range: entry 10% cover 55%;
+  }
+  html.nz-motion .ct-cord__svg--h path {
+    animation-name: ct-draw-rtl;
+    animation-range: entry 0% cover 45%;
   }
 }
 
@@ -981,6 +1055,22 @@ html:not(.js) .ct-lift {
 .ct-faq__all {
   margin-top: 18px;
   min-height: 44px;
+}
+/* the page's last word: one quiet way to write */
+.ct-faq__end {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  margin-top: 8px;
+  padding-top: 22px;
+  border-top: 1px solid var(--rule);
+}
+.ct-faq__end-q {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
+  line-height: 1.3;
+  color: var(--ink);
 }
 .ct-slips {
   display: grid;
@@ -1053,7 +1143,6 @@ html:not(.js) .ct-lift {
   background: linear-gradient(var(--line), var(--line)) 0 100% / 100% 1px no-repeat;
 }
 .ct-slip__a {
-  position: relative;
   margin-top: 14px;
 }
 .ct-slip__a p {
@@ -1063,10 +1152,12 @@ html:not(.js) .ct-lift {
   color: var(--graphite);
 }
 .ct-slip__stamp {
-  float: inline-end;
-  margin: 2px 0 6px 0;
-  margin-inline-start: 12px;
+  /* stamped across the slip's printed corner, by the form number */
+  position: absolute;
+  top: 54px;
+  inset-inline-end: 16px;
   padding: 3px 10px 4px;
+  background: rgba(248, 246, 242, 0.85);
   border: 2px solid var(--vermilion-deep);
   border-radius: 4px;
   font-size: 0.75rem;
@@ -1115,6 +1206,12 @@ html.nz-motion .ct-slip[data-in] .ct-slip__stamp {
     grid-column: 5 / span 8;
     column-gap: 32px;
     row-gap: 32px;
+  }
+  .ct-faq__end {
+    grid-column: 5 / span 8;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+    align-items: center;
   }
   .ct-slip {
     padding: 30px 28px 26px;

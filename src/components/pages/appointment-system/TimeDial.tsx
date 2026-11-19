@@ -9,6 +9,10 @@ import "./time-dial.css";
  * it. Taken slots are dark and the wheel skips them. "לקבוע את התור" stamps a confirmation card
  * (נקבע) and the slot becomes taken — the system never double-books.
  *
+ * - Like a real rotary dial, the holes run COUNTER-clockwise from the stop and you pull CLOCKWISE
+ *   to bring a later time under it (rot = +slot × STEP). A curved arrow on the plate shows the
+ *   pull; on first view the wheel gives one small clockwise nudge (motion only); a drag against
+ *   the stop springs back and says which way to turn (aria-live).
  * - Rotation is one CSS custom property (--rot, degrees) on the dial; the gears and the upright
  *   labels derive from it. Snapping is a CSS transition (off while dragging / reduced motion).
  * - Input lives on an HTML "grip" laid over the wheel (role=slider): touch-action:none works on
@@ -62,6 +66,18 @@ function gearPath(cx: number, cy: number, r: number, teeth: number, depth: numbe
   }
   return `M${pts.join(" L")} Z`;
 }
+/* the pull arrow: an arc at r 162 from -58° to -16°, its head at the stop end (clockwise) */
+const PULL_ARC = (() => {
+  const [x0, y0] = polar(162, -58);
+  const [x1, y1] = polar(162, -16);
+  return `M${x0} ${y0} A162 162 0 0 1 ${x1} ${y1}`;
+})();
+const PULL_HEAD = (() => {
+  const [x, y] = polar(162, -12);
+  const [a1, b1] = polar(155, -19);
+  const [a2, b2] = polar(169, -19);
+  return `M${a1} ${b1} L${x} ${y} L${a2} ${b2}`;
+})();
 const GEAR_A = { cx: 52, cy: 318, r: 50, teeth: 16, ratio: -1.7 };
 const GEAR_B = { cx: 318, cy: 328, r: 34, teeth: 11, ratio: 2.5 };
 
@@ -81,7 +97,7 @@ const TimeDial = () => {
   const [booked, setBooked] = useState<Record<string, number[]>>({});
   const takenOf = (d: number) => [...DAYS[d].taken, ...(booked[DAYS[d].key] ?? [])];
   const [slot, setSlot] = useState(() => firstFree(DAYS[2].taken));
-  const [rot, setRot] = useState(-slot * STEP);
+  const [rot, setRot] = useState(slot * STEP);
   const [dragging, setDragging] = useState(false);
   const [stamped, setStamped] = useState<{ day: number; slot: number } | null>(null);
   const [live, setLive] = useState("");
@@ -95,7 +111,7 @@ const TimeDial = () => {
   const choose = (i: number, announce = true) => {
     if (i < 0 || i >= N || taken.includes(i)) return;
     setSlot(i);
-    setRot(-i * STEP);
+    setRot(i * STEP);
     setStamped(null);
     if (announce) setLive(`${DAYS[day].name}, ${TIMES[i]}`);
     if (typeof navigator !== "undefined" && "vibrate" in navigator && motionOn()) navigator.vibrate?.(6);
@@ -108,7 +124,7 @@ const TimeDial = () => {
     const i = firstFree(t, slot);
     if (i >= 0) {
       setSlot(i);
-      setRot(-i * STEP);
+      setRot(i * STEP);
       setLive(`${DAYS[d].name}, ${TIMES[i]}`);
     } else {
       setLive(`${DAYS[d].name}: אין שעות פנויות`);
@@ -132,10 +148,11 @@ const TimeDial = () => {
     const { x, y, k } = vecOf(e);
     const r = Math.hypot(x, y) / k;
     if (r < R_HOLE - HOLE - 8 || r > R_HOLE + HOLE + 8) return -1;
-    let local = ((((Math.atan2(y, x) * 180) / Math.PI + 90 - rot) % 360) + 360) % 360;
-    if (local > 360 - STEP / 2) local -= 360;
-    const i = Math.round(local / STEP);
-    return i >= 0 && i < N && Math.abs(local - i * STEP) < STEP / 2 ? i : -1;
+    /* holes sit at -i × STEP on the wheel: measure counter-clockwise from the stop */
+    let ccw = (((rot - ((Math.atan2(y, x) * 180) / Math.PI + 90)) % 360) + 360) % 360;
+    if (ccw > 360 - STEP / 2) ccw -= 360;
+    const i = Math.round(ccw / STEP);
+    return i >= 0 && i < N && Math.abs(ccw - i * STEP) < STEP / 2 ? i : -1;
   };
 
   const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -151,10 +168,10 @@ const TimeDial = () => {
     if (da > 180) da -= 360;
     if (da < -180) da += 360;
     d.moved = Math.max(d.moved, Math.hypot(e.clientX - d.x, e.clientY - d.y));
-    const min = -(N - 1) * STEP;
+    const max = (N - 1) * STEP;
     let r = d.r0 + da;
-    if (r > 0) r = r * 0.3; // rubber band past the ends
-    if (r < min) r = min + (r - min) * 0.3;
+    if (r < 0) r = r * 0.3; // rubber band past the ends
+    if (r > max) r = max + (r - max) * 0.3;
     setRot(r);
   };
   const onUp = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -165,13 +182,20 @@ const TimeDial = () => {
     if (d.moved < 8 && e.type === "pointerup") {
       const i = holeAt(e);
       if (i >= 0 && !taken.includes(i)) return choose(i);
-      setRot(-slot * STEP);
+      setRot(slot * STEP);
       return;
     }
-    const want = Math.round(-rot / STEP);
+    /* pulled against the stop: spring back and say which way the wheel turns */
+    if (rot < -STEP / 4) {
+      setRot(slot * STEP);
+      setLive("החוגה מסתובבת עם כיוון השעון, כמו בטלפון ישן. סובבו כך כדי להגיע לשעות מאוחרות יותר.");
+      return;
+    }
+    if (rot > (N - 1) * STEP + STEP / 4) setLive(`${TIMES[N - 1]} היא השעה האחרונה ביום.`);
+    const want = Math.round(rot / STEP);
     const i = firstFree(taken, Math.max(0, Math.min(N - 1, want)));
     if (i >= 0) choose(i);
-    else setRot(-slot * STEP);
+    else setRot(slot * STEP);
   };
 
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -200,6 +224,29 @@ const TimeDial = () => {
     const i = firstFree(takenOf(day), slot);
     if (i >= 0) choose(i, false);
   };
+
+  /* first view (motion only): one small clockwise nudge so the pull direction reads */
+  const machineRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = machineRef.current;
+    if (!el || typeof IntersectionObserver === "undefined" || !motionOn()) return;
+    let t = 0;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting || e.intersectionRatio < 0.6) return;
+        io.disconnect();
+        if (drag.current) return;
+        setRot((r) => r + 16);
+        t = window.setTimeout(() => setRot((r) => r - 16), 520);
+      },
+      { threshold: [0.6] },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      window.clearTimeout(t);
+    };
+  }, []);
 
   /* after booking, the slot is taken: the wheel waits on it (dark) until the next choice */
   useEffect(() => {
@@ -236,7 +283,7 @@ const TimeDial = () => {
         ))}
       </div>
 
-      <div className="tdl__machine">
+      <div className="tdl__machine" ref={machineRef}>
         <svg ref={svgRef} viewBox="0 0 360 380" className="tdl__svg" aria-hidden="true" focusable="false">
           <defs>
             <radialGradient id="tdl-brass" cx="40%" cy="35%" r="75%">
@@ -271,8 +318,8 @@ const TimeDial = () => {
           <circle cx={C} cy={C} r={R_PLATE} fill="url(#tdl-brass-dark)" />
           <circle cx={C} cy={C} r={R_PLATE - 3} fill="none" stroke="rgba(255,236,180,.35)" strokeWidth="1" />
           {TIMES.map((_, i) => {
-            const [x1, y1] = polar(R_PLATE - 4, i * STEP);
-            const [x2, y2] = polar(R_PLATE - 12, i * STEP);
+            const [x1, y1] = polar(R_PLATE - 4, -i * STEP);
+            const [x2, y2] = polar(R_PLATE - 12, -i * STEP);
             return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(255,236,180,.55)" strokeWidth="1.5" />;
           })}
 
@@ -280,7 +327,7 @@ const TimeDial = () => {
           <g className="tdl__wheel">
             <circle cx={C} cy={C} r={R_WHEEL} className="tdl__wheel-disc" />
             {TIMES.map((t, i) => {
-              const [x, y] = polar(R_HOLE, i * STEP);
+              const [x, y] = polar(R_HOLE, -i * STEP);
               const isTaken = taken.includes(i);
               return (
                 <g key={t} data-i={i} className={"tdl__hole" + (isTaken ? " is-taken" : "") + (i === slot && !isTaken ? " is-on" : "")}>
@@ -301,6 +348,10 @@ const TimeDial = () => {
           <text x={C} y={C + 18} textAnchor="middle" className="tdl__read-d">
             {DAYS[day].name}
           </text>
+
+          {/* the pull: a curved arrow outside the plate, clockwise up to the stop */}
+          <path d={PULL_ARC} className="tdl__pull" />
+          <path d={PULL_HEAD} className="tdl__pull tdl__pull--head" />
 
           {/* the finger stop */}
           <path d={`M${C - 9} 14 L${C + 9} 14 L${C} 30 Z`} className="tdl__stop" />
@@ -327,7 +378,10 @@ const TimeDial = () => {
         <div ref={cardRef} className={"tdl-card" + (stamped ? " is-stamped" : "")}>
           <p className="tdl-card__k">{stamped ? "אישור תור" : "התור שבחרתם"}</p>
           <p className="tdl-card__t">
-            {SERVICE} · {DAYS[shown.day].name} ב-{full && !stamped ? "—" : TIMES[shown.slot]}
+            <span className="tdl-card__svc">{SERVICE}</span>
+            <span className="tdl-card__when">
+              {DAYS[shown.day].name} · <bdi>{full && !stamped ? "—" : TIMES[shown.slot]}</bdi>
+            </span>
           </p>
           <ul className="tdl-card__list">
             <li className={stamped ? "is-done" : ""}>{stamped ? "אישור נשלח ללקוח" : "אישור יישלח מיד ללקוח"}</li>

@@ -37,7 +37,7 @@
   line-height: 1;
 }
 .tdl__day-n {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.02em;
   color: var(--ash);
 }
@@ -111,7 +111,7 @@ html.nz-motion .tdl__wheel {
 /* no JS: nothing to turn or book — hide those controls, say what the card is */
 .tdl__nojs {
   display: none;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   line-height: 1.6;
   color: var(--ash);
 }
@@ -178,6 +178,15 @@ html.nz-motion .tdl__hole-t {
   letter-spacing: 0.04em;
   pointer-events: none;
 }
+.tdl__pull {
+  fill: none;
+  stroke: var(--brass-hi);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.75;
+  pointer-events: none;
+}
 .tdl__stop {
   fill: var(--vermilion);
   stroke: #7d2210;
@@ -217,11 +226,17 @@ html.nz-motion .tdl__hole-t {
   margin-top: 4px;
 }
 .tdl-card__t {
+  display: grid;
+  gap: 2px;
   font-family: var(--font-display);
   font-size: 1.5rem;
   line-height: 1.15;
   padding-inline-end: 84px;
-  text-wrap: balance;
+}
+.tdl-card__when {
+  font-size: 0.8em;
+  color: var(--graphite);
+  font-variant-numeric: tabular-nums;
 }
 .tdl-card__list {
   list-style: none;
@@ -229,7 +244,7 @@ html.nz-motion .tdl__hole-t {
   padding: 0;
   display: grid;
   gap: 4px;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--graphite);
 }
 .tdl-card__list li {
@@ -327,7 +342,7 @@ html.nz-motion .tdl-card.is-stamped {
   }
 }
 .tdl__note {
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   line-height: 1.55;
   color: var(--ash);
   max-width: 30rem;

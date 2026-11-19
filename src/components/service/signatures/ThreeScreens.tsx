@@ -13,8 +13,13 @@ import "./three-screens.css";
  * site is drawn at true proportions at any stage size without JS. JS only sets --v (the virtual
  * width) and the layout bucket. Keyboard: the handle is a slider (←/→, PageUp/PageDown, Home/End).
  * The free wall beside a narrow screen carries "מה השתנה בפריסה": three live notes on what the
- * current layout does (hidden when the screen is too wide to leave room for them).
- * SSR / no JS = the phone layout. Reduced motion: no hint nudge, no width transitions.
+ * current layout does; when the screen is too wide to leave room for them, the same notes sit
+ * under the ruler, so every layout is explained.
+ * First view (motion only): on a desktop-wide stage the screen opens out to the full desktop
+ * (the stage is never left mostly empty); on a tablet-wide stage it breathes out to 640 and back;
+ * on a phone-wide stage (where a 640 tablet would be ~4px text) it only nudges to 470, still the
+ * phone layout, and back. Wider layouts there come only from the visitor's own drag / stops.
+ * SSR / no JS = the phone layout. Reduced motion: no hint, no width transitions.
  */
 const VMIN = 360;
 /* The widest "desktop": 1280 virtual px, or 1024 on phones (where the stage is ~330px wide and
@@ -83,6 +88,8 @@ const ThreeScreens = () => {
   }, []);
   const freePx = trackW ? trackW - (v / vmax) * trackW - 2 * Math.max(3, (trackW / vmax) * 12) : 0;
   const notesOn = freePx > 176;
+  /* before the first measure (SSR, first paint) the notes stay beside the phone */
+  const notesBelow = trackW > 0 && !notesOn;
 
   /** px per virtual px, measured now. */
   const scale = () => (trackRef.current ? trackRef.current.clientWidth / vmax : 1);
@@ -103,11 +110,24 @@ const ThreeScreens = () => {
         if (!entries.some((e) => e.isIntersecting)) return;
         io.disconnect();
         if (!motionOn()) return;
+        const w = el.clientWidth;
+        if (w >= 900) {
+          /* desktop stage: open out to the full desktop once, and stay there */
+          timers.push(
+            window.setTimeout(() => {
+              if (touched.current) return;
+              setSnapping(true);
+              setV(1280);
+            }, 600),
+          );
+          return;
+        }
+        const out = w >= 600 ? 640 : 470;
         timers.push(
           window.setTimeout(() => {
             if (touched.current) return;
             setSnapping(true);
-            setV(640);
+            setV(out);
           }, 700),
           window.setTimeout(() => {
             if (touched.current) return;
@@ -199,7 +219,7 @@ const ThreeScreens = () => {
           <span className="ts__ghost ts__ghost--desktop" aria-hidden="true">
             <span>מחשב</span>
           </span>
-          <div className={cn("ts__notes", notesOn && "is-on")} aria-hidden="true">
+          <div className={cn("ts__notes", !notesBelow && "is-on")} aria-hidden="true">
             <p className="ts__notes-head">מה השתנה בפריסה</p>
             <ol key={layout}>
               {NOTES[layout].map((n, i) => (
@@ -294,6 +314,18 @@ const ThreeScreens = () => {
             <span className="ts__marker" />
           </div>
         </div>
+      </div>
+
+      <div className={cn("ts__under", notesBelow && "is-on")} aria-hidden="true">
+        <p className="ts__notes-head">{`מה השתנה בפריסה · ${STOPS.find((s) => s.layout === layout)!.name}`}</p>
+        <ol key={layout}>
+          {NOTES[layout].map((n, i) => (
+            <li key={n} style={{ ["--k" as string]: i }}>
+              <span className="ts__notes-num">{i + 1}</span>
+              {n}
+            </li>
+          ))}
+        </ol>
       </div>
 
       <p className="nz-sr" aria-live="polite">

@@ -6,12 +6,14 @@
  * page's FAQPage JSON-LD is built from the same items, verbatim and in this order.
  * Static (no client JS).
  */
-import { Button } from "@/components/nz";
+import { Button, WhatsAppCta } from "@/components/nz";
 import { contactFaq as f } from "./content";
 
-/* Keep phone numbers and times on one line (same text, so it still equals the JSON-LD). */
-const LTR = /(\d[\d:–-]*\d)/;
-const parts = (t: string) => t.split(LTR);
+/* Keep phone numbers, times and the day range on one line (same text, so it still equals the
+   JSON-LD). Numbers are isolated LTR; the Hebrew day range only must not break. */
+const KEEP = /(\d[\d:–-]*\d|[א-ת]׳–[א-ת]׳)/;
+const parts = (t: string) => t.split(KEEP);
+const isNum = (x: string) => /^\d/.test(x);
 ---
 
 <section class="nz-section nz-section--space-default ct-faq" data-tone="bone" aria-labelledby="ct-faq-title">
@@ -37,11 +39,20 @@ const parts = (t: string) => t.split(LTR);
             <h3 class="ct-slip__q">{item.question}</h3>
             <div class="ct-slip__a">
               <span class="ct-slip__stamp" aria-hidden="true">נענה</span>
-              <p>{parts(item.answer).map((x, k) => (k % 2 ? <bdi dir="ltr" class="ct-nowrap">{x}</bdi> : x))}</p>
+              <p>
+                {parts(item.answer).map((x, k) =>
+                  k % 2 ? isNum(x) ? <bdi dir="ltr" class="ct-nowrap">{x}</bdi> : <span class="ct-nowrap">{x}</span> : x,
+                )}
+              </p>
             </div>
           </li>
         ))
       }
     </ol>
+
+    <div class="ct-faq__end">
+      <p class="ct-faq__end-q">{f.end.q}</p>
+      <WhatsAppCta label={f.end.cta} message={f.end.message} />
+    </div>
   </div>
 </section>

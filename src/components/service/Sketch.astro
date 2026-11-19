@@ -175,6 +175,17 @@ const { kind, class: cls } = Astro.props;
     )
   }
   {
+    kind === "type" && (
+      <g>
+        <path class="sv-sk__l sv-sk__faint" d="M8 76 H112 M8 18 H66 M70 46 H112" />
+        <path class="sv-sk__l" d="M16 76 L38 18 L60 76" />
+        <path class="sv-sk__accline" d="M25 54 H51" />
+        <ellipse class="sv-sk__l" cx="88" cy="62" rx="12" ry="14" />
+        <path class="sv-sk__l" d="M100 46 V76" />
+      </g>
+    )
+  }
+  {
     kind === "chat" && (
       <g>
         <path class="sv-sk__l" d="M10 14 H74 V46 H30 L20 56 V46 H10 Z" />

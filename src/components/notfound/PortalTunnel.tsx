@@ -60,7 +60,7 @@ const PortalTunnel = () => {
           return (
             <div
               key={room.href}
-              className={`nf-gate nf-gate--${state}`}
+              className={`nf-gate nf-gate--${state}${d === 1 ? " nf-gate--next" : ""}`}
               style={{ "--s": d < 0 ? 1.9 : Math.pow(0.52, Math.min(d, DEPTH + 1)), zIndex: 20 - d } as CSSProperties}
               aria-hidden={state !== "front"}
             >

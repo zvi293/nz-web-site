@@ -17,12 +17,14 @@ import "./scales.css";
  */
 type Weight = { id: string; label: string; short: string; answers?: string; trap?: boolean };
 
-const QUESTIONS: { id: string; text: string }[] = [
-  { id: "who", text: "מי עומד מאחורי המשרד?" },
-  { id: "field", text: "יש ניסיון בתחום שלי?" },
-  { id: "discreet", text: "הפנייה תישאר דיסקרטית?" },
-  { id: "plain", text: "אבין מה אומרים לי?" },
-  { id: "reach", text: "קל ליצור קשר?" },
+/* `text` is the full question (narration); `short` is what sits in the pan — one line at 14px
+   inside a 360px phone's pan, so the pile stays under the strings' hoop. */
+const QUESTIONS: { id: string; text: string; short: string }[] = [
+  { id: "who", text: "מי עומד מאחורי המשרד?", short: "מי מאחורי המשרד?" },
+  { id: "field", text: "יש ניסיון בתחום שלי?", short: "מכירים את התחום?" },
+  { id: "discreet", text: "הפנייה תישאר דיסקרטית?", short: "זה יישאר בינינו?" },
+  { id: "plain", text: "אבין מה אומרים לי?", short: "אבין את ההסבר?" },
+  { id: "reach", text: "קל ליצור קשר?", short: "קל ליצור קשר?" },
 ];
 
 const WEIGHTS: Weight[] = [
@@ -33,6 +35,12 @@ const WEIGHTS: Weight[] = [
   { id: "plain", label: "מאמרים בשפה פשוטה", short: "מאמרים", answers: "plain" },
   { id: "reach", label: "וואטסאפ וחיוג בלחיצה", short: "וואטסאפ וחיוג", answers: "reach" },
 ];
+
+/* The hanger: two strings from the beam to a rim at 16% of the drop (a flat ellipse), then the
+   faint walls of the vessel straight down to the pan. The pile stays below the rim, so no
+   string ever crosses a card. */
+const STRINGS = "M50 0 L3 16 M50 0 L97 16 M3 16 A47 2.2 0 0 0 97 16 A47 2.2 0 0 0 3 16";
+const WALLS = "M3 16 L3 100 M97 16 L97 100";
 
 const STEP = 2.8; // degrees of tilt per unbalanced weight
 const MAX = 17;
@@ -239,12 +247,13 @@ const Scales = () => {
             <span className="vl-sc__end vl-sc__end--doubt">
               <span className="vl-sc__hanger">
                 <svg className="vl-sc__strings" viewBox="0 0 100 100" preserveAspectRatio="none">
-                  <path d="M50 0 L4 100 M50 0 L96 100" vectorEffect="non-scaling-stroke" />
+                  <path d={STRINGS} vectorEffect="non-scaling-stroke" />
+                  <path className="vl-sc__walls" d={WALLS} vectorEffect="non-scaling-stroke" />
                 </svg>
                 <span className="vl-sc__pile">
                   {QUESTIONS.map((q) => (
                     <span key={q.id} className={cn("vl-sc__q", answered.has(q.id) && "is-answered")}>
-                      {q.text}
+                      {q.short}
                     </span>
                   ))}
                   {trapIn && chip(WEIGHTS.find((w) => w.trap)!, "doubt")}
@@ -256,7 +265,8 @@ const Scales = () => {
             <span className="vl-sc__end vl-sc__end--trust">
               <span className={cn("vl-sc__hanger", hot && "is-hot")} ref={panRef}>
                 <svg className="vl-sc__strings" viewBox="0 0 100 100" preserveAspectRatio="none">
-                  <path d="M50 0 L4 100 M50 0 L96 100" vectorEffect="non-scaling-stroke" />
+                  <path d={STRINGS} vectorEffect="non-scaling-stroke" />
+                  <path className="vl-sc__walls" d={WALLS} vectorEffect="non-scaling-stroke" />
                 </svg>
                 <span className="vl-sc__pile">
                   {answers.map((id) => chip(WEIGHTS.find((w) => w.id === id)!, "trust"))}

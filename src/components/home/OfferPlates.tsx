@@ -20,7 +20,7 @@ const page = (x = 22, y = 10, w = 116, h = 80) => (
   </>
 );
 
-export const PLATES: Record<string, ReactNode> = {
+const PLATES: Record<string, ReactNode> = {
   "אתר תדמית לעסק": (
     <>
       {page()}

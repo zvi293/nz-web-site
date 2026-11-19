@@ -11,6 +11,7 @@
 import { Artwork } from "@/components/art";
 import ServiceOpener from "../ServiceOpener.astro";
 import { roomFor } from "../rooms";
+import { HUB_ROOM_NAMES } from "../data/services-hub";
 import "../service.css";
 import "./hub.css";
 
@@ -61,7 +62,7 @@ const pad = (i: number) => String(i + 1).padStart(2, "0");
                       <span class="hb-door__cond">{a.cond}</span>
                       <span class="hb-door__room">
                         {room && <span class="hb-door__num">{`חדר ${room.num}`}</span>}
-                        <span class="hb-door__name">{room?.name ?? a.href}</span>
+                        <span class="hb-door__name">{(room && HUB_ROOM_NAMES[room.num]?.name) ?? room?.name ?? a.href}</span>
                       </span>
                       <span class="hb-door__why">{a.why}</span>
                     </a>

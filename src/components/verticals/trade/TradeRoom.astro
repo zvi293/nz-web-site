@@ -48,11 +48,13 @@ const LINES: Record<TradeVariant, string[]> = {
   menu: ["תפריט הטיפולים", `${n} שורות`],
   "site-sign": ["שלט האתר", `${n} תחומים`],
 };
+/* the stacked opener prints the label as its last line: never print it twice */
+const lines = LINES[variant].filter((l) => l !== label);
 ---
 
 <section class:list={["nz-section nz-section--space-default vl-tr", `vl-tr--${variant}`]} data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
   <div class="nz-container">
-    <ServiceOpener variant={opener} index={index} label={label} title={data.title} id={`${id}-title`} lede={data.lede} lines={LINES[variant]} />
+    <ServiceOpener variant={opener} index={index} label={label} title={data.title} id={`${id}-title`} lede={data.lede} lines={lines} />
     {variant === "case-files" && <CaseFiles items={data.items} />}
     {variant === "ledger" && <Ledger items={data.items} />}
     {variant === "map" && <NeighbourhoodMap items={data.items} />}

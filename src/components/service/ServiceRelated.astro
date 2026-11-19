@@ -6,7 +6,7 @@
  * Pass `items` to choose (rooms by href get their number automatically) — keep 2–4.
  */
 import { Artwork } from "@/components/art";
-import { roomFor, SERVICE_ROOMS, SERVICES_WING } from "./rooms";
+import { roomFor, SERVICE_ROOMS } from "./rooms";
 import type { SectionTone, ServiceLink } from "./types";
 import "./service.css";
 
@@ -30,7 +30,8 @@ const list: ServiceLink[] = (
 const signs = list.map((item) => {
   const room = roomFor(item.href);
   const it = { ...item, desc: item.desc ?? room?.line, art: item.art ?? room?.art };
-  return { ...it, place: room ? `אולם ${SERVICES_WING} · חדר ${room.num}` : it.href === "/services/" ? `אולם ${SERVICES_WING}` : "המשך הסיור" };
+  /* one eyebrow pattern on every sign: "המשך הסיור", plus the room number when the link is a room */
+  return { ...it, place: room ? `המשך הסיור · חדר ${room.num}` : "המשך הסיור" };
 });
 ---
 
@@ -56,7 +57,7 @@ const signs = list.map((item) => {
               {s.desc && <span class="sv-sign__desc">{s.desc}</span>}
               {s.art && (
                 <span class="sv-sign__thumb" aria-hidden="true">
-                  <Artwork slug={s.art} sizes="72px" ratio="1 / 1" alt="" />
+                  <Artwork slug={s.art} sizes="(min-width: 1024px) 112px, 64px" ratio="1 / 1" alt="" />
                 </span>
               )}
             </a>

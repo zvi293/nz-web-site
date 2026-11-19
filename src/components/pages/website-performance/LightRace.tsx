@@ -20,8 +20,15 @@ import "./race.css";
  *   built, the heavy one shifted by its banner, every note lit, the dials full — so the lesson is
  *   readable without playing it. Tapping plays the race from the start (with motion allowed);
  *   without motion the tap shows the same finished state. Changing the network returns to the
- *   finished picture for that network. The start button is hidden without JS.
- * - aria-live announces the start and the result.
+ *   finished picture for that network. The start button is hidden without JS. Both dials are
+ *   stopwatches on one scale (a full turn = the heavy page on home Wi-Fi): on weak cellular the
+ *   heavy page's dial runs a second, inner lap.
+ * - Finished state says who won without numbers: a "ראשון" / "שני" chip beside each lane's title,
+ *   different statuses, and a lime "ghost" tick on the heavy track at the point the heavy page
+ *   had reached when the optimised one finished (it was still on a white screen).
+ * - Phones: starting the race brings the whole exhibit under the header (both lanes in one
+ *   screen) and the notes fold away while the lanes run; they return lit when it is over.
+ * - One aria-live sentence (start / result); the visible result line is not live.
  */
 type LaneKey = "heavy" | "fast";
 type Net = "wifi" | "cell";
@@ -73,7 +80,7 @@ const NOTES: Record<LaneKey, { at: number; text: string }[]> = {
 const SHIFT_AT = 0.45; // heavy lane: where the banner lands and pushes the page
 
 const STATUS = (p: number, k: LaneKey, done: boolean) => {
-  if (done) return "נטען";
+  if (done) return k === "fast" ? "מוכן ללחיצה" : "מוכן, באיחור";
   if (p <= 0) return "ממתין";
   if (p < 0.3) return k === "heavy" && p > 0.04 ? "מחכה לסקריפט" : "מסך לבן";
   if (p < 0.66) return "הטקסט מופיע";
@@ -98,12 +105,36 @@ function motionOn() {
 }
 
 type Phase = "preview" | "running" | "done";
-/** The fast lane's dial when both have finished (its duration over the heavy one's). */
-const FAST_DIAL = 0.29;
+/** The dials are stopwatches on ONE scale: a full turn = the heavy page on home Wi-Fi. On weak
+ *  cellular the heavy page needs more than a full turn (the second lap is the inner ring). */
+const DIAL_REF = DUR.wifi.heavy;
+const FAST_DIAL = DUR.wifi.fast / DIAL_REF;
+/** Where the heavy page stood (progress) at the moment the optimised one finished. */
+const ghostAt = (n: Net) => progressAt("heavy", DUR[n].fast / DUR[n].heavy);
+
+/** The visible result line, per phase and network (no numbers: the timings are illustrative). */
+const RESULT: Record<Phase, Record<Net, string>> = {
+  preview: {
+    wifi: "כך נגמר המירוץ: שני הדפים נטענו, אבל כשהמותאם כבר היה מוכן ללחיצה, הכבד עוד הציג מסך לבן. הזמנים יחסיים ומדגימים דף טיפוסי, הם לא מדידה של אתר מסוים.",
+    cell: "ברשת סלולרית חלשה שני הדפים איטיים יותר, אבל הכבד נפגע יותר: השעון שלו משלים סיבוב שני, כי ההמתנה לסקריפט החוסם מתארכת והתמונה הכבדה מגיעה אחרונה. הזמנים יחסיים ומדגימים דף טיפוסי.",
+  },
+  running: {
+    wifi: "אותו דף, נטען פעמיים ברשת ביתית. הזמנים יחסיים ומדגימים דף טיפוסי, הם לא מדידה של אתר מסוים.",
+    cell: "אותו דף, נטען פעמיים ברשת סלולרית חלשה. הזמנים יחסיים ומדגימים דף טיפוסי, הם לא מדידה של אתר מסוים.",
+  },
+  done: {
+    wifi: "הדף המותאם סיים ראשון. ברגע שהיה אפשר ללחוץ עליו, הדף הכבד עוד הציג מסך לבן וחיכה לסקריפט.",
+    cell: "גם ברשת חלשה המותאם סיים ראשון, אבל הפער גדל: השעון של הדף הכבד השלים סיבוב שני, כי הוא חיכה לסקריפט החוסם עוד יותר זמן והבאנר הקפיץ אותו מאוחר עוד יותר.",
+  },
+};
+const LIVE: Record<Net, string> = {
+  wifi: "הדף המותאם סיים ראשון. הדף הכבד הגיע שני, אחרי שחיכה לסקריפט וקפץ באמצע.",
+  cell: "ברשת חלשה המותאם סיים ראשון, והפער גדל: הדף הכבד חיכה לסקריפט עוד יותר זמן.",
+};
 
 const LANES: { key: LaneKey; name: string; line: string }[] = [
-  { key: "heavy", name: "דף כבד", line: "תמונות בגודל מלא, תוספים, צ׳אט וגופן חיצוני" },
-  { key: "fast", name: "דף מותאם", line: "אותו דף, אחרי תיקון התמונות, הקוד והטעינה" },
+  { key: "heavy", name: "דף כבד", line: "תמונות מלאות, תוספים, צ׳אט וגופן חיצוני" },
+  { key: "fast", name: "דף מותאם", line: "אותו דף, אחרי תיקון תמונות, קוד וטעינה" },
 ];
 
 const LightRace = () => {
@@ -111,6 +142,7 @@ const LightRace = () => {
   const [net, setNet] = useState<Net>("wifi");
   const [prog, setProg] = useState<Record<LaneKey, number>>({ heavy: 1, fast: 1 }); // milestone-quantised
   const [winner, setWinner] = useState<LaneKey | null>("fast");
+  const [ghost, setGhost] = useState<number | null>(() => ghostAt("wifi")); // heavy progress when the fast lane finished
   const laneRefs = useRef<Record<LaneKey, HTMLDivElement | null>>({ heavy: null, fast: null });
   const rootRef = useRef<HTMLDivElement>(null);
   const raf = useRef(0);
@@ -125,6 +157,7 @@ const LightRace = () => {
     if (!el) return;
     el.style.setProperty("--p", p.toFixed(4));
     el.style.setProperty("--d", Math.min(1, dialFrac).toFixed(4));
+    el.style.setProperty("--d2", Math.max(0, Math.min(1, dialFrac - 1)).toFixed(4));
   };
 
   /* quantise progress so React re-renders only when a mark / note / shift is crossed */
@@ -140,17 +173,19 @@ const LightRace = () => {
     c.elapsed += now - (c.last || now);
     c.last = now;
     const d = DUR[netRef.current];
-    const max = d.heavy;
     const pf = progressAt("fast", c.elapsed / d.fast);
     const ph = progressAt("heavy", c.elapsed / d.heavy);
-    paint("fast", pf, Math.min(c.elapsed, d.fast) / max);
-    paint("heavy", ph, Math.min(c.elapsed, d.heavy) / max);
+    paint("fast", pf, Math.min(c.elapsed, d.fast) / DIAL_REF);
+    paint("heavy", ph, Math.min(c.elapsed, d.heavy) / DIAL_REF);
     setProg((cur) => {
       const nf = quant(pf);
       const nh = quant(ph);
       return cur.fast === nf && cur.heavy === nh ? cur : { fast: nf, heavy: nh };
     });
-    if (pf >= 1) setWinner((w) => w ?? "fast");
+    if (pf >= 1) {
+      setWinner((w) => w ?? "fast");
+      setGhost((g) => g ?? ph);
+    }
     if (ph >= 1) {
       setPhase("done");
       raf.current = 0;
@@ -158,6 +193,9 @@ const LightRace = () => {
     }
     raf.current = requestAnimationFrame(tick);
   };
+  /* the observer below is set up once; it reaches the latest tick through this ref */
+  const tickRef = useRef(tick);
+  tickRef.current = tick;
 
   /* pause off screen */
   useEffect(() => {
@@ -170,7 +208,7 @@ const LightRace = () => {
         cancelAnimationFrame(raf.current);
         raf.current = 0;
       } else if (e.isIntersecting && phaseRef.current === "running" && !raf.current) {
-        raf.current = requestAnimationFrame(tick);
+        raf.current = requestAnimationFrame(tickRef.current);
       }
     });
     io.observe(el);
@@ -180,16 +218,29 @@ const LightRace = () => {
 
   const finish = (to: Phase = "done") => {
     const d = DUR[netRef.current];
-    paint("fast", 1, d.fast / d.heavy);
-    paint("heavy", 1, 1);
+    paint("fast", 1, d.fast / DIAL_REF);
+    paint("heavy", 1, d.heavy / DIAL_REF);
     setProg({ fast: 1, heavy: 1 });
     setWinner("fast");
+    setGhost(ghostAt(netRef.current));
     setPhase(to);
+  };
+
+  /* Phones: bring the whole exhibit (switch, button, both lanes) under the header. */
+  const bring = () => {
+    const el = rootRef.current;
+    if (!el || typeof window === "undefined") return;
+    const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 64;
+    const r = el.getBoundingClientRect();
+    const lanes = el.querySelector(".race__lanes")?.getBoundingClientRect();
+    const bottom = lanes ? lanes.bottom : r.bottom;
+    if (r.top < header || bottom > window.innerHeight) el.scrollIntoView({ block: "start", behavior: motionOn() ? "smooth" : "auto" });
   };
 
   const start = () => {
     cancelAnimationFrame(raf.current);
     setWinner(null);
+    setGhost(null);
     setProg({ heavy: 0, fast: 0 });
     paint("fast", 0, 0);
     paint("heavy", 0, 0);
@@ -200,6 +251,7 @@ const LightRace = () => {
     clock.current = { elapsed: 0, last: 0, visible: true };
     phaseRef.current = "running";
     setPhase("running");
+    bring();
     raf.current = requestAnimationFrame(tick);
   };
 
@@ -211,12 +263,9 @@ const LightRace = () => {
     finish("preview");
   };
 
-  const live =
-    phase === "running"
-      ? "המירוץ התחיל."
-      : phase === "done"
-        ? "הדף המותאם נטען ראשון. הדף הכבד הגיע לאותה נקודה הרבה אחריו, אחרי שחיכה לסקריפט וקפץ באמצע."
-        : "";
+  const live = phase === "running" ? "המירוץ התחיל." : phase === "done" ? LIVE[net] : "";
+  /* finish order: the optimised lane gets its chip the moment it finishes, the heavy one at the end */
+  const order: Record<LaneKey, string> = { fast: winner ? "ראשון" : "", heavy: phase !== "running" ? "שני" : "" };
 
   return (
     <div ref={rootRef} className={`race race--${phase}`} data-net={net}>
@@ -254,16 +303,20 @@ const LightRace = () => {
             >
               <div className="race-lane__head">
                 <p className="race-lane__name">
-                  {name}
+                  <span className="race-lane__title">
+                    {name}
+                    {order[key] && <span className={"race-lane__place" + (key === "fast" ? " is-first" : "")}>{order[key]}</span>}
+                  </span>
                   <span className="race-lane__line">{line}</span>
                 </p>
                 <p className="race-lane__status">
                   <svg className="race-dial" viewBox="0 0 36 36" aria-hidden="true">
                     <circle cx="18" cy="18" r="15" className="race-dial__track" />
                     <circle cx="18" cy="18" r="15" className="race-dial__arc" pathLength={1} />
+                    <circle cx="18" cy="18" r="9.5" className="race-dial__lap" pathLength={1} />
                     <circle cx="18" cy="18" r="2" className="race-dial__pin" />
                   </svg>
-                  <span>{STATUS(p, key, done)}</span>
+                  <span>{done && key === "heavy" && net === "cell" ? "מוכן, באיחור גדול" : STATUS(p, key, done)}</span>
                 </p>
               </div>
 
@@ -281,6 +334,11 @@ const LightRace = () => {
                       <span className="race-lane__mark-l">{m.label}</span>
                     </span>
                   ))}
+                  {key === "heavy" && ghost !== null && (
+                    <span className="race-lane__ghost" style={{ ["--at" as string]: ghost }}>
+                      <span className="race-lane__ghost-l">המותאם כבר סיים</span>
+                    </span>
+                  )}
                   <span className="race-lane__prism" />
                 </div>
 
@@ -307,16 +365,12 @@ const LightRace = () => {
         })}
       </div>
 
-      <p className="race__result" aria-live="polite">
+      <p className="race__result">
         <span className="race__result-k">{phase === "done" ? "התוצאה" : "המחשה"}</span>
-        <span>
-          {phase === "done"
-            ? "הדף המותאם סיים ראשון. בזמן שהדף הכבד עוד חיכה לסקריפט, מבקר בדף המותאם כבר יכול היה ללחוץ על הכפתור."
-            : phase === "preview"
-              ? "כך נגמר המירוץ: שני הדפים נטענו, אבל הדף המותאם היה מוכן הרבה קודם. הזמנים יחסיים ומדגימים דף טיפוסי, הם לא מדידה של אתר מסוים."
-              : "אותו דף, נטען פעמיים. הזמנים יחסיים ומדגימים דף טיפוסי, הם לא מדידה של אתר מסוים."}
-        </span>
-        <span className="nz-sr">{live}</span>
+        <span>{RESULT[phase][net]}</span>
+      </p>
+      <p className="nz-sr" aria-live="polite">
+        {live}
       </p>
     </div>
   );

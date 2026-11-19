@@ -48,15 +48,15 @@ const industries = VERTICAL_CARDS.map((v) => ({ label: v.label, href: v.href, ar
     lede={page.features!.lede}
     items={page.features!.items}
     variant="diagram"
-    opener="numeral"
+    opener="rule"
     index="02"
     label="מה כלול"
     sheet="גיליון 02 · מבנה אתר תדמית"
   />
 
-  <ServiceDeepDive data={page.deepDive!} variant="ledger" tone="paper" opener="rule" index="03" label="לפני שמתחילים" />
+  <ServiceDeepDive data={page.deepDive!} variant="ledger" tone="paper" opener="split" index="03" label="לפני שמתחילים" />
 
-  <ServiceWhoFor title={page.whoFor!.title} lede={page.whoFor!.lede} items={page.whoFor!.items} opener="stacked" index="04" />
+  <ServiceWhoFor title={page.whoFor!.title} lede={page.whoFor!.lede} items={page.whoFor!.items} opener="rule" index="04" />
 
   <IndustriesGrid
     title="אתר תדמית לפי תחום"

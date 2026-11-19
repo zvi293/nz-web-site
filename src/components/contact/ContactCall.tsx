@@ -75,6 +75,7 @@ const ContactCall = () => {
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState("");
   const [times, setTimes] = useState<string[]>([]);
+  const [startedAt, setStartedAt] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLOListElement>(null);
   const timer = useRef<number>();
@@ -131,6 +132,7 @@ const ContactCall = () => {
     setGiven([]);
     setTimes([]);
     setDraft("");
+    setStartedAt(nowHHMM());
     if (!motionAllowed()) {
       setPhase("live");
       focusNext();
@@ -236,6 +238,12 @@ const ContactCall = () => {
             </li>
           ) : (
             <>
+              <li className="ct-wire__start" aria-hidden="true">
+                <span className="ct-wire__start-k">
+                  {c.started} {startedAt && <bdi dir="ltr">{startedAt}</bdi>}
+                </span>
+                <span className="ct-wire__start-v">{c.startedNote}</span>
+              </li>
               {turns.slice(0, Math.min(turn + (typing ? 0 : 1), turns.length)).map((t, i) => (
                 <li key={t.id} className="ct-turn">
                   <p className="ct-msg-in">

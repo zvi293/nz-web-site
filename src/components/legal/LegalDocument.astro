@@ -8,7 +8,8 @@
  * `notes` (optional, by section id): a one-line plain-language note that opens the section.
  */
 import type { LegalPageSection } from "@/content/types";
-import { parseBlocks, nobrParts } from "./content";
+import { parseBlocks, nobrParts, linkParts } from "./content";
+import LegalText from "./LegalText.astro";
 
 interface Props {
   sections: LegalPageSection[];
@@ -88,11 +89,15 @@ const two = (n: number) => String(n).padStart(2, "0");
             <div class="lg-sec__body">
               {parseBlocks(s.content).map((b) =>
                 b.type === "p" ? (
-                  <p>{nobrParts(b.text).map((p) => (p.ltr ? <bdi dir="ltr" class={p.nobr ? (p.long ? "lg-nobr lg-nobr--long" : "lg-nobr") : undefined}>{p.t}</bdi> : p.t))}</p>
+                  <p class={linkParts(b.text).some((p) => p.href) ? "lg-sec__p--contact" : undefined}>
+                    <LegalText text={b.text} />
+                  </p>
                 ) : (
                   <ul>
                     {b.items.map((it) => (
-                      <li>{nobrParts(it).map((p) => (p.ltr ? <bdi dir="ltr" class={p.nobr ? (p.long ? "lg-nobr lg-nobr--long" : "lg-nobr") : undefined}>{p.t}</bdi> : p.t))}</li>
+                      <li>
+                        <LegalText text={it} />
+                      </li>
                     ))}
                   </ul>
                 ),

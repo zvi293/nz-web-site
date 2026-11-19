@@ -66,8 +66,7 @@
  *   Colours: bone, bone-2, paper, ink, ink-2, ink-3, graphite, ash, vermilion(-deep/-fill),
  *   line, line-ink (Tailwind + CSS vars). Frames: rounded-frame (2px); cards rounded-card (6px);
  *   shadow-frame / shadow-frame-lift. Logical properties only (ms-/me-/ps-/pe-, inset-inline).
- *   LEGACY classes (nz-brand-dark, btn-brand, glass-*, nz-eyebrow, text-display, shadcn
- *   tokens…) live at the end of index.css — do not use them in new code.
+ *   The shadcn-style tokens (background, primary, muted…) are LEGACY — do not use them in new code.
  */
 export { Container, Section, type Tone } from "./Layout";
 export { Eyebrow, Label, Display, Accent, Lede, Ltr } from "./Type";

@@ -9,9 +9,11 @@ import "./drawers.css";
  * per service page. Pull a drawer (drag its brass pull down, or tap the drawer) and it slides
  * out: a hanging file folder sits in it and the page's ledger sheet rises out of the folder — its
  * headline, the ruled lines of what is on it, and (double-ruled, like a total) the Google search
- * it is built to catch. Several drawers may be open; the plan beside the cabinet
- * ticks the pages visited. Opening re-flows the cabinet; the drawers below glide down (FLIP,
- * transform only) and the tray is revealed with clip-path.
+ * it is built to catch. One drawer is open at a time (pulling another closes the last one, so
+ * the cabinet never grows past a phone screen); the plan beside the cabinet ticks the pages
+ * visited. Opening re-flows the cabinet: the page scrolls by the change so the drawer front you
+ * touched stays under your thumb, the other drawers glide (FLIP, transform only) and the tray
+ * is revealed with clip-path.
  * SSR: the first drawer open; without JS every tray is shown (html:not(.js)).
  */
 type Drawer = { id: string; name: string; h1: string; items: string[]; query: string };
@@ -63,18 +65,33 @@ const Drawers = () => {
   const [pull, setPull] = useState<{ id: string; y: number } | null>(null);
   const itemRefs = useRef<Record<string, HTMLLIElement | null>>({});
   const before = useRef<Record<string, number> | null>(null);
+  /** The drawer just tapped and where its front was: the page scrolls so it stays put. */
+  const anchor = useRef<{ id: string; top: number } | null>(null);
   const openRef = useRef(open);
+  /* fronts are measured (not the <li>s): an open drawer's tray sits above its front */
+  const frontOf = (id: string) => itemRefs.current[id]?.querySelector<HTMLElement>(".vl-dr__front") ?? null;
   const drag = useRef<{ id: string; y0: number; moved: boolean } | null>(null);
 
-  /* FLIP: drawers that moved because a tray opened/closed glide to their new place. */
+  /* FLIP: drawer fronts that moved because a tray opened/closed glide to their new place. */
   useLayoutEffect(() => {
+    const a = anchor.current;
+    anchor.current = null;
+    if (a) {
+      const front = frontOf(a.id);
+      const dy = front ? front.getBoundingClientRect().top - a.top : 0;
+      if (Math.abs(dy) > 1) {
+        window.scrollBy({ top: dy, behavior: "instant" as ScrollBehavior });
+        // FLIP below compares the old tops with the tops after this scroll, so the touched
+        // drawer does not move and the others glide into place around it
+      }
+    }
     const b = before.current;
     before.current = null;
     if (!b || !motionAllowed()) return;
     for (const d of DRAWERS) {
       const el = itemRefs.current[d.id];
       if (!el || !el.animate || b[d.id] === undefined) continue;
-      const dy = b[d.id] - el.getBoundingClientRect().top;
+      const dy = b[d.id] - frontOf(d.id)!.getBoundingClientRect().top;
       if (Math.abs(dy) < 1) continue;
       el.animate([{ transform: `translateY(${dy}px)` }, { transform: "translateY(0)" }], {
         duration: 620,
@@ -86,13 +103,15 @@ const Drawers = () => {
   const toggle = (id: string) => {
     const snap: Record<string, number> = {};
     for (const d of DRAWERS) {
-      const el = itemRefs.current[d.id];
-      if (el) snap[d.id] = el.getBoundingClientRect().top;
+      const f = frontOf(d.id);
+      if (f) snap[d.id] = f.getBoundingClientRect().top;
     }
     before.current = snap;
+    const front = frontOf(id);
+    if (front) anchor.current = { id, top: front.getBoundingClientRect().top };
     const cur = openRef.current;
     const isOpen = cur.includes(id);
-    const next = isOpen ? cur.filter((x) => x !== id) : [...cur, id];
+    const next = isOpen ? [] : [id];
     openRef.current = next;
     setOpen(next);
     const d = DRAWERS.find((x) => x.id === id)!;
@@ -144,7 +163,7 @@ const Drawers = () => {
       <div className="vl-dr__cabinet">
         <p className="vl-dr__crest" aria-hidden="true">
           <span>ארכיון · אתר למשרד רואי חשבון</span>
-          <span>{`${open.length} פתוחות`}</span>
+          <span>{open.length ? "מגירה אחת פתוחה" : "כל המגירות סגורות"}</span>
         </p>
         <ul className="vl-dr__list">
           {DRAWERS.map((d, i) => {

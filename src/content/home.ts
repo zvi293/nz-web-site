@@ -37,6 +37,8 @@ export const hero = {
     { label: "שאלות", href: "#faq" },
   ],
   nextLabel: "המוצג הבא",
+  /** aria-label of the progress strip under the frame (direct navigation between exhibits). */
+  dotsLabel: "בחירת מוצג",
   exhibits: [
     { slug: "brushstroke-cube", medium: "קובייה, צבע וחלל לבן · הרגע שבו רעיון מקבל צורה" },
     { slug: "cobalt-glass", medium: "זכוכית, אור ושכבות · ממשק שמרגיש שקוף" },
@@ -48,8 +50,6 @@ export const hero = {
 export const servicesHall = {
   eyebrow: "שירותים",
   room: "אולם 01",
-  /** The plaque line under the room number. */
-  plaque: "שישה חדרים, אותה הקפדה",
   title: "מה אנחנו בונים לעסקים",
   lede: "שישה כיווני עבודה, אותה הקפדה. כל אחד מהם מתחיל באפיון ומסתיים באתר שעובד בשביל העסק.",
   rows: [
@@ -137,18 +137,23 @@ export const collection = {
 export const manifesto = {
   eyebrow: "מניפסט",
   room: "אולם 04",
-  /** One sentence, split for the composition; the last word is the accent. */
-  lead: "אתר טוב נבנה כמו יצירה: מתכננים, מוחקים, מדייקים, ותולים על הקיר רק כשכל פרט",
-  /** The same sentence as set lines (the kinetic composition). Joined, they equal `lead`. */
-  lines: ["אתר טוב נבנה כמו יצירה:", "מתכננים, מוחקים, מדייקים,", "ותולים על הקיר", "רק כשכל פרט"],
+  /** One sentence, set as lines (the kinetic composition) followed by the accent word.
+   *  Each line is split into phone segments: on phones every segment is its own drifting
+   *  line (two or three words, never one alone); from 768px the segments of a line join. */
+  lines: [
+    ["אתר טוב נבנה", "כמו יצירה:"],
+    ["מתכננים, מוחקים,"],
+    ["מדייקים, ותולים", "על הקיר"],
+    ["רק כשכל", "פרט"],
+  ],
   accent: "במקומו.",
   signature: "צבי משה",
   signatureRole: "מייסד",
   /** A detail of one piece, hung beside the sentence. */
   detail: {
-    slug: "embroidered-comet",
+    slug: "obsidian-tear",
     prefix: "פרט",
-    medium: "רקמה על בד · מה שעובר מיד ליד, בזהירות",
+    medium: "טיפה אחת, מלוטשת עד הסוף · מה שנשאר כשמורידים כל עודף",
   },
 };
 
@@ -162,16 +167,14 @@ export const magazine = {
   leadLabel: "המאמר האחרון",
   readMore: "לקריאה",
   allLink: { label: "לכל המאמרים", href: "/blog/" },
-  readTime: (m: number) => `${m} דקות קריאה`,
 };
 
 export const faqBlock = {
   eyebrow: "שאלות נפוצות",
   room: "אולם 07",
   title: "שאלות על התהליך וההצעה",
+  lede: "תשובות קצרות על ההצעה, על שלבי העבודה ועל מה שקורה אחרי ההשקה.",
   allLink: { label: "לכל השאלות", href: "/faq/" },
-  /** A small piece hung beside the questions. */
-  art: { slug: "ceramic-handsets", prefix: "מוצג", medium: "קרמיקה וזכוכית · שיחה אחת עושה סדר" },
   nudge: {
     title: "לא מצאתם את התשובה?",
     body: "כתבו לנו בוואטסאפ, ונחזור אליכם עם תשובה ברורה.",
@@ -187,4 +190,16 @@ export const finalCta = {
   body: "ספרו לנו בכמה מילים על העסק ועל מה שאתם צריכים. נחזור אליכם עם רעיון ראשון והצעה מסודרת.",
   cta: "לשיחה בוואטסאפ",
   message: "היי, הגעתי מהאתר של NZ-web ואשמח לדבר על אתר לעסק שלי.",
+};
+
+/** Home-only wording for the offer room (the shared copy lives in src/content/offer.ts). */
+export const offerHome = {
+  room: "אולם 05",
+  /** The catalogue promises nothing to "choose" here: it lists what a site can include. */
+  scopeTitle: "מה אפשר לכלול באתר",
+  /** One field label over the four stages on the ticket (instead of numbered fields). */
+  stagesLabel: "מסלול הביקור",
+  /** The stub hangs to the side from 768px, under the ticket on phones. */
+  tearHint: "משכו את הספח הצידה: המנוי לבחירתכם",
+  tearHintPhone: "משכו את הספח למטה או הצידה: המנוי לבחירתכם",
 };

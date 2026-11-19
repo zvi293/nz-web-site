@@ -3,20 +3,21 @@
  * /services/react-development/ — פיתוח React (room 07, art indigo-loom).
  * Service system sections (src/components/service) + page-local pieces in
  * src/components/pages/react-development/ (content: data.ts there): the opening essay with its
- * framed detail ("רכיב אחד, מקרוב"), the punch card and the yes/no decision diagram.
+ * framed detail ("רכיב אחד, מקרוב"), the punch card, the yes/no decision diagram and the outcomes
+ * drawn as component trees (ReactOutcomes, instead of the kit's framed-word triptych).
  * ONE island: the signature "רינדור חי" (type → live highlight, client:visible).
  * `rd-page` on <main> lets react-development.css hang the hero work first on phones.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import ServiceHero from "@/components/service/ServiceHero.astro";
 import SignatureSlot from "@/components/service/SignatureSlot.astro";
-import ServiceOutcomes from "@/components/service/ServiceOutcomes.astro";
 import ServiceFaq from "@/components/service/ServiceFaq.astro";
 import ServiceRelated from "@/components/service/ServiceRelated.astro";
 import ServiceCta from "@/components/service/ServiceCta.astro";
 import OneComponent from "@/components/pages/react-development/OneComponent.astro";
 import PunchCard from "@/components/pages/react-development/PunchCard.astro";
 import ReactDecision from "@/components/pages/react-development/ReactDecision.astro";
+import ReactOutcomes from "@/components/pages/react-development/ReactOutcomes.astro";
 import LiveRender from "@/components/pages/react-development/LiveRender";
 import { reactDevelopment as page } from "@/components/pages/react-development/data";
 import { serviceSeo } from "@/lib/page-seo";
@@ -46,9 +47,9 @@ const seo = serviceSeo(page);
 
   <ReactDecision index="03" />
 
-  <ServiceOutcomes title={page.outcomes!.title} items={page.outcomes!.items} tone="ink" opener="quote" index="04" />
+  <ReactOutcomes title={page.outcomes!.title} items={page.outcomes!.items} index="04" />
 
-  <ServiceFaq items={page.faqs} title="שאלות על פיתוח React" tone="paper" card="plaque" opener="numeral" index="05" />
+  <ServiceFaq items={page.faqs} title="שאלות על פיתוח React" tone="paper" card="plaque" opener="rule" index="05" />
 
   <ServiceRelated currentPath={page.path} items={page.related} />
 

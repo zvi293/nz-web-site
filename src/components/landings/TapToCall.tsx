@@ -11,8 +11,8 @@ import "./tap-to-call.css";
  * and the narration says what it led to. A vermilion ring shows the way only after a few idle
  * seconds or a wrong tap. So the count is the visitor's own; the end line also names the
  * shortest route (two taps vs four), and after both routes the two counts stand side by side.
- * Phones: the counter and the narration sit right above the phone, so every tap is answered in
- * view. Keyboard: real buttons; focus moves to the new screen; narration is aria-live.
+ * Phones: the narration sits right above the phone, the phone is capped at ~62% of the screen
+ * and its "island" carries the tap count, so every tap is answered in view. Keyboard: real buttons; focus moves to the new screen; narration is aria-live.
  * SSR / no JS: the first screen + both routes stated in text. Reduced motion: no slides/pulses.
  * Sample business, sample number.
  */
@@ -362,7 +362,12 @@ const TapToCall = () => {
       </p>
 
       <div className="lpt__phone">
-        <span className="lpt__notch" aria-hidden="true" />
+        {/* phones: the island carries the count, so it is in view whenever the phone is */}
+        <span className="lpt__notch" aria-hidden="true">
+          <span className="lpt__island" key={taps}>
+            {taps} {tapsWord(taps)}
+          </span>
+        </span>
         <div
           className="lpt__screen"
           key={`${route}-${screen}`}

@@ -47,10 +47,12 @@ export const mobileNav: MainNavItem[] = [
   { label: "צור קשר", href: "/contact/" },
 ];
 
+/** Footer "הסטודיו" column (the glossary sits with the magazine: reading material). */
 export const studioNav: MainNavItem[] = [
   { label: "עבודות", href: "/projects/" },
   { label: "ההצעה", href: "/packages/" },
   { label: "מגזין", href: "/blog/" },
+  { label: "מילון מונחים", href: "/glossary/" },
   { label: "אודות", href: "/about/" },
   { label: "שאלות נפוצות", href: "/faq/" },
   { label: "צור קשר", href: "/contact/" },
@@ -72,3 +74,14 @@ export const studio = {
 
 /** Normalises a path for "current page" checks ("/about" ≡ "/about/"). */
 export const samePath = (a: string, b: string) => a.replace(/\/+$/, "") === b.replace(/\/+$/, "");
+
+/** Room numbers — the order of the site map (mobile menu, then the legal pages). */
+const ROOMS = [...mobileNav.slice(1), ...legalNav].map((item) => item.href);
+
+/** "/privacy/" → 10 (01-based), or undefined for pages outside the map. */
+export function roomFor(path?: string): number | undefined {
+  if (!path) return undefined;
+  const top = `/${path.split("/").filter(Boolean)[0] ?? ""}/`;
+  const i = ROOMS.indexOf(top);
+  return i >= 0 ? i + 1 : undefined;
+}

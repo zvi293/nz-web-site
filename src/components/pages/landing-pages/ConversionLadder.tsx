@@ -126,6 +126,7 @@ const ConversionLadder = () => {
   const [level, setLevel] = useState(0);
   const [last, setLast] = useState<Hand | null>(null);
   const [slip, setSlip] = useState(0);
+  const [slipping, setSlipping] = useState(false); // the slip note shows until the next good pull
   const [live, setLive] = useState("");
   const [offset, setOffset] = useState(0);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -158,11 +159,13 @@ const ConversionLadder = () => {
     if (level >= TOP) return;
     if (last === h) {
       setSlip((n) => n + 1);
+      setSlipping(true);
       setLive("יד אחרי יד: אותה יד פעמיים מחליקה. גם מבקר לא מדלג על שלבים.");
       if (typeof navigator !== "undefined" && document.documentElement.classList.contains("nz-motion")) navigator.vibrate?.([8, 40, 8]);
       return;
     }
     const next = level + 1;
+    setSlipping(false);
     setLast(h);
     setLevel(next);
     if (next <= N) setLive(`שלב ${next} מתוך ${N}: ${RUNGS[next - 1].name}. ${RUNGS[next - 1].title}. בדף: ${RUNGS[next - 1].where}.`);
@@ -171,6 +174,7 @@ const ConversionLadder = () => {
   const again = () => {
     setLevel(0);
     setLast(null);
+    setSlipping(false);
     setLive("חזרה לקרקע. מתחילים מהקליק.");
     handsRef.current?.querySelector<HTMLButtonElement>(".ldr-hand")?.focus();
   };
@@ -196,7 +200,6 @@ const ConversionLadder = () => {
       ))}
     </ol>
   );
-  const rung = level >= 1 && level <= N ? RUNGS[level - 1] : null;
   /* hands on the rails: the hand that pulled last grips the rung above the climber */
   const handR = last === "r" ? level + 1 : level;
   const handL = last === "l" ? level + 1 : level;
@@ -238,50 +241,16 @@ const ConversionLadder = () => {
               <SamplePage active={top ? -1 : active} />
             </div>
           </div>
+          {slipping && !top && (
+            <p key={`s${slip}`} className="ldr__slip" aria-hidden="true">
+              יד אחרי יד: אותה יד פעמיים מחליקה. גם מבקר לא מדלג על שלבים.
+            </p>
+          )}
           <figcaption className="ldr__cap">
             <span className="ldr__cap-k">דף נחיתה לדוגמה</span>
             <span className="ldr__cap-i">{top ? "הגיע לפנייה" : level === 0 ? "על הקרקע" : `שלב ${pad(level)}/${pad(N)}`}</span>
           </figcaption>
         </figure>
-      </div>
-
-      <div className="ldr__card">
-        {top ? (
-          <div className="ldr-card ldr-card--top">
-            <p className="ldr-card__k">
-              <span className="ldr-card__n">ראש הסולם</span>
-              <span>מהקליק אל הפנייה</span>
-            </p>
-            <h3 className="ldr-card__t">מי שלחץ על המודעה השאיר פרטים</h3>
-            {list("ldr-all--recap")}
-          </div>
-        ) : rung ? (
-          <div key={level} className="ldr-card">
-            <p className="ldr-card__k">
-              <span className="ldr-card__n">שלב {pad(level)}</span>
-              <span>{rung.name}</span>
-            </p>
-            <h3 className="ldr-card__t">{rung.title}</h3>
-            <p className="ldr-card__b">{rung.body}</p>
-            <p className="ldr-card__w">
-              <span>איפה בדף</span> {rung.where}
-            </p>
-          </div>
-        ) : (
-          <div className="ldr-card ldr-card--ground">
-            <p className="ldr-card__k">
-              <span className="ldr-card__n">על הקרקע</span>
-              <span>הקליק נחת בדף</span>
-            </p>
-            <h3 className="ldr-card__t">עזרו לו לטפס, יד אחרי יד</h3>
-            <p className="ldr-card__b">מבקר לחץ על מודעה ונחת בדף נחיתה. כל שלב בסולם הוא חלק בדף שמקרב אותו לפנייה. משיכה ביד אחת ואז ביד השנייה מעלה אותו שלב.</p>
-          </div>
-        )}
-        {slip > 0 && !top && (
-          <p key={`s${slip}`} className="ldr__slip">
-            יד אחרי יד. אותה יד פעמיים מחליקה, וגם מבקר לא מדלג על שלבים.
-          </p>
-        )}
       </div>
 
       <div className="ldr__hands" ref={handsRef}>
@@ -305,6 +274,45 @@ const ConversionLadder = () => {
               <span>יד שמאל</span>
             </button>
           </>
+        )}
+      </div>
+
+      <div className={"ldr__card" + (top ? " is-top" : "")}>
+        {top ? (
+          <div className="ldr-card ldr-card--top is-on">
+            <p className="ldr-card__k">
+              <span className="ldr-card__n">ראש הסולם</span>
+              <span>מהקליק אל הפנייה</span>
+            </p>
+            <h3 className="ldr-card__t">מי שלחץ על המודעה השאיר פרטים</h3>
+            {list("ldr-all--recap")}
+          </div>
+        ) : (
+          /* every card sits in ONE grid cell: the box is always as tall as the tallest rung, so
+             nothing under it (or the hands, on desktop) moves between pulls */
+          <div className="ldr__deck">
+            <div className={"ldr-card ldr-card--ground" + (level === 0 ? " is-on" : "")} aria-hidden={level !== 0}>
+              <p className="ldr-card__k">
+                <span className="ldr-card__n">על הקרקע</span>
+                <span>הקליק נחת בדף</span>
+              </p>
+              <h3 className="ldr-card__t">עזרו לו לטפס, יד אחרי יד</h3>
+              <p className="ldr-card__b">מבקר לחץ על מודעה ונחת בדף נחיתה. כל שלב בסולם הוא חלק בדף שמקרב אותו לפנייה. משיכה ביד אחת ואז ביד השנייה מעלה אותו שלב.</p>
+            </div>
+            {RUNGS.map((r, i) => (
+              <div key={r.name} className={"ldr-card" + (level === i + 1 ? " is-on" : "")} aria-hidden={level !== i + 1}>
+                <p className="ldr-card__k">
+                  <span className="ldr-card__n">שלב {pad(i + 1)}</span>
+                  <span>{r.name}</span>
+                </p>
+                <h3 className="ldr-card__t">{r.title}</h3>
+                <p className="ldr-card__b">{r.body}</p>
+                <p className="ldr-card__w">
+                  <span>איפה בדף</span> {r.where}
+                </p>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 

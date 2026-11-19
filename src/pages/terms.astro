@@ -11,7 +11,7 @@ import LegalDocument from "@/components/legal/LegalDocument.astro";
 import LegalDoors from "@/components/legal/LegalDoors.astro";
 import FinePrint from "@/components/legal/FinePrint";
 import TermsExhibit from "@/components/legal/TermsExhibit.astro";
-import { roomFor } from "@/components/Breadcrumbs";
+import { roomFor } from "@/components/nz/nav";
 import "@/components/legal/rooms.css";
 import { siteSettings } from "@/content/site-settings";
 import { termsPlain, readingMinutes, readingLabel } from "@/components/legal/content";
@@ -19,8 +19,12 @@ import { webPage, COPYRIGHT_NOTICE, CREDIT_TEXT } from "@/lib/schema";
 import { heroImage, type PageSeo } from "@/lib/seo";
 
 const PATH = "/terms/";
-const ART = "ice-constellation";
-const HERO_SIZES = "(min-width: 1024px) 46vw, 100vw";
+/* Room 10 hangs its own work (room 09, /privacy/, hangs ice-constellation): one object on a plinth
+   under a spotlight, to be looked at closely, not taken: the terms' core is the image license. */
+const ART = "handbag-ice";
+/* A 4:5 crop of a 3:2 work: the <img> is ~1.875× wider than its frame (object-fit: cover), so
+   `sizes` names that rendered width, not the frame's (frame ≤ 480px from 1024, ≤ 440px from 640). */
+const HERO_SIZES = "(min-width: 1024px) 900px, (min-width: 640px) 825px, 188vw";
 const doc = siteSettings.terms;
 const title = "תנאי שימוש וזכויות יוצרים | NZ-web";
 const clauses = doc.sections.map((s) => ({
@@ -63,8 +67,8 @@ const seo: PageSeo = {
     room={roomFor(PATH) ?? 10}
     variant="sheet"
     ratio="4 / 5"
-    position="62% 50%"
-    medium="פרט מתוך היצירה · כללים ברורים כמו קרח שקוף"
+    position="64% 50%"
+    medium="על כן של קרח · מסתכלים מקרוב, לוקחים רק ברישיון"
     facts={[
       { term: "עודכן", value: doc.lastUpdated },
       { term: "זמן קריאה", value: readingLabel(readingMinutes(doc.sections)) },

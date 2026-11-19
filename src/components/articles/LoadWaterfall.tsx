@@ -31,7 +31,7 @@ const GROUPS: { key: Fix; name: string; fix: string; say: string; how: string }[
   { key: "cache", name: "מטמון לא מוגדר", fix: "תקופת מטמון ארוכה לקבצים קבועים", say: "בביקור חוזר, הקבצים הקבועים נטענים מהדפדפן עצמו, ורק העמוד יורד מחדש.", how: "ביקור חוזר: כווצו את ההורדה החוזרת, גררו ימינה" },
 ];
 
-const T = 7.4; /* the axis length, in illustrative units */
+const T = 6.9; /* the axis length, in illustrative units: the slowest "before" bar fills ~95% of a lane */
 const TARGET = 2.5;
 const ZERO: Fx = { img: 0, js: 0, server: 0, block: 0, cache: 0 };
 /* the lanes whose bars move earlier (right in RTL) when fixed; the scripts move later */

@@ -1,5 +1,5 @@
 ---
-/** Accountant — a page of the office's ledger: index column, entries, a ticked column, a double-ruled total. */
+/** Accountant — a page of the office's ledger: index column, entries, a double-ruled total (no tick column: the total carries the metaphor). */
 import Nb from "@/components/service/Nb.astro";
 import type { AudienceItem } from "@/components/service/types";
 interface Props { items: AudienceItem[] }
@@ -13,7 +13,6 @@ const pad = (i: number) => String(i + 1).padStart(2, "0");
       <span class="vl-lg__c-no">שורה</span>
       <span class="vl-lg__c-who">לקוח</span>
       <span class="vl-lg__c-what">מה האתר מסדר לו</span>
-      <span class="vl-lg__c-tick">✓</span>
     </p>
     <ol class="vl-lg__rows">
       {
@@ -22,7 +21,6 @@ const pad = (i: number) => String(i + 1).padStart(2, "0");
             <span class="vl-lg__c-no" aria-hidden="true">{pad(i)}</span>
             <h3 class="vl-lg__c-who"><Nb text={it.title} /></h3>
             <p class="vl-lg__c-what"><Nb text={it.description} /></p>
-            <svg class="vl-lg__c-tick vl-lg__tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13.5l5 5L20 6" pathLength="1" /></svg>
           </li>
         ))
       }

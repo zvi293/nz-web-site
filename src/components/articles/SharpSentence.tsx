@@ -81,16 +81,36 @@ const SharpSentence = () => {
               onClick={() => cycle(i)}
               aria-label={`${s.asks} כרגע: ${s.options[levels[i]]}. הקישו להחלפה`}
             >
-              <span key={levels[i]} className="as-ss__words">
-                {s.options[levels[i]]}
-              </span>
-              <span className="as-ss__dots" aria-hidden="true">
-                {[0, 1, 2].map((d) => (
-                  <span key={d} className={d <= levels[i] ? "is-on" : ""} />
-                ))}
-              </span>
+              {(() => {
+                /* the last word, the level dots and (at the end of the sentence) the full stop are kept
+                   on one line: a lone dot or "." never wraps onto a line of its own */
+                const words = s.options[levels[i]];
+                const cut = words.lastIndexOf(" ");
+                const head = cut > 0 ? words.slice(0, cut + 1) : "";
+                const tail = cut > 0 ? words.slice(cut + 1) : words;
+                return (
+                  <>
+                    {head && (
+                      <span key={`h${levels[i]}`} className="as-ss__words">
+                        {head}
+                      </span>
+                    )}
+                    <span style={{ whiteSpace: "nowrap" }}>
+                      <span key={`t${levels[i]}`} className="as-ss__words">
+                        {tail}
+                      </span>
+                      <span className="as-ss__dots" aria-hidden="true">
+                        {[0, 1, 2].map((d) => (
+                          <span key={d} className={d <= levels[i] ? "is-on" : ""} />
+                        ))}
+                      </span>
+                      {i === SLOTS.length - 1 && <span aria-hidden="true">.</span>}
+                    </span>
+                  </>
+                );
+              })()}
             </button>
-            {i < SLOTS.length - 1 ? " " : "."}
+            {i < SLOTS.length - 1 ? " " : ""}
           </span>
         ))}
       </p>

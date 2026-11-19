@@ -14,6 +14,10 @@ import "./code-wall.css";
  * "להפוך את כל הבד" cascades with a stagger; one panel lifts its edge once on first view.
  * The canvas is decorative (aria-hidden, pointer taps); the notes are the keyboard / screen-reader
  * controls (aria-pressed buttons) and carry the content. aria-live says what was turned.
+ * Phones / tablets (< 1024px, the notes sit under the tall canvas): a note never turns a panel
+ * the reader cannot see. The canvas panel still turns, and the same verso (linen, sticker, code)
+ * turns over right under the note that was tapped, so the flip happens where the finger is.
+ * Desktop: the notes sit beside the canvas; a note whose panel is out of view scrolls it in first.
  * SSR / no JS: the H1 panel shows its verso (the idea at a glance), all notes readable.
  * Reduced motion: the panel swaps sides instantly, no lift, no cascade.
  */
@@ -290,8 +294,10 @@ const CodeBehindWall = () => {
     announce(next, null);
   };
 
-  /* a note far from the canvas (phones: the notes sit under it) brings the panel into view first */
+  /* desktop: a note whose panel is out of view brings it into view first. Below 1024px the verso
+     turns over under the note itself (CSS), so there is nothing to scroll to. */
   const fromNote = (i: number) => {
+    if (!window.matchMedia("(min-width: 1024px)").matches) return flip(i);
     const el = panelRefs.current[i];
     const r = el?.getBoundingClientRect();
     const off = r && (r.top < 70 || r.bottom > window.innerHeight - 20);
@@ -379,6 +385,11 @@ const CodeBehindWall = () => {
                   {on ? "הגב" : "החזית"}
                 </span>
               </button>
+              {on && (
+                <div className="cw-note__verso">
+                  <Verso b={b} i={i} />
+                </div>
+              )}
             </li>
           );
         })}

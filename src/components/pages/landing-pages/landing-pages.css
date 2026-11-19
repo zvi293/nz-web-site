@@ -225,11 +225,12 @@ html.nz-motion .lnd-leak__plates[data-in] .lnd-t--faint {
   gap: 26px;
   justify-items: center;
 }
+/* phone: the thread runs down the start edge, through every pin, to the target */
 .lnd-ads__thread {
   position: absolute;
   top: 18px;
   bottom: 70px;
-  inset-inline-start: 50%;
+  inset-inline-start: 9px;
   width: 0;
   border-inline-start: 2px dashed var(--lnd-coral);
   transform-origin: 50% 0;
@@ -237,32 +238,26 @@ html.nz-motion .lnd-leak__plates[data-in] .lnd-t--faint {
 .lnd-ads__list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0;
+  padding-inline-start: 28px;
   display: grid;
-  gap: 16px;
+  gap: 14px;
   width: 100%;
   position: relative;
 }
 .lnd-ads__ad {
   position: relative;
-  width: min(88%, 26rem);
   padding: 14px 16px 16px;
   background: #fff;
   border-radius: 6px;
   box-shadow: 0 0 0 1px var(--line), 0 14px 24px -18px rgba(18, 17, 16, 0.45);
-  transform: rotate(-0.8deg);
-}
-.lnd-ads__ad:nth-child(even) {
-  justify-self: end;
-  transform: rotate(0.9deg);
 }
 .lnd-ads__pin {
   position: absolute;
-  top: -6px;
-  inset-inline-start: 50%;
+  top: 18px;
+  inset-inline-start: -25px;
   width: 12px;
   height: 12px;
-  margin-inline-start: -6px;
   border-radius: 50%;
   background: var(--lnd-coral);
   box-shadow: 0 0 0 3px var(--paper), 0 2px 4px rgba(18, 17, 16, 0.3);
@@ -271,16 +266,12 @@ html.nz-motion .lnd-leak__plates[data-in] .lnd-t--faint {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: var(--graphite);
 }
 .lnd-ads__tag {
   font-weight: 700;
   color: var(--ink);
-}
-.lnd-ads__src {
-  padding-inline-start: 8px;
-  border-inline-start: 1px solid var(--line);
 }
 .lnd-ads__h {
   margin-top: 6px;
@@ -292,7 +283,7 @@ html.nz-motion .lnd-leak__plates[data-in] .lnd-t--faint {
 }
 .lnd-ads__d {
   margin-top: 6px;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--graphite);
   text-wrap: pretty;
@@ -371,17 +362,24 @@ html.nz-motion .lnd-ads__board:not([data-in]) .lnd-ads__ad {
   .lnd-ads__head {
     align-self: center;
   }
+  /* desktop: two aligned columns, the thread down the middle gutter; an odd last ad spans both */
+  .lnd-ads__thread {
+    inset-inline-start: calc(50% - 1px);
+  }
   .lnd-ads__list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 22px 28px;
+    gap: 22px 40px;
+    padding-inline-start: 0;
   }
-  .lnd-ads__ad,
-  .lnd-ads__ad:nth-child(even) {
-    width: 100%;
-    justify-self: stretch;
+  .lnd-ads__ad:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 20px);
   }
-  .lnd-ads__ad:nth-child(even) {
-    margin-top: 48px;
+  .lnd-ads__pin {
+    top: -6px;
+    inset-inline-start: 50%;
+    margin-inline-start: -6px;
   }
   .lnd-ads__sheet {
     width: 150px;

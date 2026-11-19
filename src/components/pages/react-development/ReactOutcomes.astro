@@ -1,0 +1,92 @@
+---
+/**
+ * ReactOutcomes — "מה מקבלים מממשק שנבנה ב-React". Page-local section of
+ * /services/react-development/ (prefix rd-out). Replaces the kit's framed-word triptych on this
+ * page (business-website keeps it), so the sibling rooms do not share one template.
+ * Each outcome is drawn as the page draws everything: a small component tree.
+ *   מגיב  — one leaf lights up; the rest of the tree stays dark (only what changed re-renders).
+ *   יציב  — a wrong value is caught in the code, underlined before it ships (TypeScript).
+ *   גדל   — a new component docks onto the tree with a dashed outline (added, not rewritten).
+ * Static; the lit leaf / the underline / the new node play once when the row comes into view
+ * (html.nz-motion + [data-reveal] → [data-in] from the global script). No-JS / reduced motion:
+ * the final drawing.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import Nb from "@/components/service/Nb.astro";
+import "./react-development.css";
+
+interface Item {
+  word: string;
+  title: string;
+  body: string;
+}
+interface Props {
+  title: string;
+  items: Item[];
+  index?: string;
+}
+const { title, items, index = "04" } = Astro.props;
+
+/* one shared tree: root, three branches, six leaves (viewBox 0 0 216 124; the new node of "גדל" docks at x 203) */
+const W = 26;
+const H = 14;
+const root = { x: 100, y: 14 };
+const mids = [40, 100, 160].map((x) => ({ x, y: 58 }));
+const leaves = [24, 56, 84, 116, 144, 176].map((x, i) => ({ x, y: 102, p: mids[Math.floor(i / 2)] }));
+const edge = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+  `M${a.x} ${a.y + H / 2} C${a.x} ${(a.y + b.y) / 2} ${b.x} ${(a.y + b.y) / 2} ${b.x} ${b.y - H / 2}`;
+const kinds = ["respond", "stable", "grow"] as const;
+---
+
+<section class="nz-section nz-section--space-default rd-out" data-tone="ink" aria-labelledby="rd-out-title">
+  <div class="nz-container">
+    <ServiceOpener variant="quote" index={index} label="מה יוצא מזה" id="rd-out-title" title={title} />
+
+    <ol class="rd-out__list">
+      {
+        items.map((it, i) => {
+          const k = kinds[i] ?? "respond";
+          return (
+            <li class:list={["rd-out__row", `rd-out__row--${k}`]} data-reveal>
+              <figure class="rd-out__fig" aria-hidden="true">
+                <svg viewBox="0 0 216 124" class="rd-out__svg" focusable="false">
+                  {mids.map((m) => <path class="rd-out__edge" d={edge(root, m)} />)}
+                  {leaves.map((l) => <path class="rd-out__edge" d={edge(l.p, l)} />)}
+                  {k === "grow" && <path class="rd-out__edge rd-out__edge--new" d={edge(mids[2], { x: 203, y: 102 })} pathLength="1" />}
+                  <rect class="rd-out__node rd-out__node--root" x={root.x - W / 2} y={root.y - H / 2} width={W} height={H} rx="2" />
+                  {mids.map((m) => <rect class="rd-out__node" x={m.x - W / 2} y={m.y - H / 2} width={W} height={H} rx="2" />)}
+                  {leaves.map((l, j) => (
+                    <rect
+                      class:list={["rd-out__node", k === "respond" && j === 3 && "rd-out__node--lit", k === "stable" && j === 1 && "rd-out__node--caught"]}
+                      x={l.x - 9}
+                      y={l.y - H / 2}
+                      width={18}
+                      height={H}
+                      rx="2"
+                    />
+                  ))}
+                  {k === "grow" && <rect class="rd-out__node rd-out__node--new" x={203 - 9} y={102 - H / 2} width={18} height={H} rx="2" />}
+                  {k === "stable" && <path class="rd-out__squiggle" d="M44 115 q3 -4 6 0 t6 0 t6 0 t6 0" pathLength="1" />}
+                </svg>
+                {k === "respond" && <figcaption class="rd-out__cap">רק החלק שהשתנה</figcaption>}
+                {k === "stable" && (
+                  <figcaption class="rd-out__cap">
+                    <code dir="ltr">count: "2"</code> נתפס לפני העלייה
+                  </figcaption>
+                )}
+                {k === "grow" && <figcaption class="rd-out__cap">רכיב חדש מתחבר לעץ</figcaption>}
+              </figure>
+              <div class="rd-out__text">
+                <p class="rd-out__word">{it.word}</p>
+                <h3 class="rd-out__title">{it.title}</h3>
+                <p class="rd-out__body">
+                  <Nb text={it.body} />
+                </p>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </div>
+</section>

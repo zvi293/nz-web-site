@@ -93,7 +93,7 @@ const haystack = (t: (typeof terms)[number]) =>
       {
         groups.map((g) => (
           <Fragment>
-          <section class="gl-group" id={`letter-${g.letter}`} data-gl-group={g.letter} aria-labelledby={`gl-h-${g.letter}`}>
+          <section class={`gl-group${g.terms.length === 1 ? " gl-group--single" : ""}`} id={`letter-${g.letter}`} data-gl-group={g.letter} aria-labelledby={`gl-h-${g.letter}`}>
             <h2 class="gl-group__letter" id={`gl-h-${g.letter}`}>
               <span class="nz-sr">האות </span>
               {g.letter}

@@ -9,6 +9,8 @@
  * Fully open, the lens stays a lens (glass slivers at the top and bottom corners). Choosing a shelf
  * filters the magazine below (shared filter script in MagazineFilter.astro, via [data-mg-filter]).
  * DOM order = reading order: the pull, then the shelves (so Tab goes pull → shelves → filter).
+ * First view (motion only, once): the zipper "peeks" open ~15% and closes again, so the pull reads
+ * as something to pull. Keyboard steps keep the pull in view (it rides down a tall frame).
  * Static fallback (no JS): the facade and the pull are not shown — the shelves are plain links to
  * the departments in the archive (#dept-<key>). Reduced motion: the zipper jumps open / closed.
  */
@@ -27,28 +29,55 @@ const shelves = [
   ...DEPARTMENTS.map((d) => ({ key: d.key, name: d.name, blurb: d.blurb, count: counts[d.key] ?? 0, href: `#dept-${d.key}` })),
 ];
 
-/* The facade drawing (viewBox 100×100, stretched): grey-blue wash, cloud reflections, mullions
-   that lean out a little toward the bottom (the tower widens as it comes down), floor bands, and
-   a few pencil hatches. Deterministic, so the SSR markup is stable. */
+/* The facade drawing (viewBox 100×100, stretched) carries the artwork on below its bottom edge, so
+   the frame reads as ONE drawing: the wash is the artwork's own bottom row (sampled, left → right,
+   pale neighbours at both edges), the mullions start exactly where the drawing's mullions end
+   (measured on zipper-library) and keep leaning out as the tower widens, the floors are the same
+   "V" of pencil lines meeting at the seam, the panes carry soft cloud reflections, vertical glass
+   streaks and a fine pencil hatch. Deterministic, so the SSR markup is stable. */
 const S = 48.5; /* the tower's seam, % of the width (measured on the artwork) */
-const mullions = [3, 13, 23, 33.5, 43, 54, 63.5, 73.5, 84, 94].map((x) => ({
-  x1: S + (x - S) * 0.9,
-  x2: x,
-}));
-const floors = [9, 19, 29, 39.5, 50, 60.5, 71, 81.5, 92];
+const WASH = [
+  [0, "#e2e0e0"], [3, "#d8d6d6"], [6, "#c4c4c6"], [12, "#c2c2c5"], [18, "#b5b6b9"], [25, "#9fa1a6"],
+  [30, "#a9abaf"], [35, "#b2b4b9"], [40, "#a4a7ab"], [45, "#999a9e"], [48.5, "#8f8e8f"], [52, "#9c9ea3"],
+  [55, "#a6a8ad"], [60, "#afafb2"], [65, "#aaaaaf"], [70, "#b5b4b7"], [75, "#bebdbe"], [80, "#c0bfc1"],
+  [85, "#c9c7c8"], [90, "#d6d2d2"], [95, "#d9d6d6"], [100, "#f1ece9"],
+] as const;
+/* mullions at the seam's top edge (= the artwork's bottom row): the heavy frames carry on the
+   drawing's frames; a fainter pane line runs between them */
+const FRAMES = [4.5, 15, 26, 37, 46, 51.5, 61, 70.5, 79, 87, 94];
+const mullions = FRAMES.flatMap((x, i) => {
+  const lean = (v: number) => Math.max(0, Math.min(100, S + (v - S) * 1.14));
+  const out = [{ x1: x, x2: lean(x), heavy: true }];
+  const next = FRAMES[i + 1];
+  if (next !== undefined && !(x < S && next > S)) out.push({ x1: (x + next) / 2, x2: lean((x + next) / 2), heavy: false });
+  return out;
+});
+/* floors: a "V" meeting at the seam (left and right faces seen from below) */
+const floors = Array.from({ length: 13 }, (_, i) => {
+  const y = 6 + i * 8.6;
+  return { y, l: y - 9.5, r: y - 10, heavy: i % 2 === 0 };
+});
+/* cloud reflections: soft bright patches, clustered like the drawing's */
 const clouds = [
-  { cx: 14, cy: 16, rx: 9, ry: 3.2 },
-  { cx: 30, cy: 47, rx: 11, ry: 3.8 },
-  { cx: 9, cy: 74, rx: 7, ry: 2.6 },
-  { cx: 71, cy: 22, rx: 12, ry: 3.6 },
-  { cx: 86, cy: 55, rx: 9, ry: 3 },
-  { cx: 64, cy: 83, rx: 10, ry: 3.4 },
-  { cx: 41, cy: 90, rx: 6, ry: 2.2 },
+  { cx: 10, cy: 10, rx: 6, ry: 2.6 },
+  { cx: 17, cy: 13, rx: 4.5, ry: 2 },
+  { cx: 31, cy: 27, rx: 7.5, ry: 3 },
+  { cx: 38, cy: 30, rx: 4.5, ry: 2 },
+  { cx: 22, cy: 55, rx: 7, ry: 2.8 },
+  { cx: 10, cy: 78, rx: 6, ry: 2.4 },
+  { cx: 33, cy: 92, rx: 5, ry: 2 },
+  { cx: 66, cy: 12, rx: 7, ry: 2.8 },
+  { cx: 75, cy: 16, rx: 4.5, ry: 2 },
+  { cx: 88, cy: 40, rx: 6.5, ry: 2.6 },
+  { cx: 60, cy: 50, rx: 6, ry: 2.4 },
+  { cx: 80, cy: 72, rx: 7, ry: 2.8 },
+  { cx: 64, cy: 90, rx: 5, ry: 2 },
 ];
-const hatches = Array.from({ length: 14 }, (_, i) => {
-  const x = (i * 7.3 + 2) % 100;
-  const y = (i * 13.7 + 5) % 92;
-  return { x1: x, y1: y + 6, x2: x + 3.5, y2: y };
+/* glass reflections: a few soft vertical sheens inside the panes */
+const streaks = Array.from({ length: 9 }, (_, i) => {
+  const x = (i * 41.3 + 7.1) % 92 + 4;
+  const top = (i * 29.7) % 55;
+  return { x1: x, y1: top, x2: S + (x - S) * 1.08, y2: Math.min(100, top + 30 + ((i * 13) % 20)), light: i % 3 !== 0 };
 });
 ---
 
@@ -97,13 +126,28 @@ const hatches = Array.from({ length: 14 }, (_, i) => {
       <div class="mg-zip__facade" aria-hidden="true">
         <svg class="mg-zip__glass" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
           <defs>
-            <linearGradient id="mgz-wash" x1="0" y1="0" x2="0.35" y2="1">
-              <stop offset="0" stop-color="#aeb5bc" />
-              <stop offset="0.55" stop-color="#c3c8cc" />
-              <stop offset="1" stop-color="#b3b9bf" />
+            <linearGradient id="mgz-wash" x1="0" y1="0" x2="1" y2="0">
+              {WASH.map(([o, c]) => <stop offset={o / 100} stop-color={c} />)}
             </linearGradient>
+            <linearGradient id="mgz-depth" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#2a2d33" stop-opacity="0" />
+              <stop offset="1" stop-color="#2a2d33" stop-opacity="0.1" />
+            </linearGradient>
+            <pattern id="mgz-hatch" width="1.3" height="1.3" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+              <line x1="0" y1="0" x2="0" y2="1.3" />
+            </pattern>
+            <pattern id="mgz-hatch-x" width="2.2" height="2.2" patternUnits="userSpaceOnUse" patternTransform="rotate(-50)">
+              <line x1="0" y1="0" x2="0" y2="2.2" />
+            </pattern>
+            <linearGradient id="mgz-join-g" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff" stop-opacity="0.85" />
+              <stop offset="1" stop-color="#fff" stop-opacity="0" />
+            </linearGradient>
+            <mask id="mgz-join" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="9">
+              <rect x="0" y="0" width="100" height="9" fill="url(#mgz-join-g)" />
+            </mask>
             <filter id="mgz-soft" x="-30%" y="-60%" width="160%" height="220%">
-              <feGaussianBlur stdDeviation="1.4" />
+              <feGaussianBlur stdDeviation="0.9" />
             </filter>
             <mask id="mgz-lens" maskUnits="userSpaceOnUse" x="-10" y="-40" width="120" height="180">
               <rect x="-10" y="-40" width="120" height="180" fill="#fff" />
@@ -112,17 +156,21 @@ const hatches = Array.from({ length: 14 }, (_, i) => {
           </defs>
           <g mask="url(#mgz-lens)">
             <rect x="0" y="0" width="100" height="100" fill="url(#mgz-wash)" />
+            <g class="mg-zip__streaks">
+              {streaks.map((l) => <line x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} class={l.light ? "is-light" : undefined} />)}
+            </g>
             <g class="mg-zip__clouds" filter="url(#mgz-soft)">
               {clouds.map((c) => <ellipse cx={c.cx} cy={c.cy} rx={c.rx} ry={c.ry} />)}
             </g>
+            <rect class="mg-zip__hatch" x="0" y="0" width="100" height="100" fill="url(#mgz-hatch)" />
+            <rect class="mg-zip__hatch mg-zip__hatch--x" x="0" y="0" width="100" height="100" fill="url(#mgz-hatch-x)" />
+            <rect x="0" y="0" width="100" height="100" fill="url(#mgz-depth)" />
+            <rect x="0" y="0" width="100" height="9" fill="url(#mgz-wash)" mask="url(#mgz-join)" />
             <g class="mg-zip__floors">
-              {floors.map((y) => <line x1="0" y1={y} x2="100" y2={y} />)}
+              {floors.map((f) => <polyline points={`0,${f.l} ${S},${f.y} 100,${f.r}`} class={f.heavy ? "is-heavy" : undefined} />)}
             </g>
             <g class="mg-zip__mullions">
-              {mullions.map((m) => <line x1={m.x1} y1="0" x2={m.x2} y2="100" />)}
-            </g>
-            <g class="mg-zip__hatch">
-              {hatches.map((h) => <line x1={h.x1} y1={h.y1} x2={h.x2} y2={h.y2} />)}
+              {mullions.map((m) => <line x1={m.x1} y1="0" x2={m.x2} y2="100" class={m.heavy ? "is-heavy" : undefined} />)}
             </g>
           </g>
           <path class="mg-zip__lip" data-mg-lens-edge d="" />
@@ -163,6 +211,7 @@ const hatches = Array.from({ length: 14 }, (_, i) => {
     let p = 0;
     let isOpen = false;
     let raf = 0;
+    let touched = false;
 
     root.classList.add("is-ready");
     shelves.inert = true;
@@ -233,14 +282,15 @@ const hatches = Array.from({ length: 14 }, (_, i) => {
       raf = requestAnimationFrame(step);
     };
 
-    const open = () =>
+    const open = (after?: () => void) =>
       animateTo(1, () => {
         setOpen(true);
         render(1);
+        after?.();
       });
-    const close = () => {
+    const close = (after?: () => void) => {
       setOpen(false);
-      animateTo(0);
+      animateTo(0, after);
     };
 
     /* drag */
@@ -269,7 +319,7 @@ const hatches = Array.from({ length: 14 }, (_, i) => {
       if (!dragging) return;
       dragging = false;
       root.classList.remove("is-dragging");
-      if (moved) (p > 0.3 ? open : close)();
+      if (moved) (p > 0.3 ? open() : close());
     };
     pull.addEventListener("pointerup", endDrag);
     pull.addEventListener("pointercancel", endDrag);
@@ -278,28 +328,57 @@ const hatches = Array.from({ length: 14 }, (_, i) => {
         moved = false;
         return;
       }
-      (isOpen ? close : open)();
+      touched = true;
+      if (isOpen) close();
+      else open();
     });
 
-    /* keyboard: a vertical slider (down / end = open) */
+    /* keyboard: a vertical slider (down / end = open); the page follows the focused pull */
+    const keepInView = () =>
+      requestAnimationFrame(() => pull.scrollIntoView({ block: "nearest", behavior: motion() ? "smooth" : "auto" }));
     pull.addEventListener("keydown", (e) => {
       const steps: Record<string, number> = { ArrowDown: 0.25, ArrowRight: 0.25, ArrowUp: -0.25, ArrowLeft: -0.25 };
       if (e.key in steps) {
         e.preventDefault();
+        touched = true;
         const next = Math.max(0, Math.min(1, (isOpen ? 1 : p) + steps[e.key]));
-        if (next >= 1) open();
+        if (next >= 1) open(keepInView);
         else {
           setOpen(false);
-          animateTo(next);
+          animateTo(next, keepInView);
         }
       } else if (e.key === "Home") {
         e.preventDefault();
-        close();
+        touched = true;
+        close(keepInView);
       } else if (e.key === "End") {
         e.preventDefault();
-        open();
+        touched = true;
+        open(keepInView);
       }
     });
+
+    /* first view: a one-time peek (motion only; never after the visitor has touched it) */
+    pull.addEventListener("pointerdown", () => (touched = true));
+    if ("IntersectionObserver" in window) {
+      const peekIO = new IntersectionObserver(
+        ([e]) => {
+          if (!e.isIntersecting) return;
+          peekIO.disconnect();
+          if (!motion() || touched) return;
+          window.setTimeout(() => {
+            if (touched || isOpen) return;
+            animateTo(0.16, () =>
+              window.setTimeout(() => {
+                if (!touched && !isOpen) animateTo(0);
+              }, 650),
+            );
+          }, 900);
+        },
+        { threshold: 0.6 },
+      );
+      peekIO.observe(panel);
+    }
 
     render(0);
   }

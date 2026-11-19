@@ -1,5 +1,6 @@
 // Signature component: המצפן — answers swing a gauge needle
 import { useId, useState } from "react";
+import "./StoreCompass.css";
 
 /**
  * "The compass" (business-website-or-online-store). Six short questions from the article, each a
@@ -9,6 +10,9 @@ import { useId, useState } from "react";
  * Keyboard: native radios (arrows within a group). aria-live reads the new direction.
  * No JS: the questions render (native radios work) with a short note on how to read the answers;
  * the needle rests at centre.
+ * Phones: the dial + its reading form a compact bar that sticks under the header while the six
+ * questions scroll beneath it, so every answer swings the needle in view; what the reading means
+ * follows the last question. Desktop: the dial and its meaning stand beside the questions.
  */
 
 interface Option {
@@ -107,43 +111,55 @@ const StoreCompass = () => {
 
   return (
     <div className="as-cp">
-      <div className="as-cp__dial" aria-hidden="true">
-        <svg viewBox="0 0 320 184" className="as-cp__svg" focusable="false">
-          {/* arcs (physical): left = חנות, middle = באמצע, right = אתר תדמית (the RTL start side) */}
-          <path d="M 30 160 A 130 130 0 0 1 95.0 47.4" className="as-cp__arc as-cp__arc--b" />
-          <path d="M 95.0 47.4 A 130 130 0 0 1 225.0 47.4" className="as-cp__arc as-cp__arc--m" />
-          <path d="M 225.0 47.4 A 130 130 0 0 1 290 160" className="as-cp__arc as-cp__arc--a" />
-          {Array.from({ length: 19 }, (_, i) => {
-            const a = Math.PI - (i * Math.PI) / 18;
-            const r1 = i % 3 === 0 ? 112 : 118;
-            return (
-              <line
-                key={i}
-                x1={(160 + Math.cos(a) * r1).toFixed(2)}
-                y1={(160 - Math.sin(a) * r1).toFixed(2)}
-                x2={(160 + Math.cos(a) * 124).toFixed(2)}
-                y2={(160 - Math.sin(a) * 124).toFixed(2)}
-                className="as-cp__tick"
-              />
-            );
-          })}
-          <g className="as-cp__needle" style={{ transform: `rotate(${needle}deg)` }}>
-            <path d="M160 160 L156 150 L160 44 L164 150 Z" />
-          </g>
-          <circle cx="160" cy="160" r="9" className="as-cp__hub" />
-        </svg>
-        <span className="as-cp__end as-cp__end--a">אתר תדמית</span>
-        <span className="as-cp__end as-cp__end--m">באמצע</span>
-        <span className="as-cp__end as-cp__end--b">חנות אונליין</span>
-      </div>
+      <div className="as-cp__head">
+        <div className="as-cp__dial" aria-hidden="true">
+          <svg viewBox="0 0 320 184" className="as-cp__svg" focusable="false">
+            {/* arcs (physical): left = חנות, middle = באמצע, right = אתר תדמית (the RTL start side) */}
+            <path d="M 30 160 A 130 130 0 0 1 95.0 47.4" className="as-cp__arc as-cp__arc--b" />
+            <path d="M 95.0 47.4 A 130 130 0 0 1 225.0 47.4" className="as-cp__arc as-cp__arc--m" />
+            <path d="M 225.0 47.4 A 130 130 0 0 1 290 160" className="as-cp__arc as-cp__arc--a" />
+            {Array.from({ length: 19 }, (_, i) => {
+              const a = Math.PI - (i * Math.PI) / 18;
+              const r1 = i % 3 === 0 ? 112 : 118;
+              return (
+                <line
+                  key={i}
+                  x1={(160 + Math.cos(a) * r1).toFixed(2)}
+                  y1={(160 - Math.sin(a) * r1).toFixed(2)}
+                  x2={(160 + Math.cos(a) * 124).toFixed(2)}
+                  y2={(160 - Math.sin(a) * 124).toFixed(2)}
+                  className="as-cp__tick"
+                />
+              );
+            })}
+            <g className="as-cp__needle" style={{ transform: `rotate(${needle}deg)` }}>
+              <path d="M160 160 L156 150 L160 44 L164 150 Z" />
+            </g>
+            <circle cx="160" cy="160" r="9" className="as-cp__hub" />
+          </svg>
+          <span className="as-cp__end as-cp__end--a">אתר תדמית</span>
+          <span className="as-cp__end as-cp__end--m">באמצע</span>
+          <span className="as-cp__end as-cp__end--b">חנות אונליין</span>
+        </div>
 
-      <div className="as-cp__reading" aria-live="polite">
-        <p className="as-cp__reading-k">
-          {answered}/{QUESTIONS.length} תשובות · המחוג מצביע על
-        </p>
-        <p className="as-cp__reading-title">{r.title}</p>
-        <p className="as-cp__reading-body">{r.body}</p>
+        <div className="as-cp__reading">
+          <p className="as-cp__reading-k">
+            <span className="as-cp__count" dir="ltr">
+              {answered}/{QUESTIONS.length}
+            </span>{" "}
+            תשובות{answered > 0 ? " · המחוג מצביע על" : ""}
+          </p>
+          <p key={r.title} className="as-cp__reading-title">{r.title}</p>
+          <p className="as-cp__pips" aria-hidden="true">
+            {answers.map((a, i) => (
+              <span key={i} className={a !== null ? "is-on" : ""} />
+            ))}
+          </p>
+        </div>
       </div>
+      <p className="nz-sr" aria-live="polite">
+        {answered > 0 ? `${answered} מתוך ${QUESTIONS.length} תשובות. המחוג מצביע על ${r.title}. ${r.body}` : ""}
+      </p>
 
       <p className="as-static as-cp__static">
         בלי JavaScript המחוג לא זז, אבל אפשר לקרוא את התשובות כך: אם רוב מה שבחרתם הוא האפשרות הראשונה בכל שאלה,
@@ -176,11 +192,16 @@ const StoreCompass = () => {
           </li>
         ))}
       </ol>
-      {answered > 0 && (
-        <button type="button" className="as-btn as-btn--quiet as-cp__reset" onClick={() => setAnswers(QUESTIONS.map(() => null))}>
-          איפוס התשובות
-        </button>
-      )}
+      <div className={`as-cp__verdict${answered === QUESTIONS.length ? " is-final" : ""}`}>
+        <p className="as-cp__verdict-k">{answered === QUESTIONS.length ? "התשובה שלכם" : "מה זה אומר עד עכשיו"}</p>
+        <p className="as-cp__verdict-title">{r.title}</p>
+        <p className="as-cp__reading-body">{r.body}</p>
+        {answered > 0 && (
+          <button type="button" className="as-btn as-btn--quiet as-cp__reset" onClick={() => setAnswers(QUESTIONS.map(() => null))}>
+            איפוס התשובות
+          </button>
+        )}
+      </div>
     </div>
   );
 };

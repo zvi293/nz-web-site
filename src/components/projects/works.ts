@@ -36,9 +36,9 @@ export interface Work {
 /** Which of our service pages each work belongs to (descriptive internal links). */
 const SERVICE_OF: Record<string, { label: string; href: string }> = {
   "ahia-cars": { label: "אתר תדמית ליועץ ומאמן", href: "/services/business-website/consultant/" },
-  "sivan-eyebrows": { label: "אתר ומערכת תורים לעסק יופי", href: "/services/business-website/beauty/" },
+  "sivan-eyebrows": { label: "אתר לעסק יופי", href: "/services/business-website/beauty/" },
   "jewish-calendar": { label: "פיתוח אתרים ואפליקציות רשת", href: "/services/web-development/" },
-  "carmit-therapy": { label: "אתר ומערכת תורים לקליניקה", href: "/services/business-website/clinic/" },
+  "carmit-therapy": { label: "אתר תדמית לקליניקה", href: "/services/business-website/clinic/" },
   "mentor-moshe": { label: "אתר תדמית לעסק", href: "/services/business-website/" },
   "brows-studio": { label: "בניית אתרים לעסקים", href: "/services/website-development/" },
 };

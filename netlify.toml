@@ -67,12 +67,6 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# ── Service videos: large and rarely change (remove once public/videos/ is gone) ──
-[[headers]]
-  for = "/videos/*"
-  [headers.values]
-    Cache-Control = "public, max-age=2592000"
-
 # ── Per-page social cards (public/og/*.jpg): not hashed, so a day and revalidate ──
 [[headers]]
   for = "/og/*"

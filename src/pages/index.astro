@@ -3,9 +3,9 @@
  * / — the home page. Sections come from src/components/home (owned by the home designer).
  * Island policy: static HTML unless the section has real interactivity —
  *   HomeHero      client:load     the exhibit switcher (LCP section, hydrate at once)
- *   HomeServices  client:visible  hover/focus preview of the services hall
+ *   HomeServices  client:visible  hover/focus preview (scroll focus on touch) of the services hall
  *   HomeProcess   client:visible  scroll-driven sticky art
- *   HomeOffer     client:visible  the offer configurator
+ *   HomeOffer     client:visible  the tear-off admission ticket
  *   HomeFinalCta  client:visible  the curtain opens when it enters the viewport
  *   the rest      static          (<Reveal> entrances + art fade-in run from src/scripts/global.ts)
  * If a static section gains state/effects, give it client:visible here.

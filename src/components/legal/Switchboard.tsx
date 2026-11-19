@@ -24,9 +24,10 @@ import A11yGlyph from "./A11yGlyph";
  * Built as a piece of equipment, not a settings list:
  *  - the MONITOR: a readout that says in words what the last control did + a live specimen (a
  *    heading, a paragraph with a link, a button with its focus ring, a small picture and a moving
- *    part) that shows the effect right beside your thumb. It is sticky inside the board, so the
- *    readout never scrolls out of view while you work the lower controls (not at 150%+ text,
- *    where a sticky monitor would cover the controls themselves).
+ *    part) that shows the effect right beside your thumb. The readout is sticky inside the board
+ *    (on a phone only the compact readout strip; on desktop the whole monitor), so it never
+ *    scrolls out of view while you work the lower controls (not at 150%+ text, where it would
+ *    cover the controls themselves).
  *  - the CONSOLE: a long text-size fader, a three-position contrast selector (dark · normal ·
  *    light — one throw, so the two contrast modes can never both be on), nine breakers with a real
  *    throw (handle down = off, up = on, lamp lit), and a master reset bar.
@@ -148,7 +149,7 @@ const Switchboard = () => {
 
           <div className="lg-monitor__specimen" aria-hidden="true">
             <span className="lg-monitor__k">דוגמה חיה</span>
-            <span className="lg-monitor__pic">
+            <span className="lg-monitor__pic" data-a11y-exclude="true">
               <span />
               <span />
               <span />
@@ -161,7 +162,7 @@ const Switchboard = () => {
             </span>
             <span className="lg-monitor__row">
               <span className="lg-monitor__btn">כפתור בפוקוס</span>
-              <span className="lg-monitor__track">
+              <span className="lg-monitor__track" data-a11y-exclude="true">
                 <span className="lg-monitor__runner" />
               </span>
             </span>
@@ -283,7 +284,7 @@ const Switchboard = () => {
         <div className="lg-board__foot-text">
           <p className="lg-board__foot-title">אותו לוח, בכל עמוד</p>
           <p className="lg-board__foot-line">
-            הכפתור העגול בפינה הימנית התחתונה של המסך פותח את אותן הגדרות מכל עמוד באתר. מה שתבחרו כאן נשמר בדפדפן.
+            הכפתור העגול בפינה התחתונה של המסך פותח את אותן הגדרות מכל עמוד באתר. מה שתבחרו כאן נשמר בדפדפן.
           </p>
           <button type="button" className="lg-board__open" onClick={() => window.dispatchEvent(new Event(A11Y_OPEN_EVENT))}>
             לפתוח את התפריט הצף

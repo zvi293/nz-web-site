@@ -4,7 +4,7 @@
  * wall, vermilion glaze, a water line inside: it holds water) with numbered callouts that
  * match the list. The drawing draws itself when it enters view (stroke-dashoffset, only under
  * html.nz-motion); hovering a list item lights its callout (CSS :has, pointer only).
- * Opener: stacked label. Static (no client JS).
+ * Opener: the room label, then the title. Static (no client JS).
  */
 import { aboutIncludes } from "@/content/about";
 
@@ -28,8 +28,7 @@ const WALL = `${OUTER} L${INNER.slice(1)} Z`;
 <section class="nz-section nz-section--space-default ab-includes" data-tone="paper" aria-labelledby="ab-includes-title">
   <div class="nz-container ab-includes__grid">
     <header class="ab-stack">
-      <p class="nz-label ab-stack__room">{inc.room}</p>
-      <p class="nz-label ab-stack__label"><span class="ab-cube" aria-hidden="true"></span>{inc.label}</p>
+      <p class="nz-label"><span class="nz-label__index">{inc.room}</span><span>{inc.label}</span></p>
       <h2 id="ab-includes-title" class="nz-display nz-display--h2">{inc.title}</h2>
       <p class="nz-lede">{inc.lede}</p>
     </header>

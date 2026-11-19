@@ -74,7 +74,7 @@
 }
 .wv-sat__t {
   fill: var(--fg);
-  font: 500 15px/1 var(--font-sans);
+  font: 500 14px/1 var(--font-sans);
 }
 .wv-sat {
   transition:
@@ -143,7 +143,7 @@ html.nz-motion .wv-table[data-reveal]:not([data-in]) .wv-sat {
 .wv-links__note {
   max-width: 68ch;
   margin: clamp(32px, 4vw, 56px) 0 0;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.7;
   color: var(--fg-muted);
   text-wrap: pretty;

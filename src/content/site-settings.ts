@@ -15,7 +15,7 @@ export const siteSettings: SiteSettings = {
     whatsappMessage: "שלום צבי, הגעתי מהאתר של NZ-web ואשמח לשמוע איך תוכלו לבנות אתר לעסק שלי."
   },
   seo: {
-    ogImage: "https://nz-web.com/og-image.png",
+    ogImage: "https://nz-web.com/og/home.jpg",
     keywords:
       "בניית אתרים לעסקים, עיצוב אתרים, אתר תדמית לעסק, בניית דף נחיתה, מערכת לקביעת תורים, פיתוח אתר React, שיפור מהירות אתר, נגישות אתרים, קידום אתרים אורגני, NZ-web",
     siteTitle: "NZ-web | עיצוב ובניית אתרים לעסקים",

@@ -1,0 +1,69 @@
+---
+/**
+ * VersoLabels — "על הגב של האתר". Page-local section of /services/web-development/ (prefix wd-vl).
+ * The page's signature turns the canvas over; this section stays on its back. The back of a real
+ * painting carries labels pasted on the linen between the stretcher bars: what it is, what it is
+ * made of. Here the six materials of every site we build are those labels, each with the small
+ * code tag that holds it (the same inventory-sticker voice as the signature's verso).
+ * Replaces the kit's specimen board on this page (the board stays only on /services/).
+ * Static; the labels are pasted on one by one when the board enters (html.nz-motion +
+ * [data-reveal] → [data-in] from the global script). No-JS / reduced motion: final state.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import Nb from "@/components/service/Nb.astro";
+import type { SketchKind } from "@/components/service/types";
+import "./web-development.css";
+
+interface Item {
+  sketch?: SketchKind;
+  title: string;
+  description: string;
+}
+interface Props {
+  title: string;
+  lede?: string;
+  items: Item[];
+  index?: string;
+}
+const { title, lede, items, index = "01" } = Astro.props;
+
+/* the code that holds each material up, printed on its label */
+const TAGS: Record<string, string> = {
+  code: "<main>",
+  mobile: "@media",
+  speed: "image/avif",
+  a11y: "aria-*",
+  seo: "JSON-LD",
+  care: "https://",
+};
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+---
+
+<section class="nz-section nz-section--space-default wd-vl" data-tone="paper" aria-labelledby="wd-vl-title">
+  <div class="nz-container">
+    <ServiceOpener variant="rule" index={index} label="על הגב של האתר" id="wd-vl-title" title={title} lede={lede} />
+
+    <div class="wd-vl__board" data-reveal>
+      <ol class="wd-vl__list">
+        {
+          items.map((it, i) => (
+            <li class="wd-vl__label" style={`--i:${i}`}>
+              <p class="wd-vl__head">
+                <span class="wd-vl__no">{`תווית ${pad(i)}`}</span>
+                {it.sketch && TAGS[it.sketch] && (
+                  <code class="wd-vl__tag" dir="ltr">
+                    {TAGS[it.sketch]}
+                  </code>
+                )}
+              </p>
+              <h3 class="wd-vl__title">{it.title}</h3>
+              <p class="wd-vl__desc">
+                <Nb text={it.description} />
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>

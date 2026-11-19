@@ -6,16 +6,18 @@
  * beside the title and the summary runs under both.
  */
 import { Artwork, MuseumLabel, getArt } from "@/components/art";
-import { formatDate, type BlogPost, type Department, type Issue } from "@/lib/blog";
+import { formatDate, type BlogPost, type Department } from "@/lib/blog";
+import { typesetText, type MagazineIssue } from "./magazine-meta";
 
 interface Props {
   post: BlogPost;
   dept: Department;
-  issue: Issue;
+  issue: MagazineIssue;
+  minutes: number;
   artSlug: string;
   sizes: string;
 }
-const { post, dept, issue, artSlug, sizes } = Astro.props;
+const { post, dept, issue, minutes, artSlug, sizes } = Astro.props;
 const art = getArt(artSlug);
 const modified = post.updated_at ?? post.published_at.slice(0, 10);
 ---
@@ -39,7 +41,7 @@ const modified = post.updated_at ?? post.published_at.slice(0, 10);
         <span>{dept.name}</span>
       </p>
 
-      <h1 id="ar-title" class="ar-head__title">{post.title}</h1>
+      <h1 id="ar-title" class="ar-head__title">{typesetText(post.title)}</h1>
 
       <div class="ar-byline">
         <span class="ar-byline__mark" aria-hidden="true">צ״מ</span>
@@ -48,7 +50,7 @@ const modified = post.updated_at ?? post.published_at.slice(0, 10);
           <span class="ar-byline__meta">
             <span>עודכן ב-<time datetime={modified}>{formatDate(modified)}</time></span>
             <span aria-hidden="true">·</span>
-            <span>{post.read_time} דקות קריאה</span>
+            <span>{minutes} דקות קריאה</span>
           </span>
         </p>
       </div>
@@ -61,7 +63,7 @@ const modified = post.updated_at ?? post.published_at.slice(0, 10);
       <MuseumLabel
         as="figcaption"
         index={issue.index}
-        prefix="שער הגיליון"
+        prefix="גיליון"
         title={art.title}
         medium={`${dept.name} · ${issue.month}`}
         className="ar-cover__label"

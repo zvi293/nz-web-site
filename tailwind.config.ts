@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-import tailwindcssAnimate from "tailwindcss-animate";
 
 /**
  * NZ-web — "הגלריה" design tokens (see SITE-PLAYBOOK.md §3).
@@ -147,5 +146,5 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [],
 } satisfies Config;

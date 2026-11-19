@@ -11,7 +11,7 @@ const CATEGORY_ART: Record<string, string[]> = {
   פיתוח: ["keycap-hotel", "silver-droplet"],
   עיצוב: ["turquoise-fans", "porcelain-shockwave"],
 };
-const SPARE_ART = ["ultramarine-spill", "obsidian-tear", "cyanotype-jellyfish", "snowflake-furnace", "sneaker-pool"];
+const SPARE_ART = ["ultramarine-spill", "cyanotype-jellyfish", "snowflake-furnace", "sneaker-pool"];
 
 function pickCovers(slugsWanted: (string | undefined)[], categories: string[]): string[] {
   const used = new Set<string>();
@@ -28,10 +28,11 @@ function pickCovers(slugsWanted: (string | undefined)[], categories: string[]): 
 /**
  * "From the magazine" — set like the front page of a printed magazine: a masthead with
  * a double rule, the newest article as the lead story (large cover, serif headline),
- * two more as a column of briefs. Static (no client JS).
+ * three more as a column of briefs. Read times are not shown here (the article pages
+ * carry them); the lead shows its date, the briefs their category. Static (no client JS).
  */
 const HomeMagazine = () => {
-  const posts = getBlogPosts().slice(0, 3);
+  const posts = getBlogPosts().slice(0, 4);
   const covers = pickCovers(
     posts.map((p) => p.art),
     posts.map((p) => p.category),
@@ -68,8 +69,6 @@ const HomeMagazine = () => {
                   {lead.excerpt && <span className="hm-lead__excerpt">{lead.excerpt}</span>}
                   <span className="hm-lead__foot">
                     <time dateTime={lead.published_at.slice(0, 10)}>{formatDate(lead.published_at)}</time>
-                    <span aria-hidden="true">·</span>
-                    <span>{magazine.readTime(lead.read_time)}</span>
                   </span>
                   <span className="nz-link hm-lead__more" aria-hidden="true">
                     <span className="nz-link__text">{magazine.readMore}</span>
@@ -89,12 +88,8 @@ const HomeMagazine = () => {
                     <span className="hm-brief__body">
                       <span className="nz-label hm-brief__meta">
                         <span className="nz-label__index">{post.category}</span>
-                        <span>{magazine.readTime(post.read_time)}</span>
                       </span>
                       <h3 className="hm-brief__title">{post.title}</h3>
-                      <time className="hm-brief__date" dateTime={post.published_at.slice(0, 10)}>
-                        {formatDate(post.published_at)}
-                      </time>
                     </span>
                   </a>
                 </li>

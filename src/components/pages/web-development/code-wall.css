@@ -467,6 +467,7 @@ html.nz-motion .cw.is-lift .cw-panel--3:not(.is-turned) .cw-panel__in {
 /* ── the notes ── */
 .cw__notes {
   list-style: none;
+  min-width: 0; /* a grid item: the inline verso's code must not widen the column */
   margin: 0;
   padding: 0;
   border-top: 1px solid var(--rule);
@@ -539,7 +540,7 @@ html.nz-motion .cw.is-lift .cw-panel--3:not(.is-turned) .cw-panel__in {
   color: #f3a48f;
 }
 .cw-note__why {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--fg-muted);
   text-wrap: pretty;
@@ -571,4 +572,45 @@ html.nz-motion .cw.is-lift .cw-panel--3:not(.is-turned) .cw-panel__in {
 .is-lit .cw-note__turn {
   border-color: rgba(224, 64, 31, 0.6);
   color: #f3a48f;
+}
+
+/* phones / tablets: the verso turns over right under the tapped note (the canvas is above,
+   out of view), a strip of the same linen with the sticker and the code */
+.cw-note__verso {
+  margin: 0 0 18px;
+  margin-inline-start: 48px;
+  perspective: 900px;
+}
+.cw-note__verso .cw-v {
+  position: relative;
+  inset: auto;
+  padding: 12px 18px 12px;
+  border-block: 7px solid var(--cw-wood);
+  grid-template-columns: minmax(0, 1fr);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  border-radius: 2px;
+  transform-origin: top center;
+}
+/* long lines (the JSON-LD) wrap inside the strip instead of pushing it past the gutter */
+.cw-note__verso .cw-v__code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.cw-note__verso .cw-v__sticker {
+  justify-self: start;
+}
+html.nz-motion .cw-note__verso .cw-v {
+  animation: cw-verso 0.75s cubic-bezier(0.55, 0, 0.25, 1) both;
+}
+@keyframes cw-verso {
+  from {
+    transform: rotateX(-90deg);
+    opacity: 0.4;
+  }
+}
+@media (min-width: 1024px) {
+  .cw-note__verso {
+    display: none;
+  }
 }

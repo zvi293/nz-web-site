@@ -1,7 +1,9 @@
 /* ══════════════════════════════════════════════════════════════════════════
    פחות שדות (FewerFields) — prefix lpf-. Sits in the ink signature room.
-   Phone: the meter (field count + two gauges + verdict title) sticks under the header while
-   the paper form scrolls beneath it; the verdict text, actions and tray follow the form.
+   Phone: the meter (field count + two gauges + verdict title) opens the exhibit and scrolls
+   away with the page; while the form is on screen a one-row mini meter (count · verdict · two
+   thin gauges, ~64px) hangs under the header. The verdict text and actions follow the form.
+   DOM order is form → panel (keyboard reaches the × buttons first); `order` sets the visual one.
    Desktop: the form on the start side, the meter + verdict as a sticky column beside it.
    ══════════════════════════════════════════════════════════════════════════ */
 .lpf {
@@ -13,9 +15,6 @@
 }
 .lpf__meter {
   order: 0;
-  position: sticky;
-  inset-block-start: calc(var(--header-h) + 8px);
-  z-index: 3;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: 10px 16px;
@@ -25,16 +24,19 @@
   background: var(--ink-2);
   box-shadow: 0 0 0 1px var(--ink-3), 0 16px 30px -16px rgba(0, 0, 0, 0.85);
 }
-.lpf__sheet {
+.lpf__rail {
   order: 1;
 }
-.lpf__side {
+.lpf__sheet {
   order: 2;
+}
+.lpf__side {
+  order: 3;
   display: grid;
   gap: 12px;
 }
 .lpf__key {
-  order: 3;
+  order: 4;
 }
 
 .lpf__count {
@@ -52,7 +54,7 @@
   font-variant-numeric: tabular-nums;
 }
 .lpf__numlabel {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--fg-muted);
 }
 .lpf__gauges {
@@ -65,12 +67,13 @@
 }
 .lpf__glabel {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
-  gap: 8px;
+  gap: 0 8px;
   margin: 0;
-  font-size: 0.75rem;
-  line-height: 1.25;
+  font-size: 0.875rem;
+  line-height: 1.3;
 }
 .lpf__gname {
   color: var(--fg-muted);
@@ -98,6 +101,7 @@
 [dir="ltr"] .lpf__fill {
   transform-origin: 0 50%;
 }
+[data-kind="ease"] > .lpf__bar .lpf__fill,
 .lpf__gauge[data-kind="ease"] .lpf__fill {
   background: var(--vermilion);
 }
@@ -155,7 +159,7 @@ html.nz-motion .lpf__fill {
   line-height: 1.15;
 }
 .lpf__formsub {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: var(--graphite);
 }
 .lpf__fields {
@@ -187,7 +191,7 @@ html.nz-motion .lpf__field {
 }
 .lpf__label {
   grid-area: label;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--ink);
 }
@@ -279,7 +283,7 @@ html.nz-motion .lpf__field {
 }
 .lpf__traylabel {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--graphite);
 }
 .lpf__tray ul {
@@ -298,7 +302,7 @@ html.nz-motion .lpf__field {
   background: var(--bone-2);
   color: var(--ink);
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   cursor: pointer;
   text-decoration: line-through;
   text-decoration-color: rgba(18, 17, 16, 0.4);
@@ -380,43 +384,114 @@ html:not(.js) .lpf__key {
   display: block;
 }
 
-/* Phones: the stuck meter stays compact (count · two thin gauges · verdict title, ~100px), and
-   anything that takes focus in the form scrolls clear of it (WCAG 2.4.11). */
+/* ── phones / tablets: the mini meter ──────────────────────────────────
+   A zero-height sticky rail right after the full meter; the mini hangs from it under the header
+   and shows only while the full meter is gone above and the form still runs below. */
+.lpf__rail {
+  position: sticky;
+  inset-block-start: calc(var(--header-h) + 8px);
+  z-index: 3;
+  height: 0;
+  margin-block-start: -18px;
+}
+.lpf__mini {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "count title" "count gauges";
+  align-items: center;
+  gap: 5px 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--ink-2);
+  box-shadow: 0 0 0 1px var(--ink-3), 0 16px 30px -16px rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.3s var(--ease-gallery),
+    visibility 0s linear 0.3s;
+}
+.lpf__mini[data-on] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.25s ease,
+    transform 0.3s var(--ease-gallery),
+    visibility 0s;
+}
+.lpf__mcount {
+  grid-area: count;
+  display: grid;
+  justify-items: center;
+  min-width: 44px;
+  padding-inline-end: 12px;
+  border-inline-end: 1px solid var(--line-ink);
+}
+.lpf__mnum {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 2rem;
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums;
+}
+.lpf__mlabel {
+  font-size: 0.8125rem;
+  color: var(--fg-muted);
+}
+.lpf__mtitle {
+  grid-area: title;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+[data-state="empty"] .lpf__mtitle,
+[data-state="thin"] .lpf__mtitle {
+  color: var(--accent-text);
+}
+.lpf__mgauges {
+  grid-area: gauges;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.lpf__mgauge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.lpf__mname {
+  flex: none;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  color: var(--fg-muted);
+}
+.lpf__mgauge .lpf__bar {
+  flex: 1 1 auto;
+  height: 5px;
+}
+.lpf__end {
+  display: block;
+  height: 0;
+  margin-block-start: -14px;
+}
 @media (max-width: 1023px) {
-  .lpf__meter {
-    gap: 6px 12px;
-    padding: 8px 12px 9px;
-  }
-  .lpf__count {
-    min-width: 44px;
-    padding-inline-end: 10px;
-  }
-  .lpf__num {
-    font-size: 2rem;
-  }
-  .lpf__numlabel {
-    font-size: 0.6875rem;
-  }
-  .lpf__gauges {
-    gap: 6px;
-  }
-  .lpf__gauge {
-    gap: 3px;
-  }
-  .lpf__glabel {
-    font-size: 0.6875rem;
-  }
-  .lpf__bar {
-    height: 4px;
-  }
-  .lpf__vtitle {
-    padding-block-start: 6px;
-    font-size: 1rem;
-  }
   .lpf__rm,
   .lpf__tray button,
   .lpf__btn {
-    scroll-margin-block-start: calc(var(--header-h) + 132px);
+    scroll-margin-block-start: calc(var(--header-h) + 84px);
     scroll-margin-block-end: 24px;
   }
 }
@@ -460,8 +535,10 @@ html:not(.js) .sv-sig:has(.lpf) .sv-sig__hint {
     position: sticky;
     inset-block-start: calc(var(--header-h) + 24px);
   }
+  .lpf__rail {
+    display: none;
+  }
   .lpf__meter {
-    position: static;
     padding: 22px 22px;
     gap: 16px 20px;
   }
@@ -469,7 +546,7 @@ html:not(.js) .sv-sig:has(.lpf) .sv-sig__hint {
     font-size: 4.5rem;
   }
   .lpf__glabel {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
   }
   .lpf__bar {
     height: 8px;

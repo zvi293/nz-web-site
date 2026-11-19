@@ -30,7 +30,6 @@ import Palette from "@/components/verticals/Palette";
 import Keystone from "@/components/verticals/Keystone";
 import { VERTICALS, verticalRelated, type VerticalPage } from "@/data/verticals";
 import { serviceSeo } from "@/lib/page-seo";
-import "@/components/verticals/vertical-page.css";
 
 export function getStaticPaths() {
   return Object.keys(VERTICALS).map((vertical) => ({ params: { vertical } }));

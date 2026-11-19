@@ -11,6 +11,9 @@ import "./FoldedQuote.css";
  * a vermilion "לא כתוב" stamp marks what one of them leaves out. "פתחו את כל הקפלים" opens them
  * in a cascade. Never a number or a price: the point is that two quotes are comparable only
  * scope against scope. Folds are buttons with aria-expanded; a live counter.
+ * A fold marked with a vermilion square hides a gap (legend under the intro); when a quote simply
+ * does not say something, its cell is two blank ruled lines under the stamp (the words stay for
+ * screen readers). The chevron points down, and up once the fold is open.
  * No JS: the whole sheet is open (every row visible).
  */
 
@@ -21,6 +24,9 @@ interface Fold {
   /** which side leaves it out / is a risk */
   flag?: "a-missing" | "a-risk";
 }
+
+/** A quote that does not mention the factor at all: shown as blank ruled lines + the stamp. */
+const BLANK = "לא כתוב";
 
 const FOLDS: Fold[] = [
   { title: "כמה עמודים", a: "עמוד בית ועמוד שירותים אחד", b: "עמוד בית, עמוד לכל שירות, אודות ושאלות נפוצות" },
@@ -62,6 +68,10 @@ const FoldedQuote = () => {
         ))}
       </div>
       <p className="as-fq__intro">מבחוץ שתי ההצעות נראות אותו דבר. מה שקובע נמצא בתוך הקפלים.</p>
+      <p className="as-fq__legend">
+        <span className="as-fq__legend-dot" aria-hidden="true" />
+        בקפל מסומן, באחת ההצעות משהו חסר או שכדאי לבדוק אותו
+      </p>
 
       <ol className="as-fq__sheet">
         {FOLDS.map((f, i) => (
@@ -77,7 +87,7 @@ const FoldedQuote = () => {
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span className="as-fq__title">{f.title}</span>
-              <span className="as-fq__flag-dot" aria-hidden="true" data-on={f.flag && !open[i] ? "1" : undefined} />
+              <span className="as-fq__flag-dot" aria-hidden="true" data-on={f.flag ? "1" : undefined} />
               <span className="as-fq__chev" aria-hidden="true" />
             </button>
             <p className="as-fq__static-title">{f.title}</p>
@@ -86,7 +96,13 @@ const FoldedQuote = () => {
                 <dl className="as-fq__cols">
                   <div className={`as-fq__col${f.flag ? ` is-${f.flag}` : ""}`}>
                     <dt>הצעה א׳</dt>
-                    <dd>{f.a}</dd>
+                    {f.a === BLANK ? (
+                      <dd className="as-fq__blank">
+                        <span className="nz-sr">{BLANK}</span>
+                      </dd>
+                    ) : (
+                      <dd>{f.a}</dd>
+                    )}
                     {f.flag === "a-missing" && <span className="as-fq__stamp">לא כתוב</span>}
                     {f.flag === "a-risk" && <span className="as-fq__stamp">כדאי לבדוק</span>}
                   </div>

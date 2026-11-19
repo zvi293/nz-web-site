@@ -2,15 +2,17 @@ import { Artwork, MuseumLabel, getArt } from "@/components/art";
 import { Button } from "@/components/nz";
 import { notFoundCopy } from "./copy";
 
-/** Must equal lcpArt.sizes in src/pages/404.astro. */
-export const NF_ART_SIZES = "(min-width: 1440px) 760px, (min-width: 1024px) 52vw, 100vw";
+/** Must equal lcpArt.sizes in src/pages/404.astro. Below 1024px the piece hangs as a small museum
+    card (the tunnel below is the phone's hero visual). */
+export const NF_ART_SIZES = "(min-width: 1440px) 760px, (min-width: 1024px) 52vw, 128px";
 export const NF_ART_SLUG = "ceramic-portals";
 
 const h = notFoundCopy.hero;
 
 /**
  * 404 hero (bone): an empty room number ("אולם ∅"), the H1, the lead, and the ceramic portals
- * hung as the room's only piece. Static.
+ * hung as the room's only piece (large from 1024px; a small card with its label on phones, so the
+ * illustrated tunnel right below is not a second big picture of the same gates). Static.
  */
 const NotFoundHero = () => {
   const art = getArt(NF_ART_SLUG);

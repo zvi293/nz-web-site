@@ -55,7 +55,7 @@
 }
 .wd-plate__cap {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.65;
   color: var(--fg-muted);
   text-wrap: pretty;
@@ -281,30 +281,127 @@ html.nz-motion .wd-plate--band[data-reveal]:not([data-in]) .wd-band__notes li {
 .wd-two__fair {
   max-width: 62ch;
   margin: 28px 0 0;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.7;
   color: var(--fg-muted);
   text-wrap: pretty;
 }
 
-/* Hero on phones and tablets: the work hangs first, so the first screen is never text only
-   (the owner's rule). The split-ink exhibit becomes an ink band under the header with the art
-   cropped wide; the wall label stays with it. The kit hero is untouched on desktop. */
-@media (max-width: 1023.98px) {
-  .wd-page .sv-hero {
-    padding-top: 0;
+/* "על הגב של האתר" (VersoLabels): the six materials as labels pasted on the back of the canvas —
+   raw linen between wooden stretcher bars, paper labels each with its code tag. */
+.wd-vl__board {
+  --wd-linen: #ddd0b6;
+  --wd-wood: #a87a4c;
+  position: relative;
+  padding: 22px 18px;
+  border: 9px solid var(--wd-wood);
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(0deg, rgba(90, 70, 40, 0.07) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(90, 70, 40, 0.06) 0 1px, transparent 1px 3px),
+    var(--wd-linen);
+  box-shadow:
+    inset 0 0 0 1px rgba(60, 35, 15, 0.25),
+    inset 0 18px 30px -24px rgba(60, 35, 15, 0.5),
+    var(--shadow-md);
+}
+.wd-vl__list {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.wd-vl__label {
+  position: relative;
+  padding: 16px 18px 18px;
+  background: #fbf8f2;
+  color: var(--ink);
+  border-radius: 1px;
+  box-shadow:
+    0 1px 2px rgba(43, 33, 22, 0.28),
+    0 10px 18px -14px rgba(43, 33, 22, 0.55);
+  transform: rotate(var(--r, -0.6deg));
+}
+.wd-vl__label:nth-child(3n + 2) {
+  --r: 0.5deg;
+}
+.wd-vl__label:nth-child(3n + 3) {
+  --r: -0.25deg;
+}
+/* a strip of tape on the label's top edge */
+.wd-vl__label::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  inset-inline-start: 22px;
+  width: 54px;
+  height: 14px;
+  background: rgba(239, 230, 210, 0.75);
+  box-shadow: 0 1px 1px rgba(43, 33, 22, 0.12);
+  transform: rotate(-3deg);
+}
+.wd-vl__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(43, 33, 22, 0.28);
+}
+.wd-vl__no {
+  font: 500 0.8125rem/1.3 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--vermilion-deep);
+  font-variant-numeric: tabular-nums;
+}
+.wd-vl__tag {
+  font: 500 0.8125rem/1.3 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color: #6a4210;
+}
+.wd-vl__title {
+  margin: 0 0 6px;
+  font: 400 1.375rem/1.2 var(--font-display);
+  color: var(--ink);
+  text-wrap: balance;
+}
+.wd-vl__desc {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #3d3731;
+  text-wrap: pretty;
+}
+html.nz-motion .wd-vl__label {
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.8s var(--ease-gallery);
+  transition-delay: calc(var(--i) * 90ms);
+}
+html.nz-motion .wd-vl__board[data-reveal]:not([data-in]) .wd-vl__label {
+  opacity: 0;
+  transform: translateY(14px) rotate(calc(var(--r, -0.6deg) * 4));
+}
+@media (min-width: 768px) {
+  .wd-vl__board {
+    padding: clamp(28px, 4vw, 56px);
+    border-width: 14px;
   }
-  .wd-page .sv-hero__grid {
-    row-gap: 20px;
+  .wd-vl__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(22px, 3vw, 40px);
   }
-  .wd-page .sv-hero__exhibit {
-    order: -1;
-    padding: 18px var(--gutter) 18px;
+}
+@media (min-width: 1100px) {
+  .wd-vl__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .wd-page .sv-hero__frame .nz-art__canvas {
-    aspect-ratio: 16 / 10 !important;
+  .wd-vl__title {
+    font-size: 1.625rem;
   }
-  .wd-page .sv-hero__label {
-    margin-top: 12px;
+  .wd-vl__desc {
+    font-size: 1.0625rem;
   }
 }

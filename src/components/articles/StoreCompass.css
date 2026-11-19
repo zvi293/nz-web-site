@@ -1,0 +1,149 @@
+/* ── המצפן (store-compass) · layout on top of the base rules in articles.css ──
+   Phones: the dial + reading are one compact bar that sticks under the header while the questions
+   scroll beneath it (the needle always swings in view); the meaning comes after the last question.
+   Desktop (≥ 900px): the dial and its meaning stand beside the questions. */
+.as-cp .as-cp__head {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  margin-inline: calc(var(--gutter) * -1);
+  padding: 10px var(--gutter) 12px;
+  background: var(--ink);
+  border-bottom: 1px solid var(--line-ink);
+}
+.as-cp .as-cp__head .as-cp__reading {
+  order: -1;
+  padding: 0;
+  border: 0;
+  text-align: start;
+}
+.as-cp .as-cp__head .as-cp__dial {
+  max-width: none;
+  padding-bottom: 20px;
+}
+.as-cp .as-cp__head .as-cp__end {
+  font-size: 0.75rem;
+}
+.as-cp .as-cp__head .as-cp__end--m {
+  top: -10px;
+}
+.as-cp .as-cp__reading-k {
+  font-size: 0.75rem;
+}
+.as-cp__count {
+  color: var(--bone);
+}
+.as-cp .as-cp__head .as-cp__reading-title {
+  margin: 4px 0 8px;
+  font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem);
+  text-wrap: balance;
+}
+html.nz-motion .as-cp__reading-title {
+  animation: as-cp-in 0.5s var(--ease-gallery);
+}
+@keyframes as-cp-in {
+  from {
+    opacity: 0.2;
+  }
+}
+.as-cp__pips {
+  display: flex;
+  gap: 5px;
+  margin: 0;
+}
+.as-cp__pips > span {
+  width: 16px;
+  height: 3px;
+  background: rgba(239, 234, 226, 0.22);
+  transition: background-color 0.4s ease;
+}
+.as-cp__pips > span.is-on {
+  background: #d8b46a;
+}
+
+/* the meaning of the reading: after the questions, where the thumb ends up */
+.as-cp__verdict {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  padding: 16px 0 0 0;
+  padding-inline-start: 14px;
+  border-inline-start: 2px solid var(--line-ink);
+  transition: border-color 0.4s ease;
+}
+.as-cp__verdict.is-final {
+  border-inline-start-color: #d8b46a;
+}
+.as-cp__verdict-k {
+  margin: 0;
+  font: 500 0.75rem/1.3 var(--font-sans);
+  letter-spacing: 0.06em;
+  color: var(--ash);
+}
+.as-cp__verdict-title {
+  margin: 0;
+  font: 300 1.75rem/1.1 var(--font-display);
+  color: var(--bone);
+}
+.as-cp__verdict .as-cp__reading-body {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.as-cp__verdict .as-cp__reset {
+  margin-top: 4px;
+  margin-inline-start: -0.5rem;
+}
+
+@media (min-width: 768px) {
+  .as-cp .as-cp__head {
+    margin-inline: -32px;
+    padding-inline: 32px;
+  }
+}
+@media (min-width: 900px) {
+  /* beside the questions the dial is in view anyway: no sticking (it would slide over the meaning) */
+  .as-cp .as-cp__head {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    margin-inline: 0;
+    padding: 0 0 16px;
+    border-bottom: 0;
+  }
+  .as-cp .as-cp__head .as-cp__reading {
+    order: 0;
+    text-align: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--line-ink);
+  }
+  .as-cp .as-cp__head .as-cp__dial {
+    max-width: 380px;
+    padding-bottom: 28px;
+  }
+  .as-cp .as-cp__head .as-cp__end {
+    font-size: 0.8125rem;
+  }
+  .as-cp__pips {
+    justify-content: center;
+  }
+  .as-cp__verdict {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .as-cp__reading-title {
+    animation: none !important;
+  }
+}

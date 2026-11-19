@@ -4,8 +4,7 @@ import { offerPage, offerPageFaq } from "@/content/offer";
 const f = offerPage.faq;
 
 /**
- * Offer FAQ (bone): a pull-quote opener (the H2 set as a huge serif quotation with a
- * vermilion mark), then native <details> questions — verbatim from `offerPageFaq`, which the
+ * Offer FAQ (bone): a pull-quote opener (the H2 set as a huge serif line), then native <details> questions — verbatim from `offerPageFaq`, which the
  * page also emits as FAQPage JSON-LD in the same order — and a closing WhatsApp nudge. Static.
  */
 const OfferFaq = () => (
@@ -17,9 +16,6 @@ const OfferFaq = () => (
           <span>{f.eyebrow}</span>
         </p>
         <h2 id="of-faq-title" className="of-faq__quote">
-          <span className="of-faq__mark" aria-hidden="true">
-            ״
-          </span>
           {f.quote}
         </h2>
         <Button to={f.allLink.href} variant="quiet" className="of-faq__all">

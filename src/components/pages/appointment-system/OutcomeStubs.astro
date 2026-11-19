@@ -1,0 +1,47 @@
+---
+/**
+ * OutcomeStubs — "מה משתנה כשהלקוחות קובעים לבד", told in the page's own material: three
+ * appointment-book stubs torn off along a perforation. The stub end carries the outcome as a
+ * rubber-stamped word (שקט / מסודר / מגיעים); the slip carries its title and line. Replaces the
+ * shared word-in-a-frame outcomes on this page (that composition stays with /landing-pages/).
+ * Phone: stubs stacked, the stamp end on the start side. Desktop: three stubs in a row, the
+ * stamp end on top. The stamps press in once in view (html.nz-motion + [data-in]). Prefix ap-.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import Nb from "@/components/service/Nb.astro";
+import type { OutcomeItem } from "@/components/service/types";
+import "./appointment-system.css";
+
+interface Props {
+  title: string;
+  lede?: string;
+  items: OutcomeItem[];
+  index?: string;
+  id?: string;
+}
+const { title, lede, items, index = "06", id = "ap-outcomes" } = Astro.props;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+---
+
+<section class="nz-section nz-section--space-default ap-out" data-tone="ink" aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant="quote" index={index} label="מה יוצא מזה" title={title} id={`${id}-title`} lede={lede} />
+    <ul class="ap-out__stubs" data-reveal="fade">
+      {
+        items.map((it, i) => (
+          <li class="ap-stub" style={`--i:${i}`}>
+            <span class="ap-stub__end" aria-hidden="true">
+              <span class="ap-stub__no">{`שובר ${pad(i)}`}</span>
+              <span class="ap-stub__stamp">{it.word}</span>
+            </span>
+            <span class="ap-stub__tear" aria-hidden="true" />
+            <span class="ap-stub__slip">
+              <h3 class="ap-stub__t">{it.title}</h3>
+              <span class="ap-stub__b"><Nb text={it.body} /></span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
