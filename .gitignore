@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Brand image sources (converted by `npm run art` into src/assets/art)
+תמונות תדמית/
+
+# QA output (npm run shoot)
+.qa/

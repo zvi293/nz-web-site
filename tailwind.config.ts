@@ -1,8 +1,22 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 
+/**
+ * NZ-web — "הגלריה" design tokens (see SITE-PLAYBOOK.md §3).
+ *
+ *   Colours   bone / bone-2 / paper (walls), ink / ink-2 / ink-3 (night rooms),
+ *             graphite (secondary text on bone), ash (secondary text on ink),
+ *             vermilion (THE accent) + vermilion-deep (small accent text / pressed)
+ *             + vermilion-fill (pill fill that keeps white text ≥ 4.5:1).
+ *   Type      font-display (Frank Ruhl Libre) / font-sans (Heebo);
+ *             text-display-xl, text-display-l, text-h2, text-h3, text-lede, text-body, text-label.
+ *   Layout    max-w-gallery (1440px) — use <Container> from "@/components/nz".
+ *
+ * The shadcn-style tokens below (background, foreground, primary, muted, …) are
+ * LEGACY: they are re-pointed to the gallery palette in src/index.css so pages that
+ * are not redesigned yet keep rendering. Do not use them in new code.
+ */
 export default {
-  darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
@@ -21,11 +35,35 @@ export default {
       screens: {
         xs: "420px",
       },
+      maxWidth: {
+        gallery: "1440px",
+      },
       fontFamily: {
-        heebo: ["Heebo", "sans-serif"],
-        rubik: ["Rubik", "sans-serif"],
+        display: ['"Frank Ruhl Libre"', '"Frank Ruhl Fallback"', '"Times New Roman"', "serif"],
+        sans: ["Heebo", '"Heebo Fallback"', "Arial", "sans-serif"],
+        heebo: ["Heebo", '"Heebo Fallback"', "Arial", "sans-serif"],
+      },
+      fontSize: {
+        "display-xl": ["clamp(3.5rem, 1.6rem + 7.8vw, 10.5rem)", { lineHeight: "0.98", letterSpacing: "-0.02em" }],
+        "display-l": ["clamp(2.75rem, 1.6rem + 4.6vw, 7rem)", { lineHeight: "1", letterSpacing: "-0.018em" }],
+        h2: ["clamp(2.125rem, 1.4rem + 3vw, 4.5rem)", { lineHeight: "1.04", letterSpacing: "-0.015em" }],
+        h3: ["clamp(1.375rem, 1.15rem + 0.9vw, 2rem)", { lineHeight: "1.18", letterSpacing: "-0.01em" }],
+        lede: ["clamp(1.125rem, 1.03rem + 0.4vw, 1.375rem)", { lineHeight: "1.65" }],
+        body: ["clamp(1rem, 0.95rem + 0.2vw, 1.125rem)", { lineHeight: "1.75" }],
+        label: ["0.8125rem", { lineHeight: "1.4", letterSpacing: "0.04em" }],
       },
       colors: {
+        /* ── Gallery palette ── */
+        bone: { DEFAULT: "#EFEAE2", 2: "#E6DFD4" },
+        paper: "#F8F6F2",
+        ink: { DEFAULT: "#121110", 2: "#1C1A18", 3: "#2A2724" },
+        graphite: "#57524B",
+        ash: "#A8A097",
+        vermilion: { DEFAULT: "#E0401F", deep: "#B8321A", fill: "#D23A1B" },
+        line: "rgba(18, 17, 16, 0.14)",
+        "line-ink": "rgba(239, 234, 226, 0.14)",
+
+        /* ── LEGACY (shadcn) — re-pointed in index.css, remove after phase 2 ── */
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -68,31 +106,29 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        frame: "2px",
+        card: "6px",
+        /* LEGACY */
         "4xl": "2rem",
         "5xl": "2.5rem",
       },
       boxShadow: {
+        /* gallery light: a wall-hung piece casts a soft, long shadow downwards */
+        frame: "0 1px 1px rgba(18,17,16,0.06), 0 10px 24px -12px rgba(18,17,16,0.28), 0 38px 70px -34px rgba(18,17,16,0.42)",
+        "frame-lift": "0 2px 2px rgba(18,17,16,0.06), 0 18px 34px -14px rgba(18,17,16,0.32), 0 52px 90px -40px rgba(18,17,16,0.48)",
+        /* LEGACY */
         soft: "var(--shadow-sm)",
         elevated: "var(--shadow-md)",
         floating: "var(--shadow-lg)",
         brand: "var(--shadow-brand)",
       },
       transitionTimingFunction: {
+        gallery: "cubic-bezier(0.2, 0.8, 0.1, 1)",
         smooth: "cubic-bezier(0.22, 1, 0.36, 1)",
       },
       keyframes: {
@@ -104,25 +140,10 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-16px)" },
-        },
-        "float-slow": {
-          "0%, 100%": { transform: "translateY(0px) rotate(0deg)" },
-          "50%": { transform: "translateY(-24px) rotate(1deg)" },
-        },
-        "fade-up": {
-          from: { opacity: "0", transform: "translateY(18px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        float: "float 6s ease-in-out infinite",
-        "float-slow": "float-slow 8s ease-in-out infinite",
-        "fade-up": "fade-up 0.6s cubic-bezier(0.22,1,0.36,1) both",
       },
     },
   },

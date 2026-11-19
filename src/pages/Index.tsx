@@ -1,33 +1,58 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import HeroSection from "@/components/HeroSection";
-import AmbientShapes from "@/components/AmbientShapes";
-import AboutIntroSection from "@/components/AboutIntroSection";
-import ServicesSection from "@/components/ServicesSection";
-import PricingSection from "@/components/PricingSection";
-import ProcessSection from "@/components/ProcessSection";
-import PortfolioSection from "@/components/PortfolioSection";
-import MarqueeRibbon from "@/components/MarqueeRibbon";
-import BackToTopButton from "@/components/BackToTopButton";
-import ClientLogosSection from "@/components/ClientLogosSection";
-import ContactCTA from "@/components/ContactCTA";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
+import HomeHero from "@/components/home/HomeHero";
+import HomeServices from "@/components/home/HomeServices";
+import HomeProcess from "@/components/home/HomeProcess";
+import HomeCollection from "@/components/home/HomeCollection";
+import HomeManifesto from "@/components/home/HomeManifesto";
+import HomeOffer from "@/components/home/HomeOffer";
+import HomeMagazine from "@/components/home/HomeMagazine";
+import HomeFaq from "@/components/home/HomeFaq";
+import HomeFinalCta from "@/components/home/HomeFinalCta";
+import "@/components/home/home.css";
 import { useSeoMeta } from "@/hooks/useSeoMeta";
 import { scrollToSelectorWithRetry } from "@/lib/scroll-navigation";
+import { homeSeo } from "@/content/home";
+import { offerFaq } from "@/content/offer";
+
+const SITE = "https://nz-web.com";
+
+const homeSchema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${SITE}/#webpage`,
+    url: `${SITE}/`,
+    name: homeSeo.title,
+    description: homeSeo.description,
+    inLanguage: "he",
+    isPartOf: { "@id": `${SITE}/#website` },
+    about: { "@id": `${SITE}/#organization` },
+    primaryImageOfPage: { "@type": "ImageObject", url: `${SITE}/og-image.png` },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${SITE}/#faq`,
+    mainEntity: offerFaq.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
+  },
+];
 
 const Index = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   useSeoMeta({
-    title: "NZ-web | בניית אתרים ופיתוח אתרים מקצועי לעסקים בישראל",
-    description:
-      "NZ-web – סטודיו מוביל לבניית אתרים ופיתוח אתרים בישראל. בניית אתר תדמית, בניית אתר מכירות, חנות אונליין, דפי נחיתה ומערכת ניהול תורים. ביצועים ללא פשרות.",
-    keywords:
-      "בניית אתרים, פיתוח אתרים, בניית אתר תדמית, עיצוב אתרים, בניית אתר אינטרנט, פיתוח מערכות לעסקים, בניית אתר מכירות, חנות אונליין, דפי נחיתה, מערכת ניהול תורים, פתרונות דיגיטליים לעסקים, קידום אתרים",
+    title: homeSeo.title,
+    description: homeSeo.description,
+    schema: homeSchema,
   });
 
   useEffect(() => {
@@ -37,19 +62,12 @@ const Index = () => {
   }, [location.hash]);
 
   useEffect(() => {
-    if (
-      location.state &&
-      typeof location.state === "object" &&
-      "scrollTo" in location.state
-    ) {
+    if (location.state && typeof location.state === "object" && "scrollTo" in location.state) {
       const scrollTo = location.state.scrollTo;
       if (typeof scrollTo === "string") {
         return scrollToSelectorWithRetry(scrollTo, {
           onSuccess: () => {
-            navigate(location.pathname + location.hash, {
-              replace: true,
-              state: null,
-            });
+            navigate(location.pathname + location.hash, { replace: true, state: null });
           },
         });
       }
@@ -57,33 +75,22 @@ const Index = () => {
   }, [location.hash, location.pathname, location.state, navigate]);
 
   return (
-    <div key={location.key} className="relative bg-background pt-[68px] md:pt-[84px]">
-      <AmbientShapes />
+    <div key={location.key} className="relative bg-bone pt-[var(--header-h)]">
       <Header />
 
       <main id="page-content">
-      <HeroSection />
-
-      {/* Brand ribbon — bridges the hero into the page and states the offering
-          in one glance. Wrapper owns the overflow so the tilt can't create
-          horizontal scroll. */}
-      <div className="relative z-10 overflow-hidden bg-background py-5 md:py-7">
-        <MarqueeRibbon />
-      </div>
-
-      <ServicesSection />
-      <PricingSection />
-      <ProcessSection />
-      <div id="portfolio" aria-hidden="true" />
-      <PortfolioSection />
-      <AboutIntroSection />
-      <ClientLogosSection />
-      <ContactCTA />
+        <HomeHero />
+        <HomeServices />
+        <HomeProcess />
+        <HomeCollection />
+        <HomeManifesto />
+        <HomeOffer />
+        <HomeMagazine />
+        <HomeFaq />
+        <HomeFinalCta />
       </main>
 
       <Footer />
-      <WhatsAppButton />
-      <BackToTopButton />
       <AccessibilityWidget />
     </div>
   );

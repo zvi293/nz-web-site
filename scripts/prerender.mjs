@@ -14,9 +14,16 @@
  * It also regenerates dist/sitemap.xml from the same route list — one source
  * of truth, no manual maintenance — and renders a branded dist/404.html so
  * Netlify returns a genuine HTTP 404 for unmatched paths.
+ *
+ * Sitemap details:
+ *  - pages whose rendered <meta name="robots"> says noindex are left out;
+ *  - <lastmod>: blog posts use updated_at ?? published_at, every other page the build date;
+ *  - image sitemap (xmlns:image): one <image:image> per page for its primary (hero) image,
+ *    read from the rendered HTML: <link rel="preload" as="image"> first, else the first
+ *    <img fetchpriority="high">.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync, readdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { preview } from "vite";
@@ -60,7 +67,31 @@ const STATIC_ROUTES = [
   { path: "/privacy",                           changefreq: "yearly",  priority: "0.3" },
   { path: "/terms",                             changefreq: "yearly",  priority: "0.3" },
   { path: "/accessibility",                     changefreq: "yearly",  priority: "0.3" },
+  /* TODO: add { path: "/glossary", changefreq: "monthly", priority: "0.6" } (מילון מונחים) once
+     <Route path="/glossary"> exists in src/App.tsx. */
 ];
+
+/* Vertical / landing sub-pages are data-driven (src/data/verticals*, src/data/landings*), so any
+   new data file is picked up automatically; the explicit entries above keep their priorities.
+   A slug that does not resolve renders the noindex NotFound page and is dropped from the sitemap. */
+function getDataRoutes() {
+  const out = [];
+  const collect = (dir, base, extraFile) => {
+    const slugs = new Set();
+    const folder = join(ROOT, "src", "data", dir);
+    if (existsSync(folder)) {
+      for (const f of readdirSync(folder)) if (/\.tsx?$/.test(f) && !/^index\./.test(f)) slugs.add(f.replace(/\.tsx?$/, ""));
+    }
+    const file = join(ROOT, "src", "data", extraFile);
+    if (existsSync(file)) {
+      for (const [, slug] of readFileSync(file, "utf-8").matchAll(/^\s*slug:\s*"([a-z0-9-]+)"/gm)) slugs.add(slug);
+    }
+    for (const slug of slugs) out.push({ path: `${base}/${slug}`, changefreq: "monthly", priority: "0.8" });
+  };
+  collect("verticals", "/services/business-website", "verticals.ts");
+  collect("landings", "/services/landing-page-development", "landings.ts");
+  return out;
+}
 
 /* Routes that must exist as real static files (so a direct load / refresh works)
    but must NEVER enter the sitemap. Each page sets `noindex` on itself. */
@@ -80,16 +111,20 @@ function getBlogRoutes() {
 
   const source = readFileSync(file, "utf-8");
   const routes = [];
-  const pattern = /slug:\s*"([^"]+)"[\s\S]*?published_at:\s*"([^"]+)"/g;
-
-  for (const [, slug, publishedAt] of source.matchAll(pattern)) {
+  /* Each post object starts at its `slug: "…"`; its dates live between that and the next slug. */
+  const starts = [...source.matchAll(/\bslug:\s*"([^"]+)"/g)];
+  starts.forEach((m, i) => {
+    const chunk = source.slice(m.index, i + 1 < starts.length ? starts[i + 1].index : undefined);
+    const published = chunk.match(/\bpublished_at:\s*"([^"]+)"/)?.[1];
+    const updated = chunk.match(/\bupdated_at:\s*"([^"]+)"/)?.[1];
+    if (!published) return; // not a post object
     routes.push({
-      path: `/blog/${slug}`,
+      path: `/blog/${m[1]}`,
       changefreq: "monthly",
       priority: "0.7",
-      lastmod: (publishedAt || TODAY).slice(0, 10),
+      lastmod: (updated || published || TODAY).slice(0, 10),
     });
-  }
+  });
 
   if (routes.length === 0) {
     console.warn("  ⚠  No blog posts found in src/content/blog.ts.");
@@ -125,10 +160,48 @@ function withTrailingSlash(path) {
   return clean.endsWith("/") ? clean : `${clean}/`;
 }
 
+/* ─── XML-escape a URL for the sitemap ─── */
+const xmlEscape = (v) =>
+  String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+
+/* ─── read one attribute from a raw tag string ─── */
+function attr(tag, name) {
+  const m = tag.match(new RegExp(`\\s${name}\\s*=\\s*("([^"]*)"|'([^']*)')`, "i"));
+  return m ? (m[2] ?? m[3] ?? "").replace(/&amp;/g, "&") : null;
+}
+
+function absoluteUrl(src) {
+  if (!src || src.startsWith("data:") || src.startsWith("blob:")) return null;
+  if (/^https?:\/\//i.test(src)) return src;
+  if (src.startsWith("//")) return `https:${src}`;
+  return `${BASE_URL}${src.startsWith("/") ? "" : "/"}${src}`;
+}
+
+/* ─── the page's primary image: <link rel=preload as=image>, else first <img fetchpriority=high> ─── */
+function primaryImageOf(html) {
+  for (const [tag] of html.matchAll(/<link\b[^>]*>/gi)) {
+    if (!/\brel\s*=\s*["']?preload/i.test(tag) || attr(tag, "as") !== "image") continue;
+    const href = attr(tag, "href") || (attr(tag, "imagesrcset") || "").split(",").pop()?.trim().split(/\s+/)[0];
+    const url = absoluteUrl(href);
+    if (url) return url;
+  }
+  for (const [tag] of html.matchAll(/<img\b[^>]*>/gi)) {
+    if ((attr(tag, "fetchpriority") || "").toLowerCase() !== "high") continue;
+    const url = absoluteUrl(attr(tag, "src"));
+    if (url) return url;
+  }
+  return null;
+}
+
+const isNoindex = (html) =>
+  [...html.matchAll(/<meta\b[^>]*>/gi)].some(
+    ([tag]) => (attr(tag, "name") || "").toLowerCase() === "robots" && /noindex/i.test(attr(tag, "content") || ""),
+  );
+
 /* ─── build sitemap.xml from the route list ─── */
 function writeSitemap(routes) {
   const urls = routes
-    .map(({ path, changefreq, priority, lastmod }) => {
+    .map(({ path, changefreq, priority, lastmod, image }) => {
       /* Every <loc> must be the final URL that returns 200 with NO 301 hop —
          i.e. the trailing-slash form, identical to each page's self-canonical. */
       const loc = `${BASE_URL}${withTrailingSlash(path)}`;
@@ -136,18 +209,22 @@ function writeSitemap(routes) {
         path === "/"
           ? `\n    <xhtml:link rel="alternate" hreflang="he" href="${loc}"/>`
           : "";
+      const img = image
+        ? `\n    <image:image>\n      <image:loc>${xmlEscape(image)}</image:loc>\n    </image:image>`
+        : "";
       return `  <url>
-    <loc>${loc}</loc>
+    <loc>${xmlEscape(loc)}</loc>
     <lastmod>${lastmod || TODAY}</lastmod>
     <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>${alt}
+    <priority>${priority}</priority>${alt}${img}
   </url>`;
     })
     .join("\n\n");
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 
 ${urls}
 
@@ -168,7 +245,13 @@ async function run() {
   /* `routes` = everything that goes in the sitemap.
      `crawlRoutes` = everything that gets a static file (sitemap routes + the
      unlisted, self-noindexed ones). */
-  const routes = [...STATIC_ROUTES, ...getBlogRoutes()];
+  const seen = new Set();
+  const routes = [...STATIC_ROUTES, ...getDataRoutes(), ...getBlogRoutes()].filter((r) => {
+    const key = withTrailingSlash(r.path);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
   const crawlRoutes = [...routes, ...UNLISTED_ROUTES];
 
   /* serve the built dist/ folder */
@@ -242,7 +325,9 @@ async function run() {
 
       const html = await page.content();
       renderedPages.set(route.path, html);
-      console.log(`  ✓  ${route.path}`);
+      route.image = primaryImageOf(html);
+      route.noindex = isNoindex(html);
+      console.log(`  ✓  ${route.path}${route.noindex ? "  (noindex — not in sitemap)" : ""}`);
       success++;
     } catch (err) {
       console.error(`  ✗  ${route.path} — ${err.message}`);
@@ -296,8 +381,12 @@ async function run() {
   flushPages();
   if (notFoundHtml) writeFileSync(join(DIST, "404.html"), notFoundHtml, "utf-8");
 
-  writeSitemap(routes);
-  console.log(`\n  ✓  sitemap.xml — ${routes.length} URLs`);
+  /* Sitemap = indexable, successfully rendered routes only (a failed render keeps its entry:
+     the SPA shell still serves it). */
+  const listed = routes.filter((r) => !r.noindex);
+  writeSitemap(listed);
+  const withImages = listed.filter((r) => r.image).length;
+  console.log(`\n  ✓  sitemap.xml — ${listed.length} URLs, ${withImages} with an image entry`);
   console.log(`\n✅  Done: ${success} pages pre-rendered${fail ? `, ${fail} failed` : ""}\n`);
 
   /* A partial pre-render failure must never block the deploy — the SPA works

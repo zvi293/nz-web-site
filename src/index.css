@@ -1,753 +1,1033 @@
-/* Heebo + Rubik are self-hosted from /public/fonts and declared inline in
-   index.html — see the "Fonts" block there. An @import here would put two extra
-   origins (fonts.googleapis.com → fonts.gstatic.com) on the critical path,
-   discoverable only after this whole stylesheet had been downloaded and parsed. */
+/* ══════════════════════════════════════════════════════════════════════════
+   NZ-web — "הגלריה" design system (global tokens, base, kit, shell).
+   The binding rules live in SITE-PLAYBOOK.md. Page-specific CSS lives next to
+   the page (e.g. src/components/home/home.css), never here.
+
+   Fonts (Frank Ruhl Libre + Heebo) are self-hosted and declared inline in
+   index.html (<style id="nz-fonts">) so they are known at first byte.
+
+   Motion gate: html.nz-motion is set by src/lib/motion.ts only when motion is
+   allowed (no prefers-reduced-motion, a11y "pause animations" off, not a
+   pre-render/automation browser). Every hidden start state lives under it, so
+   no-JS visitors and the pre-rendered HTML always show the final state.
+   ══════════════════════════════════════════════════════════════════════════ */
 
 @tailwind base;
-
-html {
-  scroll-behavior: smooth;
-}
 @tailwind components;
 @tailwind utilities;
 
+/* ── 1. Tokens ─────────────────────────────────────────────────────────── */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 34% 11%;
+    --bone: #efeae2;
+    --bone-2: #e6dfd4;
+    --paper: #f8f6f2;
+    --ink: #121110;
+    --ink-2: #1c1a18;
+    --ink-3: #2a2724;
+    --graphite: #57524b;
+    --ash: #a8a097;
+    --vermilion: #e0401f;
+    --vermilion-deep: #b8321a;
+    --vermilion-fill: #d23a1b; /* pill fill: white label stays ≥ 4.5:1 */
+    --line: rgba(18, 17, 16, 0.14);
+    --line-ink: rgba(239, 234, 226, 0.14);
 
-    /* layered surfaces — used for section rhythm */
-    --surface: 222 32% 97.4%;
-    --surface-2: 222 28% 95.2%;
+    --font-display: "Frank Ruhl Libre", "Frank Ruhl Fallback", "Times New Roman", serif;
+    --font-sans: "Heebo", "Heebo Fallback", Arial, sans-serif;
 
-    --card: 0 0% 100%;
-    --card-foreground: 224 34% 11%;
+    --ease-gallery: cubic-bezier(0.2, 0.8, 0.1, 1);
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 34% 11%;
+    --gutter: 20px;
+    --section-y: 72px;
+    --header-h: 68px;
 
-    --primary: 224 84% 56%;
-    --primary-foreground: 0 0% 100%;
+    /* tone-aware helpers — redefined by [data-tone="ink"] */
+    --fg: var(--ink);
+    --fg-muted: var(--graphite);
+    --rule: var(--line);
+    --focus: var(--vermilion-deep);
+    --focus-halo: rgba(239, 234, 226, 0.9);
+    --accent-text: var(--vermilion-deep);
 
-    --secondary: 220 24% 96%;
-    --secondary-foreground: 224 24% 28%;
-
-    --muted: 220 24% 96%;
-    --muted-foreground: 222 13% 44%;
-
-    --accent: 190 95% 45%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 220 18% 90%;
-    --input: 220 18% 90%;
-    --ring: 224 84% 56%;
-
-    --radius: 1rem;
-
-    --header-bg: 220 20% 98%;
-
-    /* ── Brand gradient stops — the identity of the whole site ── */
-    --brand-1: 252 83% 63%; /* violet-indigo */
-    --brand-2: 224 88% 58%; /* electric blue  */
-    --brand-3: 189 94% 48%; /* cyan           */
-
-    /* ── Elevation (brand-tinted, never muddy grey) ── */
-    --shadow-sm: 0 1px 2px hsl(224 40% 12% / 0.05), 0 2px 8px -2px hsl(224 40% 12% / 0.05);
-    --shadow-md: 0 4px 12px -2px hsl(224 40% 12% / 0.07), 0 12px 32px -8px hsl(224 40% 12% / 0.08);
-    --shadow-lg: 0 8px 24px -6px hsl(224 40% 12% / 0.09), 0 24px 64px -16px hsl(224 40% 12% / 0.12);
-    --shadow-brand: 0 10px 34px -10px hsl(var(--brand-2) / 0.45), 0 4px 12px -4px hsl(var(--brand-1) / 0.28);
-
-    --glass-bg: 0 0% 100% / 0.72;
-    --glass-border: 220 20% 88% / 0.8;
-
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 20% 30%;
-    --sidebar-primary: 224 84% 56%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 96%;
-    --sidebar-accent-foreground: 220 20% 30%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 224 84% 56%;
+    /* ── LEGACY shadcn channels (HSL), re-pointed to the gallery palette ── */
+    --background: 37 29% 91%;
+    --foreground: 30 6% 7%;
+    --surface: 37 26% 87%;
+    --surface-2: 37 22% 84%;
+    --card: 40 30% 96%;
+    --card-foreground: 30 6% 7%;
+    --popover: 40 30% 96%;
+    --popover-foreground: 30 6% 7%;
+    --primary: 9 75% 41%;
+    --primary-foreground: 40 30% 96%;
+    --secondary: 37 26% 87%;
+    --secondary-foreground: 30 6% 7%;
+    --muted: 37 26% 87%;
+    --muted-foreground: 35 7% 32%;
+    --accent: 10 76% 50%;
+    --accent-foreground: 40 30% 96%;
+    --destructive: 9 75% 41%;
+    --destructive-foreground: 40 30% 96%;
+    --border: 33 10% 79%;
+    --input: 33 10% 74%;
+    --ring: 9 75% 41%;
+    --radius: 0.375rem;
+    --brand-1: 9 75% 41%;
+    --brand-2: 10 76% 50%;
+    --brand-3: 16 70% 46%;
+    --shadow-sm: 0 1px 2px rgba(18, 17, 16, 0.06), 0 2px 8px -2px rgba(18, 17, 16, 0.06);
+    --shadow-md: 0 4px 12px -4px rgba(18, 17, 16, 0.1), 0 14px 32px -12px rgba(18, 17, 16, 0.16);
+    --shadow-lg: 0 10px 24px -10px rgba(18, 17, 16, 0.16), 0 32px 64px -28px rgba(18, 17, 16, 0.28);
+    --shadow-brand: var(--shadow-md);
+    --glass-bg: 40 30% 96% / 1;
+    --glass-border: 33 10% 79% / 1;
   }
 
-  .dark {
-    --background: 226 42% 6%;
-    --foreground: 210 30% 96%;
+  @media (min-width: 768px) {
+    :root {
+      --gutter: 48px;
+      --section-y: 120px;
+      --header-h: 84px;
+    }
+  }
+  @media (min-width: 1280px) {
+    :root {
+      --gutter: 64px;
+      --section-y: 160px;
+    }
+  }
 
-    --surface: 226 36% 8.5%;
-    --surface-2: 226 32% 11%;
-
-    --card: 226 34% 10%;
-    --card-foreground: 210 30% 96%;
-
-    --popover: 226 34% 10%;
-    --popover-foreground: 210 30% 96%;
-
-    --primary: 220 92% 64%;
-    --primary-foreground: 226 44% 6%;
-
-    --secondary: 226 26% 15%;
-    --secondary-foreground: 210 24% 84%;
-
-    --muted: 226 26% 15%;
-    --muted-foreground: 217 16% 64%;
-
-    --accent: 189 94% 52%;
-    --accent-foreground: 226 44% 6%;
-
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 222 24% 19%;
-    --input: 222 24% 19%;
-    --ring: 220 92% 64%;
-
-    --header-bg: 226 42% 6%;
-
-    --brand-1: 258 90% 70%;
-    --brand-2: 220 92% 64%;
-    --brand-3: 186 94% 56%;
-
-    --shadow-sm: 0 1px 2px hsl(226 60% 2% / 0.5), 0 2px 8px -2px hsl(226 60% 2% / 0.4);
-    --shadow-md: 0 4px 14px -2px hsl(226 60% 2% / 0.55), 0 14px 36px -10px hsl(226 60% 2% / 0.5);
-    --shadow-lg: 0 10px 28px -8px hsl(226 60% 2% / 0.6), 0 28px 70px -18px hsl(226 60% 2% / 0.62);
-    --shadow-brand: 0 10px 38px -10px hsl(var(--brand-2) / 0.5), 0 4px 14px -4px hsl(var(--brand-1) / 0.35);
-
-    --glass-bg: 226 34% 12% / 0.62;
-    --glass-border: 220 30% 70% / 0.14;
-
-    --sidebar-background: 226 42% 6%;
-    --sidebar-foreground: 210 20% 80%;
-    --sidebar-primary: 220 92% 64%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 226 26% 15%;
-    --sidebar-accent-foreground: 210 20% 80%;
-    --sidebar-border: 222 24% 19%;
-    --sidebar-ring: 220 92% 64%;
+  [data-tone="ink"] {
+    --fg: var(--bone);
+    --fg-muted: var(--ash);
+    --rule: var(--line-ink);
+    --focus: #f3a48f;
+    --focus-halo: rgba(18, 17, 16, 0.9);
+    --accent-text: #f07a5c; /* vermilion lifted for small text on ink (≥ 4.5:1) */
   }
 }
 
+/* ── 2. Base ───────────────────────────────────────────────────────────── */
 @layer base {
   * {
     @apply border-border;
   }
 
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    background: var(--bone);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
   body {
-    @apply bg-background text-foreground font-heebo antialiased;
+    background: var(--bone);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.7;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     font-feature-settings: "kern" 1, "liga" 1;
+    overflow-x: clip;
   }
 
-  /* Headings: tighter optical tracking — Hebrew black weights need it */
-  h1, h2, h3 {
-    letter-spacing: -0.022em;
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
   }
 
-  /* Hide default cursor only while the custom cursor is actually mounted.
-     `body:not(.a11y-big-cursor)` is load-bearing: without it this rule (higher
-     specificity, also !important) beat the accessibility menu's "big cursor"
-     option and the feature silently did nothing on desktop. */
-  @media (min-width: 1024px) {
-    html[data-custom-cursor="on"] body:not(.a11y-big-cursor) * {
-      cursor: none !important;
-    }
+  img,
+  picture,
+  video {
+    max-width: 100%;
+  }
+
+  /* Focus: a crisp ring plus a halo so it reads on bone, on ink and over art. */
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px var(--focus-halo);
+    border-radius: 2px;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  ::selection {
+    background: var(--vermilion);
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bone);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(18, 17, 16, 0.28);
+    border-radius: 999px;
+    border: 3px solid var(--bone);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(18, 17, 16, 0.45);
   }
 }
 
-@layer utilities {
-  /* ────────────────────────────────────────────────
-     BRAND TEXT
-     ──────────────────────────────────────────────── */
-  .text-gradient-brand {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(
-      100deg,
-      hsl(var(--brand-1)),
-      hsl(var(--brand-2)) 45%,
-      hsl(var(--brand-3)) 78%,
-      hsl(var(--brand-2))
-    );
-    background-size: 220% auto;
-    animation: nz-gradient-pan 9s linear infinite;
-    /* keeps descenders of Hebrew glyphs from being clipped */
-    padding-block: 0.06em;
+/* ── 3. Kit (src/components/nz) ────────────────────────────────────────── */
+@layer components {
+  /* Container — max 1440, gutter 20 → 48 → 64 */
+  .nz-container {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
   }
 
-  .text-gradient-static {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(100deg, hsl(var(--brand-1)), hsl(var(--brand-2)) 55%, hsl(var(--brand-3)));
-    padding-block: 0.06em;
-  }
-
-  .text-balance { text-wrap: balance; }
-  .text-pretty { text-wrap: pretty; }
-
-  /* ────────────────────────────────────────────────
-     SURFACES / GLASS
-     ──────────────────────────────────────────────── */
-  .glass-card {
-    background: hsl(var(--glass-bg));
-    backdrop-filter: blur(18px) saturate(160%);
-    -webkit-backdrop-filter: blur(18px) saturate(160%);
-    border: 1px solid hsl(var(--glass-border));
-  }
-
-  .glass-strong {
-    background: hsl(var(--glass-bg));
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid hsl(var(--glass-border));
-    box-shadow: var(--shadow-lg);
-  }
-
-  .soft-shadow { box-shadow: var(--shadow-md); }
-  .soft-shadow-lg { box-shadow: var(--shadow-lg); }
-  .shadow-brand { box-shadow: var(--shadow-brand); }
-
-  /* Gradient hairline ring that survives dark mode */
-  .ring-gradient {
+  /* Sections — tone sets ground + text colour + focus colour */
+  .nz-section {
     position: relative;
+    color: var(--fg);
+    overflow-x: clip; /* decorative light/shadow may never widen the page */
   }
-  .ring-gradient::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(140deg, hsl(var(--brand-1) / 0.55), hsl(var(--brand-3) / 0.35) 45%, transparent 75%);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    mask-composite: exclude;
-    pointer-events: none;
+  .nz-section[data-tone="bone"] {
+    background-color: var(--bone);
   }
-
-  /* ────────────────────────────────────────────────
-     BACKGROUNDS — aurora, grid, grain
-     ──────────────────────────────────────────────── */
-  .nz-aurora {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
+  .nz-section[data-tone="paper"] {
+    background-color: var(--paper);
   }
-  .nz-aurora::before,
-  .nz-aurora::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(90px);
-    opacity: 0.75;
-    will-change: transform;
+  .nz-section[data-tone="ink"] {
+    background-color: var(--ink);
   }
-  .nz-aurora::before {
-    width: 46vw;
-    height: 46vw;
-    min-width: 320px;
-    min-height: 320px;
-    top: -14%;
-    inset-inline-end: -8%;
-    background: radial-gradient(circle at 30% 30%, hsl(var(--brand-2) / 0.28), transparent 62%);
-    animation: nz-aurora-a 18s ease-in-out infinite;
+  .nz-section--space-default {
+    padding-block: var(--section-y);
   }
-  .nz-aurora::after {
-    width: 40vw;
-    height: 40vw;
-    min-width: 280px;
-    min-height: 280px;
-    bottom: -18%;
-    inset-inline-start: -10%;
-    background: radial-gradient(circle at 60% 40%, hsl(var(--brand-1) / 0.24), transparent 62%);
-    animation: nz-aurora-b 22s ease-in-out infinite;
+  .nz-section--space-tight {
+    padding-block: calc(var(--section-y) * 0.6);
+  }
+  /* A subtle "gallery light" washing a wall from above — the only decorative gradient allowed */
+  .nz-wall-light {
+    background-image: radial-gradient(ellipse 70% 55% at 50% -10%, rgba(255, 252, 246, 0.75), transparent 70%);
+  }
+  [data-tone="ink"].nz-wall-light {
+    background-image: radial-gradient(ellipse 60% 50% at 50% -10%, rgba(239, 234, 226, 0.06), transparent 70%);
   }
 
-  .nz-grid {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image:
-      linear-gradient(to right, hsl(var(--foreground) / 0.055) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--foreground) / 0.055) 1px, transparent 1px);
-    background-size: 64px 64px;
-    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 75%);
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 75%);
+  /* Labels — small Heebo, tabular numerals, vermilion index, hairline */
+  .nz-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.75em;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg-muted);
+  }
+  .nz-label__index {
+    color: var(--accent-text);
+  }
+  .nz-label--rule {
+    display: flex;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--rule);
   }
 
-  .nz-dots {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image: radial-gradient(hsl(var(--foreground) / 0.10) 1px, transparent 1px);
-    background-size: 22px 22px;
-    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, transparent 72%);
-    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, transparent 72%);
+  /* Display type */
+  .nz-display {
+    font-family: var(--font-display);
+    font-weight: 300;
+    color: var(--fg);
+    text-wrap: balance;
+  }
+  .nz-display--xl {
+    font-size: clamp(3.5rem, 1.6rem + 7.8vw, 10.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+  }
+  .nz-display--l {
+    font-size: clamp(2.75rem, 1.6rem + 4.6vw, 7rem);
+    line-height: 1;
+    letter-spacing: -0.018em;
+  }
+  .nz-display--h2 {
+    font-size: clamp(2.125rem, 1.4rem + 3vw, 4.5rem);
+    line-height: 1.06;
+    letter-spacing: -0.015em;
+  }
+  .nz-display--h3 {
+    font-size: clamp(1.375rem, 1.15rem + 0.9vw, 2rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    font-weight: 500;
+  }
+  .nz-accent {
+    color: var(--vermilion);
+  }
+  [data-tone="bone"] .nz-accent,
+  [data-tone="paper"] .nz-accent {
+    color: var(--vermilion-deep);
+  }
+  .nz-lede {
+    font-size: clamp(1.125rem, 1.03rem + 0.4vw, 1.375rem);
+    line-height: 1.65;
+    color: var(--fg-muted);
+    text-wrap: pretty;
+    max-width: 38ch;
   }
 
-  /* The shared "brand dark" surface — every dark hero / CTA band on the site.
-     One class so they can never drift apart again. */
-  .nz-brand-dark {
+  /* Buttons — pills. Min height 48px (44px tap target + air). */
+  .nz-btn {
+    --btn-bg: transparent;
+    --btn-fg: var(--fg);
+    --btn-border: transparent;
     position: relative;
-    isolation: isolate;
-    background:
-      radial-gradient(ellipse 60% 70% at 78% 8%, hsl(var(--brand-1) / 0.3), transparent 62%),
-      radial-gradient(ellipse 55% 65% at 12% 92%, hsl(var(--brand-3) / 0.22), transparent 62%),
-      linear-gradient(140deg, hsl(228 48% 8%) 0%, hsl(224 46% 13%) 48%, hsl(203 50% 17%) 100%);
-    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    min-height: 48px;
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--btn-fg);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.35s var(--ease-out), color 0.35s var(--ease-out),
+      border-color 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out), transform 0.2s var(--ease-out);
   }
-  .nz-brand-dark::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
-    background-size: 58px 58px;
-    opacity: 0.13;
-    -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 30%, #000, transparent 75%);
-    mask-image: radial-gradient(ellipse 75% 65% at 50% 30%, #000, transparent 75%);
+  .nz-btn--sm {
+    min-height: 44px;
+    padding: 0.5rem 1.125rem;
+    font-size: 0.9375rem;
   }
-
-  /* Fine film grain — the single cheapest "expensive" trick there is */
-  .nz-grain::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.035;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  .nz-btn--lg {
+    min-height: 56px;
+    padding: 0.875rem 1.875rem;
+    font-size: 1.0625rem;
   }
-  .dark .nz-grain::after {
-    opacity: 0.05;
-    mix-blend-mode: screen;
+  .nz-btn--primary {
+    --btn-bg: var(--vermilion-fill);
+    --btn-fg: #fff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 1px rgba(18, 17, 16, 0.12),
+      0 8px 18px -10px rgba(184, 50, 26, 0.7);
   }
-
-  /* ────────────────────────────────────────────────
-     BUTTONS & INTERACTION
-     ──────────────────────────────────────────────── */
-  .btn-glow {
-    box-shadow: var(--shadow-brand);
-    transition: box-shadow 0.4s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), filter 0.25s ease;
+  .nz-btn--primary:hover {
+    --btn-bg: #c23417;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 1px rgba(18, 17, 16, 0.12),
+      0 12px 24px -12px rgba(184, 50, 26, 0.8);
   }
-  .btn-glow:hover {
-    box-shadow: 0 16px 44px -10px hsl(var(--brand-2) / 0.55), 0 6px 16px -6px hsl(var(--brand-1) / 0.35);
+  /* The refined press: the pill sinks a hair and its light goes inside. */
+  .nz-btn--primary:active {
+    --btn-bg: var(--vermilion-deep);
+    transform: translateY(1px) scale(0.985);
+    box-shadow: inset 0 2px 4px rgba(18, 17, 16, 0.25);
   }
-
-  /* Primary brand button — gradient fill + light sweep on hover */
-  .btn-brand {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    background-image: linear-gradient(100deg, hsl(var(--brand-1)), hsl(var(--brand-2)) 52%, hsl(var(--brand-3)));
-    background-size: 180% auto;
-    color: #fff;
-    transition: background-position 0.6s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 0.4s ease;
-    box-shadow: var(--shadow-brand);
+  .nz-btn--secondary {
+    --btn-border: currentColor;
+    --btn-fg: var(--fg);
   }
-  .btn-brand:hover {
-    background-position: right center;
-    box-shadow: 0 18px 46px -12px hsl(var(--brand-2) / 0.6);
+  .nz-btn--secondary:hover {
+    --btn-bg: var(--fg);
+    --btn-fg: var(--bone);
   }
-  .btn-brand::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 45%;
-    inset-inline-start: -60%;
-    background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.35), transparent);
-    transform: skewX(-18deg);
-    transition: inset-inline-start 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-    pointer-events: none;
+  [data-tone="ink"] .nz-btn--secondary:hover {
+    --btn-fg: var(--ink);
   }
-  .btn-brand:hover::after { inset-inline-start: 120%; }
-
-  /* Ghost / glass button */
-  .btn-ghost-glass {
-    background: hsl(var(--glass-bg));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--border));
-    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease,
-      background-color 0.25s ease, box-shadow 0.3s ease;
+  .nz-btn--secondary:active {
+    transform: translateY(1px) scale(0.985);
   }
-  .btn-ghost-glass:hover {
-    border-color: hsl(var(--brand-2) / 0.4);
-    box-shadow: 0 8px 26px -12px hsl(var(--brand-2) / 0.5);
+  .nz-btn__icon {
+    width: 1.125em;
+    height: 1.125em;
+    flex: none;
+  }
+  .nz-btn__arrow {
+    transition: transform 0.4s var(--ease-out);
+  }
+  .nz-btn:hover .nz-btn__arrow {
+    transform: translateX(-4px);
   }
 
-  /* Card that lifts and lights up on hover */
-  .hover-lift {
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease,
-      border-color 0.35s ease;
-  }
-  .hover-lift:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-lg);
-  }
-
-  /* Cursor-following spotlight — set --mx/--my from JS (useSpotlight).
-     Deliberately does NOT clip: the glow is already bounded by `inset: 0` +
-     `border-radius: inherit`, and an `overflow: hidden` here would cut off
-     anything a card hangs outside itself (e.g. the pricing "most popular"
-     ribbon). Cards that need clipping set `overflow-hidden` themselves. */
-  .spotlight {
-    position: relative;
-  }
-  .spotlight::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    opacity: 0;
-    transition: opacity 0.35s ease;
-    pointer-events: none;
-    background: radial-gradient(
-      340px circle at var(--mx, 50%) var(--my, 50%),
-      hsl(var(--brand-2) / 0.13),
-      transparent 62%
-    );
-  }
-  .spotlight:hover::before { opacity: 1; }
-
-  .nav-link-hover::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(90deg, hsl(var(--brand-3)), hsl(var(--brand-1)));
-    border-radius: 2px;
-    transition: width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .nav-link-hover:hover::after { width: 100%; }
-
-  /* Eyebrow chip above section titles */
-  .nz-eyebrow {
+  /* Quiet text link — underline draws in from the right (RTL), arrow nudges left */
+  .nz-link {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    min-height: 44px;
+    color: var(--fg);
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .nz-link__text {
+    background-image: linear-gradient(currentColor, currentColor), linear-gradient(var(--rule), var(--rule));
+    background-repeat: no-repeat;
+    background-position: right bottom, right bottom;
+    background-size: 0% 1px, 100% 1px;
+    padding-bottom: 3px;
+    transition: background-size 0.6s var(--ease-gallery);
+  }
+  .nz-link:hover .nz-link__text,
+  .nz-link:focus-visible .nz-link__text {
+    background-size: 100% 1px, 100% 1px;
+  }
+  .nz-link__arrow {
+    width: 1em;
+    height: 1em;
+    transition: transform 0.45s var(--ease-gallery);
+  }
+  .nz-link:hover .nz-link__arrow {
+    transform: translateX(-5px);
+  }
+  .nz-link--accent {
+    color: var(--accent-text);
+  }
+
+  /* Logo — wordmark + the vermilion cube */
+  .nz-logo {
+    display: inline-flex;
+    align-items: baseline;
+    color: var(--fg);
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .nz-logo__cube {
+    display: inline-block;
+    width: 0.24em;
+    height: 0.24em;
+    margin-inline-start: 0.08em;
+    background: var(--vermilion);
+    transform: translateY(0.02em);
+  }
+
+  /* ── Artwork (src/components/art) ── */
+  .nz-art {
+    position: relative;
+    margin: 0;
+  }
+  .nz-art__canvas {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--art-color, var(--bone-2));
+    isolation: isolate;
+  }
+  .nz-art__canvas::before {
+    content: "";
+    position: absolute;
+    inset: -12px;
+    z-index: 0;
+    background-image: var(--art-lqip);
+    background-size: cover;
+    background-position: center;
+    filter: blur(14px) saturate(1.1);
+    transition: opacity 0.6s ease 0.1s;
+  }
+  .nz-art.is-loaded .nz-art__canvas::before {
+    opacity: 0;
+  }
+  .nz-art__canvas > picture {
+    display: block;
+    height: 100%;
+  }
+  .nz-art--lit {
+    isolation: isolate;
+  }
+  .nz-art__img {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  html.nz-motion .nz-art:not(.is-priority) .nz-art__img {
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+  html.nz-motion .nz-art.is-loaded .nz-art__img {
+    opacity: 1;
+  }
+
+  /* Frame variant — a thin dark moulding, a warm mat, real light and shadow */
+  .nz-art--frame .nz-art__frame {
+    position: relative;
+    padding: clamp(10px, 1.8vw, 22px);
+    background: #f7f3ec;
+    border: clamp(5px, 0.7vw, 9px) solid #1b1917;
+    border-radius: 2px;
+    box-shadow: 0 1px 1px rgba(18, 17, 16, 0.08), 0 14px 28px -14px rgba(18, 17, 16, 0.35),
+      0 46px 80px -40px rgba(18, 17, 16, 0.5);
+    transition: transform 0.6s var(--ease-gallery), box-shadow 0.6s var(--ease-gallery);
+  }
+  /* inner bevel of the mat */
+  .nz-art--frame .nz-art__canvas {
+    box-shadow: inset 0 0 0 1px rgba(18, 17, 16, 0.12);
+  }
+  .nz-art--frame .nz-art__canvas::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    box-shadow: inset 0 2px 6px rgba(18, 17, 16, 0.25);
+  }
+  /* gallery light: a soft spot from above on the wall behind the piece */
+  .nz-art--lit::before {
+    content: "";
+    position: absolute;
+    inset: -14% 0 auto;
+    height: 70%;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(ellipse 50% 60% at 50% 0%, rgba(255, 251, 240, 0.85), transparent 72%);
+  }
+  .nz-art--frame.nz-art--hover:hover .nz-art__frame,
+  a:hover > .nz-art--frame .nz-art__frame,
+  a:focus-visible > .nz-art--frame .nz-art__frame {
+    transform: translateY(-4px);
+    box-shadow: 0 2px 2px rgba(18, 17, 16, 0.08), 0 22px 36px -16px rgba(18, 17, 16, 0.4),
+      0 60px 100px -44px rgba(18, 17, 16, 0.55);
+  }
+  [data-tone="ink"] .nz-art--frame .nz-art__frame {
+    background: #24211e;
+    border-color: #0a0908;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4), 0 20px 40px -18px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Museum label — the wall card next to a piece */
+  .nz-museum {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--fg-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .nz-museum__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.625rem;
+    letter-spacing: 0.04em;
+  }
+  .nz-museum__index {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .nz-museum__title {
+    color: var(--fg);
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  .nz-museum__medium {
+    max-width: 52ch;
+  }
+
+  /* Reveal — hidden start states ONLY under the motion gate */
+  html.nz-motion [data-reveal] {
+    transition: opacity 0.9s var(--ease-gallery), transform 0.9s var(--ease-gallery),
+      clip-path 1.1s var(--ease-gallery);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  html.nz-motion [data-reveal="rise"]:not([data-in]) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  html.nz-motion [data-reveal="fade"]:not([data-in]) {
+    opacity: 0;
+  }
+  html.nz-motion [data-reveal="curtain"]:not([data-in]) {
+    clip-path: inset(0 0 100% 0);
+  }
+  html.nz-motion [data-reveal="curtain"] {
+    clip-path: inset(0 0 0 0);
+  }
+  /* stagger: children rise one after another, 60ms apart */
+  html.nz-motion [data-reveal="stagger"] > * {
+    transition: opacity 0.9s var(--ease-gallery), transform 0.9s var(--ease-gallery);
+  }
+  html.nz-motion [data-reveal="stagger"]:not([data-in]) > * {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  html.nz-motion [data-reveal="stagger"] > :nth-child(2) { transition-delay: calc(var(--reveal-delay, 0ms) + 60ms); }
+  html.nz-motion [data-reveal="stagger"] > :nth-child(3) { transition-delay: calc(var(--reveal-delay, 0ms) + 120ms); }
+  html.nz-motion [data-reveal="stagger"] > :nth-child(4) { transition-delay: calc(var(--reveal-delay, 0ms) + 180ms); }
+  html.nz-motion [data-reveal="stagger"] > :nth-child(5) { transition-delay: calc(var(--reveal-delay, 0ms) + 240ms); }
+  html.nz-motion [data-reveal="stagger"] > :nth-child(6) { transition-delay: calc(var(--reveal-delay, 0ms) + 300ms); }
+  html.nz-motion [data-reveal="stagger"] > :nth-child(7) { transition-delay: calc(var(--reveal-delay, 0ms) + 360ms); }
+  html.nz-motion [data-reveal="stagger"] > :nth-child(8) { transition-delay: calc(var(--reveal-delay, 0ms) + 420ms); }
+  html.nz-motion [data-reveal="stagger"] > :nth-child(n + 9) { transition-delay: calc(var(--reveal-delay, 0ms) + 480ms); }
+
+  /* Visually hidden (screen-reader only) */
+  .nz-sr {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* ── 4. Shell — header, mobile menu, footer, route fade ───────────────── */
+@layer components {
+  .nz-header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 60;
+    height: var(--header-h);
+    background: var(--bone);
+    color: var(--ink);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .nz-header.is-scrolled {
+    border-bottom-color: var(--line);
+    box-shadow: 0 10px 30px -24px rgba(18, 17, 16, 0.35);
+  }
+  .nz-header__bar {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .nz-header__logo {
+    font-size: 1.625rem;
+    min-height: 44px;
+    align-items: center;
+    display: inline-flex;
+  }
+  @media (min-width: 768px) {
+    .nz-header__logo {
+      font-size: 1.875rem;
+    }
+  }
+  .nz-nav {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .nz-nav {
+      display: flex;
+      align-items: center;
+      gap: clamp(0.25rem, 1.2vw, 1.25rem);
+      margin-inline-start: clamp(1rem, 3vw, 3.5rem);
+    }
+  }
+  .nz-nav__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 44px;
+    padding-inline: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  .nz-nav__link::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0.5rem;
+    bottom: 8px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s var(--ease-gallery);
+  }
+  .nz-nav__link:hover::after,
+  .nz-nav__link[aria-current="page"]::after,
+  .nz-nav__link[aria-expanded="true"]::after {
+    transform: scaleX(1);
+  }
+  .nz-nav__link[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: -0.125rem;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    margin-top: -2px;
+    background: var(--vermilion);
+  }
+  .nz-nav__chev {
+    width: 10px;
+    height: 10px;
+    transition: transform 0.4s var(--ease-gallery);
+  }
+  .nz-nav__link[aria-expanded="true"] .nz-nav__chev {
+    transform: rotate(180deg);
+  }
+  .nz-header__actions {
+    margin-inline-start: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .nz-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 44px;
+    min-width: 44px;
+    padding-inline: 0.5rem;
+    background: none;
+    border: 0;
+    color: inherit;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .nz-menu-btn__lines {
+    position: relative;
+    width: 22px;
+    height: 10px;
+  }
+  .nz-menu-btn__lines::before,
+  .nz-menu-btn__lines::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    height: 1.5px;
+    background: currentColor;
+  }
+  .nz-menu-btn__lines::before {
+    top: 0;
+  }
+  .nz-menu-btn__lines::after {
+    bottom: 0;
+    inset-inline-start: 7px;
+  }
+  @media (min-width: 1024px) {
+    .nz-menu-btn {
+      display: none;
+    }
+  }
+
+  /* Services mega panel */
+  .nz-mega {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    background: var(--bone);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 40px 60px -40px rgba(18, 17, 16, 0.35);
+  }
+  html.nz-motion .nz-mega {
+    animation: nz-mega-in 0.5s var(--ease-gallery) both;
+  }
+  @keyframes nz-mega-in {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  .nz-mega__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 4rem;
+    padding-block: 2.5rem 3rem;
+  }
+  .nz-mega__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 2.5rem;
+  }
+  .nz-mega__item {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    gap: 0.125rem 0.5rem;
+    padding-block: 0.875rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nz-mega__num {
+    grid-row: span 2;
+    font-size: 0.8125rem;
+    color: var(--graphite);
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.375rem;
+  }
+  .nz-mega__name {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1.25;
+    transition: color 0.3s ease;
+  }
+  .nz-mega__desc {
+    font-size: 0.875rem;
+    color: var(--graphite);
+    line-height: 1.5;
+  }
+  .nz-mega__item:hover .nz-mega__name,
+  .nz-mega__item:focus-visible .nz-mega__name,
+  .nz-mega__item.is-active .nz-mega__name {
+    color: var(--vermilion-deep);
+  }
+  .nz-mega__item.is-active .nz-mega__num {
+    color: var(--vermilion-deep);
+  }
+  .nz-mega__preview {
+    position: relative;
+  }
+  .nz-mega__stack {
+    position: relative;
+    display: grid;
+  }
+  .nz-mega__stack > * {
+    grid-area: 1 / 1;
+    transition: opacity 0.5s ease, clip-path 0.8s var(--ease-gallery);
+  }
+  .nz-mega__stack > [aria-hidden="true"] {
+    opacity: 0;
+  }
+
+  /* Mobile menu — a full-screen ink room */
+  .nz-mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 10025; /* above the floating a11y button (10020), below the a11y panel (10030+) */
+    display: flex;
+    flex-direction: column;
+    background: var(--ink);
+    color: var(--bone);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  html.nz-motion .nz-mobile-menu {
+    animation: nz-menu-in 0.55s var(--ease-gallery) both;
+  }
+  @keyframes nz-menu-in {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  .nz-mobile-menu__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-h);
+    flex: none;
+  }
+  .nz-mobile-menu__list {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0 0;
+    counter-reset: menu;
+  }
+  .nz-mobile-menu__link {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    min-height: 48px;
+    padding-block: 0.25rem;
+    color: var(--bone);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line-ink);
+  }
+  .nz-mobile-menu__num {
+    flex: none;
+    width: 1.75rem;
+    font-size: 0.8125rem;
+    color: var(--ash);
+    font-variant-numeric: tabular-nums;
+  }
+  .nz-mobile-menu__name {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(1.875rem, 1.2rem + 3.4vw, 2.75rem);
+    line-height: 1.15;
+  }
+  .nz-mobile-menu__link[aria-current="page"] .nz-mobile-menu__num {
+    color: #f07a5c;
+  }
+  html.nz-motion .nz-mobile-menu__list > li {
+    animation: nz-menu-item 0.7s var(--ease-gallery) both;
+    animation-delay: calc(120ms + var(--i, 0) * 50ms);
+  }
+  @keyframes nz-menu-item {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  /* Route fade (client navigations only — never on first load, so LCP is untouched) */
+  html.nz-motion .nz-route-enter {
+    animation: nz-route-in 0.45s ease both;
+  }
+  @keyframes nz-route-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Footer — the night room */
+  .nz-footer {
+    position: relative;
+    background: var(--ink);
+    color: var(--bone);
+    overflow: hidden;
+  }
+  .nz-footer a {
+    color: inherit;
+  }
+  .nz-footer__col-title {
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    color: var(--ash);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+  }
+  .nz-footer__links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nz-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: right calc(50% + 0.8em);
+    background-size: 0% 1px;
+    transition: background-size 0.5s var(--ease-gallery);
+  }
+  .nz-footer__links a:hover {
+    background-size: 100% 1px;
+  }
+  .nz-footer__wordmark {
+    display: flex;
+    justify-content: flex-end; /* signed bottom-right, like a canvas */
+    align-items: baseline;
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(5rem, 22vw, 21rem);
+    line-height: 0.8;
+    letter-spacing: -0.045em;
+    color: var(--bone);
+    white-space: nowrap;
+  }
+  .nz-footer__wordmark .nz-logo__cube {
+    width: 0.16em;
+    height: 0.16em;
+    margin-inline-start: 0.04em;
+  }
+  .nz-credit {
+    display: inline-flex;
+    align-items: center;
     border-radius: 999px;
-    border: 1px solid hsl(var(--brand-2) / 0.22);
-    background: linear-gradient(120deg, hsl(var(--brand-1) / 0.09), hsl(var(--brand-3) / 0.09));
-    padding: 0.375rem 0.9rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    color: hsl(var(--primary));
+    background: #fff;
+    padding: 0.625rem 1.25rem;
+    box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+    transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
   }
-
-  /* Fluid display type — one class, perfect on 360px and 1920px */
-  .text-display {
-    font-size: clamp(2.1rem, 6.4vw + 0.4rem, 5rem);
-    line-height: 1.05;
-    letter-spacing: -0.035em;
-    font-weight: 900;
-  }
-  .text-section-title {
-    font-size: clamp(1.75rem, 4.4vw, 3.25rem);
-    line-height: 1.12;
-    letter-spacing: -0.03em;
-    font-weight: 900;
-  }
-  .text-lede {
-    font-size: clamp(1rem, 1.9vw, 1.2rem);
-    line-height: 1.85;
-  }
-
-  /* Masked line reveal (used by the hero) */
-  .reveal-mask { overflow: hidden; display: block; padding-block: 0.08em; }
-
-  .marquee-mask {
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  .nz-credit:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.7);
   }
 }
 
-/* ── Custom Scrollbar ── */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(hsl(var(--brand-1) / 0.5), hsl(var(--brand-3) / 0.5));
-  border-radius: 999px;
-  border: 3px solid transparent;
-  background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(hsl(var(--brand-1) / 0.8), hsl(var(--brand-3) / 0.8));
-  background-clip: content-box;
-}
-
-/* ── Keyframes ── */
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-@keyframes nz-gradient-pan {
-  0% { background-position: 0% center; }
-  100% { background-position: 200% center; }
-}
-
-@keyframes nz-aurora-a {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50%      { transform: translate3d(-6%, 6%, 0) scale(1.14); }
-}
-@keyframes nz-aurora-b {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50%      { transform: translate3d(7%, -5%, 0) scale(1.18); }
-}
-
-@keyframes nz-pulse-ring {
-  0%   { transform: scale(0.9); opacity: 0.7; }
-  70%  { transform: scale(1.9); opacity: 0; }
-  100% { transform: scale(1.9); opacity: 0; }
-}
-
-@keyframes nz-scroll-cue {
-  0%, 100% { transform: translateY(0); opacity: 0.35; }
-  50%      { transform: translateY(7px); opacity: 1; }
-}
-
-@keyframes nz-marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-/* RTL builds the track from the right edge leftwards, so the duplicate copy sits
-   OFF-SCREEN LEFT. Sliding left would empty the strip at the end of every cycle —
-   it has to travel right for the seam to land on the identical second copy. */
-@keyframes nz-marquee-rtl {
-  from { transform: translateX(0); }
-  to   { transform: translateX(50%); }
-}
-
-@keyframes nz-tilt-in {
-  from { opacity: 0; transform: perspective(1000px) rotateX(8deg) translateY(28px); }
-  to   { opacity: 1; transform: perspective(1000px) rotateX(0) translateY(0); }
-}
-
-.shimmer-text {
-  background: linear-gradient(90deg, hsl(var(--foreground)), hsl(var(--primary)), hsl(var(--foreground)));
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shimmer 3s linear infinite;
-}
-
-/* Glass sheen sweeping across the hero's browser screen — sells it as a device */
-@keyframes nz-screen-sheen {
-  0%, 62%  { transform: translateX(-220%) skewX(-14deg); opacity: 0; }
-  70%      { opacity: 0.55; }
-  92%, 100% { transform: translateX(320%) skewX(-14deg); opacity: 0; }
-}
-.nz-screen-sheen {
-  background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.5), transparent);
-  animation: nz-screen-sheen 8s ease-in-out infinite;
-  animation-delay: 2.4s;
-}
-
-.nz-pulse-ring { animation: nz-pulse-ring 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
-.nz-scroll-cue { animation: nz-scroll-cue 1.9s ease-in-out infinite; }
-.nz-marquee { animation: nz-marquee var(--marquee-duration, 34s) linear infinite; }
-[dir="rtl"] .nz-marquee { animation-name: nz-marquee-rtl; }
-.nz-marquee:hover { animation-play-state: paused; }
-
-/* ── "Website being built" graphic (AboutIntroSection) — pure CSS, always runs ── */
-@keyframes nz-build-block {
-  0%   { opacity: 0; transform: translateY(14px) scale(0.95); }
-  10%  { opacity: 1; transform: translateY(0) scale(1); }
-  82%  { opacity: 1; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(14px) scale(0.95); }
-}
-@keyframes nz-float-a {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-12px) rotate(8deg); }
-}
-@keyframes nz-float-b {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(12px); }
-}
-@keyframes nz-float-c {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-8px) rotate(90deg); }
-}
-@keyframes nz-build-shimmer {
-  0%, 64%  { transform: translateX(-170%) skewX(-12deg); opacity: 0; }
-  72%      { opacity: 0.7; }
-  86%      { transform: translateX(180%) skewX(-12deg); opacity: 0; }
-  100%     { transform: translateX(180%) skewX(-12deg); opacity: 0; }
-}
-.nz-build-block { animation: nz-build-block 7s ease-in-out infinite both; }
-.nz-float-a { animation: nz-float-a 5s ease-in-out infinite; }
-.nz-float-b { animation: nz-float-b 6s ease-in-out infinite; }
-.nz-float-c { animation: nz-float-c 7s ease-in-out infinite; }
-.nz-build-shimmer { animation: nz-build-shimmer 7s ease-in-out infinite; }
-
-/* Hero visual — gentle continuous float + subtle "breathing", on every device */
-@keyframes nz-hero-float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50%      { transform: translateY(-14px) scale(1.018); }
-}
-/* Mobile float — gentle lift only. No scale/rotate, so it can never grow into
-   or overlap the text above it; the 14px lift stays well inside the 32px gap. */
-@keyframes nz-hero-float-mobile {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-14px); }
-}
-/* Short desktop screens (laptops, browsers with lots of chrome) have far less
-   vertical room than 1440×900. Scale the hero visual to the height that is
-   actually available so the browser window never has to be cropped — and so
-   the float/parallax/tilt transforms always have room to move into.
-
-   The doubled class is deliberate: Tailwind emits its `lg:` variants after this
-   file's own rules, so a single `.nz-hero-visual` would lose to `lg:max-w-xl`
-   on source order. Doubling raises specificity instead of reaching for
-   !important. */
-@media (min-width: 1024px) and (max-height: 960px) {
-  .nz-hero-visual.nz-hero-visual { max-width: 32rem; }
-}
-@media (min-width: 1024px) and (max-height: 860px) {
-  .nz-hero-visual.nz-hero-visual { max-width: 29rem; }
-}
-@media (min-width: 1024px) and (max-height: 760px) {
-  .nz-hero-visual.nz-hero-visual { max-width: 25rem; }
-}
-@media (min-width: 1024px) and (max-height: 680px) {
-  .nz-hero-visual.nz-hero-visual { max-width: 22rem; }
-}
-
-.nz-hero-float { animation: nz-hero-float 5.5s ease-in-out infinite; animation-delay: 2.5s; }
-@media (max-width: 767px) {
-  .nz-hero-float { animation: nz-hero-float-mobile 4.5s ease-in-out infinite; animation-delay: 0.4s; }
-}
-
-/* Phones: swap the in-content glass for a flat translucent fill. Stacked
-   backdrop-filters are the most expensive thing on a scrolling mobile page,
-   and over the hero's near-flat backdrop the difference is invisible.
-   The header keeps its blur — it sits over moving content, where it reads. */
-@media (max-width: 639px) {
-  .glass-card {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: hsl(var(--card) / 0.9);
-  }
-}
-
-/* Phones keep the gradient, drop the perpetual repaint — background-position on
-   background-clip:text re-rasterises the glyphs every frame. */
-@media (max-width: 639px) {
-  .text-gradient-brand { animation: none; background-size: 100% auto; }
-}
-
-/* ── Phones: scroll smoothness beats decoration ───────────────────────────────
-   Every rule below removes a cost that is paid on EVERY scroll frame, which is
-   what made the page feel like it was flickering and stuttering on a phone.
-   None of these effects are legible at phone size. Desktop is untouched. */
-@media (max-width: 767px) {
-  /* A backdrop-filter bar sitting over moving content has to re-blur the pixels
-     behind it every frame. Flat translucent fill instead — over a solid page
-     background the difference is invisible, the cost is not. */
-  .nz-header-shell {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: hsl(var(--background) / 0.94);
-  }
-
-  /* mix-blend-mode forces the whole section to be re-composited against its
-     backdrop as it moves. The grain sits at 3.5% opacity — nobody sees it on a
-     6" screen, everybody feels it. */
-  .nz-grain::after { display: none; }
-
-  /* Animating a 90px blur means re-rasterising a viewport-sized blurred layer
-     on every tick. Keep the orbs, park the animation. */
-  .nz-aurora::before,
-  .nz-aurora::after {
-    animation: none;
-    will-change: auto;
-    filter: blur(56px);
-  }
-}
-
+/* ── 5. Motion off: reduced motion / a11y pause → final states, no transforms ── */
 @media (prefers-reduced-motion: reduce) {
-  .nz-build-block { animation: none; opacity: 1; transform: none; }
-  .nz-float-a, .nz-float-b, .nz-float-c, .nz-build-shimmer, .nz-hero-float,
-  .nz-marquee, .nz-pulse-ring, .nz-scroll-cue, .nz-screen-sheen,
-  .shimmer-text, .text-gradient-brand {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-  .nz-screen-sheen { opacity: 0; }
-  .nz-aurora::before, .nz-aurora::after { animation: none; }
 }
 
-/* Button ripple on active */
-button:active, a:active {
-  transform: scale(0.97);
-}
-
-/* Smooth focus ring */
-:focus-visible {
-  outline: 2px solid hsl(var(--primary) / 0.7);
-  outline-offset: 3px;
-  border-radius: 6px;
-}
-
-/* Selection color */
-::selection {
-  background: hsl(var(--brand-2) / 0.22);
-  color: hsl(var(--foreground));
-}
-
-/* ── Accessibility Classes ── */
-/* Accessibility Classes */
-
-/* Readable Font */
+/* ── 6. Accessibility widget (AccessibilityWidget.tsx toggles these on <body>) ── */
 .a11y-readable-font,
 .a11y-readable-font * {
   font-family: Arial, Helvetica, sans-serif !important;
   letter-spacing: 0.02em !important;
 }
 
-/* Highlight Links */
 .a11y-highlight-links a {
-  outline: 3px solid hsl(217 91% 60%) !important;
+  outline: 3px solid var(--vermilion-deep) !important;
   outline-offset: 2px !important;
   text-decoration: underline !important;
-  background-color: hsl(217 91% 60% / 0.15) !important;
+  background-color: rgba(224, 64, 31, 0.12) !important;
 }
 
-/* Highlight Titles */
 .a11y-highlight-titles h1,
 .a11y-highlight-titles h2,
 .a11y-highlight-titles h3,
 .a11y-highlight-titles h4,
 .a11y-highlight-titles h5,
 .a11y-highlight-titles h6 {
-  outline: 3px solid hsl(45 93% 47%) !important;
+  outline: 3px solid #b88a00 !important;
   outline-offset: 4px !important;
-  background-color: hsl(45 93% 47% / 0.1) !important;
+  background-color: rgba(230, 180, 0, 0.12) !important;
 }
 
-/* High Contrast Dark */
 .a11y-high-contrast-dark {
   background-color: #000 !important;
 }
 .a11y-high-contrast-dark *:not([data-a11y-exclude]):not([data-a11y-exclude] *) {
   background-color: #000 !important;
+  background-image: none !important;
   color: #ffff00 !important;
   border-color: #ffff00 !important;
 }
@@ -771,12 +1051,12 @@ button:active, a:active {
   filter: brightness(0.9) contrast(1.2) !important;
 }
 
-/* High Contrast Light */
 .a11y-high-contrast-light {
   background-color: #fff !important;
 }
 .a11y-high-contrast-light *:not([data-a11y-exclude]):not([data-a11y-exclude] *) {
   background-color: #fff !important;
+  background-image: none !important;
   color: #000 !important;
   border-color: #000 !important;
 }
@@ -797,12 +1077,10 @@ button:active, a:active {
   border: 2px solid #000 !important;
 }
 
-/* Grayscale */
 .a11y-grayscale {
   filter: grayscale(100%) !important;
 }
 
-/* Invert Colors */
 .a11y-invert-colors {
   filter: invert(100%) hue-rotate(180deg) !important;
 }
@@ -810,13 +1088,11 @@ button:active, a:active {
 .a11y-invert-colors video {
   filter: invert(100%) hue-rotate(180deg) !important;
 }
-
-/* Combined filters */
 .a11y-grayscale.a11y-invert-colors {
   filter: grayscale(100%) invert(100%) hue-rotate(180deg) !important;
 }
 
-/* Pause Animations */
+/* Pause animations — the motion gate (src/lib/motion.ts) also drops html.nz-motion */
 .a11y-pause-animations *,
 .a11y-pause-animations *::before,
 .a11y-pause-animations *::after {
@@ -826,24 +1102,156 @@ button:active, a:active {
   transition: none !important;
 }
 
-/* Big Cursor — replaces the system pointer with an oversized one. The decorative
-   custom cursor is hidden while it is on, otherwise two pointers chase each other. */
 .a11y-big-cursor,
 .a11y-big-cursor * {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M8 8L40 20L24 26L18 40Z' fill='%23000' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") 8 8, auto !important;
 }
-.a11y-big-cursor [data-nz-cursor] {
-  display: none !important;
-}
 
-/* Focus Outline */
 .a11y-focus-outline *:focus {
-  outline: 4px solid hsl(0 84% 60%) !important;
+  outline: 4px solid var(--vermilion-deep) !important;
   outline-offset: 4px !important;
-  box-shadow: 0 0 0 8px hsl(0 84% 60% / 0.25) !important;
+  box-shadow: 0 0 0 8px rgba(224, 64, 31, 0.25) !important;
 }
 
-/* Reading Guide Active (the line is rendered in React) */
 .a11y-reading-guide-active {
-  /* Body class marker */
+  /* body class marker — the guide line is rendered in React */
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LEGACY — remove after phase 2
+   Classes still used by pages that are not redesigned yet. They are re-pointed
+   to the gallery palette (no gradients, no glass, no glow, no loops) so those
+   pages read as part of the same site in the meantime. Do NOT use in new code.
+   ══════════════════════════════════════════════════════════════════════════ */
+@layer utilities {
+  .text-gradient-brand,
+  .text-gradient-static {
+    color: var(--vermilion-deep);
+    padding-block: 0.06em;
+  }
+  .nz-brand-dark .text-gradient-brand,
+  .nz-brand-dark .text-gradient-static {
+    color: #f07a5c;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .glass-card,
+  .glass-strong {
+    background: var(--paper);
+    border: 1px solid var(--line);
+  }
+  .glass-strong {
+    box-shadow: var(--shadow-lg);
+  }
+  .soft-shadow {
+    box-shadow: var(--shadow-md);
+  }
+  .soft-shadow-lg {
+    box-shadow: var(--shadow-lg);
+  }
+  .shadow-brand {
+    box-shadow: var(--shadow-md);
+  }
+  .ring-gradient {
+    position: relative;
+  }
+
+  .nz-aurora,
+  .nz-grid,
+  .nz-dots,
+  .animate-float,
+  .animate-float-slow {
+    display: none !important;
+  }
+  .nz-grain::after {
+    content: none;
+  }
+
+  .nz-brand-dark {
+    position: relative;
+    isolation: isolate;
+    background: var(--ink);
+    color: var(--bone);
+    --focus: #f3a48f;
+    --focus-halo: rgba(18, 17, 16, 0.9);
+  }
+
+  .btn-glow {
+    box-shadow: none;
+  }
+  .btn-brand {
+    position: relative;
+    background: var(--vermilion-fill);
+    color: #fff;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  .btn-brand:hover {
+    background: #c23417;
+  }
+  .btn-brand:active {
+    background: var(--vermilion-deep);
+    transform: translateY(1px);
+  }
+  .btn-ghost-glass {
+    background: transparent;
+    border: 1px solid currentColor;
+  }
+
+  .hover-lift {
+    transition: transform 0.5s var(--ease-gallery), box-shadow 0.5s var(--ease-gallery);
+  }
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+  .spotlight {
+    position: relative;
+  }
+
+  .nz-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--vermilion-deep);
+  }
+  .nz-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background: var(--vermilion);
+  }
+  .nz-brand-dark .nz-eyebrow {
+    color: #f07a5c;
+  }
+
+  .text-display {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 6vw + 0.4rem, 5.25rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+  .text-section-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 4.4vw, 3.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    font-weight: 500;
+  }
+  .text-lede {
+    font-size: clamp(1rem, 1.9vw, 1.2rem);
+    line-height: 1.8;
+  }
+
+  .nz-pulse-ring {
+    display: none;
+  }
 }

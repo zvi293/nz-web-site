@@ -67,6 +67,20 @@ export interface BlogPost {
   author: string;
   read_time: number;
   published_at: string;
+  /** Optional shorter <title> (without the "| NZ-web" suffix) when `title` is too long for search results. */
+  seo_title?: string;
+  /** Cover artwork slug from src/content/art-manifest.json (render with <Artwork slug=… />).
+   *  Each slug is used by at most one post. */
+  art?: string;
+  /** ISO date of the last material edit (feeds BlogPosting.dateModified). */
+  updated_at?: string;
+  /** Visible Q&A block at the end of the article (also feeds FAQPage JSON-LD). */
+  faq?: BlogFaqItem[];
+}
+
+export interface BlogFaqItem {
+  question: string;
+  answer: string;
 }
 
 export interface ClientLogo {
@@ -100,6 +114,13 @@ export interface AboutPageContent {
   ctaSubtitle: string;
   ctaButtonText: string;
   ctaButtonLink: string;
+  /** Optional: short label for the founder block (e.g. "המייסד"). */
+  founderLabel?: string;
+  /** Optional: founder name + role line + a few paragraphs about him. */
+  founder?: { name: string; role: string; paragraphs: string[] };
+  /** Optional: non-numeric working principles (replaces the old stats bar). */
+  principlesTitle?: string;
+  principles?: AboutAccordionItem[];
 }
 
 export interface ContactInfo {

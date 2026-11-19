@@ -1,0 +1,146 @@
+/**
+ * Home page copy (nz-web.com/). Hebrew, written for business owners: short, concrete,
+ * no buzzwords, no numbers or claims (SITE-PLAYBOOK iron rules 4–5).
+ */
+
+export const homeSeo = {
+  title: "בניית אתרים לעסקים בעיצוב אישי | NZ-web",
+  description:
+    "NZ-web הוא סטודיו לעיצוב ובניית אתרים לעסקים בישראל: אתרי תדמית, דפי נחיתה ומערכות תורים, מהירים, נגישים ומותאמים אישית. מקבלים הצעה אישית בוואטסאפ.",
+};
+
+export interface Exhibit {
+  slug: string;
+  /** The "medium" line on the museum label. */
+  medium: string;
+}
+
+export const hero = {
+  eyebrow: "סטודיו לעיצוב ובניית אתרים לעסקים",
+  /** H1 — rendered as: kicker line (keyword) + the statement. */
+  h1Kicker: "עיצוב ובניית אתרים לעסקים",
+  h1Statement: ["כל אתר נבנה", "כמו יצירת"],
+  h1Accent: "אמנות.",
+  lede:
+    "אנחנו מעצבים ובונים אתרי תדמית, דפי נחיתה ומערכות לעסקים. כל אתר מתחיל בדף לבן, נבנה בהתאמה אישית, ונמסר מהיר, נגיש ומוכן לגוגל.",
+  primaryCta: "לשיחה בוואטסאפ",
+  secondaryCta: { label: "לעבודות שלנו", href: "/projects/" },
+  nextLabel: "המוצג הבא",
+  exhibits: [
+    { slug: "brushstroke-cube", medium: "קובייה, צבע וחלל לבן · הרגע שבו רעיון מקבל צורה" },
+    { slug: "cobalt-glass", medium: "זכוכית, אור ושכבות · ממשק שמרגיש שקוף" },
+    { slug: "origami-crane", medium: "בטון מקופל כמו נייר · מבנה חזק שנראה קל" },
+    { slug: "paper-plane", medium: "נייר, אבן ותנועה · רעיון שיוצא לדרך" },
+  ] satisfies Exhibit[],
+};
+
+export const servicesHall = {
+  eyebrow: "שירותים",
+  title: "מה אנחנו בונים לעסקים",
+  lede: "שישה כיווני עבודה, אותה הקפדה. כל אחד מהם מתחיל באפיון ומסתיים באתר שעובד בשביל העסק.",
+  rows: [
+    {
+      name: "אתר תדמית לעסק",
+      line: "האתר שמציג את העסק במיטבו ומביא פניות מלקוחות חדשים.",
+      href: "/services/business-website/",
+      art: "titanium-ribbon",
+    },
+    {
+      name: "דפי נחיתה",
+      line: "עמוד אחד עם מטרה אחת: להפוך את מי שהגיע מקמפיין לפנייה.",
+      href: "/services/landing-page-development/",
+      art: "coral-ladders",
+    },
+    {
+      name: "מערכת ניהול תורים",
+      line: "לקוחות קובעים תור לבד, מקבלים תזכורת, והיומן נשאר מסודר.",
+      href: "/services/appointment-system/",
+      art: "brass-clockwork",
+    },
+    {
+      name: "בניית אתרים מקצועיים",
+      line: "אתר מלא מהסקיצה ועד ההשקה, מהיר ונגיש בכל מסך.",
+      href: "/services/web-development/",
+      art: "mobius-brick",
+    },
+    {
+      name: "פיתוח אתרים",
+      line: "מערכות, חיבורים ולוגיקה, על בסיס קוד שמחזיק שנים.",
+      href: "/services/website-development/",
+      art: "shell-staircases",
+    },
+    {
+      name: "שיפור מהירות אתר",
+      line: "מאתרים מה מאט את האתר ומתקנים, כדי שגולשים לא יוותרו בדרך.",
+      href: "/services/website-performance/",
+      art: "lime-prism",
+    },
+  ],
+  allLink: { label: "לכל השירותים", href: "/services/" },
+};
+
+export const processSteps = {
+  eyebrow: "התהליך",
+  title: "איך נבנה אתר אצלנו",
+  lede: "ארבעה שלבים ברורים. בכל אחד מהם אתם רואים, מאשרים ויודעים מה הלאה.",
+  steps: [
+    {
+      name: "אפיון",
+      body: "מכירים את העסק, את הלקוחות ואת המטרה, ומשרטטים מבנה ברור לאתר: אילו עמודים, מה בכל עמוד, ומה הגולש צריך לעשות.",
+      art: "marble-maze",
+    },
+    {
+      name: "עיצוב",
+      body: "מעצבים שפה חזותית שמתאימה לכם: טיפוגרפיה, צבע וקומפוזיציה. קודם במובייל, ורק אחרי שאישרתם ממשיכים הלאה.",
+      art: "kinetic-balance",
+    },
+    {
+      name: "פיתוח",
+      body: "כותבים קוד נקי ומהיר, ובודקים נגישות, מהירות ותצוגה בכל מסך לפני שמשהו עולה לאוויר.",
+      art: "indigo-loom",
+    },
+    {
+      name: "השקה וליווי",
+      body: "מעלים לאוויר, מחברים לכלים של גוגל, ונשארים זמינים לתחזוקה, לשאלות ולשיפורים.",
+      art: "amber-sun-stair",
+    },
+  ],
+};
+
+export const collection = {
+  eyebrow: "עבודות",
+  title: "מהאוסף שלנו",
+  lede: "אתרים אמיתיים של עסקים אמיתיים. כל אחד מהם נבנה מאפס, לפי העסק שעומד מאחוריו.",
+  visit: "לאתר",
+  allLink: { label: "לכל העבודות", href: "/projects/" },
+};
+
+export const manifesto = {
+  eyebrow: "מניפסט",
+  /** One sentence, split for the composition; the last word is the accent. */
+  lead: "אתר טוב נבנה כמו יצירה: מתכננים, מוחקים, מדייקים, ותולים על הקיר רק כשכל פרט",
+  accent: "במקומו.",
+  signature: "צבי משה",
+};
+
+export const magazine = {
+  eyebrow: "מגזין",
+  title: "מהמגזין",
+  lede: "מדריכים קצרים וברורים על אתרים, קידום וכלים לעסקים.",
+  allLink: { label: "לכל המאמרים", href: "/blog/" },
+  readTime: (m: number) => `${m} דקות קריאה`,
+};
+
+export const faqBlock = {
+  eyebrow: "שאלות נפוצות",
+  title: "שאלות על התהליך וההצעה",
+  allLink: { label: "לכל השאלות", href: "/faq/" },
+};
+
+export const finalCta = {
+  eyebrow: "המסך עולה",
+  title: "הקיר הבא בגלריה שמור לעסק שלכם.",
+  body: "ספרו לנו בכמה מילים על העסק ועל מה שאתם צריכים. נחזור אליכם עם רעיון ראשון והצעה מסודרת.",
+  cta: "לשיחה בוואטסאפ",
+  message: "היי, הגעתי מהאתר של NZ-web ואשמח לדבר על אתר לעסק שלי.",
+};

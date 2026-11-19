@@ -56,4 +56,5 @@ export const LANDING_CARDS = Object.values(LANDINGS).map((v) => ({
   label: v.navName,
   href: `/services/landing-page-development/${v.slug}/`,
   desc: v.hero.badge,
+  art: v.art,
 }));

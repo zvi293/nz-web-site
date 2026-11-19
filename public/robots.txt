@@ -1,42 +1,120 @@
-# nz-web.com — everything is crawlable except the post-submit thank-you page.
-User-agent: *
-Allow: /
-Disallow: /thank-you
+# NZ-web · robots.txt · https://nz-web.com
+# Everything is crawlable except the post-submit thank-you page.
+#
+# Content signals (https://contentsignals.org): explicit permission for search, AI answers and AI training.
+# A crawler obeys only its most specific group (RFC 9309), so every named group repeats the rules
+# (the Disallow for /thank-you/ included) instead of inheriting them from "*".
 
-# ── AI / answer-engine crawlers (GEO·AEO·LLMO) — explicitly welcome ──
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+Allow: /
+Disallow: /thank-you/
+
+# ===== AI / answer-engine crawlers: explicitly welcome (GEO / AEO) =====
+
+# OpenAI (ChatGPT)
 User-agent: GPTBot
 Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
+# Anthropic (Claude)
 User-agent: ClaudeBot
 Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
-User-agent: Claude-Web
+User-agent: Claude-User
 Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 User-agent: anthropic-ai
 Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
+# Perplexity
 User-agent: PerplexityBot
 Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
+User-agent: Perplexity-User
+Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+# Google (Gemini, AI Overviews, other AI surfaces)
 User-agent: Google-Extended
 Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
+User-agent: GoogleOther
+Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+# Apple (Apple Intelligence)
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
-User-agent: cohere-ai
+# Amazon
+User-agent: Amazonbot
 Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
+# Common Crawl
 User-agent: CCBot
 Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
+# Cohere
+User-agent: cohere-ai
+Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+# DuckDuckGo AI
+User-agent: DuckAssistBot
+Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+# Mistral
+User-agent: MistralAI-User
+Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+# ByteDance
+User-agent: Bytespider
+Allow: /
+Disallow: /thank-you/
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+# ===== Discovery =====
 Sitemap: https://nz-web.com/sitemap.xml
 
-# Summary of the business for language models: https://nz-web.com/llms.txt
+# AI-readable site summary: https://nz-web.com/llms.txt
+# Full AI-readable content:  https://nz-web.com/llms-full.txt

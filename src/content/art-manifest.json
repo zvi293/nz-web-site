@@ -1,0 +1,479 @@
+{
+  "amber-sun-stair": {
+    "width": 1672,
+    "height": 941,
+    "color": "#181818",
+    "lqip": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAACQAwCdASoYAA4APu1iqU2ppaOiMAgBMB2JZAAAUb82kbRQ23wAAP122baPwEGup7Lny7QUcHlBnX/F43mMbWn959e5F4UWcYzjAAAA",
+    "tone": "dark",
+    "title": "שמש ענבר, מדרגה לבנה",
+    "alt": "מדרגות לבנות עולות אל דיסק זהוב ענק מעל מים כהים בשעת דמדומים"
+  },
+  "lighthouse-blueprint": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#f8f8e8",
+    "lqip": "data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADQAwCdASoYABAAPu1oqk6ppiQiMAgBMB2JYwCdACHfF3mZQqbw0gAA/u/QvlkZvh6heE3Mc5HFGfJdhV0o6WrWC/aysoAA",
+    "tone": "light",
+    "title": "מגדלור בשרטוט",
+    "alt": "שרטוט עדין של מגדלור שבראשו פורחים עלי כותרת מכניים, קרני אור אדומות"
+  },
+  "carnation-pavilion": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#081808",
+    "lqip": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAABwAwCdASoYABAALrV2u12jqampiYC0SzAE6AGen6pZkaJjAQAA/u+B2qjTCz6erPes96p0aF/mp463DGwNvlmnz5pzLGDG6u1cEkqLAWQWzwsvfG/jRVBw4Pch72J7q0J9yoSAAAA=",
+    "tone": "dark",
+    "title": "ביתן ציפורנים",
+    "alt": "ביתן זכוכית ירוק עטוף פרחי ציפורן ורודים בכיכר עירונית בשעה הכחולה"
+  },
+  "brass-clockwork": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#080808",
+    "lqip": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAADwAwCdASoYABAAPu1kqU2ppaQiMAgBMB2JYwCdACHPMOhf2la7tUIAAP7y2088Pmt7FOenM0WrFfchZxxssrFXjLyI/q02BaWw3DVAAAA=",
+    "tone": "dark",
+    "title": "שעון של פליז",
+    "alt": "שורת גלגלי שיניים מפליז מרחפת מעל בריכה שחורה ומשתקפת בה"
+  },
+  "chair-bubble": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#383838",
+    "lqip": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAABwBACdASoYABAAPu1kqU2ppaOiMAgBMB2JagCdACBj4xTYxYkWNkhbnPmEAAD+0cOdtrgC/loU3H9hgRmCqZOzCG4thXmCQ3yaJRlVmmoM9hqLxOQhOCFGCBq0lxGdKjH7sgAA",
+    "tone": "light",
+    "title": "כיסא בבועה",
+    "alt": "כיסא עור כתום מרחף בתוך בועת סבון שקופה על רצפת טרצו מוארת"
+  },
+  "ceramic-handsets": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#f8d868",
+    "lqip": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAAAQBACdASoYABAAPu1iqU2ppaQiMAgBMB2JZACdMoR3ACILs4PFaggAAAD+3ufAhAkDMr9+4aOhTIQFJ+JX8qophQWxJrFq3b+fGonAAAA=",
+    "tone": "light",
+    "title": "שפופרות מקרמיקה",
+    "alt": "שתי שפופרות טלפון לבנות מקרמיקה מחוברות בכבל זכוכית צהוב מסולסל על רקע צהוב"
+  },
+  "ceramic-portals": {
+    "width": 1672,
+    "height": 941,
+    "color": "#6898c8",
+    "lqip": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAAAQBACdASoYAA4APu1iqU2ppaOiMAgBMB2JagCdMoACM+m4nE9DzFLnAAD1/meNtTRwzeP44mUHKAlVZXCyqZ6y8DT4kO18jqKk12nfB+qFIRJDUViSAAAA",
+    "tone": "light",
+    "title": "שערים בדיונות",
+    "alt": "שורת שערים מקרמיקה בהירה בתוך דיונות חול, בסופם נגלה שמי לילה זרועי כוכבים"
+  },
+  "ceramics-volcanic": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#382828",
+    "lqip": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAAAwBACdASoYABAAPu1iqU2ppaOiMAgBMB2JQBWGUABpZepM6mo/R3ciBAAA/ujcxqTdtBjSzSL87Rl14ngFr2o6bgkYkVXOUxzj3kBaeuEjWAB8gAA=",
+    "tone": "dark",
+    "title": "כלים מאפר",
+    "alt": "כדים לבנים עם פנים כתום עולים מתוך אפר וולקני בתוך מסגרת עגולה כהה"
+  },
+  "chrome-umbrella": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#080808",
+    "lqip": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAADQAwCdASoYABAAPu1iqU2ppaQiMAgBMB2JQAAKT6GeqRtFame9HYAA/tCX6zQ+w3991z1yzJomFDTF3b8gCgN9LZ2jLv72d5ph9D2hTKRphfOr8nbDPnBcIngKEiAA",
+    "tone": "dark",
+    "title": "מטריה ומסדרון",
+    "alt": "רחוב גשום בשחור־לבן, ובתוך מטריית כרום נגלה מסדרון צהוב מואר"
+  },
+  "cobalt-brutalist": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#f8d8b8",
+    "lqip": "data:image/webp;base64,UklGRqAAAABXRUJQVlA4IJQAAABwBACdASoYABAAPu1mqk2ppaQiMAgBMB2JbACdH8AJOxC508TCd4i93A9MQAD+9QOp5pgR+OLjBvfKAed/CfylDJqKZiQVHUdf/o15jAECmMw7rTZbImdgnmIn9QPsfAiInAG5x58zvp3/i2OP3y7yJESOdv2LdhAoQD7k73lSBgVWXgtxgVaE599wvpBI4IidTgAA",
+    "tone": "light",
+    "title": "טבע דומם בקובלט",
+    "alt": "קולאז' אדריכלי של בית בטון בהיר, קשתות כחולות ובריכה כחולה זורמת"
+  },
+  "cobalt-glass": {
+    "width": 1672,
+    "height": 941,
+    "color": "#080818",
+    "lqip": "data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAACQAwCdASoYAA4APu1iqU2ppaOiMAgBMB2JZACw7B6V/4SkYDgAAP7u3tQpfpajfC8vil4T+FTsU+qSMteMnUeyfzQWOWeAAAA=",
+    "tone": "dark",
+    "title": "ממשק מזכוכית",
+    "alt": "פסל של לוחות זכוכית בכחול קובלט וסרט כסוף מתפתל על רקע שחור"
+  },
+  "cobalt-storefront": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#081838",
+    "lqip": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAAAwBACdASoYABAAPu1iqU2ppaQiMAgBMB2JZgCdMoADTtRUQoPL5WmDnoAA/u6SHsNP3Pw5RjcYUzNaTQLxT/MlL4mVw0ozkcBMqla1MCbo1eDiJ73q9ubjjI1nCzrloAA=",
+    "tone": "dark",
+    "title": "חלון ראווה בקובלט",
+    "alt": "ויטרינה במסגרת כחולה עומדת במדבר מלח ומציגה נעל צהובה, רמקול ובקבוק בושם"
+  },
+  "ice-constellation": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#386878",
+    "lqip": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAACwAwCdASoYABAAPu1kqU2ppaQiMAgBMB2JZAC7AB2cT27LL7K/UAD+HSwHXmnnLKCp0fBDUUUf+uNza+5Z8AqVeRIwV5bntjh2Xg+GzG5AAA==",
+    "tone": "dark",
+    "title": "פתח בקרח",
+    "alt": "פתח עגול ומושלם בקרח טורקיז, ומתחתיו נקודות אור כמו קבוצת כוכבים"
+  },
+  "copper-roots": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#181818",
+    "lqip": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAADwAwCdASoYABAAPu1kq04ppaQiMAgBMB2JYgCdACHfF+PbW0Ay36LAAP7r6qFPc1f++vQhuGI9+HO2dCEG44CyW+oB54mqHxp7hQAA",
+    "tone": "dark",
+    "title": "שורשים נסתרים",
+    "alt": "קרן אור פוגעת בדיסק נחושת על קיר אבן וחושפת מערכת שורשים זוהרת"
+  },
+  "chocolate-landscape": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#080808",
+    "lqip": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADwAwCdASoYABAAPu1kq04ppaQiMAgBMB2JaQDKACHTP2l6bQJ9b6GAAP6+Qrr3JO6CD+SSB4qpljc3TA6XzJaoXADB5++YckHpQVHEBS0nOmUkAAA=",
+    "tone": "dark",
+    "title": "נוף של שוקולד",
+    "alt": "מקרו של שכבות שוקולד סדוקות ומרנג לבן שנראות כמו רכס הרים"
+  },
+  "cyanotype-jellyfish": {
+    "width": 1672,
+    "height": 941,
+    "color": "#082858",
+    "lqip": "data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAABwAwCdASoYAA4APu1iqk2ppaQiMAgBMB2JQBadBCzuPCcMVKAA/kCAyHH150nP6a0v8rVc890n6oEAYwmkthjD6tvTaj+q1gAAAA==",
+    "tone": "dark",
+    "title": "מדוזה בציאנוטייפ",
+    "alt": "הדפס ציאנוטייפ של מדוזה לבנה על רקע כחול פרוסי עמוק"
+  },
+  "darkroom-glow": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#080808",
+    "lqip": "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAAAQBACdASoYABAAPu1oqk6ppiQiMAgBMB2JZgC7MoADTlXj3M//AVhAAAD+6fWOZKfx6xpHGX3r4TB1RpEWWeV0kiZRg2Tld4U1J9cVirmXbO6M0wEeSc1uhaiJMrXxGtggAA==",
+    "tone": "dark",
+    "title": "חדר חושך",
+    "alt": "תצלומים שקופים תלויים על חבל בחדר חושך, אור כתום חם עובר דרכם"
+  },
+  "emerald-curtain": {
+    "width": 1672,
+    "height": 941,
+    "color": "#081818",
+    "lqip": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAABQAwCdASoYAA4APu1iqU2ppaOiMAgBMB2JYwAAXKM7lWNI0AD+7NeQCBoCn9Qdb8Vio7lCD3sYOdLgAAA=",
+    "tone": "dark",
+    "title": "המסך עולה",
+    "alt": "וילון קטיפה ירוק אמרלד נפתח וחושף גן ים־תיכוני מואר באור ירח"
+  },
+  "emerald-staircase": {
+    "width": 1672,
+    "height": 941,
+    "color": "#986848",
+    "lqip": "data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAAAQBACdASoYAA4APu1iqU2ppaQiMAgBMB2JQBOmUABwMPJl63rDzN++AAD+zxF48goc8xVszY+ZRwkpCwvRG0ZLY3Uu9tSpj23gAA==",
+    "tone": "light",
+    "title": "גרם מדרגות אל הדיונה",
+    "alt": "גרם מדרגות לולייני ירוק בחלל בהיר שרצפתו הופכת לדיונת חול"
+  },
+  "felt-coral-drawer": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#c8a898",
+    "lqip": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAABQBACdASoYABAAPu1orU6ppiSiMAgBMB2JbACdMoR3ACn0wu2GQo3v5JpgAMxLGGHrZ6f3RhxM41av6yjbbbM03TF3ciBzbT/4IVXR2FkZbeGMXpeRcDlz6TQ6TmAA",
+    "tone": "light",
+    "title": "אלמוג במגירה",
+    "alt": "אלמוגים כתומים מלבד צומחים מתוך ארון מגירות ירוק וינטג'"
+  },
+  "origami-crane": {
+    "width": 1672,
+    "height": 941,
+    "color": "#282828",
+    "lqip": "data:image/webp;base64,UklGRkwAAABXRUJQVlA4IEAAAABQAwCdASoYAA4APu1iqU2ppaOiMAgBMB2JZQC/OCHDHrK5YAD+zXRlSZNfsFOFaZXoUvBM9YtrBZ4Wgd1QAAAA",
+    "tone": "dark",
+    "title": "עגור מבטון",
+    "alt": "עגור אוריגמי מבטון מרחף מעל ערפל וגשר צר על רקע כהה"
+  },
+  "book-garden": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#989888",
+    "lqip": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAADwAwCdASoYABAAPu1yrU+pp6QiMAgBMB2JQAAIzMpMJBXFH3VIHCMAAP6WMEOixgSnNdhMf3BJN71ceaoJNrUJDFLSgTyyz63AuppW987dgwgA",
+    "tone": "light",
+    "title": "ספר שהפך לגן",
+    "alt": "ספר פתוח שדפיו הופכים לגן יפני ערפילי עם בונסאי, גשר ופריחת דובדבן"
+  },
+  "brushstroke-cube": {
+    "width": 1672,
+    "height": 941,
+    "color": "#e8e8d8",
+    "lqip": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAAAQBACdASoYAA4APu1iqU2ppaOiMAgBMB2JZwCsACP3npgaNfpQpO8ICAD+azhlIzXu79yjdeSscT2eKHzriClpIcyWi4xMjyY07SJXy4OAAA==",
+    "tone": "light",
+    "title": "משיכת מכחול",
+    "alt": "משיכת מכחול שחורה ענקית תלויה בגלריה לבנה ומוארת, וקובייה אדומה קטנה מתחתיה"
+  },
+  "harp-bridge": {
+    "width": 1672,
+    "height": 941,
+    "color": "#a8a8a8",
+    "lqip": "data:image/webp;base64,UklGRkwAAABXRUJQVlA4IEAAAADQAwCdASoYAA4APu1krU2ppaSiMAgBMB2JaQAASosldVyBU9rr1wAA/sA1Jh/NZpMrtWFDgWMtBG8ZcFpyk8AA",
+    "tone": "light",
+    "title": "גשר של מיתרים",
+    "alt": "גשר תלוי שהעמוד שלו הוא נבל, מיתריו הם הכבלים, נעלם בתוך ערפל"
+  },
+  "indigo-loom": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#081838",
+    "lqip": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAAAQBACdASoYABAAPu1mqk4ppaOiMAgBMB2JYwC06B5fs50MgqKNTs2gAAD+8N+lkxgftKSDA+v3TAmosAj0W10grQ96oB9H9Oim/fBjnbtQOaFsKWoM6aW3bhrAAA==",
+    "tone": "dark",
+    "title": "נול של אור",
+    "alt": "נול עץ ישן באולם תעשייתי אורג רשת דיגיטלית זוהרת של אור"
+  },
+  "kinetic-balance": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#f8d8b8",
+    "lqip": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAADwAwCdASoYABAAPu1kqU2ppaQiMAgBMB2JQBOgBAxUnrCuDV2/YPUAAP7e3a98bpjjlI0geg8S/j6S6XIbBltsVCmc4XimWf5apU28MocPtzV+CriGJ7KeFukhPwAA",
+    "tone": "light",
+    "title": "איזון קינטי",
+    "alt": "מובייל תלוי של צורות אדומות ואפרסק מטיל צללים על קיר חמים באור חלון"
+  },
+  "coral-ladders": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#080808",
+    "lqip": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAACQAwCdASoYABAAPu1iqU2ppaOiMAgBMB2JZACsACHgd7QtKRsAAP7s1YOv/g0kp48ZOTV3XDu7NVZc1tPvN9DGWQfabKZnt7dc8AAA",
+    "tone": "dark",
+    "title": "סולמות אל האור",
+    "alt": "סולמות לבנים מובילים אל עיגול אור אלמוגי זוהר בחלל חשוך"
+  },
+  "lime-prism": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#080818",
+    "lqip": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAAAQBACdASoYABAAPu1kqU2ppaQiMAgBMB2JaACdMoRwACm1/xcmZaBxgAD+8MPFvWDUZssLvRpqwQHBwH923Zv8lHsEXaZ4FKCMgc87oPQ1Xh8Pu6rQHB/0OeBRoAAA",
+    "tone": "dark",
+    "title": "קרן דרך פריזמה",
+    "alt": "קרן לייזר ירוקה עוברת דרך לוחות זכוכית כחולים אל פריזמה על רצפה מבריקה"
+  },
+  "luminous-net": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#482818",
+    "lqip": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwBACdASoYABAAPu1kq04ppaQiMAgBMB2JZgCdMoADUn6f8ZuERSeA9iAA/qHIflnLg7e3mYEyj9cB70nrlsHHfXrpjExSghs7UvVA08Ltt64t2gAAAA==",
+    "tone": "dark",
+    "title": "רשת של אורות",
+    "alt": "רשת דייגים זרועת נורות זוהרות פרושה מעל חוף בשקיעה"
+  },
+  "sneaker-pool": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#e8c8a8",
+    "lqip": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAAAwBACdASoYABAAPu1iqk2ppaQiMAgBMB2JbACdMoMpAEIHX1qht5R7KIAA/sAqT7MRq7kw7VnzFRDNZ4DkN3ZzhDM+xlwitsMZwzCybB5/ipU4cZVZuU/xiPXTc+qEtMfdKViuE0XVaSpQ2VpfAAAA",
+    "tone": "light",
+    "title": "נעל מעל הבריכה",
+    "alt": "נעל ספורט ירוקה זוהרת בתוך קופסה לבנה פתוחה ליד בריכה של וילה מודרנית"
+  },
+  "keycap-hotel": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#280828",
+    "lqip": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAAAwBACdASoYABAAPu1kq04ppaQiMAgBMB2JaACdL1yBprpzCkh3R0NxRwAA/ujxGbmEp1hWwyhMed/yfdr9NlV7/y3MqVvkIT5RAyImJEmAR9eOW3Z5Lb6lOIUAAA==",
+    "tone": "dark",
+    "title": "מלון בתוך מקש",
+    "alt": "מקש מקלדת סגול ענק שבתוכו לובי של מלון יוקרה מואר, עצי דובדבן וירח"
+  },
+  "ultramarine-spill": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#d8c8d8",
+    "lqip": "data:image/webp;base64,UklGRooAAABXRUJQVlA4IH4AAABQBACdASoYABAAPu1iqU2ppaQiMAgBMB2JbAC7MoACtOgUMzDCyDD5w7mAAP7B4W9bzWeIySvgAjGZJjBFgx8ZKywmgd/Inv0Wd47f2+BBpTtunhzG8A/DiD/Wk6R9kPN9Gxlq1ZZ6NOZ8J+NnsN2GDU8x+H3JYuThS14IAAA=",
+    "tone": "dark",
+    "title": "עיר בשלולית",
+    "alt": "לכה כחולה שנשפכה מבקבוק ויוצרת קו רקיע של עיר בלילה"
+  },
+  "neon-gallery-door": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#483838",
+    "lqip": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAADQAwCdASoYABAAPu1iqk2ppaQiMAgBMB2JZgAASlDN9jo/zr67NCAA/uOpcmDfRsUWocdHRee3KTWS+jurV+DMZERB1Oow+kWFsPDNyH/t71eruZ+fwsAwAAA=",
+    "tone": "dark",
+    "title": "קו אל דלת הגלריה",
+    "alt": "דמות הולכת בדמדומים לאורך קו ניאון ורוד המוביל אל פתח של גלריה"
+  },
+  "obsidian-tear": {
+    "width": 1672,
+    "height": 941,
+    "color": "#484858",
+    "lqip": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAABwAwCdASoYAA4APu1iqk4ppaQiMAgBMB2JZgAARg51fxb1JtgA/TGxPrcAkqsaYVvMCSk4kI/+RYq2gZEdqoUnn8P/BlCRst2gSXMVAAA=",
+    "tone": "light",
+    "title": "טיפה מאובסידיאן",
+    "alt": "טיפה שחורה ומבריקה תלויה באוויר מעל מטע עצים בפריחה ורודה"
+  },
+  "origami-lemon": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#585828",
+    "lqip": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAAAwBACdASoYABAAPu1iqU2ppaOiMAgBMB2JZACdMoAC+07mzdgziTRIERAA/hYp4fB7KdIA1E0b0x+nPgrRDgix258SeyIWCnX1FxKvrquUimaXSftj5gZNnjeLAAAA",
+    "tone": "light",
+    "title": "חדרים מנייר",
+    "alt": "חדרי נייר מקופלים זה בתוך זה ובלבם עץ לימון קטן באור רך"
+  },
+  "embroidered-comet": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#080818",
+    "lqip": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAAAwBACdASoYABAAPu1iqU2ppaOiMAgBMB2JYwCzgB6Iyk8PbfbPoX5F0EAA/qhgG9h7BbZc4uy0MZkkCInDM1BZmcwfnk/SJDPxaQwVH32jqF9Yd+l8nsm2fEIAAA==",
+    "tone": "dark",
+    "title": "השביט עובר מיד ליד",
+    "alt": "רקמה של שתי ידיים על בד כחול כהה, אחת מעבירה לשנייה שביט זהוב"
+  },
+  "handbag-ice": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#080808",
+    "lqip": "data:image/webp;base64,UklGRngAAABXRUJQVlA4IGwAAADwAwCdASoYABAAPu1kq04ppaQiMAgBMB2JbACdACE+UxYpkcJHL2AgAP678tpTIe4pYSbpTyz2B7B8d0qW0FN6EJEnb/P70aXPKg40/i+oggJaJYmhnUJgN12+HyQXDCJCKM/tWImsg6GKAAA=",
+    "tone": "dark",
+    "title": "תיק בשוק של קרח",
+    "alt": "תיק יד כתום מוצג על בסיס קרח בתוך שוק של קרח סגול מואר בזרקור"
+  },
+  "porcelain-shockwave": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#280808",
+    "lqip": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAADwAwCdASoYABAAPu1iqk2ppaQiMAgBMB2JZgB2AADCQakuQMKF5qNAAP7r3cnX/uX1nav/i2JJFdUNmn0RSdn8+LRU8Wy45HBRmcYAAAA=",
+    "tone": "dark",
+    "title": "כדור חרסינה",
+    "alt": "כדור חרסינה לבן חודר דרך גלי הדף שקופים בצבע מג'נטה על רקע כהה"
+  },
+  "balance-dome": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#181818",
+    "lqip": "data:image/webp;base64,UklGRngAAABXRUJQVlA4IGwAAAAQBACdASoYABAAPu1iqk2ppaQiMAgBMB2JZAC7AB6WsjBwwFh1PROskAD+7qGNn/hqOTPafKLmdxrtH+tkjjrZIO4Zm5zfzAsl2DXAT7eYvmbjI1wfXVhQvtKPc7H+rw1nEEaDVZeYiYlrAAA=",
+    "tone": "dark",
+    "title": "איזון",
+    "alt": "חצי כיפה אדומה ולוח מנטה מאוזנים על גליל שחור באור דרמטי"
+  },
+  "ruby-amphora": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#580808",
+    "lqip": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAACQBACdASoYABAAPu1mq04ppaQiMAgBMB2JbACdMoR3ACUXC/KZbjey6z1B1QAA/uv+dzkE/uragAgXi33++bh937tSCOnAwrGbjs/bD1W8rM6tHNF+MCz/QrJklUHX9ig1ZqRmQAA=",
+    "tone": "dark",
+    "title": "אמפורה מאודם",
+    "alt": "בקבוק אמפורה אדום עומד בתוך פרוסת תפוז דם ענקית ומוארת"
+  },
+  "chess-pawn": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#c87868",
+    "lqip": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADwAwCdASoYABAAPu1iqU2ppaQiMAgBMB2JYgCdACLPIy8+tKOi+5GAAP3T5SrKmhkk6TDOZ3w4ubwdaHxdtF0UjMSZJ1ZdN6i9tyoD+FLDYPkGhbwAAA==",
+    "tone": "light",
+    "title": "המהלך המנצח",
+    "alt": "רגלי שחמט מזכוכית ירוקה בראש גבעה של סאטן משובץ בגווני סלמון"
+  },
+  "paper-plane": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#d8c8c8",
+    "lqip": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAADwAwCdASoYABAAPu1kqk2ppaQiMAgBMB2JQBdgAztU4DQq3BWT7jCQAP7kH/PTnK+nISmlEr2Mz7qkUhJY9NhJ5+/9k3Rc8W212+MPZ5tm+5jlgKKJ+b+U4QAAAA==",
+    "tone": "light",
+    "title": "מטוס נייר",
+    "alt": "מטוס נייר אדום חולף ברווח צר בין שני סלעי צפחה כהים"
+  },
+  "mobius-brick": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#887868",
+    "lqip": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADwAwCdASoYABAAPu1iqU2ppaOiMAgBMB2JYgCdMoACsqX9r//Ru+hAAN+wgn6ZoxfPuk89JzeiQ09V9qO4DQpuytEbwT68i4dMUdDHJHdjuuS7gAA=",
+    "tone": "light",
+    "title": "מביוס בקיר",
+    "alt": "רצועת מביוס מכסף ונחושת עוברת דרך קיר לבנים"
+  },
+  "silver-droplet": {
+    "width": 1672,
+    "height": 941,
+    "color": "#280828",
+    "lqip": "data:image/webp;base64,UklGRkwAAABXRUJQVlA4IEAAAADQAwCdASoYAA4APu1iqU2ppaQiMAgBMB2JYgCdACHYyEYRJYXB4QAA/uk5oEalsgejL0Iv8p2gTXao2q/nWYAA",
+    "tone": "dark",
+    "title": "טיפת כסף",
+    "alt": "טיפת כסף תלויה מעל עיר בגוון שזיף שמשתקפת בתוכה"
+  },
+  "zipper-library": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#f8f8f8",
+    "lqip": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAADQAwCdASoYABAAPu1kqk2ppaQiMAgBMB2JbAAAPuKgG8srl6j8TgAA/u/Wcxf6cAho4EFv7TwcEa/2tzZIj/rZWP75COGWAjLKR7oM0lswMAAA",
+    "tone": "light",
+    "title": "ספרייה בתוך מגדל",
+    "alt": "שרטוט של גורד שחקים שרוכסן נפתח בו וחושף ספרייה לוליינית כתומה"
+  },
+  "snowflake-furnace": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#281818",
+    "lqip": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAAAwBACdASoYABAAPu1qrU8ppiQiMAgBMB2JbACdMoR4GCmWWMXeQmrRMAAA/uwa3Q7/FssuGMnTTkj8UzonZlVK5KTKdJcdjjnSY5eACQb2WbwPjQaizU7DzFPjxZ9C1PtmbjwgopSBHrRlXeoRE4AA",
+    "tone": "dark",
+    "title": "פתית בכבשן",
+    "alt": "פתית שלג שלם בתוך קוביית זכוכית לוהטת מול כבשן נפחות"
+  },
+  "stone-arcs": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#381838",
+    "lqip": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAABwBACdASoYABAAPu1iqU2ppaQiMAgBMB2JZgCdMoR3ACLVV3OUwxt2BLTqAACosuNDAv8VrTMV2rXI+w1V5b/JnI/v0TJ6G7SaRQN8a92xuWs9IwgZ0TGhDuz6AAAA",
+    "tone": "dark",
+    "title": "קשתות אבן",
+    "alt": "שתי קשתות אבן ענקיות נפגשות מעל חוף בשקיעה זהובה"
+  },
+  "thermal-hand": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#080808",
+    "lqip": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAAAwBACdASoYABAAPu1iqU2ppaOiMAgBMB2JbACxBaAAYGteCE+1A+7ihlAA/vQiVdaBBzLd99wjxlpoSz0tVCFbavyLKaH/ClyEeaxadKr1jvPPDZlKRX+GKnWNwvz6sLIkCAdpDSwAAA==",
+    "tone": "dark",
+    "title": "פריחה תרמית",
+    "alt": "צילום תרמי של יד כחולה פתוחה שממנה צומח פרח כתום זוהר"
+  },
+  "titanium-ribbon": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#b8b8b8",
+    "lqip": "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAACwAwCdASoYABAAPu1kqU2ppaQiMAgBMB2JQBOgAvUXYXj0DQ1nQAD8qkytm/YhSZmVrjEzx4OwUN9lmaimoH8AsWVmXesPC+KZPq4YAOd0ZRRA274L9kwrgQv+iZgVSgAAAA==",
+    "tone": "light",
+    "title": "סרט של טיטניום",
+    "alt": "סרט טיטניום אחד מתפתל ויוצר מסך מחשב, טאבלט וטלפון שמציגים אותו גל"
+  },
+  "shell-staircases": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#a85818",
+    "lqip": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADQAwCdASoYABAAPu1kqU2ppaOiMAgBMB2JZACdMoRwAA65/eM1KwAA/qnt4bKGusguO02b7BAlakFf4/XaUcgWcxMi68J0iVYSrzRLm0tHtrUIsXAAAA==",
+    "tone": "light",
+    "title": "מדרגות של צדפים",
+    "alt": "גרמי מדרגות לוליינים בתוך צדפות שקופות באולם בגוון אוכרה"
+  },
+  "turquoise-fans": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#083838",
+    "lqip": "data:image/webp;base64,UklGRoAAAABXRUJQVlA4IHQAAADwAwCdASoYABAAPu1iqk2ppaQiMAgBMB2JbACdABSkoX9THBgmR/dAAP6a7Eam6D7uBgWT49fS5y1KfnOqupvrow8VfyS8RB9IHlIJpJ4uoltrBYecqmdNmrLc2b1B52x3kpGUtCMotl3gzEeIaLs6vQAAAA==",
+    "tone": "light",
+    "title": "מניפות וצל",
+    "alt": "מניפות נייר טורקיז מטילות על קיר בהיר צל בצורת שלד דג"
+  },
+  "marble-maze": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#c8c8c8",
+    "lqip": "data:image/webp;base64,UklGRkoAAABXRUJQVlA4ID4AAAAQAwCdASoYABAALrV2u12jqampiYC0SygABcrbxC9e5gAA/utmBoFf7sP6Y117zxHCfrtN9stotWcNhAAAAA==",
+    "tone": "light",
+    "title": "חוט במבוך",
+    "alt": "חוט אדום עובר בדרך הנכונה במבוך עגול חצוב בשיש לבן"
+  },
+  "terracotta-waterfall": {
+    "width": 1536,
+    "height": 1024,
+    "color": "#b85838",
+    "lqip": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAADwAwCdASoYABAAPu1iqU2ppaQiMAgBMB2JbACdMoMYAEjLFoYSHAeAAP1Qh6kplmGM77gKfpZ66hJU1zUpg9KHNNob1EH9htpkPk0FJdD75fKtPNKxry1gJYcLyItyjNDgUo5lUwAAAA==",
+    "tone": "light",
+    "title": "מפל בטרקוטה",
+    "alt": "קיר טרקוטה עם פתחים קשתיים שדרכם זורם מפל אל בריכה ליד הים"
+  }
+}

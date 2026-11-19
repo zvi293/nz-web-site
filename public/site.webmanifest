@@ -1,11 +1,13 @@
 {
   "name": "NZ-web",
   "short_name": "NZ-web",
-  "description": "סטודיו לפיתוח Full-Stack, עיצוב UI/UX ואוטומציות AI",
+  "description": "NZ-web: עיצוב ובניית אתרים לעסקים בישראל",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#3b82f6",
+  "background_color": "#EFEAE2",
+  "theme_color": "#121110",
   "lang": "he",
   "dir": "rtl",
   "icons": [

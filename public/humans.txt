@@ -1,0 +1,17 @@
+/* TEAM */
+Studio:     NZ-web
+Founder:    צבי משה (Zvi Moshe), design and development
+Contact:    zstore.ai295 [at] gmail [dot] com
+WhatsApp:   +972 58 729 2029
+About:      https://nz-web.com/about/
+Location:   Israel
+Languages:  Hebrew
+
+/* SITE */
+Last update:  2026/11/19
+Language:     Hebrew (RTL)
+Standards:    HTML5, CSS3, WCAG 2.1 AA / IS 5568, Schema.org JSON-LD, Open Graph, llms.txt, IndexNow, robots.txt Content Signals
+Components:   React 18, TypeScript, Vite, Tailwind CSS; every route pre-rendered to static HTML
+Fonts:        Frank Ruhl Libre, Heebo (self-hosted)
+Hosting:      Netlify
+Concept:      "הגלריה" (The Gallery): every website treated as a work of art

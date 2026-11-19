@@ -2,6 +2,14 @@
   command = "npm run build"
   publish = "dist"
 
+# ── Serverless functions ──
+# netlify/functions/deploy-succeeded.js is an EVENT function: Netlify runs it after every
+# successful deploy; on production it submits the sitemap URLs to IndexNow (Bing / ChatGPT
+# Search / Copilot). It is an ES module (package.json "type": "module"), hence esbuild.
+[functions]
+  directory    = "netlify/functions"
+  node_bundler = "esbuild"
+
 # ── Canonical redirect: www → non-www ──
 [[redirects]]
   from = "https://www.nz-web.com/*"
@@ -28,6 +36,13 @@
   to     = "/index.html"
   status = 200
 
+# ── Function sources are never served as files (functions run from /.netlify/functions/). ──
+[[redirects]]
+  from   = "/netlify/*"
+  to     = "/404.html"
+  status = 404
+  force  = true
+
 # NOTE: there is intentionally NO global "/* → /index.html 200" catch-all.
 # Every real content route is pre-rendered to its own dist/<route>/index.html
 # and served directly. Any other unmatched path now falls through to
@@ -36,57 +51,103 @@
 # returned 200. IMPORTANT: any future client-only (non-pre-rendered) route must
 # be added here, or it will correctly 404 on direct load.
 
-# ── Security + SEO headers for all pages ──
+# ══════════════════════════════════ HEADERS ══════════════════════════════════
+# Netlify applies EVERY [[headers]] block whose path matches a request. Keep each header name
+# in one matching block only (the same name in "/*" and in a narrower path can end up as one
+# comma-joined value, e.g. a broken Cache-Control or CORP). "/*" owns the security headers; the
+# narrower blocks below only add Cache-Control / Content-Type / X-Robots-Tag.
+
+# ── Security headers for every response ──
+# Content-Security-Policy lives HERE ONLY (never also as a <meta>: two policies stack and
+# silently block things).
+#  - script-src has NO 'unsafe-inline' / 'unsafe-eval': index.html and every pre-rendered page
+#    carry no inline executable <script> (JSON-LD blocks are data, CSP does not apply to them;
+#    the app is one hashed module from /assets/). GA4 (googletagmanager.com) and the Meta Pixel
+#    (connect.facebook.net) are injected by src/components/Analytics.tsx only after cookie
+#    consent, so their hosts stay allowed.
+#    If an inline boot script is ever added to index.html, allow it by hash, e.g. put
+#    'sha256-<hash>' in script-src, computed from the committed bytes with:
+#      node -e "const s=require('fs').readFileSync('index.html','utf8');for(const m of s.matchAll(/<script>([\s\S]*?)<\/script>/g))console.log('sha256-'+require('crypto').createHash('sha256').update(m[1]).digest('base64'))"
+#  - style-src 'unsafe-inline': React style={{…}} attributes, the inline @font-face block and
+#    runtime-injected styles (toasts) need it. Styles cannot execute code.
+#  - img-src data:/blob: for LQIP placeholders and generated images; GA/Meta beacons.
+#  - form-action: the contact form composes a WhatsApp message (wa.me / api.whatsapp.com).
 [[headers]]
   for = "/*"
   [headers.values]
-    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
-    X-Frame-Options        = "SAMEORIGIN"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy        = "strict-origin-when-cross-origin"
-    Permissions-Policy     = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
-    Cross-Origin-Opener-Policy = "same-origin"
+    Strict-Transport-Security    = "max-age=63072000; includeSubDomains; preload"
+    Content-Security-Policy      = "default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://www.googletagmanager.com https://www.facebook.com; font-src 'self'; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://connect.facebook.net; media-src 'self'; manifest-src 'self'; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://wa.me https://api.whatsapp.com; frame-ancestors 'none'; upgrade-insecure-requests"
+    X-Frame-Options              = "DENY"
+    X-Content-Type-Options       = "nosniff"
+    Referrer-Policy              = "strict-origin-when-cross-origin"
+    Permissions-Policy           = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), hid=(), bluetooth=(), display-capture=(), idle-detection=(), browsing-topics=(), fullscreen=(self)"
+    Cross-Origin-Opener-Policy   = "same-origin"
     Cross-Origin-Resource-Policy = "same-origin"
-    # Content-Security-Policy for a fully static site.
-    #  - script-src: the bundle itself; GA + Meta Pixel load only after cookie
-    #    consent, so their hosts must be allowed here. 'unsafe-inline' is required
-    #    because the pre-rendered pages carry inline JSON-LD-adjacent bootstrap
-    #    and GA's gtag snippet is inline-invoked; there is no server to mint nonces.
-    #  - style-src 'unsafe-inline': React/framer-motion set inline styles.
-    #  - frame-ancestors mirrors X-Frame-Options for modern browsers.
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https://www.facebook.com; font-src 'self'; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://www.facebook.com; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://wa.me https://api.whatsapp.com; frame-ancestors 'self'; upgrade-insecure-requests"
 
-# ── Long cache for assets ──
+# ── Hashed build output and self-hosted fonts: content-addressed, cache forever ──
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# ── Self-hosted fonts — versioned by filename, safe to cache forever ──
 [[headers]]
   for = "/fonts/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# ── Service videos — large and rarely change ──
+# ── Service videos: large and rarely change (remove once public/videos/ is gone) ──
 [[headers]]
   for = "/videos/*"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
 
-# ── Static files cache ──
+# ── Per-page social cards (public/og/*.jpg): not hashed, so a day and revalidate ──
 [[headers]]
-  for = "/*.webmanifest"
+  for = "/og/*"
   [headers.values]
     Cache-Control = "public, max-age=86400"
+
+# ── Crawler / AI text files: explicit UTF-8 so Hebrew is read correctly ──
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Content-Type  = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/llms.txt"
+  [headers.values]
+    Content-Type  = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/llms-full.txt"
+  [headers.values]
+    Content-Type  = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/humans.txt"
+  [headers.values]
+    Content-Type  = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=86400"
+
+# ── IndexNow key file (file name = key; see netlify/functions/deploy-succeeded.js).
+#    Search engines fetch it to verify submissions; keep it out of search results. ──
+[[headers]]
+  for = "/b4de74f617e50be05dfea2e84c50902a.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    X-Robots-Tag = "noindex"
 
 [[headers]]
   for = "/sitemap.xml"
   [headers.values]
-    Cache-Control   = "public, max-age=86400"
-    Content-Type    = "application/xml; charset=utf-8"
+    Content-Type  = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
 
 [[headers]]
-  for = "/robots.txt"
+  for = "/site.webmanifest"
   [headers.values]
+    Content-Type  = "application/manifest+json; charset=utf-8"
     Cache-Control = "public, max-age=86400"

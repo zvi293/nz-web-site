@@ -1,18 +1,14 @@
-import { lazy, Suspense, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useRef, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import CustomCursor from "./components/CustomCursor";
 import ScrollToTop from "./components/ScrollToTop";
 import Analytics from "./components/Analytics";
 import CookieConsent from "./components/CookieConsent";
-import ScrollProgressBar from "./components/ScrollProgressBar";
-import PageTransition from "./components/PageTransition";
 
 const queryClient = new QueryClient();
 
@@ -40,58 +36,56 @@ const VerticalBusinessWebsite = lazy(() => import("./pages/services/VerticalBusi
 const LandingPageVertical = lazy(() => import("./pages/services/LandingPageVertical"));
 
 const RouteFallback = () => (
-  <div className="min-h-screen bg-background" aria-hidden="true" />
+  <div className="min-h-screen bg-bone" aria-hidden="true" />
 );
 
-const wrap = (node: ReactNode) => (
-  <Suspense fallback={<RouteFallback />}>
-    <PageTransition>{node}</PageTransition>
-  </Suspense>
-);
+const wrap = (node: ReactNode) => <Suspense fallback={<RouteFallback />}>{node}</Suspense>;
 
-/* ── Animated routes — must live inside BrowserRouter to use useLocation ── */
+/* ── Routes with a light CSS fade between pages ──
+   The fade runs only on client-side navigations (never on the first load, so the
+   LCP paint is untouched) and only under the motion gate (html.nz-motion). */
 const AnimatedRoutes = () => {
   const location = useLocation();
+  const firstRender = useRef(true);
+  useEffect(() => {
+    firstRender.current = false;
+  }, []);
 
   return (
-    <>
-      <ScrollProgressBar />
-      <AnimatePresence mode="wait" initial={false}>
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageTransition><Index /></PageTransition>} />
-          <Route path="/about" element={wrap(<About />)} />
-          <Route path="/projects" element={wrap(<AllProjects />)} />
-          <Route path="/packages" element={wrap(<Packages />)} />
-          <Route path="/accessibility" element={wrap(<Accessibility />)} />
-          <Route path="/privacy" element={wrap(<Privacy />)} />
-          <Route path="/faq" element={wrap(<FAQ />)} />
-          <Route path="/terms" element={wrap(<Terms />)} />
-          <Route path="/contact" element={wrap(<Contact />)} />
-          <Route path="/thank-you" element={wrap(<ThankYou />)} />
-          <Route path="/blog" element={wrap(<Blog />)} />
-          <Route path="/blog/:slug" element={wrap(<BlogPost />)} />
-          <Route path="/services" element={wrap(<ServicesIndex />)} />
-          <Route path="/services/web-development" element={wrap(<WebDevelopment />)} />
-          <Route path="/services/react-development" element={wrap(<ReactDevelopment />)} />
-          <Route path="/services/landing-pages" element={wrap(<LandingPages />)} />
-          <Route path="/services/website-performance" element={wrap(<WebsitePerformance />)} />
-          <Route path="/services/website-development" element={wrap(<WebsiteDevelopment />)} />
-          <Route path="/services/business-website" element={wrap(<BusinessWebsite />)} />
-          <Route path="/services/business-website/:vertical" element={wrap(<VerticalBusinessWebsite />)} />
-          <Route path="/services/appointment-system" element={wrap(<AppointmentSystem />)} />
-          <Route path="/services/landing-page-development" element={wrap(<LandingPageDevelopment />)} />
-          <Route path="/services/landing-page-development/:landing" element={wrap(<LandingPageVertical />)} />
-          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
-        </Routes>
-      </AnimatePresence>
-    </>
+    <div key={location.pathname} className={firstRender.current ? undefined : "nz-route-enter"}>
+      <Routes location={location}>
+        <Route path="/" element={<Index />} />
+        <Route path="/about" element={wrap(<About />)} />
+        <Route path="/projects" element={wrap(<AllProjects />)} />
+        <Route path="/packages" element={wrap(<Packages />)} />
+        <Route path="/accessibility" element={wrap(<Accessibility />)} />
+        <Route path="/privacy" element={wrap(<Privacy />)} />
+        <Route path="/faq" element={wrap(<FAQ />)} />
+        <Route path="/terms" element={wrap(<Terms />)} />
+        <Route path="/contact" element={wrap(<Contact />)} />
+        <Route path="/thank-you" element={wrap(<ThankYou />)} />
+        <Route path="/blog" element={wrap(<Blog />)} />
+        <Route path="/blog/:slug" element={wrap(<BlogPost />)} />
+        <Route path="/services" element={wrap(<ServicesIndex />)} />
+        <Route path="/services/web-development" element={wrap(<WebDevelopment />)} />
+        <Route path="/services/react-development" element={wrap(<ReactDevelopment />)} />
+        <Route path="/services/landing-pages" element={wrap(<LandingPages />)} />
+        <Route path="/services/website-performance" element={wrap(<WebsitePerformance />)} />
+        <Route path="/services/website-development" element={wrap(<WebsiteDevelopment />)} />
+        <Route path="/services/business-website" element={wrap(<BusinessWebsite />)} />
+        <Route path="/services/business-website/:vertical" element={wrap(<VerticalBusinessWebsite />)} />
+        <Route path="/services/appointment-system" element={wrap(<AppointmentSystem />)} />
+        <Route path="/services/landing-page-development" element={wrap(<LandingPageDevelopment />)} />
+        <Route path="/services/landing-page-development/:landing" element={wrap(<LandingPageVertical />)} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
   );
 };
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <CustomCursor />
       <Toaster />
       <Sonner />
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -109,7 +103,7 @@ const App = () => (
               main.scrollIntoView();
             }
           }}
-          className="sr-only focus:not-sr-only focus:fixed focus:right-4 focus:top-4 focus:z-[10050] focus:rounded-lg focus:bg-primary focus:px-5 focus:py-2.5 focus:text-sm focus:font-bold focus:text-primary-foreground focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/40"
+          className="sr-only focus:not-sr-only focus:fixed focus:right-4 focus:top-4 focus:z-[10050] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-sm focus:font-medium focus:text-bone focus:shadow-lg"
         >
           דלג לתוכן הראשי
         </a>

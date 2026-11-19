@@ -1,45 +1,77 @@
 # NZ-web
 
-> NZ-web הוא סטודיו ישראלי לבניית אתרים ופיתוח אתרים בניהול צבי משה (Zvi Moshe).
-> הסטודיו מתמחה בבניית אתרי תדמית לעסקים, דפי נחיתה ממירים, מערכות ניהול תורים
-> ופיתוח React/TypeScript — עם דגש על ביצועים, SEO ועיצוב UI/UX מוקפד.
-> "Perfect in every Pixel".
+> NZ-web הוא סטודיו לעיצוב ובניית אתרים לעסקים בישראל, בניהול צבי משה.
+> הסטודיו מעצב וכותב בקוד אתרי תדמית, דפי נחיתה, מערכות לקביעת תורים ואתרים ב-React,
+> עם נגישות (ת"י 5568 / WCAG 2.1 AA), מהירות ו-SEO טכני כחלק מכל אתר.
 
-- שפה: עברית (RTL). קהל היעד: בעלי עסקים בישראל.
-- יצירת קשר: טלפון ‎058-7292029, דוא"ל nzweb295@gmail.com, וואטסאפ.
-- שעות פעילות: ראשון–חמישי 09:00–18:00 (שעון ישראל).
-- אזור שירות: כל ישראל (שירות מקוון מלא).
+- שפת האתר: עברית (RTL). קהל: בעלי עסקים קטנים ובינוניים בישראל.
+- בעלים: צבי משה.
+- יצירת קשר: וואטסאפ וטלפון 058-7292029 (https://wa.me/972587292029), דוא"ל zstore.ai295@gmail.com.
+- שעות פעילות: ראשון עד חמישי, 09:00 עד 19:00 (שעון ישראל).
+- אזור שירות: כל הארץ. העבודה נעשית מרחוק, בוואטסאפ ובטלפון.
+- גרסה מורחבת של הקובץ: https://nz-web.com/llms-full.txt
+
+## איך עובד התמחור
+
+- אין חבילות ואין מחירון. יש הצעה אחת שנבנית לפי מה שהעסק צריך.
+- ההצעה בנויה משני חלקים: תשלום חד-פעמי על הקמת האתר, ומנוי חודשי אופציונלי (אחסון, תחזוקה, עדכוני אבטחה ושינויים שוטפים), ללא התחייבות לתקופה.
+- ההיקף קובע את המחיר: מספר העמודים, המערכות, התוכן והחיבורים.
+- הצעה אישית ומפורטת נשלחת בוואטסאפ אחרי שיחה קצרה.
+- [ההצעה](https://nz-web.com/packages/): הסבר על המודל ומה הוא כולל.
 
 ## שירותים
 
-- [בניית אתרים מקצועיים](https://nz-web.com/services/web-development/): אתרים מהירים ויציבים לעסקים.
-- [פיתוח אתרים](https://nz-web.com/services/website-development/): פיתוח מתקדם — React, TypeScript, ארכיטקטורה, API וממשקי ניהול.
-- [אתר תדמית לעסקים](https://nz-web.com/services/business-website/): אתרי תדמית שממירים מבקרים ללידים, כולל עמודים ייעודיים לעורכי דין, רואי חשבון, נדל"ן, קליניקות, אדריכלים, יועצים, מכוני יופי וקבלנים.
-- [מערכת ניהול תורים](https://nz-web.com/services/appointment-system/): קביעת תורים אונליין 24/7 עם תזכורות אוטומטיות.
-- [דפי נחיתה](https://nz-web.com/services/landing-page-development/): דפי נחיתה לקמפיינים ממומנים, ליצירת לידים ולבעלי מקצוע.
-- [React Development](https://nz-web.com/services/react-development/): אפליקציות React מתקדמות וחיבורי API.
-- [שיפור מהירות אתרים](https://nz-web.com/services/website-performance/): אופטימיזציית Core Web Vitals וקידום אורגני.
+- [כל השירותים](https://nz-web.com/services/)
+- [אתר תדמית לעסקים](https://nz-web.com/services/business-website/): אתר שמסביר מה העסק עושה ומביא פניות, עם עמוד לכל שירות.
+  - [לעורך דין](https://nz-web.com/services/business-website/lawyer/) · [לרואה חשבון](https://nz-web.com/services/business-website/accountant/) · [למתווך נדל"ן](https://nz-web.com/services/business-website/real-estate/) · [לקליניקה](https://nz-web.com/services/business-website/clinic/) · [לאדריכל ומעצב פנים](https://nz-web.com/services/business-website/architect/) · [ליועץ ומאמן](https://nz-web.com/services/business-website/consultant/) · [לעסק יופי](https://nz-web.com/services/business-website/beauty/) · [לבעלי מקצוע](https://nz-web.com/services/business-website/contractor/)
+- [בניית אתרים לעסקים](https://nz-web.com/services/web-development/): אתרים שנכתבים בקוד, מהירים ומותאמים לנייד.
+- [פיתוח אתרים](https://nz-web.com/services/website-development/): פרויקטים עם לוגיקה עסקית, ממשקי ניהול וחיבורים.
+- [פיתוח React](https://nz-web.com/services/react-development/): אתרים ואפליקציות ווב בהתאמה מלאה.
+- [דפי נחיתה](https://nz-web.com/services/landing-page-development/): עמוד אחד, מטרה אחת, לקמפיינים ולייצור פניות.
+  - [לקמפיין בפייסבוק ובגוגל](https://nz-web.com/services/landing-page-development/campaign/) · [לייצור לידים](https://nz-web.com/services/landing-page-development/lead-generation/) · [לשיפוצניק וצבעי](https://nz-web.com/services/landing-page-development/trades/)
+- [דפי נחיתה לקמפיינים](https://nz-web.com/services/landing-pages/)
+- [מערכת לקביעת תורים](https://nz-web.com/services/appointment-system/): הזמנת תורים מהאתר, עם תזכורות אוטומטיות.
+- [שיפור מהירות אתרים](https://nz-web.com/services/website-performance/): אבחון ותיקון של אתר קיים איטי (Core Web Vitals).
 
-## חבילות אתר תדמית
+## מאמרים מרכזיים
 
-- [עמוד החבילות המלא](https://nz-web.com/packages/)
-- חבילת Smart ״נוכחות״: אתר סטטי מהיר עד 5 עמודים, קידום אורגני בסיסי ועדכון תוכן חודשי בשירות מלא.
-- חבילת Pro ״מובילות״: פאנל ניהול אישי, ניהול לידים, עד 8 עמודים + בלוג, SEO מתקדם ודוח ביצועים חודשי.
-- חבילת Elite ״פסגה״: קידום במנועי AI (GEO/AEO) עם דוח אזכורים, עד 10 עמודים + עמודי אזור גיאוגרפי והרשאות מרובות.
-- מודל התשלום: הקמה חד-פעמית + מנוי חודשי ללא התחייבות; האתר מאוחסן, מאובטח ומתוחזק כל עוד המנוי פעיל.
-- אין מחירון פומבי: המחיר נקבע אישית לכל לקוח לפי היקף הפרויקט, ומתקבל כהצעה מפורטת אחרי שיחת אפיון קצרה.
+- [נגישות אתרים לעסקים: מה החוק בישראל דורש ואיך עומדים בו](https://nz-web.com/blog/website-accessibility-israel/)
+- [איך להופיע בתשובות של ChatGPT ו-Gemini: מדריך GEO לעסקים](https://nz-web.com/blog/geo-ai-search-guide/)
+- [אתר תדמית או חנות אונליין: מה העסק שלכם באמת צריך](https://nz-web.com/blog/business-website-or-online-store/)
+- [איך לכתוב תוכן לאתר העסקי שמביא פניות](https://nz-web.com/blog/website-content-writing-guide/)
+- [Google Business Profile: המדריך לעסק מקומי בישראל](https://nz-web.com/blog/google-business-profile-guide/)
+- [מערכת ניהול תורים: איך לבחור ומה חשוב לבדוק לפני](https://nz-web.com/blog/appointment-system-guide/)
+- [כמה עולה דף נחיתה ומה באמת משפיע על המחיר](https://nz-web.com/blog/landing-page-cost/)
+- [המדריך המלא לבניית אתר תדמית לעסק ב-2026](https://nz-web.com/blog/business-website-guide/)
+- [כמה עולה לבנות אתר ב-2026? מה באמת קובע את המחיר](https://nz-web.com/blog/website-cost-2026/)
+- [React או WordPress ב-2026: מה נכון לעסק שלכם?](https://nz-web.com/blog/react-vs-wordpress-2026/)
+- [UI/UX Design ב-2026: טרנדים שכדאי להכיר](https://nz-web.com/blog/uiux-trends-2026/)
+- [SEO ב-2026: מה באמת עובד ומה כבר לא רלוונטי](https://nz-web.com/blog/seo-2026-what-works/)
+- [למה האתר שלכם איטי, ו-5 דרכים לתקן את זה](https://nz-web.com/blog/website-speed-fix/)
+- [5 דברים שחייבים לדעת לפני שבונים אתר לעסק](https://nz-web.com/blog/5-things-before-building-website/)
 
-## עמודים מרכזיים
+## עמודים נוספים
 
 - [דף הבית](https://nz-web.com/)
-- [מי אנחנו](https://nz-web.com/about/): על הסטודיו ועל צבי משה.
-- [פרויקטים](https://nz-web.com/projects/): תיק עבודות עם דוגמאות חיות.
-- [שאלות נפוצות](https://nz-web.com/faq/): לוחות זמנים, תהליך העבודה ומה כולל השירות.
-- [בלוג](https://nz-web.com/blog/): מדריכים על בניית אתרים, SEO ותהליך העבודה.
-- [צור קשר](https://nz-web.com/contact/)
+- [אודות](https://nz-web.com/about/): על הסטודיו ועל צבי משה.
+- [עבודות](https://nz-web.com/projects/): אתרים אמיתיים שנבנו ללקוחות, עם קישורים חיים.
+- [שאלות נפוצות](https://nz-web.com/faq/): לוחות זמנים, תמחור, בעלות, נגישות, אחסון ומה קורה אחרי ההשקה.
+- [מגזין](https://nz-web.com/blog/): מדריכים לבעלי עסקים.
+- [יצירת קשר](https://nz-web.com/contact/)
 
-## מסמכים
+## מדיניות
 
-- [הצהרת נגישות](https://nz-web.com/accessibility/): תאימות WCAG 2.1 AA ות"י 5568.
-- [מדיניות פרטיות](https://nz-web.com/privacy/)
+- [הצהרת נגישות](https://nz-web.com/accessibility/): ת"י 5568 / WCAG 2.1 AA. רכז נגישות: צבי משה, 058-7292029, zvi293293@gmail.com.
+- [מדיניות פרטיות](https://nz-web.com/privacy/): הפניות נשלחות בוואטסאפ; כלי מדידה נטענים רק אחרי הסכמה לעוגיות.
 - [תנאי שימוש](https://nz-web.com/terms/)
+
+## English summary
+
+NZ-web (nz-web.com) is a web design and development studio in Israel, run by Zvi Moshe. It designs and hand-codes
+websites for small and medium businesses: business (brochure) websites, landing pages, appointment-booking
+systems, React web apps and speed optimisation for existing sites. Every site is built mobile-first and includes
+accessibility (Israeli Standard 5568 / WCAG 2.1 AA), technical SEO, structured data and fast loading.
+There are no packages and no published pricing: each client gets one tailored proposal made of a one-time setup
+fee plus an optional monthly subscription (hosting, maintenance, security updates and ongoing changes), with no
+fixed-term commitment. Contact: WhatsApp / phone +972-58-729-2029, email zstore.ai295@gmail.com.
+Site language: Hebrew.
