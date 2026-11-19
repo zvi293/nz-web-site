@@ -1,0 +1,133 @@
+---
+/**
+ * LeakMap — "לאן הולך הקליק": two drawn plates side by side. Plate א׳: the click lands on a home
+ * page and leaks out through its exits (menu, blog, another service…), the vermilion path thins
+ * to a doubtful dot. Plate ב׳: the same click lands on a landing page and runs straight down one
+ * path to the enquiry. Static SVG; the paths draw themselves once the section is in view
+ * (html.nz-motion + [data-in] from the global reveal script). Prefix lnd-.
+ * SVG text inherits direction: rtl, so text-anchor "start" = the right edge, "end" = the left edge.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import "./landing-pages.css";
+
+interface Props {
+  index?: string;
+}
+const { index = "01" } = Astro.props;
+
+const exits = [
+  { from: [112, 128], to: [34, 96], label: "תפריט", side: "s" },
+  { from: [250, 128], to: [326, 96], label: "בלוג", side: "e" },
+  { from: [118, 232], to: [34, 214], label: "שירות אחר", side: "s" },
+  { from: [244, 232], to: [326, 214], label: "אודות", side: "e" },
+  { from: [122, 326], to: [34, 340], label: "אינסטגרם", side: "s" },
+  { from: [240, 326], to: [326, 340], label: "חזרה לגוגל", side: "e" },
+];
+const steps = [
+  { y: 138, label: "אותה הבטחה" },
+  { y: 196, label: "תמונה אמיתית" },
+  { y: 254, label: "הוכחה" },
+  { y: 306, label: "כפתור אחד" },
+];
+---
+
+<section class="nz-section nz-section--space-default lnd-leak" data-tone="bone" aria-labelledby="lnd-leak-title">
+  <div class="nz-container">
+    <ServiceOpener
+      variant="split"
+      index={index}
+      label="לאן הולך הקליק"
+      title="דף נחיתה או עמוד הבית: לאן לשלוח את הקליק?"
+      accent="לאן לשלוח את הקליק?"
+      id="lnd-leak-title"
+      lede="לדף נחיתה. עמוד הבית מציג את כל העסק, ולכן יש בו הרבה יציאות. דף נחיתה בנוי סביב ההצעה שהופיעה במודעה, ולכן יש בו דרך אחת: מהקליק אל הפנייה."
+    />
+
+    <div class="lnd-leak__plates" data-reveal="fade">
+      <figure class="lnd-plate lnd-plate--home">
+        <div class="lnd-plate__sheet">
+          <svg viewBox="0 0 360 400" class="lnd-plate__svg" role="img" aria-labelledby="lnd-a-t">
+            <title id="lnd-a-t">שרטוט: קליק ממודעה נוחת בעמוד הבית ויוצא דרך התפריט, הבלוג, שירות אחר, אודות, אינסטגרם או חזרה לגוגל. רק קו דק ומהוסס מגיע לפנייה.</title>
+            <!-- the ad -->
+            <g class="lnd-ad">
+              <rect x="112" y="10" width="136" height="42" rx="3" />
+              <text x="236" y="27" class="lnd-t lnd-t--k" text-anchor="start">מודעה</text>
+              <text x="236" y="43" class="lnd-t" text-anchor="start">שיעורי שחייה לילדים</text>
+            </g>
+            <!-- the home page -->
+            <g class="lnd-page">
+              <rect x="92" y="108" width="176" height="236" rx="2" class="lnd-page__sheet" />
+              <line x1="92" y1="128" x2="268" y2="128" class="lnd-hair" />
+              <rect x="236" y="120" width="22" height="3" class="lnd-ink" />
+              <rect x="104" y="121" width="14" height="2" class="lnd-mute" /><rect x="124" y="121" width="14" height="2" class="lnd-mute" /><rect x="144" y="121" width="14" height="2" class="lnd-mute" /><rect x="164" y="121" width="14" height="2" class="lnd-mute" />
+              <rect x="190" y="142" width="66" height="5" class="lnd-ink" /><rect x="206" y="152" width="50" height="5" class="lnd-ink" />
+              <rect x="104" y="140" width="72" height="50" class="lnd-mute-fill" />
+              <rect x="200" y="166" width="56" height="3" class="lnd-mute" /><rect x="214" y="173" width="42" height="3" class="lnd-mute" />
+              <rect x="104" y="204" width="48" height="40" class="lnd-card" /><rect x="156" y="204" width="48" height="40" class="lnd-card" /><rect x="208" y="204" width="48" height="40" class="lnd-card" />
+              <rect x="104" y="258" width="152" height="3" class="lnd-mute" /><rect x="128" y="266" width="128" height="3" class="lnd-mute" /><rect x="146" y="274" width="110" height="3" class="lnd-mute" />
+              <line x1="92" y1="314" x2="268" y2="314" class="lnd-hair" />
+              <circle cx="120" cy="327" r="4" class="lnd-mute-fill" /><circle cx="134" cy="327" r="4" class="lnd-mute-fill" /><rect x="214" y="325" width="42" height="3" class="lnd-mute" />
+            </g>
+            <!-- exits -->
+            {
+              exits.map((e, i) => (
+                <g class="lnd-exit" style={`--i:${i}`}>
+                  <path d={`M${e.from[0]} ${e.from[1]} Q ${(e.from[0] + e.to[0]) / 2} ${e.to[1] - 18} ${e.to[0]} ${e.to[1]}`} class="lnd-exit__line" />
+                  <circle cx={e.to[0]} cy={e.to[1]} r="2.6" class="lnd-exit__dot" />
+                  <text x={e.to[0]} y={e.to[1] + 16} text-anchor="middle" class="lnd-t lnd-t--exit">{e.label}</text>
+                </g>
+              ))
+            }
+            <!-- the click: enters, wanders, thins -->
+            <path d="M180 52 L180 108" class="lnd-path" pathLength="1" />
+            <path d="M180 108 C 180 150, 150 160, 160 200 S 205 250, 186 290 S 176 340, 180 372" class="lnd-path lnd-path--thin" pathLength="1" />
+            <circle cx="180" cy="378" r="4" class="lnd-goal lnd-goal--faint" />
+            <text x="180" y="396" text-anchor="middle" class="lnd-t lnd-t--faint">פנייה?</text>
+          </svg>
+        </div>
+        <figcaption class="nz-museum lnd-plate__label">
+          <span class="nz-museum__head"><span class="nz-museum__index">לוח א׳</span><span class="nz-museum__title">הקליק נוחת בעמוד הבית</span></span>
+          <span class="nz-museum__medium">שש יציאות, וההבטחה מהמודעה מחכה איפשהו בפנים</span>
+        </figcaption>
+      </figure>
+
+      <figure class="lnd-plate lnd-plate--landing">
+        <div class="lnd-plate__sheet">
+          <svg viewBox="0 0 360 400" class="lnd-plate__svg" role="img" aria-labelledby="lnd-b-t">
+            <title id="lnd-b-t">שרטוט: אותו קליק נוחת בדף נחיתה ויורד בקו ישר דרך אותה הבטחה, תמונה אמיתית, הוכחה וכפתור אחד, עד הפנייה.</title>
+            <g class="lnd-ad">
+              <rect x="112" y="10" width="136" height="42" rx="3" />
+              <text x="236" y="27" class="lnd-t lnd-t--k" text-anchor="start">מודעה</text>
+              <text x="236" y="43" class="lnd-t" text-anchor="start">שיעורי שחייה לילדים</text>
+            </g>
+            <g class="lnd-page">
+              <rect x="110" y="108" width="120" height="226" rx="2" class="lnd-page__sheet" />
+              <rect x="128" y="124" width="84" height="6" class="lnd-ink" /><rect x="142" y="135" width="70" height="6" class="lnd-ink" />
+              <rect x="122" y="152" width="96" height="2.5" class="lnd-mute" />
+              <rect x="122" y="168" width="96" height="48" class="lnd-mute-fill" />
+              <rect x="150" y="228" width="68" height="3" class="lnd-mute" /><rect x="160" y="236" width="58" height="3" class="lnd-mute" /><rect x="140" y="244" width="78" height="3" class="lnd-mute" />
+              <rect x="122" y="258" width="96" height="22" class="lnd-card" />
+              <rect x="138" y="296" width="64" height="20" rx="10" class="lnd-btn" />
+            </g>
+            <!-- the click: one path -->
+            <path d="M180 52 L180 92 Q180 100 190 100 L 240 100 Q 250 100 250 110 L 250 330 Q 250 344 236 350 L 196 366" class="lnd-path" pathLength="1" />
+            {
+              steps.map((s, i) => (
+                <g class="lnd-step" style={`--i:${i}`}>
+                  <line x1="244" y1={s.y} x2="256" y2={s.y} class="lnd-step__tick" />
+                  <text x="264" y={s.y + 4} text-anchor="end" class="lnd-t lnd-t--step">{s.label}</text>
+                </g>
+              ))
+            }
+            <circle cx="180" cy="372" r="15" class="lnd-goal" />
+            <text x="180" y="376" text-anchor="middle" class="lnd-t lnd-t--goal">פנייה</text>
+          </svg>
+        </div>
+        <figcaption class="nz-museum lnd-plate__label">
+          <span class="nz-museum__head"><span class="nz-museum__index">לוח ב׳</span><span class="nz-museum__title">הקליק נוחת בדף נחיתה</span></span>
+          <span class="nz-museum__medium">דרך אחת, מההבטחה שבמודעה ועד הכפתור</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>

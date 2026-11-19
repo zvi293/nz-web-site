@@ -1,0 +1,41 @@
+---
+/** Consultant — the whiteboard in the office: "you" in the middle, marker circles round each audience, arrows between them. */
+import Nb from "@/components/service/Nb.astro";
+import type { AudienceItem } from "@/components/service/types";
+interface Props { items: AudienceItem[] }
+const { items } = Astro.props;
+---
+
+<div class="vl-wb" data-reveal>
+  <div class="vl-wb__frame">
+    <div class="vl-wb__board">
+      <p class="vl-wb__you" aria-hidden="true">
+        <span>אתם</span>
+        <svg class="vl-wb__you-ring" viewBox="0 0 120 60" preserveAspectRatio="none"><path d="M60 4C30 3 5 14 6 31c1 17 28 25 56 24 30-1 53-11 52-27C113 12 90 3 56 6" pathLength="1" /></svg>
+      </p>
+      <p class="vl-wb__q" aria-hidden="true">למי האתר מדבר?</p>
+      <ol class="vl-wb__notes">
+        {
+          items.map((it, i) => (
+            <li class="vl-wb__note" style={`--i:${i}`}>
+              <span class="vl-wb__num" aria-hidden="true">
+                {i + 1}
+                <svg viewBox="0 0 40 40"><path d="M21 3C10 3 3 10 4 21s9 16 18 15c10-1 15-8 14-18C35 9 28 4 17 5" pathLength="1" /></svg>
+              </span>
+              <h3 class="vl-wb__name">
+                <Nb text={it.title} />
+                <svg class="vl-wb__under" viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true"><path d="M2 6c30-4 50 3 80-1s60 2 116-2" pathLength="1" /></svg>
+              </h3>
+              <p class="vl-wb__line"><Nb text={it.description} /></p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <div class="vl-wb__tray" aria-hidden="true">
+      <span class="vl-wb__marker" />
+      <span class="vl-wb__marker vl-wb__marker--red" />
+      <span class="vl-wb__eraser" />
+    </div>
+  </div>
+</div>

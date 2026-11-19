@@ -1,0 +1,48 @@
+---
+/**
+ * /glossary/ — מילון מונחים: the web terms a business owner meets, in plain Hebrew.
+ * Sections (src/components/blog/glossary): GlossaryHero (H1 + lead + type specimen),
+ * GlossaryCatalogue (the signature "מגירת הכרטיסים": riffle a card-catalogue drawer, an island),
+ * GlossaryIndex (live search + letter index + every entry, with illustrated plates between letters),
+ * GlossaryClosing (a blank card: suggest a term). Articles link here on first use: /glossary/#term-<slug>.
+ * JSON-LD: WebPage + DefinedTermSet (same names / definitions as the visible entries).
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import GlossaryHero from "@/components/blog/glossary/GlossaryHero.astro";
+import GlossaryCatalogue from "@/components/blog/glossary/GlossaryCatalogue.astro";
+import GlossaryIndex from "@/components/blog/glossary/GlossaryIndex.astro";
+import GlossaryClosing from "@/components/blog/glossary/GlossaryClosing.astro";
+import "@/components/blog/glossary/glossary.css";
+import { glossaryIntro, sortedTerms } from "@/content/glossary";
+import { definedTermSet, webPage, OG_IMAGES, SITE_LAST_UPDATED } from "@/lib/schema";
+import type { PageSeo } from "@/lib/seo";
+
+const PATH = "/glossary/";
+const title = "מילון מונחים לבניית אתרים: SEO, נגישות ועוד | NZ-web";
+const description =
+  "מילון מונחים לבניית אתרים בעברית פשוטה: SEO, GEO, Core Web Vitals, דומיין, אחסון, SSL, נגישות ועוד. הגדרה קצרה לכל מונח, עם קישור למדריך המתאים במגזין.";
+
+const seo: PageSeo = {
+  path: PATH,
+  title,
+  description,
+  ogImage: OG_IMAGES.blog,
+  breadcrumb: { name: "מילון מונחים", path: PATH, parent: { name: "מגזין", path: "/blog/" } },
+  jsonLd: [
+    webPage({ path: PATH, title, description, dateModified: SITE_LAST_UPDATED, speakable: ["h1", ".lead"] }),
+    definedTermSet({
+      path: PATH,
+      name: glossaryIntro.title,
+      description: glossaryIntro.lead,
+      terms: sortedTerms().map((t) => ({ name: t.name, description: t.definition, slug: `term-${t.slug}` })),
+    }),
+  ],
+};
+---
+
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <GlossaryHero />
+  <GlossaryCatalogue />
+  <GlossaryIndex />
+  <GlossaryClosing />
+</BaseLayout>

@@ -1,0 +1,59 @@
+---
+/**
+ * "אולמות סמוכים" — the other legal rooms as tall arched doorways (the current page is left out),
+ * plus a short contact note. Shared by /accessibility/, /privacy/ and /terms/.
+ */
+import { WhatsAppCta } from "@/components/nz";
+import { getMailtoHref } from "@/lib/contact-utils";
+import { studio } from "@/components/nz/nav";
+import { roomFor } from "@/components/Breadcrumbs";
+
+interface Props {
+  current: string;
+  title: string;
+  line: string;
+  message: string;
+}
+const { current, title, line, message } = Astro.props;
+const doors = [
+  { href: "/accessibility/", name: "הצהרת נגישות", line: "מה עשינו כדי שכל אחד יוכל לגלוש, ולוח בקרה לנסות בעצמכם." },
+  { href: "/privacy/", name: "מדיניות פרטיות", line: "איזה מידע נאסף, למה, ומה הזכויות שלכם." },
+  { href: "/terms/", name: "תנאי שימוש", line: "השימוש באתר, זכויות יוצרים ורישוי תמונות." },
+].filter((d) => d.href !== current);
+---
+
+<section class="nz-section nz-section--space-default lg-doors" data-tone="bone" aria-labelledby="lg-doors-title">
+  <div class="nz-container lg-doors__grid">
+    <div class="lg-doors__ask">
+      <p class="nz-label nz-label--rule"><span class="nz-label__index">?</span><span>שאלות</span></p>
+      <h2 id="lg-doors-title" class="nz-display nz-display--h2 lg-doors__title">{title}</h2>
+      <p class="lg-doors__line">{line}</p>
+      <div class="lg-doors__ways">
+        <WhatsAppCta label="לכתוב בוואטסאפ" message={message} size="md" />
+        <a href={getMailtoHref(studio.email)} class="nz-link lg-doors__mail">
+          <bdi dir="ltr" class="nz-link__text">{studio.email}</bdi>
+        </a>
+      </div>
+    </div>
+
+    <nav class="lg-doors__nav" aria-label="אולמות סמוכים">
+      <p class="lg-doors__nav-title">אולמות סמוכים</p>
+      <ul class="lg-doors__list">
+        {
+          doors.map((d) => (
+            <li>
+              <a href={d.href} class="lg-arch">
+                <span class="lg-arch__room">אולם {String(roomFor(d.href) ?? "").padStart(2, "0")}</span>
+                <span class="lg-arch__name">{d.name}</span>
+                <span class="lg-arch__line">{d.line}</span>
+                <span class="lg-arch__go" aria-hidden="true">
+                  <svg viewBox="0 0 20 20"><path d="M16 10H4.5M9 5 4 10l5 5" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</section>

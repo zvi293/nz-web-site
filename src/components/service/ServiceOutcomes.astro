@@ -1,0 +1,51 @@
+---
+/**
+ * ServiceOutcomes — what the client gets, hung as typographic works: each outcome is ONE serif
+ * word in a frame (moulding + mat), with a wall label underneath (title + line). Salon hang:
+ * the middle work is larger on desktop, the frames step on phones. No numbers, no stats.
+ */
+import Nb from "./Nb.astro";
+import ServiceOpener from "./ServiceOpener.astro";
+import type { OpenerVariant, OutcomeItem, SectionTone } from "./types";
+import "./service.css";
+
+interface Props {
+  title: string;
+  lede?: string;
+  items: OutcomeItem[];
+  tone?: SectionTone;
+  opener?: OpenerVariant;
+  index?: string;
+  label?: string;
+  id?: string;
+}
+
+const { title, lede, items, tone = "ink", opener = "quote", index = "06", label = "מה יוצא מזה", id = "sv-outcomes" } = Astro.props;
+---
+
+<section class="nz-section nz-section--space-default nz-wall-light sv-out" data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant={opener} index={index} label={label} title={title} id={`${id}-title`} lede={lede} center />
+    <ul class:list={["sv-out__wall", `sv-out__wall--${Math.min(items.length, 4)}`]}>
+      {
+        items.map((it, i) => (
+          <li class:list={["sv-out__work", "sv-sd", i === 1 && "sv-out__work--main"]}>
+            <div class="sv-out__frame" aria-hidden="true">
+              <span class="sv-out__mat">
+                <span class="sv-out__roman">{["I", "II", "III", "IV"][i]}</span>
+                <span class="sv-out__word">{it.word}</span>
+              </span>
+            </div>
+            <div class="nz-museum sv-out__label">
+              <span class="nz-museum__head">
+                <span class="nz-museum__index">{`עבודה ${String(i + 1).padStart(2, "0")}`}</span>
+                <h3 class="nz-museum__title sv-out__title">{it.title}</h3>
+              </span>
+              <span class="nz-museum__medium"><Nb text={it.body} /></span>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

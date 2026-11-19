@@ -1,0 +1,141 @@
+---
+/**
+ * ServiceHero — the room's entrance: visible breadcrumbs, the room plaque, the H1, the
+ * answer-first lead (<p class="lead">, speakable), the WhatsApp CTA and the page's signature
+ * artwork as the LCP image (priority; serviceSeo() preloads it with the same HERO_SIZES string).
+ *
+ * variant
+ *   framed-right  (default) bone wall; text on the start side, the work hung on wires beside it
+ *   full-bleed    ink room; the work fills the width, a bone title card overlaps its foot
+ *   split-ink     split screen; text on a bone half, the work framed in an ink half
+ */
+import Nb from "./Nb.astro";
+import { Artwork, MuseumLabel, getArt } from "@/components/art";
+import { WhatsAppCta } from "@/components/nz";
+import { HERO_SIZES } from "./index";
+import { roomFor, SERVICES_WING } from "./rooms";
+import type { Crumb, HeroVariant, ServiceHeroData } from "./types";
+import "./service.css";
+
+interface Props {
+  data: ServiceHeroData;
+  variant?: HeroVariant;
+  /** This page's path (for the room number and the crumb trail). */
+  path: string;
+  /** Breadcrumb: this page's name + parent (default שירותים) or a full middle trail. */
+  crumb: { name: string; parent?: Crumb; trail?: Crumb[] };
+  /** Room number override ("01"); default from rooms.ts by path. Pass "" for none (hub). */
+  room?: string;
+  /** Wing label after "אולם 03". */
+  wingLabel?: string;
+  /** object-position of the art when cropped (full-bleed / split-ink on phones). */
+  position?: string;
+}
+
+const { data, variant = "framed-right", path, crumb, room, wingLabel = "שירותים", position } = Astro.props;
+const sizes = HERO_SIZES[variant];
+const roomNum = room ?? roomFor(path)?.num;
+const middle: Crumb[] = crumb.trail ?? (crumb.parent ? [crumb.parent] : path === "/services/" ? [] : [{ name: "שירותים", path: "/services/" }]);
+const crumbs = [{ name: "דף הבית", path: "/" }, ...middle];
+
+const at = data.accent ? data.title.indexOf(data.accent) : -1;
+const [t0, t1, t2] = at >= 0 ? [data.title.slice(0, at), data.accent!, data.title.slice(at + data.accent!.length)] : [data.title, "", ""];
+const secondary = data.secondary ?? { label: "לעבודות שלנו", href: "/projects/" };
+const tone = variant === "full-bleed" ? "ink" : "bone";
+const artTitle = getArt(data.art).title;
+---
+
+<section class:list={["sv-hero", `sv-hero--${variant}`]} data-tone={tone} aria-labelledby="sv-hero-title">
+  {variant === "split-ink" && <div class="sv-hero__ink" data-tone="ink" aria-hidden="true" />}
+  {
+    variant === "full-bleed" && (
+      <div class="sv-hero__bleed">
+        <Artwork slug={data.art} sizes={sizes} priority position={position} className="sv-hero__bleed-art" />
+      </div>
+    )
+  }
+  <div class="nz-container sv-hero__grid">
+    <div class="sv-hero__text" data-tone={variant === "full-bleed" ? "bone" : undefined}>
+      <nav class="sv-crumbs sv-enter" aria-label="מיקום בתוך האתר">
+        <ol>
+          {
+            crumbs.map((c) => (
+              <li>
+                <a href={c.path}>{c.name}</a>
+              </li>
+            ))
+          }
+          <li><span aria-current="page">{crumb.name}</span></li>
+        </ol>
+      </nav>
+
+      <p class="sv-plaque sv-enter" style="--d: 60ms">
+        <span class="sv-plaque__wing">אולם {SERVICES_WING}</span>
+        {roomNum && <span class="sv-plaque__room">חדר {roomNum}</span>}
+        <span class="sv-plaque__name">{data.kicker || wingLabel}</span>
+      </p>
+
+      <h1 id="sv-hero-title" class="sv-hero__title">
+        <span class="sv-line"><span class="sv-line__in" style="--d: 120ms">{t0}{t1 && <span class="nz-accent">{t1}</span>}{t2}</span></span>
+      </h1>
+
+      <p class="lead sv-hero__lead sv-enter" style="--d: 280ms"><Nb text={data.lead} /></p>
+
+      <div class="sv-hero__ctas sv-enter" style="--d: 360ms">
+        <WhatsAppCta size="lg" label={data.cta?.label ?? "לשיחה בוואטסאפ"} message={data.cta?.message} />
+        <a href={secondary.href} class="nz-link">
+          <span class="nz-link__text">{secondary.label}</span>
+          <svg class="nz-link__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H3m0 0 4-4M3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </a>
+      </div>
+
+      {
+        data.facts && data.facts.length > 0 && (
+          <ul class="sv-facts sv-enter" style="--d: 440ms" aria-label="חומרים">
+            {data.facts.map((f) => (
+              <li>{f}</li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+
+    {
+      variant !== "full-bleed" && (
+        <figure class="sv-hero__exhibit">
+          {variant === "framed-right" && (
+            <svg class="sv-hero__wires" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M100 1 L6 39 M100 1 L194 39" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" />
+              <circle cx="100" cy="1.5" r="1.6" fill="currentColor" />
+            </svg>
+          )}
+          <div class="sv-hero__frame">
+            <Artwork
+              slug={data.art}
+              sizes={sizes}
+              priority
+              frame
+              lit={variant === "framed-right"}
+              position={position}
+            />
+          </div>
+          <MuseumLabel
+            as="figcaption"
+            index={roomNum || SERVICES_WING}
+            prefix="מוצג"
+            title={artTitle}
+            medium={data.medium}
+            className="sv-hero__label"
+          />
+        </figure>
+      )
+    }
+  </div>
+  {
+    variant === "full-bleed" && (
+      <div class="nz-container sv-hero__bleed-label">
+        <MuseumLabel index={roomNum || SERVICES_WING} prefix="מוצג" title={artTitle} medium={data.medium} />
+      </div>
+    )
+  }
+</section>

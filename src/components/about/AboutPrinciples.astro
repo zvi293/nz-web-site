@@ -1,0 +1,63 @@
+---
+/**
+ * Philosophy & principles. Opens with a pull quote (not an eyebrow + H2). The embroidered
+ * comet hangs beside the list (sticky on desktop); the principles sit on the comet's path:
+ * a dotted orbit with a four-pointed star at each principle, and a small comet (head + tail)
+ * that travels down the orbit as the list scrolls through view (CSS scroll-driven transform
+ * inside @supports; otherwise the comet rests at the top). Static (no client JS).
+ */
+import { Artwork, MuseumLabel, getArt } from "@/components/art";
+import { aboutPrinciples } from "@/content/about";
+
+const p = aboutPrinciples;
+const art = getArt(p.art.slug);
+---
+
+<section class="nz-section nz-section--space-default ab-principles" data-tone="bone" aria-labelledby="ab-principles-title">
+  <div class="nz-container ab-principles__grid">
+    <figure class="ab-pull" data-reveal="rise">
+      <p class="nz-label ab-pull__room"><span class="nz-label__index">{p.room}</span><span>הפילוסופיה</span></p>
+      <blockquote class="ab-pull__quote">
+        <p>{p.quote}</p>
+      </blockquote>
+      <figcaption class="ab-pull__by"><span class="ab-cube" aria-hidden="true"></span>{p.quoteBy}</figcaption>
+    </figure>
+
+    <figure class="ab-principles__art">
+      <div class="ab-principles__sticky">
+        <Artwork
+          slug={p.art.slug}
+          sizes="(min-width: 1024px) 40vw, 100vw"
+          ratio="4 / 3"
+          position="50% 50%"
+          frame
+          alt={art.alt}
+        />
+        <MuseumLabel as="figcaption" index={p.art.index} prefix={p.art.prefix} title={art.title} medium={p.art.medium} />
+      </div>
+    </figure>
+
+    <div class="ab-principles__body">
+      <h2 id="ab-principles-title" class="nz-display nz-display--h2 ab-principles__title">{p.title}</h2>
+      <div class="ab-orbit">
+        <span class="ab-orbit__path" aria-hidden="true">
+          <span class="ab-orbit__comet"><span class="ab-orbit__head"></span></span>
+        </span>
+        <ol class="ab-orbit__list">
+          {
+            p.items.map((item, i) => (
+              <li class="ab-orbit__item" data-reveal="rise" style={`--reveal-delay:${i * 60}ms`}>
+                <span class="ab-orbit__star" aria-hidden="true" />
+                <span class="ab-orbit__num" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 class="ab-orbit__title">{item.title}</h3>
+                <p class="ab-orbit__body">{item.body}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>

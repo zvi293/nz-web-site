@@ -1,0 +1,26 @@
+---
+/** Lawyer — the office's case files: manila folders with staggered tabs, the top one tied with red tape. */
+import Nb from "@/components/service/Nb.astro";
+import type { AudienceItem } from "@/components/service/types";
+interface Props { items: AudienceItem[] }
+const { items } = Astro.props;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+---
+
+<div class="vl-cf" data-reveal>
+  <ol class="vl-cf__stack">
+    {
+      items.map((it, i) => (
+        <li class="vl-cf__file" style={`--i:${i}; --tab:${(i % 4) * 22}%`}>
+          <span class="vl-cf__tab" aria-hidden="true">{`תיק ${pad(i)}`}</span>
+          <div class="vl-cf__face">
+            <p class="vl-cf__meta" aria-hidden="true"><span>נושא</span><span class="vl-cf__dots" /><span>{`${pad(i)} / ${String(items.length).padStart(2, "0")}`}</span></p>
+            <h3 class="vl-cf__name"><Nb text={it.title} /></h3>
+            <p class="vl-cf__line"><Nb text={it.description} /></p>
+          </div>
+          {i === 0 && <span class="vl-cf__tape" aria-hidden="true" />}
+        </li>
+      ))
+    }
+  </ol>
+</div>

@@ -1,0 +1,75 @@
+---
+/**
+ * /about/ hero — the studio's entrance. Static (no client JS).
+ * Mobile: room label, H1, the hung piece (LCP), lead + actions, the catalogue colophon.
+ * Desktop: the statement on the wall (start side), the piece hung large on the end side,
+ * the colophon as one hairline row under both.
+ * The piece opens like a kiln door (clip-path circle) — only under html.nz-motion.
+ */
+import { Artwork, MuseumLabel, getArt } from "@/components/art";
+import { WhatsAppCta, ArrowIcon, studio } from "@/components/nz";
+import { aboutHero } from "@/content/about";
+
+interface Props {
+  /** Must equal the page's lcpArt.sizes. */
+  sizes: string;
+}
+const { sizes } = Astro.props;
+const h = aboutHero;
+const art = getArt(h.art.slug);
+---
+
+<section class="nz-section nz-wall-light ab-hero" data-tone="bone" aria-labelledby="ab-title">
+  <div class="nz-container ab-hero__grid">
+    <div class="ab-hero__head">
+      <p class="nz-label ab-hero__room ab-enter" style="--d:0ms">
+        <span class="ab-cube" aria-hidden="true"></span>
+        <span>{h.room}</span>
+      </p>
+      <h1 id="ab-title" class="nz-display ab-hero__title">
+        <span class="ab-line"><span class="ab-line__in" style="--d:100ms">{h.h1[0]}</span></span>
+        {" "}
+        <span class="ab-line">
+          <span class="ab-line__in" style="--d:190ms">{h.h1[1]} <span class="nz-accent">{h.h1Accent}</span></span>
+        </span>
+      </h1>
+    </div>
+
+    <figure class="ab-hero__art">
+      <div class="ab-kilndoor">
+        <Artwork slug={h.art.slug} sizes={sizes} priority frame alt={art.alt} />
+      </div>
+      <MuseumLabel as="figcaption" index={h.art.index} prefix={h.art.prefix} title={art.title} medium={h.art.medium} />
+    </figure>
+
+    <div class="ab-hero__body">
+      <p class="nz-lede lead ab-hero__lead ab-enter" style="--d:320ms">{h.lead}</p>
+      <div class="ab-hero__ctas ab-enter" style="--d:420ms">
+        <WhatsAppCta size="lg" label={h.primaryCta} message={h.whatsappMessage} />
+        <a href={h.secondaryCta.href} class="nz-link ab-hero__secondary">
+          <span class="nz-link__text">{h.secondaryCta.label}</span>
+          <ArrowIcon className="nz-link__arrow" />
+        </a>
+      </div>
+    </div>
+
+    <dl class="ab-colophon" aria-label="פרטי הסטודיו">
+      {
+        h.colophon.map((row) => (
+          <div class="ab-colophon__row">
+            <dt>{row.k}</dt>
+            <dd>
+              {row.v === "hours" ? (
+                <>
+                  {studio.days} <bdi dir="ltr">{studio.time}</bdi>
+                </>
+              ) : (
+                row.v
+              )}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>

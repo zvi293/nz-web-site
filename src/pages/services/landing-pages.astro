@@ -1,32 +1,66 @@
 ---
 /**
- * /services/landing-pages/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /services/landing-pages/ — בניית דפי נחיתה. Service system page (src/components/service).
+ * Content: src/components/pages/landing-pages/data.ts. Static sections (page-born: LeakMap,
+ * AdStack); ONE island: the signature "סולם ההמרה" (hand-over-hand climb, client:visible).
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import LandingPages from "@/views/services/LandingPages";
-import { FAQS } from "@/views/services/LandingPages";
-import { faqPage, service, webPage } from "@/lib/schema";
-import type { PageSeo } from "@/lib/seo";
+import ServiceHero from "@/components/service/ServiceHero.astro";
+import SignatureSlot from "@/components/service/SignatureSlot.astro";
+import ServiceDeepDive from "@/components/service/ServiceDeepDive.astro";
+import ServiceProcess from "@/components/service/ServiceProcess.astro";
+import ServiceOutcomes from "@/components/service/ServiceOutcomes.astro";
+import ServiceFaq from "@/components/service/ServiceFaq.astro";
+import ServiceRelated from "@/components/service/ServiceRelated.astro";
+import ServiceCta from "@/components/service/ServiceCta.astro";
+import LeakMap from "@/components/pages/landing-pages/LeakMap.astro";
+import AdStack from "@/components/pages/landing-pages/AdStack.astro";
+import ConversionLadder from "@/components/pages/landing-pages/ConversionLadder";
+import { landingPages as page } from "@/components/pages/landing-pages/data";
+import { serviceSeo } from "@/lib/page-seo";
 
-const PATH = "/services/landing-pages/";
-const title = "בניית דפי נחיתה שממירים | דף נחיתה לקמפיינים | NZ-web";
-const description =
-  "בניית דפי נחיתה מהירים, ממירים ומחוברים למערכות שיווק. UX מוכח לדפי מכירה, טעינה מתחת ל-2 שניות ו-SEO מובנה. דף נחיתה שמכפיל את ה-ROI של הקמפיין.";
-const seo: PageSeo = {
-  path: PATH,
-  title,
-  description,
-  breadcrumb: { name: "בניית דפי נחיתה", path: PATH, parent: { name: "שירותים", path: "/services/" } },
-  jsonLd: [
-    webPage({ path: PATH, title, description }),
-    service({ path: PATH, name: "בניית דפי נחיתה שממירים", description, serviceType: "Landing Page Development" }),
-    faqPage(FAQS.map((f) => ({ question: f.q, answer: f.a })), PATH),
-  ],
-};
+const seo = serviceSeo(page);
 ---
 
-<BaseLayout seo={seo}>
-  <LandingPages client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <ServiceHero data={page.hero} variant={page.heroVariant} path={page.path} crumb={page.crumb} position="30% 50%" />
+
+  <LeakMap index="01" />
+
+  <SignatureSlot
+    name="סולם ההמרה"
+    title="שישה שלבים מהקליק אל הפנייה"
+    lede="דף נחיתה טוב הוא סולם: כל חלק בו מעלה את המבקר שלב אחד, מהמודעה שעליה לחץ ועד הטופס. עזרו לו לטפס על דף לדוגמה, יד אחרי יד. כל שלב מדליק את החלק בדף שבו הוא עובד."
+    hint="הקישו לסירוגין על יד ימין ועל יד שמאל, וכל משיכה מעלה שלב. אותה יד פעמיים מחליקה."
+    keys="במקלדת: Tab לכפתורי הידיים ו-Enter, או חץ ימינה ושמאלה לסירוגין."
+    opener="split"
+    index="02"
+    id="lnd-sig"
+  >
+    <ConversionLadder client:visible />
+  </SignatureSlot>
+
+  <AdStack title={page.whoFor!.title} lede={page.whoFor!.lede} items={page.whoFor!.items} index="03" />
+
+  <ServiceOutcomes title={page.outcomes!.title} items={page.outcomes!.items} index="04" opener="numeral" id="lnd-outcomes" />
+
+  <ServiceDeepDive data={page.deepDive!} variant="ledger" tone="bone" opener="rule" index="05" label="מה כולל" id="lnd-deep" />
+
+  <ServiceProcess
+    title={page.process!.title}
+    lede={page.process!.lede}
+    steps={page.process!.steps}
+    tone="paper"
+    opener="stacked"
+    index="06"
+    art={["marble-maze", "origami-crane", "kinetic-balance", "emerald-curtain"]}
+    avoid={[page.hero.art, "paper-plane", "lime-prism", "titanium-ribbon"]}
+    id="lnd-process"
+  />
+
+  <ServiceFaq items={page.faqs} title="שאלות על בניית דפי נחיתה" index="07" card="plaque" tone="bone" id="lnd-faq" />
+
+  <ServiceRelated currentPath={page.path} items={page.related} />
+
+  <ServiceCta data={page.cta!} label="הזמנה לשיחה · דף נחיתה" />
 </BaseLayout>

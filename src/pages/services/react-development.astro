@@ -1,32 +1,56 @@
 ---
 /**
- * /services/react-development/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /services/react-development/ — פיתוח React (room 07, art indigo-loom).
+ * Service system sections (src/components/service) + page-local pieces in
+ * src/components/pages/react-development/ (content: data.ts there): the opening essay with its
+ * framed detail ("רכיב אחד, מקרוב"), the punch card and the yes/no decision diagram.
+ * ONE island: the signature "רינדור חי" (type → live highlight, client:visible).
+ * `rd-page` on <main> lets react-development.css hang the hero work first on phones.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import ReactDevelopment from "@/views/services/ReactDevelopment";
-import { FAQS } from "@/views/services/ReactDevelopment";
-import { faqPage, service, webPage } from "@/lib/schema";
-import type { PageSeo } from "@/lib/seo";
+import ServiceHero from "@/components/service/ServiceHero.astro";
+import SignatureSlot from "@/components/service/SignatureSlot.astro";
+import ServiceOutcomes from "@/components/service/ServiceOutcomes.astro";
+import ServiceFaq from "@/components/service/ServiceFaq.astro";
+import ServiceRelated from "@/components/service/ServiceRelated.astro";
+import ServiceCta from "@/components/service/ServiceCta.astro";
+import OneComponent from "@/components/pages/react-development/OneComponent.astro";
+import PunchCard from "@/components/pages/react-development/PunchCard.astro";
+import ReactDecision from "@/components/pages/react-development/ReactDecision.astro";
+import LiveRender from "@/components/pages/react-development/LiveRender";
+import { reactDevelopment as page } from "@/components/pages/react-development/data";
+import { serviceSeo } from "@/lib/page-seo";
+import "@/components/pages/react-development/react-development.css";
 
-const PATH = "/services/react-development/";
-const title = "פיתוח React מתקדם | אפליקציות ואתרים מהירים | NZ-web";
-const description =
-  "פיתוח אפליקציות ואתרים מבוססי React עם TypeScript. ביצועים גבוהים, ארכיטקטורה נקייה, SEO מובנה ושילוב עם מערכות backend. פיתוח React מקצועי בישראל.";
-const seo: PageSeo = {
-  path: PATH,
-  title,
-  description,
-  breadcrumb: { name: "פיתוח React", path: PATH, parent: { name: "שירותים", path: "/services/" } },
-  jsonLd: [
-    webPage({ path: PATH, title, description }),
-    service({ path: PATH, name: "פיתוח אתרי React מתקדמים", description, serviceType: "React Development" }),
-    faqPage(FAQS.map((f) => ({ question: f.q, answer: f.a })), PATH),
-  ],
-};
+const seo = serviceSeo(page);
 ---
 
-<BaseLayout seo={seo}>
-  <ReactDevelopment client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)] rd-page">
+  <ServiceHero data={page.hero} variant={page.heroVariant} path={page.path} crumb={page.crumb} />
+
+  <SignatureSlot
+    name="רינדור חי"
+    title="הקלידו, וראו מה מתעדכן"
+    lede="חנות תה קטנה שבנויה מרכיבים, ולצידה עץ הרכיבים שלה. הקלידו בחיפוש או שימו תה בסל, וראו אילו רכיבים מצטיירים מחדש. כל השאר לא זז, וזה בדיוק מה שהופך ממשק React למהיר."
+    hint="הקלידו בשדה החיפוש, או הקישו על 'הקלידו בשבילי' ועל 'לסל'. כל רכיב שהתעדכן מסומן בחנות עם מספר הפעמים שצויר. המתג 'בלי חלוקה לרכיבים' מראה מה היה קורה אילו כל העמוד היה נבנה מחדש בכל שינוי."
+    keys="במקלדת: Tab בין השדה, הכפתורים והמתג; רווח או Enter מפעילים."
+    opener="rule"
+    index="מוצג חי"
+  >
+    <LiveRender client:visible />
+  </SignatureSlot>
+
+  <OneComponent index="01" />
+
+  <PunchCard index="02" />
+
+  <ReactDecision index="03" />
+
+  <ServiceOutcomes title={page.outcomes!.title} items={page.outcomes!.items} tone="ink" opener="quote" index="04" />
+
+  <ServiceFaq items={page.faqs} title="שאלות על פיתוח React" tone="paper" card="plaque" opener="numeral" index="05" />
+
+  <ServiceRelated currentPath={page.path} items={page.related} />
+
+  <ServiceCta data={page.cta!} label="פרויקט React" />
 </BaseLayout>

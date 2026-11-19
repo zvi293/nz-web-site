@@ -1,21 +1,32 @@
 ---
 /**
  * 404 — built to dist/404.html; Netlify serves it with a real HTTP 404 for any unmatched path.
- * noindex, never in the sitemap. LEGACY view as one island until it is redesigned.
+ * noindex, no canonical, never in the sitemap.
+ * Static sections (src/components/notfound) + ONE island:
+ *   PortalTunnel  client:visible  the signature "השערים" (receding gates, each a suggested room)
+ * Page CSS: src/components/notfound/notfound.css (prefix `nf-`).
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import NotFound from "@/views/NotFound";
+import NotFoundHero, { NF_ART_SIZES, NF_ART_SLUG } from "@/components/notfound/NotFoundHero";
+import NotFoundGates from "@/components/notfound/NotFoundGates";
+import PortalTunnel from "@/components/notfound/PortalTunnel";
+import "@/components/notfound/notfound.css";
+import { notFoundCopy } from "@/components/notfound/copy";
 import type { PageSeo } from "@/lib/seo";
 
 const seo: PageSeo = {
   path: "/404/",
-  title: "404 — הדף לא נמצא | NZ-web",
-  description: "הדף שחיפשתם לא נמצא. חזרו לדף הבית של NZ-web או צרו איתנו קשר.",
+  title: notFoundCopy.seo.title,
+  description: notFoundCopy.seo.description,
   noindex: true,
   canonical: false,
+  lcpArt: { slug: NF_ART_SLUG, sizes: NF_ART_SIZES },
 };
 ---
 
-<BaseLayout seo={seo}>
-  <NotFound client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <NotFoundHero />
+  <NotFoundGates>
+    <PortalTunnel client:visible />
+  </NotFoundGates>
 </BaseLayout>

@@ -1,482 +1,297 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { 
-  X, RotateCcw, Eye, Type, Palette, Navigation, 
-  MousePointer, Link2, Focus, Minus, Plus, 
-  Heading, SunMoon, Moon, Sun, Contrast
-} from "lucide-react";
-import accessibilityIcon from "@/assets/accessibility-icon.png";
+import { useCallback, useEffect, useRef, useState } from "react";
+import "@/components/legal/floating-ui.css";
+import {
+  A11Y_LABELS,
+  A11Y_OPEN_EVENT,
+  FONT_MAX,
+  FONT_MIN,
+  FONT_STEP,
+  countActive,
+  isDefaultA11y,
+  toggled,
+  useA11ySettings,
+  withFontSize,
+  DEFAULT_A11Y,
+  type A11yToggle,
+} from "@/components/legal/a11y-store";
+import { probeCovers, watchWhileScrolling } from "@/components/legal/floating";
+import A11yGlyph from "@/components/legal/A11yGlyph";
 
-interface AccessibilitySettings {
-  fontSize: number;
-  readableFont: boolean;
-  highlightLinks: boolean;
-  highlightTitles: boolean;
-  highContrastDark: boolean;
-  highContrastLight: boolean;
-  grayscale: boolean;
-  invertColors: boolean;
-  pauseAnimations: boolean;
-  bigCursor: boolean;
-  readingGuide: boolean;
-  focusOutline: boolean;
-}
+/**
+ * The accessibility widget (global chrome — BaseLayout: <AccessibilityWidget client:idle />).
+ *
+ *  - The bead: a compact 44px ink disc docked bottom-start (bottom-right in RTL) inside the
+ *    safe-area insets, riding above the cookie sheet (--nz-sheet-h). While the page scrolls it
+ *    probes what it sits on (~10×/s); over a link, button, form field or a block marked
+ *    [data-float-avoid] (e.g. a hero's key facts) it docks as a half-disc tab on the edge so it
+ *    never covers a call to action, and comes back as soon as the spot is clear.
+ *    It is never hidden: the control stays reachable at all times (legal requirement).
+ *  - The panel: a native <dialog> (focus trap, Escape, top layer) — a bottom sheet on phones,
+ *    a side panel on desktop. Opening adds one history entry so the phone BACK button closes it;
+ *    page scroll is pinned without layout shift; focus returns to the bead.
+ *  - Settings live in src/components/legal/a11y-store.ts (localStorage "a11y-settings-v2" +
+ *    body classes, the same contract as BaseLayout's boot script). The statement page's
+ *    switchboard flips the same settings; both stay in sync through the "nz:a11y" event.
+ *  - Other code can open the panel: window.dispatchEvent(new Event("nz:a11y-open")).
+ */
 
-const defaultSettings: AccessibilitySettings = {
-  fontSize: 100,
-  readableFont: false,
-  highlightLinks: false,
-  highlightTitles: false,
-  highContrastDark: false,
-  highContrastLight: false,
-  grayscale: false,
-  invertColors: false,
-  pauseAnimations: false,
-  bigCursor: false,
-  readingGuide: false,
-  focusOutline: false,
-};
+const GROUPS: { title: string; keys: A11yToggle[] }[] = [
+  { title: "טקסט וקריאה", keys: ["readableFont", "highlightLinks", "highlightTitles"] },
+  { title: "צבע וניגודיות", keys: ["highContrastDark", "highContrastLight", "grayscale", "invertColors"] },
+  { title: "תנועה וניווט", keys: ["pauseAnimations", "bigCursor", "readingGuide", "focusOutline"] },
+];
 
 const AccessibilityWidget = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  /* Server render + first client render use the defaults (identical markup → clean hydration);
-     the saved settings are read right after mounting. BaseLayout's boot script has already
-     applied them to <html>/<body> before first paint, so nothing flashes. */
-  const [settings, setSettings] = useState<AccessibilitySettings>(defaultSettings);
-  const [ready, setReady] = useState(false);
-  const [readingGuideY, setReadingGuideY] = useState(0);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [settings, setSettings, ready] = useA11ySettings();
+  const [open, setOpen] = useState(false);
+  const [tucked, setTucked] = useState(false);
+  const [announce, setAnnounce] = useState("");
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const beadRef = useRef<HTMLButtonElement>(null);
+  const dockRef = useRef<HTMLDivElement>(null);
+  const guideRef = useRef<HTMLDivElement>(null);
 
-  // Apply settings to DOM
-  const applySettings = useCallback((s: AccessibilitySettings) => {
-    const root = document.documentElement;
-    const body = document.body;
-
-    // Font size
-    root.style.fontSize = s.fontSize === 100 ? "" : `${s.fontSize}%`;
-
-    // Readable font
-    body.classList.toggle("a11y-readable-font", s.readableFont);
-
-    // Highlight links
-    body.classList.toggle("a11y-highlight-links", s.highlightLinks);
-
-    // Highlight titles
-    body.classList.toggle("a11y-highlight-titles", s.highlightTitles);
-
-    // High contrast modes (mutually exclusive)
-    body.classList.remove("a11y-high-contrast-dark", "a11y-high-contrast-light");
-    if (s.highContrastDark) {
-      body.classList.add("a11y-high-contrast-dark");
-    } else if (s.highContrastLight) {
-      body.classList.add("a11y-high-contrast-light");
-    }
-
-    // Grayscale
-    body.classList.toggle("a11y-grayscale", s.grayscale);
-
-    // Invert colors
-    body.classList.toggle("a11y-invert-colors", s.invertColors);
-
-    // Pause animations
-    body.classList.toggle("a11y-pause-animations", s.pauseAnimations);
-
-    // Big cursor
-    body.classList.toggle("a11y-big-cursor", s.bigCursor);
-
-    // Reading guide
-    body.classList.toggle("a11y-reading-guide-active", s.readingGuide);
-
-    // Focus outline
-    body.classList.toggle("a11y-focus-outline", s.focusOutline);
-
+  /* ── open / close (native dialog + one history entry for the BACK button) ── */
+  const show = useCallback(() => {
+    const dlg = dialogRef.current;
+    if (!dlg || dlg.open) return;
+    const html = document.documentElement;
+    html.classList.add("nzc-scroll-pinned");
+    dlg.showModal();
+    /* The scrollable sheet would otherwise take the initial focus: start on "close". */
+    dlg.querySelector<HTMLButtonElement>(".nzc-x")?.focus();
+    setOpen(true);
     try {
-      localStorage.setItem("a11y-settings-v2", JSON.stringify(s));
+      history.pushState({ ...(history.state ?? {}), nzA11y: true }, "");
     } catch {
-      /* storage blocked — settings last for this page only */
+      /* sandboxed: no history entry */
     }
   }, []);
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("a11y-settings-v2");
-      if (saved) setSettings({ ...defaultSettings, ...JSON.parse(saved) });
-    } catch {
-      /* keep the defaults */
-    }
-    setReady(true);
+  const requestClose = useCallback(() => {
+    if (history.state?.nzA11y) history.back();
+    else dialogRef.current?.close();
   }, []);
 
   useEffect(() => {
-    if (ready) applySettings(settings);
-  }, [settings, ready, applySettings]);
+    const dlg = dialogRef.current;
+    if (!dlg) return;
+    const onClose = () => {
+      setOpen(false);
+      document.documentElement.classList.remove("nzc-scroll-pinned");
+      if (history.state?.nzA11y) history.back();
+      beadRef.current?.focus({ preventScroll: true });
+    };
+    const onPop = () => {
+      if (dlg.open) dlg.close();
+    };
+    const onOpenRequest = () => show();
+    dlg.addEventListener("close", onClose);
+    window.addEventListener("popstate", onPop);
+    window.addEventListener(A11Y_OPEN_EVENT, onOpenRequest);
+    return () => {
+      dlg.removeEventListener("close", onClose);
+      window.removeEventListener("popstate", onPop);
+      window.removeEventListener(A11Y_OPEN_EVENT, onOpenRequest);
+    };
+  }, [show]);
 
-  // Reading guide mouse tracking
+  /* ── the bead tucks into the edge while it would cover a link, button or field ── */
+  useEffect(() => {
+    let clear = 0;
+    const probe = () => {
+      const dock = dockRef.current;
+      if (!dock) return;
+      const hit = probeCovers(dock.getBoundingClientRect(), ["field", "target", "avoid"]);
+      if (hit) {
+        clear = 0;
+        setTucked(true);
+      } else if (++clear >= 2) {
+        setTucked(false);
+      }
+    };
+    const stop = watchWhileScrolling(probe);
+    const first = window.setTimeout(probe, 600);
+    return () => {
+      stop();
+      window.clearTimeout(first);
+    };
+  }, []);
+
+  /* ── reading guide: a hairline that follows the pointer (mouse, pen or finger) ── */
   useEffect(() => {
     if (!settings.readingGuide) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      setReadingGuideY(e.clientY);
+    const move = (e: PointerEvent) => {
+      if (guideRef.current) guideRef.current.style.transform = `translate3d(0, ${Math.round(e.clientY)}px, 0)`;
     };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerdown", move, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerdown", move);
+    };
   }, [settings.readingGuide]);
 
-  /* Escape closes; Tab is trapped inside the dialog.
-     A `role="dialog" aria-modal="true"` that leaks focus back to the page behind
-     it fails WCAG 2.4.3 — and this is the accessibility menu itself, so it has to
-     be exemplary. */
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        setIsOpen(false);
-        triggerRef.current?.focus();
-        return;
-      }
-
-      if (e.key !== "Tab" || !panelRef.current) return;
-
-      const focusable = panelRef.current.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
-      );
-      if (focusable.length === 0) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      const active = document.activeElement;
-
-      if (e.shiftKey && (active === first || !panelRef.current.contains(active))) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && active === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
-
-  /* Move focus into the panel on open, and stop the page behind it scrolling. */
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const firstButton = panelRef.current?.querySelector("button");
-    firstButton?.focus();
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
-
-  const updateSetting = <K extends keyof AccessibilitySettings>(
-    key: K,
-    value: AccessibilitySettings[K]
-  ) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev, [key]: value };
-      // Handle mutually exclusive contrast modes
-      if (key === "highContrastDark" && value) {
-        newSettings.highContrastLight = false;
-      }
-      if (key === "highContrastLight" && value) {
-        newSettings.highContrastDark = false;
-      }
-      return newSettings;
-    });
+  const flip = (key: A11yToggle) => {
+    const next = setSettings((prev) => toggled(prev, key));
+    setAnnounce(`${A11Y_LABELS[key]} ${next[key] ? "פועל" : "כבוי"}`);
+  };
+  const size = (delta: number) => {
+    const next = setSettings((prev) => withFontSize(prev, prev.fontSize + delta));
+    setAnnounce(`גודל טקסט ${next.fontSize}%`);
+  };
+  const reset = () => {
+    setSettings({ ...DEFAULT_A11Y });
+    setAnnounce("כל ההגדרות אופסו");
   };
 
-  const adjustFontSize = (delta: number) => {
-    setSettings((prev) => ({
-      ...prev,
-      fontSize: Math.min(200, Math.max(80, prev.fontSize + delta)),
-    }));
-  };
-
-  const resetSettings = () => {
-    setSettings(defaultSettings);
-  };
-
-  const hasChanges = JSON.stringify(settings) !== JSON.stringify(defaultSettings);
+  const active = ready ? countActive(settings) : 0;
+  const pct = ((settings.fontSize - FONT_MIN) / (FONT_MAX - FONT_MIN)) * 100;
 
   return (
     <>
-      {/* Floating Accessibility Button */}
-      {/* 48px, not 40: this is the legally-required accessibility control, so it
-          has to clear the 44×44 minimum touch target comfortably. It also sits
-          above the cookie banner's z-index band so it is never unreachable. */}
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={() => setIsOpen(true)}
-        aria-label="פתח תפריט נגישות"
-        aria-expanded={isOpen}
-        aria-haspopup="dialog"
-        aria-controls="accessibility-panel"
-        className="fixed bottom-[92px] left-6 z-[10020] flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 cursor-pointer"
+      <div ref={dockRef} className="nzc-dock nzc-dock--start" data-nz-float="" data-a11y-exclude="true" data-tucked={tucked ? "" : undefined}>
+        <button
+          ref={beadRef}
+          type="button"
+          className="nzc-bead nzc-bead--a11y"
+          onClick={show}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-controls="nz-a11y-panel"
+          aria-label={active ? `תפריט נגישות (${active} הגדרות פעילות)` : "תפריט נגישות"}
+        >
+          <A11yGlyph className="nzc-bead__glyph" />
+          {active > 0 && <span className="nzc-bead__dot" aria-hidden="true" />}
+        </button>
+      </div>
+
+      {settings.readingGuide && <div ref={guideRef} className="nzc-guide" aria-hidden="true" data-nz-float="" />}
+
+      <dialog
+        ref={dialogRef}
+        id="nz-a11y-panel"
+        className="nzc-a11y"
+        aria-labelledby="nz-a11y-title"
+        data-a11y-exclude="true"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) requestClose();
+        }}
       >
-        <img src={accessibilityIcon} alt="" width={24} height={24} className="h-6 w-6 invert" aria-hidden="true" />
-      </button>
-
-      {/* Reading Guide Line */}
-      {settings.readingGuide && (
-        <div
-          className="fixed left-0 right-0 h-[3px] bg-primary/80 pointer-events-none z-[10010] transition-transform duration-75"
-          style={{ top: `${readingGuideY}px` }}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Panel */}
-      {isOpen && (
-          <>
-            {/* Overlay */}
-            <div
-              className="fixed inset-0 z-[10030] bg-black/50 backdrop-blur-sm duration-200 animate-in fade-in motion-reduce:animate-none"
-              onClick={() => setIsOpen(false)}
-              aria-hidden="true"
-            />
-
-            {/* Side Panel */}
-            <div
-              ref={panelRef}
-              id="accessibility-panel"
-              role="dialog"
-              aria-modal="true"
-              aria-label="תפריט נגישות"
-              data-a11y-exclude="true"
-              className="duration-300 animate-in slide-in-from-left fade-in motion-reduce:animate-none fixed top-0 left-0 bottom-0 z-[10040] w-[380px] max-w-[92vw] bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 shadow-2xl overflow-y-auto"
-              dir="rtl"
-            >
-              {/* Header */}
-              <div className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700 px-5 py-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 
-                    className="text-xl font-bold text-white flex items-center gap-3"
-                    style={{ fontFamily: "'Heebo', sans-serif" }}
-                  >
-                    <img src={accessibilityIcon} alt="" className="h-6 w-6 invert" aria-hidden="true" />
-                    תפריט נגישות
-                  </h2>
-                  <button
-                    onClick={() => setIsOpen(false)}
-                    className="p-2 rounded-full hover:bg-slate-700 transition-colors text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                    aria-label="סגור תפריט נגישות"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-
-                {/* Reset Button */}
-                {hasChanges && (
-                  <button
-                    onClick={resetSettings}
-                    className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-400"
-                    aria-label="איפוס כל הגדרות הנגישות"
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    איפוס הגדרות
-                  </button>
-                )}
-              </div>
-
-              <div className="p-5 space-y-6">
-                {/* Content Adjustments */}
-                <Section icon={<Type className="h-5 w-5" />} title="התאמות תוכן">
-                  {/* Font Size */}
-                  <div className="bg-slate-800/60 rounded-2xl p-4 border border-slate-700">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-white font-medium text-sm">גודל טקסט</span>
-                      <span className="text-primary font-bold text-sm">{settings.fontSize}%</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => adjustFontSize(-10)}
-                        disabled={settings.fontSize <= 80}
-                        className="flex-1 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary"
-                        aria-label="הקטן גודל טקסט"
-                      >
-                        <Minus className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => adjustFontSize(10)}
-                        disabled={settings.fontSize >= 200}
-                        className="flex-1 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary"
-                        aria-label="הגדל גודל טקסט"
-                      >
-                        <Plus className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <ToggleButton
-                      icon={<span className="text-lg font-serif">Aa</span>}
-                      label="גופן קריא"
-                      active={settings.readableFont}
-                      onClick={() => updateSetting("readableFont", !settings.readableFont)}
-                    />
-                    <ToggleButton
-                      icon={<Link2 className="h-5 w-5" />}
-                      label="הדגש קישורים"
-                      active={settings.highlightLinks}
-                      onClick={() => updateSetting("highlightLinks", !settings.highlightLinks)}
-                    />
-                    <ToggleButton
-                      icon={<Heading className="h-5 w-5" />}
-                      label="הדגש כותרות"
-                      active={settings.highlightTitles}
-                      onClick={() => updateSetting("highlightTitles", !settings.highlightTitles)}
-                    />
-                  </div>
-                </Section>
-
-                {/* Visual Adjustments */}
-                <Section icon={<Palette className="h-5 w-5" />} title="התאמות צבע וניגודיות">
-                  <div className="grid grid-cols-2 gap-3">
-                    <ToggleButton
-                      icon={<Moon className="h-5 w-5" />}
-                      label="ניגודיות גבוהה (כהה)"
-                      active={settings.highContrastDark}
-                      onClick={() => updateSetting("highContrastDark", !settings.highContrastDark)}
-                    />
-                    <ToggleButton
-                      icon={<Sun className="h-5 w-5" />}
-                      label="ניגודיות גבוהה (בהיר)"
-                      active={settings.highContrastLight}
-                      onClick={() => updateSetting("highContrastLight", !settings.highContrastLight)}
-                    />
-                    <ToggleButton
-                      icon={<SunMoon className="h-5 w-5" />}
-                      label="גווני אפור"
-                      active={settings.grayscale}
-                      onClick={() => updateSetting("grayscale", !settings.grayscale)}
-                    />
-                    <ToggleButton
-                      icon={<Contrast className="h-5 w-5" />}
-                      label="הפוך צבעים"
-                      active={settings.invertColors}
-                      onClick={() => updateSetting("invertColors", !settings.invertColors)}
-                    />
-                  </div>
-                </Section>
-
-                {/* Orientation & Navigation */}
-                <Section icon={<Navigation className="h-5 w-5" />} title="ניווט ואוריינטציה">
-                  <div className="grid grid-cols-2 gap-3">
-                    <ToggleButton
-                      icon={<span className="text-lg">⏸</span>}
-                      label="עצור אנימציות"
-                      active={settings.pauseAnimations}
-                      onClick={() => updateSetting("pauseAnimations", !settings.pauseAnimations)}
-                    />
-                    <ToggleButton
-                      icon={<MousePointer className="h-5 w-5" />}
-                      label="סמן גדול"
-                      active={settings.bigCursor}
-                      onClick={() => updateSetting("bigCursor", !settings.bigCursor)}
-                    />
-                    <ToggleButton
-                      icon={<Eye className="h-5 w-5" />}
-                      label="קו עזר לקריאה"
-                      active={settings.readingGuide}
-                      onClick={() => updateSetting("readingGuide", !settings.readingGuide)}
-                    />
-                    <ToggleButton
-                      icon={<Focus className="h-5 w-5" />}
-                      label="מסגרת מיקוד"
-                      active={settings.focusOutline}
-                      onClick={() => updateSetting("focusOutline", !settings.focusOutline)}
-                    />
-                  </div>
-                </Section>
-
-                {/* Accessibility Statement Link */}
-                <div className="pt-4 border-t border-slate-700">
-                  <a
-                    href="/accessibility/"
-                    onClick={() => setIsOpen(false)}
-                    className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    aria-label="עבור לדף הצהרת הנגישות"
-                  >
-                    <span>📄</span>
-                    הצהרת נגישות
-                  </a>
-                </div>
-
-                {/* Footer */}
-                <p className="text-xs text-slate-500 text-center pt-2">
-                  תפריט נגישות תואם WCAG 2.1 AA
-                </p>
-              </div>
+        <div className="nzc-a11y__sheet">
+          <div className="nzc-a11y__head">
+            <div>
+              <p className="nzc-a11y__kicker">
+                <span className="nzc-cube" aria-hidden="true" />
+                נגישות
+              </p>
+              <h2 id="nz-a11y-title" className="nzc-a11y__title">
+                התאמת התצוגה
+              </h2>
             </div>
-          </>
-        )}
+            <button type="button" className="nzc-x" onClick={requestClose} aria-label="סגירת תפריט הנגישות">
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M5 5l10 10M15 5 5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="nzc-a11y__body">
+            <section className="nzc-a11y__group" aria-labelledby="nz-a11y-g0">
+              <h3 id="nz-a11y-g0" className="nzc-a11y__gtitle">
+                <span className="nzc-a11y__gnum">01</span> {GROUPS[0].title}
+              </h3>
+              <div className="nzc-size">
+                <div className="nzc-size__row">
+                  <span className="nzc-size__name" id="nz-a11y-size">
+                    גודל טקסט
+                  </span>
+                  <output className="nzc-size__value" aria-labelledby="nz-a11y-size">
+                    {settings.fontSize}%
+                  </output>
+                </div>
+                <div className="nzc-size__ctrl">
+                  <button
+                    type="button"
+                    className="nzc-size__btn"
+                    onClick={() => size(-FONT_STEP)}
+                    disabled={settings.fontSize <= FONT_MIN}
+                    aria-label="הקטנת טקסט"
+                  >
+                    <span aria-hidden="true">א</span>
+                    <span aria-hidden="true" className="nzc-size__sign">−</span>
+                  </button>
+                  <span className="nzc-size__meter" aria-hidden="true">
+                    <span className="nzc-size__fill" style={{ transform: `scaleX(${pct / 100})` }} />
+                    <span className="nzc-size__base" style={{ insetInlineStart: `${((100 - FONT_MIN) / (FONT_MAX - FONT_MIN)) * 100}%` }} />
+                  </span>
+                  <button
+                    type="button"
+                    className="nzc-size__btn nzc-size__btn--big"
+                    onClick={() => size(FONT_STEP)}
+                    disabled={settings.fontSize >= FONT_MAX}
+                    aria-label="הגדלת טקסט"
+                  >
+                    <span aria-hidden="true">א</span>
+                    <span aria-hidden="true" className="nzc-size__sign">+</span>
+                  </button>
+                </div>
+              </div>
+              <Rows keys={GROUPS[0].keys} settings={settings} onFlip={flip} />
+            </section>
+
+            {GROUPS.slice(1).map((g, gi) => (
+              <section key={g.title} className="nzc-a11y__group" aria-labelledby={`nz-a11y-g${gi + 1}`}>
+                <h3 id={`nz-a11y-g${gi + 1}`} className="nzc-a11y__gtitle">
+                  <span className="nzc-a11y__gnum">{String(gi + 2).padStart(2, "0")}</span> {g.title}
+                </h3>
+                <Rows keys={g.keys} settings={settings} onFlip={flip} />
+              </section>
+            ))}
+          </div>
+
+          <div className="nzc-a11y__foot">
+            <button type="button" className="nzc-pill" onClick={reset} disabled={isDefaultA11y(settings)}>
+              איפוס הכול
+            </button>
+            <a href="/accessibility/" className="nzc-a11y__link">
+              הצהרת הנגישות
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M10 3.5 5.5 8l4.5 4.5" fill="none" stroke="currentColor" strokeWidth="1.4" />
+              </svg>
+            </a>
+          </div>
+          <p className="nzc-a11y__note">ההגדרות נשמרות בדפדפן הזה ונטענות בכל עמוד באתר.</p>
+          <p className="nz-sr" role="status" aria-live="polite">
+            {announce}
+          </p>
+        </div>
+      </dialog>
     </>
   );
 };
 
-// Section Component
-const Section = ({ 
-  icon, 
-  title, 
-  children 
-}: { 
-  icon: React.ReactNode; 
-  title: string; 
-  children: React.ReactNode;
-}) => (
-  <div className="space-y-3">
-    <div className="flex items-center gap-2 pb-1">
-      <span className="text-primary">{icon}</span>
-      <span className="text-sm font-bold text-white" style={{ fontFamily: "'Heebo', sans-serif" }}>
-        {title}
-      </span>
-    </div>
-    {children}
-  </div>
-);
-
-// Toggle Button Component
-const ToggleButton = ({
-  icon,
-  label,
-  active,
-  onClick,
+const Rows = ({
+  keys,
+  settings,
+  onFlip,
 }: {
-  icon: React.ReactNode;
-  label: string;
-  active: boolean;
-  onClick: () => void;
+  keys: A11yToggle[];
+  settings: Record<A11yToggle, boolean>;
+  onFlip: (k: A11yToggle) => void;
 }) => (
-  <button
-    onClick={onClick}
-    onKeyDown={(e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        onClick();
-      }
-    }}
-    role="switch"
-    aria-checked={active}
-    aria-label={label}
-    className={`flex items-center gap-3 rounded-2xl px-4 py-3.5 text-right transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-primary ${
-      active
-        ? "bg-primary/20 border-primary text-white"
-        : "bg-slate-800/60 border-slate-700 text-slate-300 hover:bg-slate-700/60 hover:text-white"
-    }`}
-  >
-    <span className="shrink-0">{icon}</span>
-    <span className="text-xs font-medium leading-tight">{label}</span>
-  </button>
+  <ul className="nzc-rows">
+    {keys.map((k) => (
+      <li key={k}>
+        <button type="button" role="switch" aria-checked={settings[k]} className="nzc-row" onClick={() => onFlip(k)}>
+          <span className="nzc-row__name">{A11Y_LABELS[k]}</span>
+          <span className="nzc-row__switch" aria-hidden="true">
+            <span className="nzc-row__knob" />
+          </span>
+        </button>
+      </li>
+    ))}
+  </ul>
 );
 
 export default AccessibilityWidget;

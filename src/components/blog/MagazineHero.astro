@@ -1,0 +1,47 @@
+---
+/**
+ * Magazine hub hero: the room label, the H1 (keyword kicker + serif statement), the answer-first
+ * lead (.lead, speakable) and the signature — the zipper (MagazineZipper.astro). Static markup;
+ * the zipper's behaviour is its own bundled script.
+ */
+import MagazineZipper from "./MagazineZipper.astro";
+import { DEPARTMENTS, getBlogPosts, getCurrentIssuePosts, getIssue } from "@/lib/blog";
+
+interface Props {
+  sizes: string;
+}
+const { sizes } = Astro.props;
+const current = getCurrentIssuePosts();
+const issue = getIssue(current[0]);
+const total = getBlogPosts().length;
+---
+
+<section class="mg-hero" data-tone="bone" aria-labelledby="mg-title">
+  <div class="mg-hero__light" aria-hidden="true"></div>
+  <div class="nz-container mg-hero__grid">
+    <div class="mg-hero__text">
+      <p class="nz-label mg-hero__room">
+        <span class="mg-cube" aria-hidden="true"></span>
+        <span class="nz-label__index">אולם 06</span>
+        <span>המגזין</span>
+      </p>
+      <h1 id="mg-title" class="mg-hero__title">
+        <span class="mg-hero__kicker">בלוג בניית אתרים</span>
+        <span class="mg-hero__statement">מדריכים לבעלי עסקים, <span class="nz-accent">בלי ז'רגון.</span></span>
+      </h1>
+      <p class="lead mg-hero__lead">
+        המגזין של NZ-web הוא בלוג על בניית אתרים לעסקים בישראל: מדריכים על תכנון אתר, קידום בגוגל ובמנועי AI, נגישות, עיצוב
+        ומהירות. כל מאמר נפתח בתשובה קצרה, מסביר מה עושים בפועל ומסתיים בשאלות נפוצות. את המונחים המקצועיים אפשר לבדוק
+        ב<a href="/glossary/">מילון המונחים</a>.
+      </p>
+      <dl class="mg-hero__facts">
+        <div><dt>גיליון נוכחי</dt><dd>{issue.index} · {issue.month}</dd></div>
+        <div><dt>מאמרים</dt><dd>{String(total).padStart(2, "0")}</dd></div>
+        <div><dt>מדורים</dt><dd>{String(DEPARTMENTS.length).padStart(2, "0")}</dd></div>
+      </dl>
+    </div>
+    <div class="mg-hero__art">
+      <MagazineZipper sizes={sizes} />
+    </div>
+  </div>
+</section>

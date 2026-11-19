@@ -1,0 +1,65 @@
+---
+/**
+ * /faq/ hero: the statement and answer-first lead on the start side, the harp bridge hung wide
+ * on the end side (LCP), and the jump row into the three topics ("octaves"). Static.
+ */
+import { Artwork, MuseumLabel, getArt } from "@/components/art";
+import { faqGroups, visibleFaqItems } from "@/content/faq";
+
+interface Props {
+  /** Must equal the page's lcpArt.sizes. */
+  sizes: string;
+}
+const { sizes } = Astro.props;
+const art = getArt("harp-bridge");
+const ROMAN = ["I", "II", "III", "IV"];
+const counts = Object.fromEntries(faqGroups.map((g) => [g.id, visibleFaqItems.filter((i) => i.group === g.id).length]));
+---
+
+<section class="nz-section nz-wall-light fq-hero" data-tone="bone" aria-labelledby="fq-title">
+  <div class="nz-container fq-hero__grid">
+    <div class="fq-hero__head">
+      <p class="nz-label fq-hero__room fq-enter" style="--d:0ms">
+        <span class="fq-cube" aria-hidden="true"></span>
+        <span>אולם 00 · שאלות נפוצות</span>
+      </p>
+      <h1 id="fq-title" class="nz-display fq-hero__title fq-enter" style="--d:90ms">
+        שאלות נפוצות על בניית אתר <span class="nz-accent">לעסק</span>
+      </h1>
+      <p class="nz-lede lead fq-hero__lead fq-enter" style="--d:200ms">
+        כאן תמצאו תשובות ישירות לשאלות שעסקים שואלים לפני שבונים אתר: כמה זמן זה לוקח, מה שואלים בשיחה הראשונה, מה צריך
+        להכין, איך האתר נבנה ומה קורה אחרי ההשקה. כל שאלה היא מיתר: לחצו עליה, והתשובה תיפתח. לא מצאתם? שלחו לנו את
+        השאלה בוואטסאפ.
+      </p>
+    </div>
+
+    <figure class="fq-hero__art">
+      <div class="fq-hero__frame">
+        <Artwork slug="harp-bridge" sizes={sizes} priority frame alt={art.alt} />
+      </div>
+      <MuseumLabel as="figcaption" index={1} prefix="מוצג" title={art.title} medium="פלדה, ערפל ומיתרים · כל תשובה היא גשר לצד השני" />
+    </figure>
+
+    <nav class="fq-jump fq-enter" style="--d:320ms" aria-label="נושאי השאלות">
+      <p class="nz-label fq-jump__label">לפי נושא</p>
+      <ol class="fq-jump__list">
+        {
+          faqGroups.map((g, i) => (
+            <li>
+              <a href={`#${g.id}`} class="fq-jump__link">
+                <span class="fq-jump__oct" aria-hidden="true">
+                  {ROMAN[i]}
+                </span>
+                <span class="fq-jump__title">{g.title}</span>
+                <span class="fq-jump__count">{counts[g.id]} שאלות</span>
+                <svg class="fq-jump__arrow" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                  <path d="M10 4v11.5M5 11l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+  </div>
+</section>

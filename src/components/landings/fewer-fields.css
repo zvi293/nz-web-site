@@ -1,0 +1,491 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   פחות שדות (FewerFields) — prefix lpf-. Sits in the ink signature room.
+   Phone: the meter (field count + two gauges + verdict title) sticks under the header while
+   the paper form scrolls beneath it; the verdict text, actions and tray follow the form.
+   Desktop: the form on the start side, the meter + verdict as a sticky column beside it.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lpf {
+  display: grid;
+  gap: 18px;
+}
+.lpf__panel {
+  display: contents;
+}
+.lpf__meter {
+  order: 0;
+  position: sticky;
+  inset-block-start: calc(var(--header-h) + 8px);
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px 16px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: var(--ink-2);
+  box-shadow: 0 0 0 1px var(--ink-3), 0 16px 30px -16px rgba(0, 0, 0, 0.85);
+}
+.lpf__sheet {
+  order: 1;
+}
+.lpf__side {
+  order: 2;
+  display: grid;
+  gap: 12px;
+}
+.lpf__key {
+  order: 3;
+}
+
+.lpf__count {
+  display: grid;
+  justify-items: center;
+  min-width: 56px;
+  padding-inline-end: 14px;
+  border-inline-end: 1px solid var(--line-ink);
+}
+.lpf__num {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 2.75rem;
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums;
+}
+.lpf__numlabel {
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+}
+.lpf__gauges {
+  display: grid;
+  gap: 9px;
+}
+.lpf__gauge {
+  display: grid;
+  gap: 4px;
+}
+.lpf__glabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+.lpf__gname {
+  color: var(--fg-muted);
+}
+.lpf__glevel {
+  font-weight: 500;
+  color: var(--fg);
+  text-align: end;
+}
+.lpf__bar {
+  position: relative;
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ink-3);
+  overflow: hidden;
+}
+.lpf__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background: var(--bone);
+  transform-origin: 100% 50%;
+}
+[dir="ltr"] .lpf__fill {
+  transform-origin: 0 50%;
+}
+.lpf__gauge[data-kind="ease"] .lpf__fill {
+  background: var(--vermilion);
+}
+html.nz-motion .lpf__fill {
+  transition: transform 0.7s var(--ease-gallery);
+}
+.lpf__vtitle {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding-block-start: 9px;
+  border-block-start: 1px solid var(--line-ink);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  line-height: 1.2;
+}
+.lpf__vmark {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--ash);
+}
+[data-state="balanced"] .lpf__vmark {
+  background: var(--vermilion);
+  box-shadow: none;
+}
+[data-state="empty"] .lpf__vtitle,
+[data-state="thin"] .lpf__vtitle {
+  color: var(--accent-text);
+}
+
+/* ── the form ───────────────────────────────────────────────────────── */
+.lpf__sheet {
+  display: grid;
+  gap: 14px;
+  padding: 20px 16px 18px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 30px 60px -36px rgba(0, 0, 0, 0.9);
+}
+.lpf__formhead {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding-block-end: 12px;
+  border-block-end: 1px solid var(--line);
+}
+.lpf__formtitle {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+.lpf__formsub {
+  font-size: 0.75rem;
+  color: var(--graphite);
+}
+.lpf__fields {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lpf__field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  grid-template-areas: "label rm" "input rm";
+  column-gap: 6px;
+  row-gap: 4px;
+  align-items: center;
+}
+html.nz-motion .lpf__field {
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+}
+.lpf__field[data-leaving] {
+  opacity: 0;
+  transform: translateX(-24px);
+}
+[dir="ltr"] .lpf__field[data-leaving] {
+  transform: translateX(24px);
+}
+.lpf__label {
+  grid-area: label;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+.lpf__input {
+  grid-area: input;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding-inline: 12px;
+  border: 1px solid rgba(18, 17, 16, 0.22);
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.875rem;
+  color: var(--graphite);
+}
+.lpf__input--area {
+  height: 64px;
+  align-items: flex-start;
+  padding-block-start: 9px;
+}
+.lpf__ph {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.lpf__caret {
+  margin-inline-start: auto;
+  width: 8px;
+  height: 8px;
+  border-inline-end: 1.5px solid var(--graphite);
+  border-block-end: 1.5px solid var(--graphite);
+  transform: translateY(-2px) rotate(45deg);
+}
+.lpf__rm {
+  grid-area: rm;
+  align-self: end;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-block-end: -2px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--graphite);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lpf__rm span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(18, 17, 16, 0.25);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+.lpf__rm:hover span,
+.lpf__rm:focus-visible span {
+  background: var(--ink);
+  color: var(--bone);
+  box-shadow: none;
+}
+.lpf__rm:focus-visible {
+  outline: 2px solid var(--vermilion-deep);
+  outline-offset: -4px;
+}
+.lpf__submit {
+  justify-self: stretch;
+  display: grid;
+  place-items: center;
+  height: 48px;
+  margin-block-start: 4px;
+  border-radius: 999px;
+  background: var(--vermilion-fill);
+  color: #fff;
+  font-weight: 500;
+}
+
+.lpf__tray {
+  display: grid;
+  gap: 8px;
+  padding-block-start: 14px;
+  border-block-start: 1px dashed rgba(18, 17, 16, 0.3);
+}
+.lpf__traylabel {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--graphite);
+}
+.lpf__tray ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lpf__tray button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--bone-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  text-decoration: line-through;
+  text-decoration-color: rgba(18, 17, 16, 0.4);
+}
+.lpf__tray button span {
+  display: inline-block;
+  text-decoration: none;
+  margin-inline-end: 2px;
+}
+.lpf__tray button[data-kind="must"],
+.lpf__tray button[data-kind="qualify"] {
+  box-shadow: inset 0 0 0 1.5px var(--vermilion-deep);
+  color: var(--vermilion-deep);
+}
+.lpf__tray button:hover {
+  background: var(--bone);
+}
+.lpf__tray button:focus-visible {
+  outline: 2px solid var(--vermilion-deep);
+  outline-offset: 2px;
+}
+
+/* ── verdict text + actions ─────────────────────────────────────────── */
+.lpf__vbody {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+.lpf__note {
+  margin: 0;
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid var(--vermilion);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--fg-muted);
+}
+.lpf__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+.lpf__btn {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--bone);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.lpf__btn:hover {
+  background: #fff;
+}
+.lpf__btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.lpf__btn--quiet {
+  background: transparent;
+  color: var(--ash);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.lpf__btn--quiet:hover {
+  background: transparent;
+  color: var(--bone);
+}
+.lpf__key {
+  display: none;
+  margin: 0;
+  color: var(--fg);
+}
+html:not(.js) .lpf__key {
+  display: block;
+}
+
+/* Phones: the stuck meter stays compact (count · two thin gauges · verdict title, ~100px), and
+   anything that takes focus in the form scrolls clear of it (WCAG 2.4.11). */
+@media (max-width: 1023px) {
+  .lpf__meter {
+    gap: 6px 12px;
+    padding: 8px 12px 9px;
+  }
+  .lpf__count {
+    min-width: 44px;
+    padding-inline-end: 10px;
+  }
+  .lpf__num {
+    font-size: 2rem;
+  }
+  .lpf__numlabel {
+    font-size: 0.6875rem;
+  }
+  .lpf__gauges {
+    gap: 6px;
+  }
+  .lpf__gauge {
+    gap: 3px;
+  }
+  .lpf__glabel {
+    font-size: 0.6875rem;
+  }
+  .lpf__bar {
+    height: 4px;
+  }
+  .lpf__vtitle {
+    padding-block-start: 6px;
+    font-size: 1rem;
+  }
+  .lpf__rm,
+  .lpf__tray button,
+  .lpf__btn {
+    scroll-margin-block-start: calc(var(--header-h) + 132px);
+    scroll-margin-block-end: 24px;
+  }
+}
+/* No JS: nothing to remove or restore — the form reads as a static specimen + the key. */
+html:not(.js) .lpf__rm {
+  visibility: hidden;
+}
+html:not(.js) .lpf__actions,
+html:not(.js) .sv-sig:has(.lpf) .sv-sig__hint {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .lpf__sheet {
+    padding: 32px 32px 28px;
+  }
+  .lpf__fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 18px;
+    row-gap: 12px;
+  }
+  .lpf__field:has(.lpf__input--area) {
+    grid-column: 1 / -1;
+  }
+  .lpf__submit {
+    justify-self: start;
+    padding-inline: 40px;
+  }
+}
+@media (min-width: 1024px) {
+  .lpf {
+    grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.85fr);
+    column-gap: clamp(40px, 5vw, 88px);
+    align-items: start;
+  }
+  .lpf__panel {
+    display: grid;
+    gap: 18px;
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    inset-block-start: calc(var(--header-h) + 24px);
+  }
+  .lpf__meter {
+    position: static;
+    padding: 22px 22px;
+    gap: 16px 20px;
+  }
+  .lpf__num {
+    font-size: 4.5rem;
+  }
+  .lpf__glabel {
+    font-size: 0.8125rem;
+  }
+  .lpf__bar {
+    height: 8px;
+  }
+  .lpf__vtitle {
+    font-size: 1.625rem;
+    padding-block-start: 14px;
+  }
+  .lpf__sheet {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .lpf__vbody {
+    font-size: 1.0625rem;
+  }
+  .lpf__key {
+    grid-column: 1;
+  }
+}

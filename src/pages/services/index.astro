@@ -1,25 +1,88 @@
 ---
 /**
- * /services/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /services/ — the services wing (hub). Built with the service system (src/components/service).
+ * Static sections; ONE island: the signature "מפת האולמות" floor plan (client:visible).
+ * JSON-LD: CollectionPage + ItemList of the 8 rooms, FAQPage, BreadcrumbList (no Service node).
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import ServicesIndex from "@/views/services/ServicesIndex";
-import { OG_IMAGES } from "@/lib/schema";
-import type { PageSeo } from "@/lib/seo";
+import ServiceHero from "@/components/service/ServiceHero.astro";
+import SignatureSlot from "@/components/service/SignatureSlot.astro";
+import HubGuide from "@/components/service/hub/HubGuide.astro";
+import ServiceFeatures from "@/components/service/ServiceFeatures.astro";
+import ServiceFaq from "@/components/service/ServiceFaq.astro";
+import ServiceCta from "@/components/service/ServiceCta.astro";
+import FloorPlan from "@/components/service/signatures/FloorPlan";
+import { servicesHub as page, hubGuide } from "@/components/service/data/services-hub";
+import { SERVICE_ROOMS, SERVICES_WING } from "@/components/service";
+import { VERTICAL_CARDS } from "@/data/verticals";
+import { collectionPage, SITE_LAST_UPDATED } from "@/lib/schema";
+import { heroImage } from "@/lib/seo";
+import { serviceSeo } from "@/lib/page-seo";
 
-const PATH = "/services/";
-const seo: PageSeo = {
-  path: PATH,
-  title: "שירותי בניית אתרים ופיתוח | NZ-web – ישראל",
-  description:
-    "כל שירותי בניית האתרים ופיתוח האתרים של NZ-web. בניית אתר תדמית, פיתוח אתרים, מערכת ניהול תורים, דפי נחיתה ובניית אתר מכירות לעסקים בישראל.",
-  ogImage: OG_IMAGES.services,
-  breadcrumb: { name: "שירותים", path: PATH },
-};
+const [collection, itemList] = collectionPage({
+  path: page.path,
+  title: page.seo.title,
+  description: page.seo.description,
+  primaryImage: heroImage(page.hero.art, page.path),
+  dateModified: SITE_LAST_UPDATED,
+  speakable: true,
+  items: SERVICE_ROOMS.map((r) => ({ name: r.name, path: r.href, description: r.line })),
+});
+const seo = serviceSeo(page, { webPageNode: collection, jsonLd: [itemList], noService: true });
+
+/* The plan's rooms: the 8 services + the conversation room at the end of the hall. */
+const rooms = [
+  ...SERVICE_ROOMS.map(({ num, name, short, href, art, line, medium }) => ({ num, name, short, href, art, line, medium })),
+  {
+    num: "09",
+    name: "חדר השיחה",
+    short: "השיחה",
+    href: "/contact/",
+    art: "ceramic-handsets",
+    line: "בסוף המסדרון: מספרים על העסק ומקבלים הצעה אישית.",
+    medium: "וואטסאפ, טלפון או טופס קצר",
+  },
+];
+const fields = VERTICAL_CARDS.map((v) => ({ label: v.label, href: v.href }));
 ---
 
-<BaseLayout seo={seo}>
-  <ServicesIndex client:load />
+<BaseLayout seo={seo} mainClass="relative bg-ink pt-[var(--header-h)]">
+  <ServiceHero data={page.hero} variant="full-bleed" path={page.path} crumb={page.crumb} room="" position="50% 40%" />
+
+  <SignatureSlot
+    name="מפת האולמות"
+    title="מפת האגף: שמונה חדרים, שירות בכל אחד"
+    lede="כל חדר באגף הוא שירות. בחרו חדר במפה כדי להדליק בו את האור ולקרוא את תווית הקיר שלו."
+    hint="הקישו על חדר במפה כדי להדליק אותו, ועל הקישור שבתווית כדי להיכנס."
+    keys="במקלדת: Tab אל המפה, חיצים בין החדרים, Enter על חדר מואר."
+    index={`אולם ${SERVICES_WING}`}
+    opener="split"
+  >
+    <FloorPlan client:visible rooms={rooms} wing={SERVICES_WING} />
+  </SignatureSlot>
+
+  <HubGuide title={hubGuide.title} lede={hubGuide.lede} rows={hubGuide.rows} index="01" fields={fields} />
+
+  <ServiceFeatures
+    title={page.features!.title}
+    lede={page.features!.lede}
+    items={page.features!.items}
+    variant="specimens"
+    tone="paper"
+    opener="numeral"
+    index="02"
+    label="בכל שירות"
+  />
+
+  <ServiceFaq
+    items={page.faqs}
+    title="שאלות על השירותים"
+    index="03"
+    tone="bone"
+    opener="rule"
+    card="plaque"
+    note={{ title: "השאלה שלכם לא כאן?", body: "כתבו לנו מה העסק עושה ומה מתלבטים. נענה בוואטסאפ, בלי מונחים מקצועיים.", cta: "לשאול בוואטסאפ" }}
+  />
+
+  <ServiceCta data={page.cta!} variant="door" label="לא חייבים לדעת מראש" />
 </BaseLayout>

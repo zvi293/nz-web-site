@@ -1,0 +1,468 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+ *  404 — page styles, prefix `nf-`. Mobile first. Motion only under html.nz-motion.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Hero (bone) ───────────────────────────────────────────────────────── */
+.nf-hero {
+  padding-block: calc(var(--section-y) * 0.45) calc(var(--section-y) * 0.8);
+}
+.nf-hero__grid {
+  display: grid;
+}
+.nf-hero__title {
+  margin-top: 1.1rem;
+  font-size: clamp(2.5rem, 1.55rem + 4vw, 5.5rem);
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+}
+.nf-hero__lead {
+  margin-top: 1.25rem;
+  max-width: 44ch;
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  line-height: 1.7;
+  color: var(--graphite);
+  text-wrap: pretty;
+}
+.nf-hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.75rem;
+  margin-top: 1.75rem;
+}
+.nf-hero__art {
+  margin: 2.5rem 0 0;
+}
+@media (min-width: 1024px) {
+  .nf-hero__grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 2rem;
+    align-items: center;
+  }
+  .nf-hero__text {
+    grid-column: 1 / span 5;
+  }
+  .nf-hero__art {
+    grid-column: 6 / span 7;
+    margin: 0;
+  }
+}
+
+/* ── The gates (ink) ───────────────────────────────────────────────────── */
+.nf-gates__head h2 {
+  margin-top: 1rem;
+}
+.nf-gates__hint {
+  margin-top: 0.75rem;
+  max-width: 40ch;
+  color: var(--ash);
+  line-height: 1.6;
+}
+.nf-tunnel {
+  display: grid;
+  margin-top: 2.25rem;
+}
+
+.nf-stage {
+  position: relative;
+  container-type: size;
+  block-size: clamp(340px, 98vw, 440px);
+  overflow: hidden;
+  border-radius: 6px;
+  isolation: isolate;
+  background: #0b1430;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.9);
+}
+.nf-stage:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+/* the night: deep blue to the dusk band, a few fixed stars (no twinkle) */
+.nf-stage__sky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1.5px 1.5px at 12% 14%, #fff 50%, transparent 60%),
+    radial-gradient(1px 1px at 26% 31%, rgba(255, 255, 255, 0.8) 50%, transparent 60%),
+    radial-gradient(1.5px 1.5px at 41% 9%, rgba(255, 255, 255, 0.9) 50%, transparent 60%),
+    radial-gradient(1px 1px at 58% 22%, rgba(255, 255, 255, 0.7) 50%, transparent 60%),
+    radial-gradient(1.5px 1.5px at 73% 12%, #fff 50%, transparent 60%),
+    radial-gradient(1px 1px at 86% 34%, rgba(255, 255, 255, 0.75) 50%, transparent 60%),
+    radial-gradient(1px 1px at 92% 7%, rgba(255, 255, 255, 0.8) 50%, transparent 60%),
+    radial-gradient(1px 1px at 6% 40%, rgba(255, 255, 255, 0.6) 50%, transparent 60%),
+    radial-gradient(ellipse 80% 30% at 50% 66%, rgba(255, 196, 150, 0.35), transparent 70%),
+    linear-gradient(to bottom, #050a1d 0%, #0f1d42 40%, #27477d 62%, #6f86b3 68%);
+}
+/* the dunes: a warm slope with soft wind ripples */
+.nf-stage__sand {
+  position: absolute;
+  inset-inline: -20%;
+  inset-block-end: 0;
+  block-size: 35%;
+  border-radius: 55% 45% 0 0 / 14% 10% 0 0;
+  background:
+    repeating-linear-gradient(-8deg, rgba(120, 75, 45, 0) 0 9px, rgba(120, 75, 45, 0.09) 9px 10px),
+    radial-gradient(ellipse 60% 70% at 30% 0%, rgba(255, 222, 180, 0.55), transparent 70%),
+    linear-gradient(to bottom, #e3b98c, #c7966a 45%, #9a6d47);
+}
+
+.nf-gate {
+  --gw: min(70cqw, 60cqh);
+  --tilt: 0deg;
+  position: absolute;
+  left: 50%;
+  inset-block-end: 7%;
+  inline-size: var(--gw);
+  aspect-ratio: 6 / 6.6;
+  transform-origin: 50% 100%;
+  transform: translate(-50%, calc((1 - var(--s)) * -26cqh)) scale(var(--s)) rotate(var(--tilt));
+  pointer-events: none;
+}
+/* like the artwork: each portal leans a little, alternating */
+.nf-gate:nth-child(odd of .nf-gate) {
+  --tilt: -2.5deg;
+}
+.nf-gate:nth-child(even of .nf-gate) {
+  --tilt: 2deg;
+}
+html.nz-motion .nf-gate {
+  transition: transform 1s var(--ease-gallery), opacity 0.7s var(--ease-gallery);
+}
+.nf-gate--past {
+  transform: translate(-50%, 14cqh) scale(var(--s)) rotate(var(--tilt));
+  opacity: 0;
+}
+.nf-gate--hidden {
+  opacity: 0;
+}
+/* a glazed ceramic frame: light on the left face, terracotta shade on the right, a deep inner reveal */
+.nf-gate__arch {
+  --t: calc(var(--gw) * 0.12);
+  position: absolute;
+  inset: 0;
+  border-style: solid;
+  border-width: var(--t) var(--t) 0 var(--t);
+  border-color: #f6e9da #d9b292 transparent #fbf1e6;
+  border-radius: calc(var(--gw) * 0.2) calc(var(--gw) * 0.2) calc(var(--gw) * 0.03) calc(var(--gw) * 0.03);
+  box-shadow: calc(var(--gw) * 0.05) calc(var(--gw) * 0.03) calc(var(--gw) * 0.06) rgba(25, 15, 25, 0.4);
+}
+.nf-gate__depth {
+  /* the inner face of the frame (its thickness), in shade */
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--gw) * 0.09) calc(var(--gw) * 0.09) 0 0;
+  box-shadow:
+    inset calc(var(--gw) * -0.03) calc(var(--gw) * 0.025) 0 rgba(196, 140, 104, 0.85),
+    inset calc(var(--gw) * 0.012) 0 0 rgba(255, 245, 232, 0.5);
+}
+.nf-gate__arch::after {
+  /* the foot of the frame, sunk in the sand */
+  content: "";
+  position: absolute;
+  inset-inline: calc(var(--t) * -1);
+  inset-block-end: calc(var(--gw) * -0.02);
+  block-size: calc(var(--gw) * 0.05);
+  background: linear-gradient(to bottom, transparent, rgba(160, 110, 70, 0.55));
+}
+.nf-gate__plate {
+  position: absolute;
+  inset-block-start: calc(var(--gw) * 0.028);
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4em;
+  font-size: calc(var(--gw) * 0.055);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #6b5444;
+  white-space: nowrap;
+}
+.nf-gate__n {
+  color: var(--vermilion-deep);
+  font-variant-numeric: tabular-nums;
+}
+.nf-gate__hit {
+  position: absolute;
+  inset: -6%;
+  border: 0;
+  background: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 30;
+}
+.nf-gate::before {
+  /* the long evening shadow on the sand */
+  content: "";
+  position: absolute;
+  inset-inline: -4% -40%;
+  inset-block-end: -6%;
+  block-size: 11%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 38% 50%, rgba(70, 40, 25, 0.5), transparent 70%);
+}
+
+/* the room card under the scene: the front gate's room */
+.nf-room {
+  display: grid;
+  justify-items: start;
+  gap: 0.2rem;
+  margin-top: 1rem;
+  padding: 1rem 1.1rem 1.1rem;
+  border: 1px solid var(--line-ink);
+  border-inline-start: 3px solid #e3b98c;
+  border-radius: 6px;
+  background: var(--ink-2);
+}
+html.nz-motion .nf-room {
+  animation: nf-room-in 0.6s var(--ease-gallery) 0.25s both;
+}
+@keyframes nf-room-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.nf-room__n {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: #f07a5c;
+}
+.nf-room__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.625rem, 1.4rem + 1vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--bone);
+}
+.nf-room__line {
+  margin-bottom: 0.6rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ash);
+}
+.nf-room__enter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: 48px;
+  padding: 0 1.2rem;
+  border-radius: 999px;
+  background: var(--bone);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.nf-room__enter:hover {
+  background: #fff;
+}
+.nf-room__enter:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.nf-room__arrow {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+/* controls */
+.nf-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.nf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-block-size: 48px;
+  min-inline-size: 48px;
+  padding: 0 0.9rem;
+  border: 1px solid rgba(239, 234, 226, 0.3);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--bone);
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+.nf-btn:hover {
+  border-color: rgba(239, 234, 226, 0.7);
+}
+.nf-btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.nf-btn--deeper {
+  padding: 0 1.25rem;
+  background: var(--vermilion-fill, #d23a1b);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 500;
+}
+.nf-btn--deeper:hover {
+  background: #c23417;
+}
+.nf-btn__arrow {
+  inline-size: 18px;
+  block-size: 18px;
+}
+.nf-btn__arrow--back {
+  transform: scaleX(-1);
+}
+.nf-controls__pos {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--ash);
+  font-variant-numeric: tabular-nums;
+}
+.nf-controls__n {
+  color: var(--bone);
+  font-weight: 500;
+}
+.nf-controls__track {
+  display: flex;
+  gap: 4px;
+}
+.nf-controls__track span {
+  inline-size: 10px;
+  block-size: 3px;
+  border-radius: 2px;
+  background: rgba(239, 234, 226, 0.22);
+  transition: background-color 0.4s, inline-size 0.4s var(--ease-gallery);
+}
+.nf-controls__track .is-past {
+  background: rgba(239, 234, 226, 0.5);
+}
+.nf-controls__track .is-on {
+  inline-size: 20px;
+  background: var(--vermilion);
+}
+
+/* the full list (always there: no-JS and screen readers) */
+.nf-list {
+  margin-top: 2.5rem;
+}
+.nf-list__title {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line-ink);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ash);
+}
+.nf-list ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nf-list a {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  column-gap: 0.75rem;
+  align-items: baseline;
+  min-block-size: 56px;
+  padding-block: 0.8rem;
+  border-bottom: 1px solid var(--line-ink);
+  color: var(--bone);
+}
+.nf-list a:hover .nf-list__name,
+.nf-list a:focus-visible .nf-list__name {
+  color: #f07a5c;
+}
+.nf-list a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.nf-list__n {
+  grid-row: span 2;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #f07a5c;
+  font-variant-numeric: tabular-nums;
+}
+.nf-list__name {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: color 0.3s;
+}
+.nf-list__line {
+  font-size: 0.875rem;
+  color: var(--ash);
+}
+.nf-list .is-active .nf-list__name::after {
+  content: "";
+  display: inline-block;
+  inline-size: 7px;
+  block-size: 7px;
+  margin-inline-start: 0.6rem;
+  vertical-align: 0.2em;
+  background: var(--vermilion);
+}
+
+@media (min-width: 1024px) {
+  .nf-gates__head {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 2rem;
+    align-items: end;
+  }
+  .nf-gates__head > * {
+    grid-column: 1 / span 7;
+  }
+  .nf-gates__head > .nf-gates__hint {
+    grid-column: 9 / span 4;
+    grid-row: 2;
+  }
+  .nf-tunnel {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 2rem;
+    margin-top: 3.5rem;
+    align-items: start;
+  }
+  .nf-stage {
+    grid-column: 1 / span 8;
+    block-size: 600px;
+  }
+  .nf-gate {
+    --gw: min(46cqw, 62cqh);
+  }
+  .nf-room {
+    grid-column: 1 / span 8;
+    grid-row: 2;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 1.25rem;
+  }
+  .nf-room__n {
+    grid-row: span 2;
+  }
+  .nf-room__name {
+    grid-column: 2;
+  }
+  .nf-room__line {
+    grid-column: 2;
+    margin: 0;
+  }
+  .nf-room__enter {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+  .nf-controls {
+    grid-column: 1 / span 8;
+    grid-row: 3;
+  }
+  .nf-list {
+    grid-column: 10 / span 3;
+    grid-row: 1 / span 3;
+    margin-top: 0;
+  }
+}

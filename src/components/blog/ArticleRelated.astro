@@ -1,0 +1,49 @@
+---
+/**
+ * "ממשיכים לקרוא" — three related articles (same department first). Each card shows the
+ * other article's cover as a small plate. Static.
+ */
+import { Artwork } from "@/components/art";
+import { hasArt } from "@/lib/art";
+import { getDepartment, type BlogPost } from "@/lib/blog";
+
+interface Props {
+  posts: BlogPost[];
+}
+const { posts } = Astro.props;
+---
+
+{
+  posts.length > 0 && (
+    <section class="ar-related" data-tone="bone" aria-labelledby="ar-related-title">
+      <div class="nz-container">
+        <div class="ar-related__head">
+          <h2 id="ar-related-title" class="ar-related__title">ממשיכים לקרוא</h2>
+          <a class="nz-link ar-related__all" href="/blog/">
+            <span class="nz-link__text">לכל המגזין</span>
+          </a>
+        </div>
+        <ol class="ar-related__list">
+          {posts.map((p, i) => (
+            <li class="ar-card">
+              <a href={`/blog/${p.slug}/`} class="ar-card__link">
+                <span class="ar-card__plate" aria-hidden="true">
+                  {hasArt(p.art) && <Artwork slug={p.art} sizes="(min-width: 1024px) 26vw, 34vw" ratio="4 / 3" alt="" />}
+                </span>
+                <span class="ar-card__body">
+                  <span class="ar-card__meta">
+                    <span class="ar-card__idx">{String(i + 1).padStart(2, "0")}</span>
+                    <span>{getDepartment(p.category).name}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{p.read_time} דקות</span>
+                  </span>
+                  <span class="ar-card__title">{p.title}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )
+}

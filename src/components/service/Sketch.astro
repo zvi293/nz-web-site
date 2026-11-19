@@ -1,0 +1,187 @@
+---
+/**
+ * Sketch — a small architect's line drawing (viewBox 120×90) that gives a block of text its own
+ * visual: the specimens on ServiceFeatures variant="specimens" and the figure beside a
+ * ServiceDeepDive ledger entry. Hairlines in the section's ink (currentColor), one vermilion
+ * detail per drawing. Decorative (aria-hidden): the text beside it carries the meaning.
+ * The lines draw themselves once in view (CSS scroll-driven, @supports; static otherwise).
+ */
+import type { SketchKind } from "./types";
+import "./service.css";
+
+interface Props {
+  kind: SketchKind;
+  class?: string;
+}
+const { kind, class: cls } = Astro.props;
+---
+
+<svg class:list={["sv-sk", `sv-sk--${kind}`, cls]} viewBox="0 0 120 90" aria-hidden="true" focusable="false">
+  {
+    kind === "code" && (
+      <g>
+        <path class="sv-sk__l" d="M30 14 L16 26 L30 38" />
+        <path class="sv-sk__l" d="M90 14 L104 26 L90 38" />
+        <path class="sv-sk__l sv-sk__acc" d="M66 10 L54 42" />
+        <path class="sv-sk__l" d="M16 54 H70 M28 64 H96 M28 74 H58" />
+        <path class="sv-sk__l sv-sk__acc" d="M64 74 H84" />
+        <path class="sv-sk__l sv-sk__faint" d="M16 84 H44" />
+      </g>
+    )
+  }
+  {
+    kind === "a11y" && (
+      <g>
+        <rect class="sv-sk__fill" x="14" y="12" width="42" height="42" />
+        <text class="sv-sk__t sv-sk__t--inv" x="35" y="40" text-anchor="middle">Aa</text>
+        <rect class="sv-sk__l" x="64" y="12" width="42" height="42" />
+        <text class="sv-sk__t" x="85" y="40" text-anchor="middle">Aa</text>
+        <rect class="sv-sk__l" x="30" y="66" width="60" height="14" rx="7" />
+        <rect class="sv-sk__l sv-sk__acc sv-sk__dash" x="25" y="61" width="70" height="24" rx="12" />
+      </g>
+    )
+  }
+  {
+    kind === "mobile" && (
+      <g>
+        <rect class="sv-sk__l" x="40" y="4" width="40" height="80" rx="7" />
+        <path class="sv-sk__l" d="M54 9 H66" />
+        <rect class="sv-sk__fill" x="46" y="16" width="28" height="5" />
+        <rect class="sv-sk__l" x="46" y="26" width="28" height="18" />
+        <path class="sv-sk__l sv-sk__faint" d="M46 50 H74 M46 56 H68" />
+        <rect class="sv-sk__accf" x="46" y="66" width="28" height="8" rx="4" />
+        <path class="sv-sk__l sv-sk__acc sv-sk__dash" d="M100 86 C100 66 92 56 80 52" />
+        <circle class="sv-sk__accf" cx="100" cy="86" r="2.5" />
+      </g>
+    )
+  }
+  {
+    kind === "speed" && (
+      <g>
+        <path class="sv-sk__l" d="M18 72 A42 42 0 0 1 102 72" />
+        <path class="sv-sk__l sv-sk__faint" d="M24 52 L30 55 M38 37 L42 42 M60 30 V36 M82 37 L78 42 M96 52 L90 55" />
+        <path class="sv-sk__l sv-sk__acc sv-sk__thick" d="M60 72 L90 46" />
+        <circle class="sv-sk__fill" cx="60" cy="72" r="4" />
+        <path class="sv-sk__l" d="M10 84 H110" />
+      </g>
+    )
+  }
+  {
+    kind === "seo" && (
+      <g>
+        <rect class="sv-sk__l" x="10" y="8" width="100" height="16" rx="8" />
+        <circle class="sv-sk__l" cx="98" cy="15" r="3.5" />
+        <path class="sv-sk__l" d="M95.5 17.5 L93 20" />
+        <path class="sv-sk__l sv-sk__acc sv-sk__thick" d="M44 38 H104" />
+        <path class="sv-sk__l" d="M30 46 H104 M52 52 H104" />
+        <path class="sv-sk__l sv-sk__thick sv-sk__faint" d="M58 66 H104" />
+        <path class="sv-sk__l sv-sk__faint" d="M40 74 H104 M64 80 H104" />
+      </g>
+    )
+  }
+  {
+    kind === "care" && (
+      <g>
+        <path class="sv-sk__l" d="M88 22 A32 32 0 1 0 92 60" />
+        <path class="sv-sk__l" d="M80 18 L89 22 L86 32" />
+        <path
+          class="sv-sk__l sv-sk__faint"
+          d="M60 13 V18 M60 72 V77 M28 45 H33 M87 45 H92 M37 22 L40 26 M80 64 L83 68 M37 68 L40 64"
+        />
+        <rect class="sv-sk__accf" x="53" y="38" width="14" height="14" />
+      </g>
+    )
+  }
+  {
+    kind === "domain" && (
+      <g>
+        <path class="sv-sk__l" d="M14 30 H62 L74 44 L62 58 H14 Z" />
+        <circle class="sv-sk__l" cx="62" cy="44" r="3" />
+        <path class="sv-sk__l" d="M22 40 H46 M22 48 H38" />
+        <path class="sv-sk__l sv-sk__dash" d="M65 44 C80 44 82 26 94 26" />
+        <rect class="sv-sk__l" x="92" y="12" width="20" height="28" />
+        <path class="sv-sk__l" d="M92 20 H112" />
+        <rect class="sv-sk__accf" x="97" y="25" width="10" height="10" />
+        <path class="sv-sk__l sv-sk__faint" d="M14 76 H106" />
+      </g>
+    )
+  }
+  {
+    kind === "materials" && (
+      <g>
+        <g transform="rotate(-6 38 40)">
+          <rect class="sv-sk__l sv-sk__paper" x="12" y="18" width="48" height="40" />
+          <path class="sv-sk__l" d="M16 52 L30 36 L40 46 L46 40 L56 52" />
+          <circle class="sv-sk__accf" cx="48" cy="28" r="3.5" />
+        </g>
+        <g transform="rotate(5 84 48)">
+          <rect class="sv-sk__l sv-sk__paper" x="62" y="22" width="44" height="54" />
+          <path class="sv-sk__l" d="M70 34 H98 M70 42 H94 M70 50 H98 M70 58 H86" />
+        </g>
+        <circle class="sv-sk__l sv-sk__paper" cx="30" cy="72" r="11" />
+        <path class="sv-sk__l sv-sk__acc" d="M24 72 H36 M30 66 V78" />
+      </g>
+    )
+  }
+  {
+    kind === "launch" && (
+      <g>
+        <path class="sv-sk__l" d="M10 62 H110" />
+        <rect class="sv-sk__accf" x="10" y="50" width="12" height="12" />
+        <path class="sv-sk__l" d="M44 62 V40 M70 62 V30 M96 62 V22" />
+        <path class="sv-sk__l" d="M44 40 H56 L54 44 L56 48 H44 M70 30 H82 L80 34 L82 38 H70 M96 22 H108 L106 26 L108 30 H96" />
+        <path class="sv-sk__l sv-sk__faint" d="M10 74 H22 M44 74 H52 M70 74 H78 M96 74 H104" />
+      </g>
+    )
+  }
+  {
+    kind === "calendar" && (
+      <g>
+        <rect class="sv-sk__l" x="14" y="12" width="92" height="68" />
+        <path class="sv-sk__l" d="M14 26 H106 M37 26 V80 M60 26 V80 M83 26 V80 M14 44 H106 M14 62 H106" />
+        <rect class="sv-sk__accf" x="64" y="48" width="15" height="10" />
+        <path class="sv-sk__l" d="M32 6 V16 M88 6 V16" />
+      </g>
+    )
+  }
+  {
+    kind === "form" && (
+      <g>
+        <rect class="sv-sk__l" x="14" y="10" width="92" height="14" />
+        <rect class="sv-sk__l" x="14" y="30" width="92" height="14" />
+        <rect class="sv-sk__l sv-sk__faint" x="14" y="50" width="92" height="14" />
+        <rect class="sv-sk__accf" x="54" y="70" width="52" height="14" rx="7" />
+      </g>
+    )
+  }
+  {
+    kind === "search" && (
+      <g>
+        <circle class="sv-sk__l" cx="42" cy="38" r="22" />
+        <path class="sv-sk__l sv-sk__thick" d="M58 54 L76 72" />
+        <path class="sv-sk__l sv-sk__acc" d="M32 34 H52" />
+        <path class="sv-sk__l sv-sk__faint" d="M32 42 H48" />
+        <path class="sv-sk__l" d="M84 30 H110 M88 40 H110 M92 50 H110" />
+      </g>
+    )
+  }
+  {
+    kind === "layers" && (
+      <g>
+        <path class="sv-sk__l sv-sk__paper" d="M60 52 L104 64 L60 78 L16 64 Z" />
+        <path class="sv-sk__l sv-sk__paper" d="M60 34 L104 46 L60 60 L16 46 Z" />
+        <path class="sv-sk__accline sv-sk__paper" d="M60 14 L104 26 L60 40 L16 26 Z" />
+      </g>
+    )
+  }
+  {
+    kind === "chat" && (
+      <g>
+        <path class="sv-sk__l" d="M10 14 H74 V46 H30 L20 56 V46 H10 Z" />
+        <path class="sv-sk__l sv-sk__faint" d="M20 26 H64 M20 34 H52" />
+        <path class="sv-sk__accline" d="M46 50 H110 V78 H100 V88 L90 78 H46 Z" />
+        <path class="sv-sk__l" d="M56 62 H100" />
+      </g>
+    )
+  }
+</svg>

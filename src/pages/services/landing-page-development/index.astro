@@ -1,18 +1,90 @@
 ---
 /**
- * /services/landing-page-development/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /services/landing-page-development/ — פיתוח דף נחיתה. Service system page and the hub of the
+ * three landing sub-pages (the departures board). Content: src/components/pages/landing-page-development/data.ts.
+ * Static sections; ONE island: the signature "מבחן חמש השניות" (timed recall, client:visible).
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import LandingPageDevelopment from "@/views/services/LandingPageDevelopment";
-import { config } from "@/views/services/LandingPageDevelopment";
-import { servicePageSeo } from "@/lib/page-seo";
-import type { PageSeo } from "@/lib/seo";
+import ServiceHero from "@/components/service/ServiceHero.astro";
+import ServiceIntro from "@/components/service/ServiceIntro.astro";
+import SignatureSlot from "@/components/service/SignatureSlot.astro";
+import ServiceFeatures from "@/components/service/ServiceFeatures.astro";
+import ServiceProcess from "@/components/service/ServiceProcess.astro";
+import ServiceFaq from "@/components/service/ServiceFaq.astro";
+import ServiceRelated from "@/components/service/ServiceRelated.astro";
+import ServiceCta from "@/components/service/ServiceCta.astro";
+import DepartureBoard from "@/components/pages/landing-page-development/DepartureBoard.astro";
+import FiveSecondTest from "@/components/pages/landing-page-development/FiveSecondTest";
+import { landingPageDevelopment as page, LANDING_ROUTES } from "@/components/pages/landing-page-development/data";
+import { pageUrl } from "@/lib/schema";
+import { serviceSeo } from "@/lib/page-seo";
 
-const seo: PageSeo = servicePageSeo(config);
+/* Hub of the landing sub-pages: an ItemList of the three routes beside the Service node. */
+const itemList = {
+  "@type": "ItemList",
+  "@id": `${pageUrl(page.path)}#itemlist`,
+  name: "סוגי דפי נחיתה",
+  numberOfItems: LANDING_ROUTES.length,
+  itemListElement: LANDING_ROUTES.map((r, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: r.label,
+    url: pageUrl(r.href),
+    description: r.line,
+  })),
+};
+const seo = serviceSeo(page, { jsonLd: [itemList] });
 ---
 
-<BaseLayout seo={seo}>
-  <LandingPageDevelopment client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <ServiceHero data={page.hero} variant={page.heroVariant} path={page.path} crumb={page.crumb} position="62% 50%" />
+
+  <ServiceIntro data={page.intro!} tone="paper" opener="quote" index="01" label="מבוא · למה מתחילים מהמטרה" id="lpd-intro" />
+
+  <DepartureBoard routes={LANDING_ROUTES} index="02" />
+
+  <SignatureSlot
+    name="מבחן חמש השניות"
+    title="מה הדף הציע? יש לכם חמש שניות"
+    lede="מי שמגיע ממודעה מחליט מהר אם להישאר. פתחו דף נחיתה לחמש שניות, נסו לומר מה הוא הציע, ואז עשו את אותו הדבר עם דף אחר של אותו עסק."
+    hint="הקישו על הכפתור, הסתכלו על הדף עד שהמסך נסגר, ובחרו תשובה. אחרי כל סבב אפשר לראות את הדף שוב."
+    keys="במקלדת: Tab בין הכפתורים ו-Enter. אחרי כל שלב המיקוד עובר לשאלה או לתשובה."
+    tone="bone"
+    opener="numeral"
+    index="03"
+    id="lpd-sig"
+  >
+    <FiveSecondTest client:visible />
+  </SignatureSlot>
+
+  <ServiceFeatures
+    title={page.features!.title}
+    lede={page.features!.lede}
+    items={page.features!.items}
+    variant="diagram"
+    tone="paper"
+    opener="split"
+    index="04"
+    label="מה מפותח"
+    sheet="גיליון 04 · מבנה דף נחיתה"
+    id="lpd-features"
+  />
+
+  <ServiceProcess
+    title={page.process!.title}
+    lede={page.process!.lede}
+    steps={page.process!.steps}
+    tone="bone"
+    opener="rule"
+    index="05"
+    art={["silver-droplet", "porcelain-shockwave", "keycap-hotel", "amber-sun-stair"]}
+    avoid={[page.hero.art, "coral-ladders", "lime-prism", "titanium-ribbon", "ruby-amphora", "luminous-net", "terracotta-waterfall"]}
+    id="lpd-process"
+  />
+
+  <ServiceFaq items={page.faqs} title="שאלות על פיתוח דף נחיתה" index="06" opener="stacked" id="lpd-faq" />
+
+  <ServiceRelated currentPath={page.path} items={page.related} tone="paper" />
+
+  <ServiceCta data={page.cta!} label="הזמנה לשיחה · מסלול לבחירה" />
 </BaseLayout>

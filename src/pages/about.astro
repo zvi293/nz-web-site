@@ -1,28 +1,56 @@
 ---
 /**
- * /about/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /about/ — the studio and its founder. Sections: src/components/about (all static .astro, no
+ * React; the signature "מהאפר לכלי" — a potter's wheel — is a small bundled vanilla script).
+ * Content: src/content/about.ts. Styles: about.css (ab-).
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import About from "@/views/About";
-import { aboutPage, OG_IMAGES } from "@/lib/schema";
-import type { PageSeo } from "@/lib/seo";
+import AboutHero from "@/components/about/AboutHero.astro";
+import AboutWheel from "@/components/about/AboutWheel.astro";
+import AboutFounder from "@/components/about/AboutFounder.astro";
+import AboutPrinciples from "@/components/about/AboutPrinciples.astro";
+import AboutProcess from "@/components/about/AboutProcess.astro";
+import AboutIncludes from "@/components/about/AboutIncludes.astro";
+import AboutCta from "@/components/about/AboutCta.astro";
+import "@/components/about/about.css";
+import { aboutSeo, aboutHero } from "@/content/about";
+import { aboutPage, ref, FOUNDER_ID, ORG_ID, OG_IMAGES } from "@/lib/schema";
+import { heroImage, type PageSeo } from "@/lib/seo";
 
 const PATH = "/about/";
-const title = "מי אנחנו | NZ-web – סטודיו לבניית אתרים ופיתוח אתרים בישראל";
-const description =
-  "NZ-web – סטודיו מוביל לבניית אתרים ופיתוח אתרים בישראל בניהול צבי משה. 50+ פרויקטים, 5+ שנות ניסיון, 100% שביעות רצון. Perfect in every Pixel.";
+const { title, description } = aboutSeo;
+/* Must equal the <Artwork priority sizes> in AboutHero (passed down below). */
+const HERO_SIZES = "(min-width: 1280px) 640px, (min-width: 1024px) 42vw, 100vw";
+const heroSlug = aboutHero.art.slug;
+
 const seo: PageSeo = {
   path: PATH,
   title,
   description,
   ogImage: OG_IMAGES.about,
-  breadcrumb: { name: "מי אנחנו", path: PATH },
-  jsonLd: [aboutPage({ path: PATH, title, description })],
+  lcpArt: { slug: heroSlug, sizes: HERO_SIZES },
+  breadcrumb: { name: "אודות", path: PATH },
+  jsonLd: [
+    aboutPage({
+      path: PATH,
+      title,
+      description,
+      primaryImage: heroImage(heroSlug, PATH),
+      speakable: true,
+      /* The studio is the page's main entity; it is about the studio and its founder (#founder, site graph). */
+      mainEntity: ref(ORG_ID),
+      about: ref(FOUNDER_ID),
+    }),
+  ],
 };
 ---
 
-<BaseLayout seo={seo}>
-  <About client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <AboutHero sizes={HERO_SIZES} />
+  <AboutWheel />
+  <AboutFounder />
+  <AboutPrinciples />
+  <AboutProcess />
+  <AboutIncludes />
+  <AboutCta />
 </BaseLayout>

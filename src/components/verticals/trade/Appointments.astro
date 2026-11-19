@@ -1,0 +1,38 @@
+---
+/** Clinic — appointment cards: who the card is for, what waits on the site, a perforated stub with a circled day. */
+import Nb from "@/components/service/Nb.astro";
+import type { AudienceItem } from "@/components/service/types";
+interface Props { items: AudienceItem[] }
+const { items } = Astro.props;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+const DAYS = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳"];
+---
+
+<div class="vl-ap" data-reveal>
+  <ol class="vl-ap__deck">
+    {
+      items.map((it, i) => (
+        <li class="vl-ap__card" style={`--i:${i}`}>
+          <div class="vl-ap__body">
+            <p class="vl-ap__head" aria-hidden="true">
+              <span class="vl-ap__mark" />
+              <span>כרטיס תור</span>
+              <span class="vl-ap__no">{pad(i)}</span>
+            </p>
+            <h3 class="vl-ap__name"><Nb text={it.title} /></h3>
+            <p class="vl-ap__field" aria-hidden="true">מה מחכה באתר</p>
+            <p class="vl-ap__line"><Nb text={it.description} /></p>
+          </div>
+          <div class="vl-ap__stub" aria-hidden="true">
+            <span class="vl-ap__stub-label">נקבע מהאתר</span>
+            <span class="vl-ap__days">
+              {DAYS.map((d, k) => (
+                <span class:list={["vl-ap__day", k === (i * 2 + 1) % 5 && "is-on"]}>{d}</span>
+              ))}
+            </span>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</div>

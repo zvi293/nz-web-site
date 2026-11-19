@@ -1,0 +1,424 @@
+/* ── אותו סיפור (profile-blink) · prefix as-pb ──────────────────────────── */
+.as-pb__live {
+  display: grid;
+  gap: 16px;
+}
+.as-pb__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+/* the two plate holders: what the eyepiece is showing (and the manual switch) */
+.as-pb__holders {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  flex: 1 1 100%;
+}
+.as-pb__holder {
+  display: grid;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--line-ink);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ash);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+.as-pb__holder:hover {
+  border-color: rgba(239, 234, 226, 0.4);
+}
+.as-pb__holder[aria-pressed="true"] {
+  border-color: #f07a5c;
+  background: rgba(239, 234, 226, 0.05);
+  color: var(--bone);
+}
+.as-pb__holder:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.as-pb__holder-l {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 0.875rem/1.2 var(--font-sans);
+}
+.as-pb__holder-l::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+.as-pb__holder[aria-pressed="true"] .as-pb__holder-l::before {
+  background: var(--vermilion);
+  border-color: var(--vermilion);
+}
+.as-pb__thumb {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  height: 92px;
+  padding: 0 0 8px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--paper);
+}
+/* google: a profile card (map, name, a grey line, three action chips) */
+.as-pb__t-map {
+  position: relative;
+  display: block;
+  height: 30px;
+  background:
+    linear-gradient(100deg, transparent 46%, rgba(18, 17, 16, 0.14) 46% 50%, transparent 50%),
+    linear-gradient(8deg, transparent 54%, rgba(18, 17, 16, 0.12) 54% 58%, transparent 58%),
+    var(--bone-2);
+}
+.as-pb__t-map i {
+  position: absolute;
+  top: 9px;
+  inset-inline-start: 46%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--vermilion);
+  transform: rotate(-45deg);
+}
+.as-pb__t-name,
+.as-pb__t-sub {
+  display: block;
+  height: 7px;
+  margin-inline: 8px;
+  border-radius: 2px;
+  background: var(--ink);
+  width: 72%;
+}
+.as-pb__t-sub {
+  height: 5px;
+  width: 50%;
+  background: rgba(18, 17, 16, 0.25);
+}
+.as-pb__t-chips {
+  display: flex;
+  gap: 4px;
+  margin: 2px 8px 0;
+}
+.as-pb__t-chips b {
+  padding: 2px 5px;
+  border: 1px solid rgba(18, 17, 16, 0.3);
+  border-radius: 999px;
+  font: 500 0.5625rem/1.2 var(--font-sans);
+  color: var(--ink);
+}
+/* site: a page fading into its footer strip */
+.as-pb__t-page {
+  display: grid;
+  gap: 5px;
+  padding: 10px 8px 0;
+}
+.as-pb__t-page span {
+  height: 5px;
+  border-radius: 2px;
+  background: rgba(18, 17, 16, 0.16);
+}
+.as-pb__t-page span:first-child {
+  width: 60%;
+  height: 8px;
+  background: rgba(18, 17, 16, 0.5);
+}
+.as-pb__t-page span:last-child {
+  width: 80%;
+}
+.as-pb__t-foot {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding-inline: 8px;
+  background: var(--ink-3);
+}
+.as-pb__t-logo {
+  width: 14px;
+  height: 14px;
+  background: var(--vermilion);
+}
+.as-pb__t-cols {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+}
+.as-pb__t-cols i {
+  flex: 1;
+  height: 14px;
+  background: repeating-linear-gradient(to bottom, rgba(239, 234, 226, 0.45) 0 2px, transparent 2px 5px);
+}
+.as-pb__auto {
+  font-size: 0.875rem;
+  color: var(--ash);
+}
+.as-pb__plate {
+  position: relative;
+  padding: 0 0 6px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 4px;
+  box-shadow: 0 24px 40px -30px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+}
+.as-pb__reticle,
+.as-pb__reticle::before,
+.as-pb__reticle::after {
+  position: absolute;
+  pointer-events: none;
+}
+.as-pb__reticle {
+  inset: 6px;
+  z-index: 2;
+  background:
+    linear-gradient(var(--vermilion), var(--vermilion)) top right / 16px 1.5px no-repeat,
+    linear-gradient(var(--vermilion), var(--vermilion)) top right / 1.5px 16px no-repeat,
+    linear-gradient(var(--vermilion), var(--vermilion)) top left / 16px 1.5px no-repeat,
+    linear-gradient(var(--vermilion), var(--vermilion)) top left / 1.5px 16px no-repeat,
+    linear-gradient(rgba(18, 17, 16, 0.45), rgba(18, 17, 16, 0.45)) bottom right / 16px 1.5px no-repeat,
+    linear-gradient(rgba(18, 17, 16, 0.45), rgba(18, 17, 16, 0.45)) bottom right / 1.5px 16px no-repeat,
+    linear-gradient(rgba(18, 17, 16, 0.45), rgba(18, 17, 16, 0.45)) bottom left / 16px 1.5px no-repeat,
+    linear-gradient(rgba(18, 17, 16, 0.45), rgba(18, 17, 16, 0.45)) bottom left / 1.5px 16px no-repeat;
+}
+.as-pb__tab {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  inset-inline-start: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 5px 11px;
+  background: var(--paper);
+  border-radius: 999px;
+  font: 500 0.75rem/1.2 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  box-shadow: 0 1px 0 var(--line);
+}
+.as-pb__tab-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--vermilion);
+}
+.as-pb__plate--site .as-pb__tab-dot {
+  background: var(--ink);
+  border-radius: 50%;
+}
+.as-pb__map {
+  display: block;
+  width: 100%;
+  height: 64px;
+  background: var(--bone-2);
+}
+.as-pb__map path {
+  fill: none;
+  stroke: rgba(18, 17, 16, 0.18);
+  stroke-width: 6;
+}
+.as-pb__pin {
+  fill: var(--vermilion);
+  stroke: var(--paper);
+  stroke-width: 2;
+}
+.as-pb__lines {
+  margin: 0;
+  padding: 6px 16px 0;
+}
+.as-pb__line {
+  display: grid;
+  gap: 0;
+  padding-block: 6px 4px;
+  border-top: 1px solid var(--line);
+}
+.as-pb__line:first-child {
+  border-top: 0;
+}
+.as-pb__label {
+  font: 500 0.75rem/1.3 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+}
+.as-pb__dd {
+  margin: 0;
+}
+.as-pb__value {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 44px;
+  margin-inline-start: -8px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ink);
+  font: 400 1.1875rem/1.3 var(--font-display);
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.25s ease;
+}
+.as-pb__value:hover {
+  background: rgba(18, 17, 16, 0.05);
+}
+.as-pb__value:focus-visible {
+  outline: 2px solid var(--vermilion-deep);
+  outline-offset: 2px;
+}
+.as-pb__stack {
+  display: inline-grid;
+}
+.as-pb__stack > span {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+.as-pb__stack > span.is-shown {
+  visibility: visible;
+}
+.as-pb__line.is-fixed .as-pb__value {
+  cursor: default;
+}
+.as-pb__ring {
+  position: absolute;
+  inset: -6px -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 12px);
+  overflow: visible;
+  pointer-events: none;
+}
+.as-pb__ring path {
+  fill: none;
+  stroke: var(--vermilion);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+html.nz-motion .as-pb__ring path {
+  stroke-dasharray: 1;
+  animation: as-pb-draw 0.7s var(--ease-gallery) both;
+}
+@keyframes as-pb-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.as-pb__seal {
+  position: absolute;
+  bottom: 14px;
+  inset-inline-end: 14px;
+  display: grid;
+  place-content: center;
+  width: 86px;
+  height: 86px;
+  margin: 0;
+  border: 2px solid var(--vermilion-deep);
+  border-radius: 50%;
+  color: var(--vermilion-deep);
+  font: 500 1.0625rem/1 var(--font-display);
+  text-align: center;
+  transform: rotate(-12deg);
+  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5px rgba(184, 50, 26, 0.5);
+  opacity: 0.9;
+}
+html.nz-motion .as-pb__seal {
+  animation: as-pb-stamp 0.5s var(--ease-gallery) both;
+}
+@keyframes as-pb-stamp {
+  from {
+    transform: rotate(-12deg) scale(1.6);
+    opacity: 0;
+  }
+}
+.as-pb__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.as-pb__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ash);
+  font-variant-numeric: tabular-nums;
+}
+.as-pb__marks {
+  display: inline-flex;
+  gap: 6px;
+}
+.as-pb__marks span {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid rgba(239, 234, 226, 0.4);
+  border-radius: 50%;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.as-pb__marks span.is-on {
+  background: var(--vermilion);
+  border-color: var(--vermilion);
+}
+.as-pb__note {
+  min-height: 6.4em;
+  padding-inline-start: 14px;
+  border-inline-start: 2px solid var(--line-ink);
+}
+.as-pb__note.is-ok {
+  border-inline-start-color: var(--vermilion);
+}
+.as-pb__note-title {
+  margin: 0 0 4px;
+  font: 400 1.25rem/1.3 var(--font-display);
+  color: var(--bone);
+}
+.as-pb__note-body {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--ash);
+}
+@media (min-width: 768px) {
+  .as-pb__live {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 18px 28px;
+    align-items: start;
+  }
+  .as-pb__bar {
+    grid-column: 1 / -1;
+  }
+  .as-pb__plate {
+    grid-row: span 2;
+  }
+  .as-pb__lines {
+    padding-inline: 22px;
+  }
+  .as-pb__foot {
+    order: 2;
+    align-self: start;
+  }
+  .as-pb__note {
+    order: 1;
+    align-self: end;
+  }
+}

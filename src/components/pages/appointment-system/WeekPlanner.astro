@@ -1,0 +1,73 @@
+---
+/**
+ * WeekPlanner — "למי מתאימה מערכת ניהול תורים", drawn as one sample week in a ring-bound
+ * planner instead of a list of names. Five kinds of business share the week, each with its own
+ * fill (ink, hatching, brass, outline, dots); blocks of different lengths show that services are
+ * not one size. One block — the 11:30 facial booked in the dial above — carries the vermilion
+ * "חדש" flag. The planner is a picture (aria-hidden); the legend under it is the real content:
+ * each kind's swatch, name and note. Blocks settle into the grid once in view
+ * (html.nz-motion + [data-in]). Prefix apw-.
+ */
+import Nb from "@/components/service/Nb.astro";
+import type { AudienceItem } from "@/components/service/types";
+import { PLANNER_BLOCKS, PLANNER_KINDS } from "./data";
+import "./appointment-system.css";
+
+interface Props {
+  title: string;
+  lede?: string;
+  items: AudienceItem[];
+  index?: string;
+}
+const { title, lede, items, index = "04" } = Astro.props;
+const DAYS = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳"];
+const HOURS = ["08", "10", "12", "14", "16", "18"];
+---
+
+<section class="nz-section nz-section--space-default apw-sec" data-tone="paper" aria-labelledby="apw-title">
+  <div class="nz-container apw">
+    <header class="apw__head">
+      <p class="apw__tab"><span class="apw__tab-i">{index}</span> למי זה מתאים</p>
+      <h2 id="apw-title" class="nz-display nz-display--h2 apw__title">{title}</h2>
+      {lede && <p class="nz-lede apw__lede"><Nb text={lede} /></p>}
+    </header>
+
+    <figure class="apw__book">
+      <div class="apw__sheet" data-reveal="fade" aria-hidden="true">
+        <span class="apw__rings">{Array.from({ length: 9 }, () => <span />)}</span>
+        <div class="apw__grid">
+          <span class="apw__corner" />
+          {DAYS.map((d, i) => <span class="apw__day" style={`grid-column:${i + 2}`}>{d}</span>)}
+          {HOURS.map((h, i) => <span class="apw__hour" style={`grid-row:${i * 4 + 2} / span 4`}>{h}:00</span>)}
+          {DAYS.map((_, i) => <span class="apw__col" style={`grid-column:${i + 2}`} />)}
+          {
+            PLANNER_BLOCKS.map(([day, row, span, kind, isNew], n) => (
+              <span
+                class:list={["apw__blk", `apw__blk--${PLANNER_KINDS[kind].key}`, span > 1 && "is-long", isNew && "is-new"]}
+                style={`grid-column:${day + 2};grid-row:${row + 1} / span ${span};--n:${n}`}
+              >
+                {span > 1 && <span class="apw__blk-w">{PLANNER_KINDS[kind].word}</span>}
+                {isNew && <span class="apw__flag">חדש</span>}
+              </span>
+            ))
+          }
+        </div>
+      </div>
+      <figcaption class="apw__cap">שבוע לדוגמה ביומן אחד · התור החדש נקבע בחוגה שלמעלה</figcaption>
+    </figure>
+
+    <ul class="apw__legend">
+      {
+        items.map((it, i) => (
+          <li class="apw__entry">
+            <span class:list={["apw__sw", `apw__blk--${PLANNER_KINDS[i % PLANNER_KINDS.length].key}`]} aria-hidden="true" />
+            <span class="apw__entry-t">
+              <span class="apw__name">{it.title}</span>
+              <span class="apw__note"><Nb text={it.description} /></span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

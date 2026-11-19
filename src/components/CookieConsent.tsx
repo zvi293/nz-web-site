@@ -1,35 +1,32 @@
-import { useState, useEffect } from "react";
-import { Cookie } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useCallback, useEffect, useRef, useState } from "react";
+import "@/components/legal/floating-ui.css";
+import { ctaInZone, setSheetLift } from "@/components/legal/floating";
 
 const COOKIE_CONSENT_KEY = "nz_web_cookie_consent";
 const COOKIE_PREFERENCES_KEY = "nz_web_cookie_preferences";
+/** Reopen the sheet from anywhere (e.g. the privacy page): window.dispatchEvent(new Event(...)). */
+export const COOKIE_REOPEN_EVENT = "nz:cookies-open";
 
 /**
- * Cookie consent banner.
+ * Cookie consent — a slim bone/ink sheet (global chrome — BaseLayout: <CookieConsent client:idle />).
  *
- * Shows once, on the first visit, and records the choice in localStorage.
- * Declining is a real, equally-prominent option — consent that can only be given
- * is not consent, under either the GDPR or Israel's Privacy Protection Law. Until
- * a visitor accepts, `Analytics` loads no tracker at all; the site itself only
- * uses functional storage (accessibility settings, theme).
+ *  - Shows once, on the first visit, and records the choice in localStorage
+ *    ("nz_web_cookie_consent" = accepted | declined, "nz_web_cookie_preferences" = JSON) — the keys
+ *    src/lib/analytics.ts and scripts/qa/shoot.mjs rely on. "nz-consent-updated" tells the tracker
+ *    loader the choice changed. Until a visitor accepts, no tracker loads at all.
+ *  - Accept and decline are the same size and the same style (consent that can only be given
+ *    is not consent — GDPR / Israel's Privacy Protection Law), 44px tall.
+ *  - Never covers a primary call to action: it waits while a CTA sits in the bottom zone of the
+ *    first screen and appears once that zone is clear (or after the first scroll moves it away).
+ *    While open on a phone it publishes its height (--nz-sheet-h) so the corner beads ride above it.
+ *  - A non-modal <dialog> opened by its `open` attribute (not show(), which would move focus into
+ *    it on page load): the page stays fully usable behind it and focus stays where it was.
  */
 const CookieConsent = () => {
-  const [showBanner, setShowBanner] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLDialogElement>(null);
 
-  useEffect(() => {
-    // Only show the banner if the user has not made a choice yet.
-    try {
-      const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
-      if (consent) return;
-    } catch {
-      /* storage blocked (private mode / hardened browser) — show the banner. */
-    }
-    const timer = setTimeout(() => setShowBanner(true), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const persist = (value: "accepted" | "declined") => {
+  const persist = useCallback((value: "accepted" | "declined") => {
     const optedIn = value === "accepted";
     try {
       localStorage.setItem(COOKIE_CONSENT_KEY, value);
@@ -38,61 +35,113 @@ const CookieConsent = () => {
         JSON.stringify({ essential: true, analytics: optedIn, marketing: optedIn }),
       );
     } catch {
-      /* Nothing to persist to — the banner simply reappears next visit. */
+      /* nothing to persist to — the sheet simply reappears next visit */
     }
-    setShowBanner(false);
-    // Tell the tracker loader the choice changed, so it can act on it now.
+    setVisible(false);
     window.dispatchEvent(new Event("nz-consent-updated"));
-  };
+  }, []);
 
-  const handleAccept = () => persist("accepted");
-  const handleDecline = () => persist("declined");
+  /* First visit: wait a beat, then appear — but never on top of a primary CTA. */
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(COOKIE_CONSENT_KEY)) return;
+    } catch {
+      /* storage blocked (private mode / hardened browser) — ask anyway */
+    }
+    let done = false;
+    let timer = 0;
+    const zone = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const phone = vw < 768;
+      const w = phone ? vw : Math.min(720, vw - 48);
+      const left = phone ? 0 : (vw - w) / 2;
+      return { top: vh - (phone ? 170 : 130), bottom: vh, left, right: left + w };
+    };
+    const tryShow = () => {
+      if (done) return;
+      if (ctaInZone(zone())) return;
+      done = true;
+      setVisible(true);
+      cleanup();
+    };
+    const onScroll = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(tryShow, 250);
+    };
+    const cleanup = () => {
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(timer);
+    };
+    const start = window.setTimeout(() => {
+      tryShow();
+      if (!done) window.addEventListener("scroll", onScroll, { passive: true });
+    }, 1200);
+    return () => {
+      window.clearTimeout(start);
+      cleanup();
+    };
+  }, []);
 
-  if (!showBanner) return null;
+  /* Reopen on request (privacy page: "לשנות את הבחירה"). */
+  useEffect(() => {
+    const reopen = () => setVisible(true);
+    window.addEventListener(COOKIE_REOPEN_EVENT, reopen);
+    return () => window.removeEventListener(COOKIE_REOPEN_EVENT, reopen);
+  }, []);
 
-  /* Entrance: a CSS slide-up (tailwindcss-animate), none under reduced motion. */
+  /* Open/close the non-modal dialog and publish its height for the beads. */
+  useEffect(() => {
+    const dlg = ref.current;
+    if (!dlg) return;
+    if (!visible) {
+      setSheetLift(0);
+      return;
+    }
+    const measure = () => setSheetLift(window.innerWidth < 768 ? dlg.getBoundingClientRect().height : 0);
+    measure();
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    ro?.observe(dlg);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", measure);
+      setSheetLift(0);
+    };
+  }, [visible]);
+
   return (
-        <div
-          /* 152px clears the whole bottom-left FAB stack (WhatsApp ends at 80px,
-             the accessibility launcher at 140px) at EVERY breakpoint. It must not
-             be relaxed to `md:bottom-4` — on desktop the banner is ~158px tall,
-             so a 16px offset puts it straight over both buttons, and the
-             accessibility launcher has to stay reachable at all times. */
-          className="fixed bottom-[152px] left-4 right-4 z-[10000] duration-300 animate-in fade-in slide-in-from-bottom-8 motion-reduce:animate-none md:right-auto md:max-w-md"
-          dir="rtl"
-          role="dialog"
-          aria-modal="false"
-          aria-label="הסכמה לשימוש בעוגיות"
-        >
-          <div className="glass-strong ring-gradient rounded-2xl p-5">
-            <div className="flex items-start gap-3">
-              <div className="shrink-0 rounded-xl bg-gradient-to-br from-brand-1/15 to-brand-3/15 p-2.5">
-                <Cookie aria-hidden="true" className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex-1 space-y-3">
-                <p className="text-sm text-foreground leading-relaxed">
-                  אנחנו משתמשים בעוגיות חיוניות להפעלת האתר, ובעוגיות סטטיסטיקה רק אם תאשרו.
-                  אפשר לקרוא עוד ב
-                  <a href="/privacy/" className="text-primary hover:underline">מדיניות הפרטיות</a>
-                  {" "}שלנו.
-                </p>
-                <div className="flex gap-2">
-                  <Button onClick={handleAccept} size="sm" className="btn-brand flex-1 rounded-xl">
-                    אישור
-                  </Button>
-                  <Button
-                    onClick={handleDecline}
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 rounded-xl"
-                  >
-                    רק חיוניות
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
+    <dialog
+      ref={ref}
+      open={visible}
+      className="nzc-cookies"
+      aria-labelledby="nz-cookies-title"
+      aria-describedby="nz-cookies-text"
+      data-nz-float=""
+      data-a11y-exclude="true"
+      onCancel={(e) => e.preventDefault()}
+    >
+      <div className="nzc-cookies__card">
+        <p id="nz-cookies-title" className="nzc-cookies__title">
+          <span className="nzc-cube" aria-hidden="true" />
+          עוגיות
+        </p>
+        <p id="nz-cookies-text" className="nzc-cookies__text">
+          עוגיות חיוניות שומרות את ההגדרות שלכם. עוגיות מדידה נטענות רק אם תאשרו.{" "}
+          <a href="/privacy/#collected" className="nzc-cookies__more">
+            מה זה אומר
+          </a>
+        </p>
+        <div className="nzc-cookies__actions">
+          <button type="button" className="nzc-pill" onClick={() => persist("accepted")}>
+            לאשר הכול
+          </button>
+          <button type="button" className="nzc-pill" onClick={() => persist("declined")}>
+            רק חיוניות
+          </button>
         </div>
+      </div>
+    </dialog>
   );
 };
 

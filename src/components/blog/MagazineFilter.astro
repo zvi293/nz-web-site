@@ -1,0 +1,103 @@
+---
+/**
+ * The department filter — one horizontal scroll row of chips with counts, sticky under the header
+ * while the issue + archive scroll by. Its script also serves every other [data-mg-filter] control
+ * on the page (the zipper's shelves): choosing a department hides the cards / groups of the other
+ * departments ([data-mg-dept]) and sections left empty ([data-mg-section]), announces the result,
+ * and keeps #dept-<key> in the URL (replaceState, only when the reader picks a filter — the query
+ * string, e.g. ?utm_… / ?gclid, is always kept) so the view can be shared / come back.
+ * No JS: the chips are plain links to the departments in the archive.
+ */
+import { DEPARTMENTS, departmentCounts, getBlogPosts } from "@/lib/blog";
+
+const counts = departmentCounts();
+const chips = [
+  { key: "all", name: "הכול", count: getBlogPosts().length, href: "#mg-issue" },
+  ...DEPARTMENTS.map((d) => ({ key: d.key, name: d.name, count: counts[d.key] ?? 0, href: `#dept-${d.key}` })),
+];
+---
+
+<nav class="mg-filter" aria-label="סינון לפי מדור" data-mg-filterbar>
+  <div class="nz-container mg-filter__wrap">
+    <p class="mg-filter__label" aria-hidden="true">מדורים</p>
+    <ul class="mg-filter__row">
+      {
+        chips.map((c) => (
+          <li>
+            <a class="mg-chip" href={c.href} data-mg-filter={c.key} data-mg-chip>
+              <span>{c.name}</span>
+              <span class="mg-chip__n">{c.count}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <p class="nz-sr" aria-live="polite" data-mg-filter-live></p>
+</nav>
+
+<script>
+  const NAMES: Record<string, string> = {};
+  const chips = [...document.querySelectorAll<HTMLAnchorElement>("[data-mg-chip]")];
+  const live = document.querySelector<HTMLElement>("[data-mg-filter-live]");
+  const items = [...document.querySelectorAll<HTMLElement>("[data-mg-dept]")];
+  const sections = [...document.querySelectorAll<HTMLElement>("[data-mg-section]")];
+  const issue = document.getElementById("mg-issue");
+
+  chips.forEach((c) => {
+    NAMES[c.dataset.mgFilter!] = c.querySelector("span")?.textContent ?? "";
+    c.setAttribute("role", "button");
+    c.addEventListener("keydown", (e) => {
+      if (e.key === " ") {
+        e.preventDefault();
+        c.click();
+      }
+    });
+  });
+
+  function apply(key: string, opts: { scroll?: boolean; announce?: boolean; updateUrl?: boolean } = {}) {
+    const all = key === "all" || !NAMES[key];
+    items.forEach((el) => {
+      el.hidden = !all && el.dataset.mgDept !== key;
+    });
+    sections.forEach((sec) => {
+      const any = [...sec.querySelectorAll<HTMLElement>("[data-mg-dept]")].some((el) => !el.hidden);
+      sec.hidden = !any;
+    });
+    chips.forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.mgFilter === (all ? "all" : key))));
+    const shown = new Set(
+      items
+        .filter((el) => !el.hidden)
+        .flatMap((el) =>
+          el.hasAttribute("data-mg-post")
+            ? [el.dataset.mgPost]
+            : [...el.querySelectorAll<HTMLElement>("[data-mg-post]")].map((p) => p.dataset.mgPost),
+        ),
+    ).size;
+    if (opts.announce && live)
+      live.textContent = all ? `מוצגים כל ${shown} המאמרים.` : `מוצגים ${shown} מאמרים במדור ${NAMES[key]}.`;
+    if (opts.updateUrl)
+      history.replaceState(history.state, "", `${location.pathname}${location.search}${all ? "" : `#dept-${key}`}`);
+    if (opts.scroll && issue) {
+      const target = sections.find((s) => !s.hidden) ?? issue;
+      target.scrollIntoView({ block: "start" });
+    }
+    if (opts.announce)
+      chips.find((c) => c.getAttribute("aria-pressed") === "true")?.scrollIntoView({ block: "nearest", inline: "center" });
+  }
+
+  document.addEventListener("click", (e) => {
+    const a = (e.target as Element | null)?.closest<HTMLAnchorElement>("[data-mg-filter]");
+    if (!a) return;
+    e.preventDefault();
+    const fromChip = a.hasAttribute("data-mg-chip");
+    apply(a.dataset.mgFilter!, {
+      scroll: !fromChip || window.scrollY > (issue?.offsetTop ?? 0),
+      announce: true,
+      updateUrl: true,
+    });
+  });
+
+  const fromHash = /^#dept-([a-z]+)$/.exec(location.hash)?.[1];
+  apply(fromHash && NAMES[fromHash] ? fromHash : "all", { scroll: !!fromHash });
+</script>

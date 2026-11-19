@@ -59,11 +59,11 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   category: string;
-  cover_image: string;
-  /** Intrinsic pixel size of `cover_image`. Rendered as width/height on the
-   *  <img> so the browser reserves the right box before the file arrives (CLS). */
-  cover_width: number;
-  cover_height: number;
+  /** LEGACY raster cover (pre-gallery). Optional: covers now come from `art` (<Artwork>). */
+  cover_image?: string;
+  /** LEGACY intrinsic pixel size of `cover_image`. Optional. */
+  cover_width?: number;
+  cover_height?: number;
   author: string;
   read_time: number;
   published_at: string;
@@ -76,6 +76,9 @@ export interface BlogPost {
   updated_at?: string;
   /** Visible Q&A block at the end of the article (also feeds FAQPage JSON-LD). */
   faq?: BlogFaqItem[];
+  /** Optional per-article signature component key (registry: src/components/articles/index.ts).
+   *  Rendered where `content` has a line "[[signature]]" (or after the 2nd H2 section). */
+  signature?: string;
 }
 
 export interface BlogFaqItem {

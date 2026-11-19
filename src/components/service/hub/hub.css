@@ -1,0 +1,262 @@
+/* /services/ hub — prefix hb-. The "three questions" fork diagram. */
+.hb-guide__list {
+  display: grid;
+  gap: clamp(40px, 5vw, 64px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hb-fork {
+  display: grid;
+}
+.hb-fork__q {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  text-align: center;
+}
+.hb-fork__idx {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--accent-text);
+}
+.hb-fork__text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.75rem, 1.3rem + 1.8vw, 3rem);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.hb-fork__svg {
+  display: block;
+  overflow: visible;
+}
+.hb-fork__svg path {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+.hb-fork__svg--down {
+  width: 100%;
+  height: 48px;
+  margin-block: 10px 0;
+}
+.hb-fork__svg--side {
+  display: none;
+}
+@supports (animation-timeline: view()) {
+  html.nz-motion .hb-fork__svg path {
+    stroke-dasharray: 1;
+    animation: hb-draw linear both;
+    animation-timeline: view();
+    animation-range: entry 30% cover 45%;
+  }
+}
+@keyframes hb-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.hb-fork__ends {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hb-door {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  height: 100%;
+  color: var(--fg);
+  text-decoration: none;
+}
+/* the doorway: an arched opening in the wall, the room's work glimpsed inside */
+.hb-door__way {
+  position: relative;
+  display: block;
+  margin-bottom: 8px;
+  padding: 6px 6px 0;
+  background: var(--ink);
+  border-radius: 999px 999px 0 0;
+  overflow: hidden;
+  box-shadow: 0 24px 34px -26px rgba(18, 17, 16, 0.8);
+  transition: transform 0.6s var(--ease-gallery), box-shadow 0.6s var(--ease-gallery);
+}
+.hb-door__way .hb-door__art,
+.hb-door__way .nz-art__canvas {
+  margin: 0;
+  border-radius: 999px 999px 0 0;
+}
+.hb-door__way .nz-art img {
+  transition: transform 1s var(--ease-gallery), filter 0.6s var(--ease-out);
+  filter: brightness(0.82);
+}
+.hb-door__big {
+  position: absolute;
+  inset-block-end: 6px;
+  inset-inline-start: 12px;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.75rem, 2rem + 3vw, 4.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--bone);
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.55);
+  font-variant-numeric: lining-nums;
+}
+.hb-door:hover .hb-door__way,
+.hb-door:focus-visible .hb-door__way {
+  transform: translateY(-4px);
+  box-shadow: 0 34px 44px -28px rgba(18, 17, 16, 0.85), 0 3px 0 var(--vermilion);
+}
+.hb-door:hover .nz-art img,
+.hb-door:focus-visible .nz-art img {
+  transform: scale(1.05);
+  filter: brightness(1);
+}
+.hb-door__cond {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--accent-text);
+}
+.hb-door__room {
+  display: grid;
+  gap: 2px;
+}
+.hb-door__num {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+}
+.hb-door__name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.1875rem, 1.05rem + 0.5vw, 1.5rem);
+  line-height: 1.15;
+}
+.hb-door__why {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--fg-muted);
+}
+
+/* the compact index of the industry pages */
+.hb-index {
+  margin-top: clamp(56px, 7vw, 96px);
+  padding-top: 18px;
+  border-top: 2px solid var(--fg);
+}
+.hb-index__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin: 0 0 8px;
+}
+.hb-index__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.375rem, 1.15rem + 0.9vw, 2rem);
+}
+.hb-index__note {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+}
+.hb-index__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hb-index__link {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-height: 48px;
+  padding-block: 12px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--fg);
+  text-decoration: none;
+}
+.hb-index__num {
+  flex: none;
+  width: 2.6em;
+  font-size: 0.75rem;
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+.hb-index__label {
+  font-size: 1rem;
+}
+.hb-index__dots {
+  flex: 1;
+  min-width: 12px;
+  border-bottom: 1px dotted var(--fg-muted);
+  opacity: 0.5;
+  transition: opacity 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
+}
+.hb-index__link:hover .hb-index__dots,
+.hb-index__link:focus-visible .hb-index__dots {
+  opacity: 1;
+  border-color: var(--vermilion);
+}
+@media (min-width: 768px) {
+  .hb-index__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 48px;
+  }
+}
+@media (min-width: 1024px) {
+  .hb-guide__list {
+    gap: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .hb-fork {
+    grid-template-columns: minmax(0, 4fr) 72px minmax(0, 7fr);
+    align-items: center;
+    padding-block: 44px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .hb-fork__q {
+    justify-items: start;
+    text-align: start;
+    padding-inline-end: 24px;
+  }
+  .hb-fork__svg--down {
+    display: none;
+  }
+  .hb-fork__svg--side {
+    display: block;
+    width: 72px;
+    height: 100%;
+    min-height: 260px;
+  }
+  .hb-fork__ends {
+    gap: clamp(24px, 3vw, 48px);
+  }
+  .hb-door {
+    grid-template-columns: minmax(170px, 1fr) minmax(0, 1fr);
+    column-gap: 20px;
+    align-items: end;
+  }
+  .hb-door__way {
+    grid-row: 1 / span 3;
+    margin-bottom: 0;
+  }
+  .hb-door__cond {
+    align-self: end;
+  }
+  .hb-index__list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

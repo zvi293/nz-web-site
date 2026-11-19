@@ -1,34 +1,50 @@
 ---
 /**
- * /projects/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /projects/ — "האוסף": the real works, hung as a salon wall.
+ * Static sections (src/components/projects) + ONE island:
+ *   SalonWall  client:visible  the signature "קיר הסלון" (salon hang → framed lightbox <dialog>)
+ * Page CSS: src/components/projects/projects.css (prefix `pj-`).
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import AllProjects from "@/views/AllProjects";
+import ProjectsHero, { PROJECTS_HERO_SIZES, PROJECTS_HERO_SLUG } from "@/components/projects/ProjectsHero";
+import ProjectsSalon from "@/components/projects/ProjectsSalon";
+import SalonWall from "@/components/projects/SalonWall";
+import ProjectsCatalogue from "@/components/projects/ProjectsCatalogue";
+import ProjectsLabel from "@/components/projects/ProjectsLabel";
+import ProjectsNext from "@/components/projects/ProjectsNext";
+import "@/components/projects/projects.css";
+import { projectsCopy } from "@/components/projects/copy";
+import { works } from "@/components/projects/works";
 import { collectionPage, OG_IMAGES } from "@/lib/schema";
-import { publishedProjects } from "@/content/projects";
-import type { PageSeo } from "@/lib/seo";
+import { heroImage, type PageSeo } from "@/lib/seo";
 
 const PATH = "/projects/";
-const title = "פורטפוליו | פרויקטי בניית אתרים ופיתוח | NZ-web";
-const description =
-  "גלו פרויקטי בניית אתרים ופיתוח אתרים שביצענו ללקוחות בישראל. אתרי תדמית, חנויות אונליין, מערכות ניהול תורים ודפי נחיתה — כל פרויקט עם תוצאות מדידות.";
+const { title, description, breadcrumb } = projectsCopy.seo;
+
 const seo: PageSeo = {
   path: PATH,
   title,
   description,
   ogImage: OG_IMAGES.projects,
-  breadcrumb: { name: "פרויקטים", path: PATH },
+  lcpArt: { slug: PROJECTS_HERO_SLUG, sizes: PROJECTS_HERO_SIZES },
+  breadcrumb: { name: breadcrumb, path: PATH },
   jsonLd: collectionPage({
     path: PATH,
     title,
     description,
-    items: publishedProjects.map((p) => ({ name: p.title, url: p.link, description: p.description, image: p.image })),
+    primaryImage: heroImage(PROJECTS_HERO_SLUG, PATH),
+    speakable: true,
+    items: works.map((w) => ({ name: w.title, url: w.link, description: w.description, image: w.desktop.src })),
   }),
 };
 ---
 
-<BaseLayout seo={seo}>
-  <AllProjects client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <ProjectsHero />
+  <ProjectsSalon>
+    <SalonWall client:visible />
+  </ProjectsSalon>
+  <ProjectsCatalogue />
+  <ProjectsLabel />
+  <ProjectsNext />
 </BaseLayout>

@@ -1,0 +1,63 @@
+---
+/**
+ * ReactDecision — "מתי React". Page-local section of /services/react-development/ (prefix rd-).
+ * A yes/no decision diagram instead of a list: a solid vermilion spine is the "כן" path through
+ * two questions to a full React app; each "לא" leaves the spine on a dashed branch to an honest
+ * exit (static HTML; HTML + React islands, with "האתר הזה בנוי כך"). Phones: one column, the
+ * spine on the start edge, exits indented. Wide: questions on the start column, exits across a
+ * dashed connector. Static, an ordered list read top to bottom; no-JS = the same.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import Nb from "@/components/service/Nb.astro";
+import { DECISION } from "./data";
+import "./react-development.css";
+
+interface Props {
+  index?: string;
+}
+const { index = "03" } = Astro.props;
+const D = DECISION;
+---
+
+<section class="nz-section nz-section--space-default rd-dec" data-tone="bone" aria-labelledby="rd-dec-title">
+  <div class="nz-container">
+    <ServiceOpener variant="split" index={index} label="מתי כן ומתי לא" id="rd-dec-title" title={D.title} lede={D.lede} />
+
+    <ol class="rd-flow" data-reveal>
+      <li class="rd-flow__start"><span class="rd-flow__dot" aria-hidden="true"></span>{D.start}</li>
+      {
+        D.questions.map((q, i) => (
+          <li class="rd-row" style={`--r:${i}`}>
+            <div class="rd-q">
+              <p class="rd-q__no">שאלה {i + 1}</p>
+              <h3 class="rd-q__q"><Nb text={q.q} /></h3>
+              <p class="rd-q__hint"><Nb text={q.hint} /></p>
+            </div>
+            <div class="rd-no">
+              <span class="rd-no__line" aria-hidden="true"></span>
+              <span class="rd-no__label">לא</span>
+            </div>
+            <div class="rd-exit">
+              <p class="rd-exit__tag">{q.no.tag}</p>
+              <p class="rd-exit__title"><Nb text={q.no.title} /></p>
+              <p class="rd-exit__body"><Nb text={q.no.body} /></p>
+              {q.no.here && (
+                <p class="rd-exit__here">
+                  <span class="rd-exit__cube" aria-hidden="true"></span>
+                  {q.no.here}
+                </p>
+              )}
+            </div>
+            <span class="rd-yes" aria-hidden="true"><span>כן</span></span>
+          </li>
+        ))
+      }
+      <li class="rd-final">
+        <p class="rd-exit__tag">{D.yes.tag}</p>
+        <p class="rd-final__title"><Nb text={D.yes.title} /></p>
+        <p class="rd-final__body"><Nb text={D.yes.body} /></p>
+      </li>
+    </ol>
+    <p class="nz-sr">בכל שאלה: תשובה "כן" ממשיכה לשאלה הבאה, תשובה "לא" מובילה לתשובה שמופיעה לידה.</p>
+  </div>
+</section>

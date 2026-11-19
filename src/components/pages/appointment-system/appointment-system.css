@@ -1,0 +1,470 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   /services/appointment-system/ — page sections. Prefix ap-.
+   MessageTrail (paper): one appointment along a brass thread, its messages hung on knots.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ap-trail {
+  --ap-brass: #b88a3e;
+  --ap-col-when: 76px;
+  --ap-col-knot: 28px;
+  position: relative;
+  list-style: none;
+  margin: clamp(32px, 5vw, 64px) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+.ap-trail::before {
+  /* the thread */
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  inset-inline-start: calc(var(--ap-col-when) + var(--ap-col-knot) / 2 - 1px);
+  width: 2px;
+  background: linear-gradient(to bottom, #e3c27a, var(--ap-brass) 40%, #7a5520);
+  border-radius: 2px;
+  transform-origin: 50% 0;
+}
+.ap-stop {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--ap-col-when) var(--ap-col-knot) minmax(0, 1fr);
+  align-items: start;
+}
+.ap-stop__when {
+  padding-top: 14px;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  line-height: 1.15;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.ap-stop__knot {
+  justify-self: center;
+  margin-top: 16px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f6dc93, #b88a3e 55%, #6e4a1a);
+  box-shadow: 0 0 0 4px var(--paper), 0 2px 4px rgba(18, 17, 16, 0.3);
+  position: relative;
+  z-index: 1;
+}
+.ap-msg {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px 16px;
+  background: #fff;
+  border-radius: 14px 14px 14px 4px;
+  box-shadow: 0 0 0 1px var(--line), 0 16px 28px -22px rgba(18, 17, 16, 0.5);
+}
+.ap-msg__ch {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--graphite);
+}
+.ap-msg__t {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1.1;
+}
+.ap-msg__b {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.ap-msg__link {
+  justify-self: start;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--vermilion-deep);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+/* the business's calendar: a block in a day grid */
+.ap-stop--cal .ap-msg {
+  border-radius: 4px;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 27px, rgba(18, 17, 16, 0.06) 27px 28px),
+    var(--bone-2);
+  box-shadow: inset -4px 0 0 var(--vermilion), 0 0 0 1px var(--line); /* RTL: the bar on the start (right) edge */
+}
+/* the system: a dashed note, the slot goes back to the board */
+.ap-stop--sys .ap-msg {
+  border-radius: 4px;
+  background: transparent;
+  box-shadow: none;
+  outline: 1.5px dashed rgba(18, 17, 16, 0.3);
+  outline-offset: -1px;
+}
+.ap-trail__cap {
+  margin-top: 24px;
+  max-width: 36rem;
+}
+
+@media (min-width: 1024px) {
+  .ap-trail {
+    --ap-col-knot: 56px;
+    gap: 0;
+  }
+  .ap-trail::before {
+    inset-inline-start: calc(50% - 1px);
+  }
+  /* each stop keeps its moment and its message on one side; the sides alternate */
+  .ap-stop {
+    grid-template-columns: minmax(0, 1fr) var(--ap-col-knot) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "when knot ."
+      "card knot .";
+    row-gap: 8px;
+  }
+  .ap-stop:nth-child(even) {
+    grid-template-areas:
+      ". knot when"
+      ". knot card";
+  }
+  .ap-stop:nth-child(n + 2) {
+    margin-top: -56px;
+  }
+  .ap-stop__when {
+    grid-area: when;
+    padding-top: 0;
+    font-size: 1.5rem;
+  }
+  .ap-stop:nth-child(odd) .ap-stop__when,
+  .ap-stop:nth-child(odd) .ap-msg {
+    justify-self: end;
+    text-align: start;
+  }
+  .ap-stop:nth-child(odd) .ap-stop__when {
+    width: min(100%, 440px);
+  }
+  .ap-stop:nth-child(even) .ap-stop__when,
+  .ap-stop:nth-child(even) .ap-msg {
+    justify-self: start;
+  }
+  .ap-stop__knot {
+    grid-area: knot;
+    align-self: start;
+    margin-top: 8px;
+    width: 18px;
+    height: 18px;
+  }
+  .ap-msg {
+    grid-area: card;
+    width: min(100%, 440px);
+    padding: 18px 22px 20px;
+  }
+  .ap-stop:nth-child(odd) .ap-msg {
+    border-radius: 14px 4px 14px 14px;
+  }
+  .ap-stop:nth-child(even) .ap-msg {
+    border-radius: 4px 14px 14px 14px;
+  }
+  .ap-stop--cal .ap-msg,
+  .ap-stop--sys .ap-msg {
+    border-radius: 4px !important;
+  }
+}
+
+/* the thread draws itself, then the knots and messages arrive in turn */
+html.nz-motion .ap-trail::before {
+  transform: scaleY(0);
+  transition: transform 1.6s var(--ease-gallery) 0.2s;
+}
+html.nz-motion .ap-trail[data-in]::before {
+  transform: scaleY(1);
+}
+html.nz-motion .ap-trail .ap-stop__knot,
+html.nz-motion .ap-trail .ap-msg {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.7s var(--ease-gallery), transform 0.7s var(--ease-gallery);
+  transition-delay: calc(0.35s + var(--i) * 0.22s);
+}
+html.nz-motion .ap-trail .ap-stop__knot {
+  transform: scale(0.4);
+}
+html.nz-motion .ap-trail[data-in] .ap-stop__knot,
+html.nz-motion .ap-trail[data-in] .ap-msg {
+  opacity: 1;
+  transform: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WeekPlanner (paper): who books — one sample week in a ring-bound planner. Prefix apw-.
+   Fills: c ink · b hatching · t brass · k outline · m dots. Phone: planner, then legend.
+   Desktop: heading + legend on the start side, the planner large on the other.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.apw {
+  --apw-brass: #c99a4b;
+  --apw-row: 15px;
+  display: grid;
+  gap: clamp(28px, 4vw, 48px);
+}
+.apw__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 6px 14px 6px 16px;
+  border-radius: 4px 4px 0 0;
+  border-bottom: 2px solid var(--ink);
+  background: var(--bone-2);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+}
+.apw__tab-i {
+  color: var(--vermilion-deep);
+  font-variant-numeric: tabular-nums;
+}
+.apw__title {
+  text-wrap: balance;
+}
+.apw__lede {
+  margin-top: 16px;
+  color: var(--graphite);
+  max-width: 34rem;
+}
+
+/* the planner */
+.apw__book {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+.apw__sheet {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  padding: 26px 12px 14px;
+  background: #fbf9f5;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--line), 0 1px 0 4px #ece6dc, 0 2px 0 5px var(--line), 0 30px 40px -28px rgba(18, 17, 16, 0.45);
+  transform: rotate(-1.2deg);
+}
+.apw__rings {
+  position: absolute;
+  top: -10px;
+  inset-inline: 22px;
+  display: flex;
+  justify-content: space-between;
+}
+.apw__rings span {
+  width: 10px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid #8a8378;
+  background: linear-gradient(90deg, #d9d3c9, #f7f3ec);
+}
+.apw__grid {
+  display: grid;
+  grid-template-columns: 34px repeat(5, minmax(0, 1fr));
+  grid-template-rows: 26px repeat(22, var(--apw-row));
+  column-gap: 4px;
+  position: relative;
+}
+.apw__grid::before {
+  /* the ruled hour lines of the page */
+  content: "";
+  position: absolute;
+  top: 26px;
+  bottom: 0;
+  inset-inline: 34px 0;
+  background: repeating-linear-gradient(to bottom, rgba(18, 17, 16, 0.12) 0 1px, transparent 1px calc(var(--apw-row) * 2));
+}
+.apw__corner {
+  grid-column: 1;
+  grid-row: 1;
+}
+.apw__day {
+  grid-row: 1;
+  align-self: center;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  line-height: 1;
+  color: var(--ink);
+}
+.apw__hour {
+  grid-column: 1;
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--graphite);
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  text-align: end;
+  padding-inline-end: 4px;
+  transform: translateY(-5px);
+}
+.apw__col {
+  grid-row: 2 / span 22;
+  border-inline-start: 1px solid rgba(18, 17, 16, 0.08);
+}
+.apw__blk {
+  position: relative;
+  z-index: 1;
+  margin: 1px 0;
+  border-radius: 3px;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  min-width: 0;
+}
+.apw__blk-w {
+  padding: 2px 4px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+/* fills — shared by blocks and legend swatches */
+.apw__blk--c {
+  background: var(--ink);
+  color: var(--bone);
+}
+.apw__blk--b {
+  background: repeating-linear-gradient(-45deg, #fbf9f5 0 3px, rgba(87, 82, 75, 0.55) 3px 4px);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px rgba(87, 82, 75, 0.6);
+}
+.apw__blk--b .apw__blk-w {
+  background: #fbf9f5;
+  border-radius: 0 0 3px 0;
+}
+.apw__blk--t {
+  background: var(--apw-brass);
+  color: var(--ink);
+}
+.apw__blk--k {
+  background: #fbf9f5;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.apw__blk--m {
+  background-color: var(--bone-2);
+  background-image: radial-gradient(rgba(18, 17, 16, 0.38) 1px, transparent 1.4px);
+  background-size: 5px 5px;
+  color: var(--ink);
+}
+.apw__blk--m .apw__blk-w {
+  background: var(--bone-2);
+  border-radius: 0 0 3px 0;
+}
+.apw__blk.is-new {
+  box-shadow: 0 0 0 2px var(--vermilion), 0 6px 14px -6px rgba(224, 64, 31, 0.6);
+  z-index: 2;
+  overflow: visible;
+}
+.apw__flag {
+  position: absolute;
+  inset-inline-end: -6px;
+  top: -9px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--vermilion);
+  color: #fff;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.apw__cap {
+  font-size: 0.8125rem;
+  color: var(--graphite);
+  text-align: center;
+  text-wrap: balance;
+}
+/* blocks are written into the week once it is in view */
+html.nz-motion .apw__sheet .apw__blk {
+  transition: opacity 0.5s var(--ease-gallery), transform 0.6s var(--ease-gallery);
+  transition-delay: calc(var(--n) * 22ms);
+}
+html.nz-motion .apw__sheet:not([data-in]) .apw__blk {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+/* the legend = the content */
+.apw__legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+.apw__entry {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.apw__sw {
+  width: 34px;
+  height: 34px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+.apw__entry-t {
+  display: grid;
+  gap: 4px;
+}
+.apw__name {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.apw__note {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--graphite);
+  text-wrap: pretty;
+}
+
+@media (min-width: 640px) {
+  .apw {
+    --apw-row: 18px;
+  }
+  .apw__legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 32px;
+  }
+  .apw__blk-w {
+    font-size: 0.75rem;
+  }
+}
+@media (min-width: 1024px) {
+  .apw {
+    --apw-row: 21px;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas: "head book" "legend book";
+    column-gap: clamp(48px, 6vw, 96px);
+    align-items: start;
+  }
+  .apw__head {
+    grid-area: head;
+  }
+  .apw__book {
+    grid-area: book;
+    position: sticky;
+    top: calc(var(--header-h) + 32px);
+  }
+  .apw__legend {
+    grid-area: legend;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .apw__sheet {
+    max-width: 640px;
+    padding: 34px 20px 20px;
+  }
+}

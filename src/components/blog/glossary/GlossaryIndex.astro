@@ -1,0 +1,283 @@
+---
+/**
+ * The glossary's index (the tools under the signature drawer): every term is static HTML (id="term-<slug>"),
+ * grouped under its letter. Above it: a live search field and a thumb index of the whole alphabet
+ * (letters without terms are dimmed, like a real dictionary's cut tabs) — a scroll row on phones,
+ * a vertical thumb-index rail on desktop. Type, or tap a letter: the entries that match flip into
+ * view (rotateX, staggered), the rest step aside, the match is marked in the term, and the count is
+ * announced (aria-live). Each entry links its related terms and, where there is one, the article.
+ * Three illustrated plates (GlossaryPlate.astro) sit between letter groups and step aside while
+ * the list is filtered.
+ * No JS: the search is hidden; the letters are plain anchors (#letter-<x>) and everything is listed.
+ * Reduced motion: no flip.
+ */
+import { HEBREW_LETTERS, glossaryTerms, sortedTerms, termLetter, usedLetters } from "@/content/glossary";
+import { getBlogPost } from "@/lib/blog";
+import GlossaryPlate from "./GlossaryPlate.astro";
+
+/* which plate follows which letter group */
+const PLATES: Record<string, "address" | "journey" | "vitals"> = { ד: "address", ר: "journey", L: "vitals" };
+
+const terms = sortedTerms();
+const used = new Set(usedLetters());
+const latin = usedLetters().filter((l) => /[A-Z]/.test(l));
+const groups = usedLetters().map((letter) => ({ letter, terms: terms.filter((t) => termLetter(t) === letter) }));
+const nameOf = (slug: string) => glossaryTerms.find((t) => t.slug === slug)?.name ?? slug;
+const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[֑-ׇ]/g, "")
+    .replace(/["'׳״-]/g, "");
+const haystack = (t: (typeof terms)[number]) =>
+  norm([t.name, t.alt ?? "", ...(t.aliases ?? []), t.tag, t.definition].join(" "));
+---
+
+<section class="gl-index" data-tone="paper" aria-label="המילון" data-gl>
+  <div class="nz-container gl-index__grid">
+    <div class="gl-tools">
+      <div class="gl-search" data-gl-searchbox>
+        <label for="gl-q" class="gl-search__label">חיפוש במילון</label>
+        <div class="gl-search__field">
+          <svg class="gl-search__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"></circle>
+            <path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+          </svg>
+          <input
+            id="gl-q"
+            type="search"
+            class="gl-search__input"
+            placeholder="למשל: מהירות, דומיין, AI"
+            autocomplete="off"
+            spellcheck="false"
+            enterkeyhint="search"
+            data-gl-q
+          />
+        </div>
+        <p class="gl-search__status" aria-live="polite" data-gl-status>{terms.length} מונחים</p>
+      </div>
+
+      <nav class="gl-thumbs" aria-label="מפתח אותיות">
+        <ul class="gl-thumbs__row">
+          <li>
+            <a href="#gl-entries" class="gl-thumb gl-thumb--all" data-gl-letter="*">הכול</a>
+          </li>
+          {
+            HEBREW_LETTERS.map((l) =>
+              used.has(l) ? (
+                <li>
+                  <a href={`#letter-${l}`} class="gl-thumb" data-gl-letter={l} aria-label={`האות ${l}`}>
+                    {l}
+                  </a>
+                </li>
+              ) : (
+                <li aria-hidden="true">
+                  <span class="gl-thumb is-empty">{l}</span>
+                </li>
+              ),
+            )
+          }
+          {
+            latin.map((l) => (
+              <li>
+                <a href={`#letter-${l}`} class="gl-thumb gl-thumb--latin" data-gl-letter={l} aria-label={`האות ${l}`}>
+                  {l}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+
+    <div id="gl-entries" class="gl-entries">
+      {
+        groups.map((g) => (
+          <Fragment>
+          <section class="gl-group" id={`letter-${g.letter}`} data-gl-group={g.letter} aria-labelledby={`gl-h-${g.letter}`}>
+            <h2 class="gl-group__letter" id={`gl-h-${g.letter}`}>
+              <span class="nz-sr">האות </span>
+              {g.letter}
+            </h2>
+            <ol class="gl-group__list">
+              {g.terms.map((t) => {
+                const post = t.article ? getBlogPost(t.article.slug) : null;
+                return (
+                  <li class="gl-term" id={`term-${t.slug}`} data-gl-term data-gl-hay={haystack(t)}>
+                    <div class="gl-term__card">
+                      <div class="gl-term__head">
+                        <h3 class="gl-term__name" data-gl-name>
+                          {t.name}
+                        </h3>
+                        {t.alt && (
+                          <span class="gl-term__alt" dir="auto">
+                            {t.alt}
+                          </span>
+                        )}
+                        <span class="gl-term__tag">{t.tag}</span>
+                      </div>
+                      <p class="gl-term__def">{t.definition}</p>
+                      {(t.seeAlso?.length || post) && (
+                        <div class="gl-term__foot">
+                          {t.seeAlso && t.seeAlso.length > 0 && (
+                            <p class="gl-term__see">
+                              <span class="gl-term__k">ראו גם</span>
+                              {t.seeAlso.map((s) => (
+                                <a href={`#term-${s}`}>{nameOf(s)}</a>
+                              ))}
+                            </p>
+                          )}
+                          {post && (
+                            <a class="gl-term__read" href={`/blog/${post.slug}/`}>
+                              <span class="gl-term__k">במגזין</span>
+                              <span class="gl-term__read-t">{t.article!.label}</span>
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+          {PLATES[g.letter] && <GlossaryPlate kind={PLATES[g.letter]} />}
+          </Fragment>
+        ))
+      }
+      <div class="gl-empty" hidden data-gl-empty>
+        <p class="gl-empty__title">לא מצאנו את המונח הזה במילון.</p>
+        <p class="gl-empty__body">נסו מילה אחרת, או כתבו לנו ונסביר אותו (ואולי גם נוסיף אותו למילון).</p>
+        <button type="button" class="nz-btn nz-btn--secondary nz-btn--sm" data-gl-clear>ניקוי החיפוש</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-gl]");
+  if (root) {
+    const input = root.querySelector<HTMLInputElement>("[data-gl-q]")!;
+    const status = root.querySelector<HTMLElement>("[data-gl-status]")!;
+    const empty = root.querySelector<HTMLElement>("[data-gl-empty]")!;
+    const terms = [...root.querySelectorAll<HTMLElement>("[data-gl-term]")];
+    const groups = [...root.querySelectorAll<HTMLElement>("[data-gl-group]")];
+    const letters = [...root.querySelectorAll<HTMLAnchorElement>("[data-gl-letter]")];
+    const plates = [...root.querySelectorAll<HTMLElement>("[data-gl-plate]")];
+    const names = new Map(terms.map((t) => [t, t.querySelector<HTMLElement>("[data-gl-name]")!]));
+    const original = new Map(terms.map((t) => [t, names.get(t)!.textContent ?? ""]));
+    const total = terms.length;
+    root.classList.add("is-live");
+
+    const norm = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/[֑-ׇ]/g, "")
+        .replace(/["'׳״-]/g, "")
+        .trim();
+    const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const motion = () => document.documentElement.classList.contains("nz-motion");
+
+    let letter = "*";
+    let timer = 0;
+
+    function mark(el: HTMLElement, text: string, q: string) {
+      if (!q) {
+        el.textContent = text;
+        return;
+      }
+      const i = norm(text).indexOf(q);
+      /* indices line up only when normalising removed nothing — otherwise skip the mark */
+      if (i < 0 || norm(text).length !== text.toLowerCase().length) {
+        el.textContent = text;
+        return;
+      }
+      el.innerHTML = `${esc(text.slice(0, i))}<mark>${esc(text.slice(i, i + q.length))}</mark>${esc(text.slice(i + q.length))}`;
+    }
+
+    function render(announce = true, flip = true) {
+      const q = norm(input.value);
+      let shown = 0;
+      let k = 0;
+      terms.forEach((t) => {
+        const inLetter = letter === "*" || t.closest<HTMLElement>("[data-gl-group]")?.dataset.glGroup === letter;
+        const hit = !q || (t.dataset.glHay ?? "").includes(q);
+        const on = inLetter && hit;
+        const was = !t.hidden;
+        t.hidden = !on;
+        mark(names.get(t)!, original.get(t)!, q);
+        if (on) {
+          shown += 1;
+          if (flip && motion()) {
+            t.classList.remove("is-flipping");
+            t.style.setProperty("--k", String(Math.min(k++, 10)));
+            void t.offsetWidth; /* restart the flip */
+            t.classList.add("is-flipping");
+          }
+        }
+        if (!on && was) t.classList.remove("is-flipping");
+      });
+      groups.forEach((g) => {
+        g.hidden = ![...g.querySelectorAll<HTMLElement>("[data-gl-term]")].some((t) => !t.hidden);
+      });
+      empty.hidden = shown > 0;
+      plates.forEach((pl) => (pl.hidden = !!q || letter !== "*"));
+      letters.forEach((a) => a.setAttribute("aria-pressed", String(a.dataset.glLetter === letter)));
+      const scope = letter === "*" ? "" : ` באות ${letter}`;
+      const text =
+        !q && letter === "*"
+          ? `${total} מונחים`
+          : shown === 0
+            ? "לא נמצאו מונחים"
+            : `${shown === 1 ? "מונח אחד" : `${shown} מונחים`}${scope}${q ? ` עבור "${input.value.trim()}"` : ""}`;
+      if (announce) status.textContent = text;
+    }
+
+    input.addEventListener("input", () => {
+      letter = "*";
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => render(), 120);
+    });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && input.value) {
+        input.value = "";
+        render();
+      }
+    });
+    letters.forEach((a) => {
+      a.setAttribute("role", "button");
+      a.addEventListener("keydown", (e) => {
+        if (e.key === " ") {
+          e.preventDefault();
+          a.click();
+        }
+      });
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const l = a.dataset.glLetter!;
+        letter = letter === l ? "*" : l;
+        input.value = "";
+        render();
+        const target = letter === "*" ? root : root.querySelector(`[data-gl-group="${CSS.escape(letter)}"]`);
+        target?.scrollIntoView({ block: "start" });
+      });
+    });
+    root.querySelector("[data-gl-clear]")?.addEventListener("click", () => {
+      input.value = "";
+      letter = "*";
+      render();
+      input.focus();
+    });
+    /* "ראו גם" links inside a filtered view: show everything first so the target exists */
+    root.addEventListener("click", (e) => {
+      const a = (e.target as Element | null)?.closest<HTMLAnchorElement>('a[href^="#term-"]');
+      if (!a) return;
+      const target = document.getElementById(a.hash.slice(1));
+      if (target?.hidden) {
+        input.value = "";
+        letter = "*";
+        render(false, false);
+      }
+    });
+    render(false, false);
+  }
+</script>

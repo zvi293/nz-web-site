@@ -1,0 +1,325 @@
+/* ── היומן של מחר (reminder-day) · prefix as-rd ─────────────────────────── */
+.as-rd__live {
+  display: grid;
+  gap: 18px;
+}
+.as-rd__switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+  padding: 6px 18px 6px 8px;
+  padding-inline: 8px 18px;
+  border: 1px solid var(--line-ink);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--bone);
+  font: 500 1rem/1.2 var(--font-sans);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.as-rd__switch:hover {
+  border-color: rgba(239, 234, 226, 0.5);
+}
+.as-rd__track {
+  position: relative;
+  width: 54px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--ink-3);
+  box-shadow: inset 0 0 0 1px rgba(239, 234, 226, 0.25);
+  transition: background-color 0.35s ease;
+}
+.as-rd__knob {
+  position: absolute;
+  top: 4px;
+  inset-inline-start: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bone);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  transition: inset-inline-start 0.35s var(--ease-gallery);
+}
+.as-rd__switch[aria-checked="true"] .as-rd__track {
+  background: var(--vermilion-fill);
+}
+.as-rd__switch[aria-checked="true"] .as-rd__knob {
+  inset-inline-start: 26px;
+}
+.as-rd__switch-text {
+  display: grid;
+  text-align: start;
+}
+.as-rd__switch-state {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--ash);
+}
+
+.as-rd__time {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.as-rd__clock {
+  flex: none;
+  width: 72px;
+  height: 72px;
+}
+.as-rd__face {
+  fill: var(--ink-2);
+  stroke: rgba(239, 234, 226, 0.35);
+  stroke-width: 1;
+}
+.as-rd__clock line {
+  stroke: var(--ash);
+  stroke-width: 1.2;
+}
+.as-rd__clock .as-rd__hour,
+.as-rd__clock .as-rd__min {
+  stroke-linecap: round;
+  transform-box: view-box;
+  transform-origin: 32px 32px;
+}
+.as-rd__clock .as-rd__hour {
+  stroke: var(--bone);
+  stroke-width: 3;
+}
+.as-rd__clock .as-rd__min {
+  stroke: var(--vermilion);
+  stroke-width: 1.6;
+}
+html.nz-motion .as-rd__hour,
+html.nz-motion .as-rd__min {
+  transition: transform 1.1s var(--ease-gallery);
+}
+.as-rd__pin {
+  fill: var(--vermilion);
+}
+.as-rd__when {
+  display: grid;
+  gap: 8px;
+}
+.as-rd__moment {
+  margin: 0;
+  font: 300 1.75rem/1.05 var(--font-display);
+  color: var(--bone);
+}
+.as-rd__steps {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.as-rd__steps li {
+  width: 28px;
+  height: 3px;
+  background: rgba(239, 234, 226, 0.22);
+  transition: background-color 0.4s ease;
+}
+.as-rd__steps li.is-past {
+  background: var(--bone);
+}
+.as-rd__steps li[aria-current="step"] {
+  background: var(--vermilion);
+}
+
+/* the diary page */
+.as-rd__diary {
+  position: relative;
+  padding: 14px 0 6px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 3px;
+  box-shadow: 0 24px 40px -30px rgba(0, 0, 0, 0.9);
+}
+.as-rd__diary::before {
+  /* the margin rule of a paper diary */
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  inset-inline-start: 68px;
+  width: 1px;
+  background: rgba(224, 64, 31, 0.45);
+}
+.as-rd__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  padding: 0 16px 10px;
+  padding-inline-start: 80px;
+  font: 500 0.75rem/1.3 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+}
+.as-rd__slots {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.as-rd__slot {
+  position: relative;
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 12px;
+  min-height: 52px;
+  padding: 6px 14px 6px 0;
+  padding-inline: 0 14px;
+  border-top: 1px solid var(--line);
+  transition: background-color 0.4s ease;
+}
+.as-rd__hour-t {
+  justify-self: center;
+  font: 500 0.875rem/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--graphite);
+}
+.as-rd__who {
+  padding-inline-start: 4px;
+  font: 400 1.1875rem/1.2 var(--font-display);
+}
+.as-rd__who s {
+  color: var(--graphite);
+  text-decoration-color: var(--vermilion);
+  text-decoration-thickness: 2px;
+}
+.as-rd__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font: 500 0.75rem/1.2 var(--font-sans);
+  color: var(--graphite);
+  white-space: nowrap;
+}
+.as-rd__chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+}
+.is-confirmed .as-rd__chip,
+.is-done .as-rd__chip {
+  color: var(--ink);
+  border-color: rgba(18, 17, 16, 0.3);
+}
+.is-confirmed .as-rd__chip::before,
+.is-done .as-rd__chip::before {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.is-reminded .as-rd__chip::before {
+  border-style: dashed;
+}
+.is-freed .as-rd__chip {
+  color: var(--vermilion-deep);
+  border-color: var(--vermilion-deep);
+}
+.is-rebooked .as-rd__who {
+  color: var(--vermilion-deep);
+}
+.is-rebooked .as-rd__chip {
+  color: #fff;
+  border-color: transparent;
+  background: var(--vermilion-fill);
+}
+.is-rebooked .as-rd__chip::before {
+  background: #fff;
+  border-color: #fff;
+}
+.as-rd__slot.is-noshow {
+  background: repeating-linear-gradient(135deg, rgba(18, 17, 16, 0.09) 0 1px, transparent 1px 7px);
+}
+.is-noshow .as-rd__chip {
+  color: var(--vermilion-deep);
+  border-color: var(--vermilion-deep);
+  background: var(--paper);
+}
+.as-rd__bubble {
+  grid-column: 2 / -1;
+  justify-self: start;
+  position: relative;
+  margin: 2px 4px 6px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  border-start-start-radius: 2px;
+  background: var(--bone-2);
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+html.nz-motion .as-rd__bubble {
+  animation: as-rd-in 0.5s var(--ease-gallery) both;
+}
+html.nz-motion .as-rd__slot {
+  animation: none;
+}
+@keyframes as-rd-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+}
+.as-rd__story {
+  margin: 0;
+  min-height: 4.4em;
+  padding-inline-start: 14px;
+  border-inline-start: 2px solid var(--vermilion);
+  font: 300 1.1875rem/1.45 var(--font-display);
+  color: var(--bone);
+}
+.as-rd__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.as-rd__actions .as-btn--primary {
+  flex: 1 1 16rem;
+}
+.as-rd__verdict {
+  display: grid;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-ink);
+}
+.as-rd__verdict p {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  font: 400 1.125rem/1.4 var(--font-display);
+  color: var(--bone);
+}
+.as-rd__v-label {
+  font: 500 0.75rem/1.3 var(--font-sans);
+  letter-spacing: 0.06em;
+  color: var(--ash);
+}
+.as-rd__v-label.is-on {
+  color: #f07a5c;
+}
+@media (min-width: 768px) {
+  .as-rd__live {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 18px 28px;
+    align-items: start;
+  }
+  .as-rd__diary {
+    grid-column: 1;
+    grid-row: 1 / span 5;
+  }
+  .as-rd__controls,
+  .as-rd__time,
+  .as-rd__story,
+  .as-rd__actions,
+  .as-rd__verdict {
+    grid-column: 2;
+  }
+}

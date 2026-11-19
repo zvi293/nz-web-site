@@ -1,0 +1,150 @@
+/* /services/website-development/ — page-local sections. Prefix wv-.
+   "החיבורים" (Integrations): the site as a hub, six systems around it, and the ledger of flows. */
+
+.wv-links__body {
+  display: grid;
+  gap: 32px;
+  align-items: center;
+}
+@media (min-width: 1024px) {
+  .wv-links__body {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+    gap: clamp(48px, 5vw, 96px);
+  }
+}
+
+.wv-table {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 520px;
+}
+.wv-table__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.wv-ring {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+}
+.wv-link__line {
+  stroke: var(--fg);
+  stroke-width: 1.2;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.9s var(--ease-gallery);
+  transition-delay: calc(0.35s + var(--i) * 0.11s);
+}
+.wv-link__parcel {
+  fill: var(--vermilion);
+  transition:
+    opacity 0.4s var(--ease-out),
+    transform 0.6s var(--ease-gallery);
+  transition-delay: calc(1s + var(--i) * 0.11s);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.wv-hub {
+  fill: var(--ink);
+}
+.wv-hub__t {
+  fill: var(--bone);
+  font: 300 30px/1 var(--font-display);
+}
+.wv-hub__s {
+  fill: var(--ash);
+  font: 500 13px/1 var(--font-sans);
+  letter-spacing: 0.04em;
+}
+.wv-hub__cube {
+  fill: var(--vermilion);
+}
+.wv-sat__c {
+  fill: var(--paper);
+  stroke: var(--fg);
+  stroke-width: 1;
+}
+.wv-sat__no {
+  fill: var(--vermilion-deep);
+  font: 500 11px/1 var(--font-sans);
+  letter-spacing: 0.04em;
+}
+.wv-sat__t {
+  fill: var(--fg);
+  font: 500 15px/1 var(--font-sans);
+}
+.wv-sat {
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.8s var(--ease-gallery);
+  transition-delay: calc(0.15s + var(--i) * 0.09s);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+html.nz-motion .wv-table[data-reveal]:not([data-in]) .wv-link__line {
+  stroke-dashoffset: 1;
+}
+html.nz-motion .wv-table[data-reveal]:not([data-in]) .wv-link__parcel {
+  opacity: 0;
+  transform: scale(0.2);
+}
+html.nz-motion .wv-table[data-reveal]:not([data-in]) .wv-sat {
+  opacity: 0;
+  transform: scale(0.86);
+}
+
+/* the ledger of flows */
+.wv-flows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--fg);
+}
+.wv-flow {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  grid-template-areas:
+    "no name"
+    ". text";
+  gap: 2px 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.wv-flow__no {
+  grid-area: no;
+  font: 500 0.75rem/1.9 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--vermilion-deep);
+  font-variant-numeric: tabular-nums;
+}
+.wv-flow__name {
+  grid-area: name;
+  font: 400 1.375rem/1.25 var(--font-display);
+  color: var(--fg);
+}
+.wv-flow__text {
+  grid-area: text;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}
+@media (min-width: 640px) {
+  .wv-flow {
+    grid-template-columns: 34px 132px minmax(0, 1fr);
+    grid-template-areas: "no name text";
+    align-items: baseline;
+  }
+}
+
+.wv-links__note {
+  max-width: 68ch;
+  margin: clamp(32px, 4vw, 56px) 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}

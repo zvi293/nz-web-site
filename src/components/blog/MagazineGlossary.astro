@@ -1,0 +1,51 @@
+---
+/**
+ * The glossary, previewed as a page from a dictionary: a tall serif "א–ת" spine and three sample
+ * entries (term, other name, definition), then the way in. Static.
+ */
+import { glossaryTerms, termHref } from "@/content/glossary";
+
+const SAMPLE = ["geo", "lcp", "web-accessibility"];
+const sample = SAMPLE.map((s) => glossaryTerms.find((t) => t.slug === s)).filter((t) => !!t);
+---
+
+<section class="mg-gloss" data-tone="bone" aria-labelledby="mg-gloss-title">
+  <div class="nz-container mg-gloss__grid">
+    <div class="mg-gloss__spine" aria-hidden="true">
+      <span>א</span><span class="mg-gloss__dash"></span><span>ת</span>
+    </div>
+    <div class="mg-gloss__text">
+      <p class="nz-label nz-label--rule">
+        <span class="nz-label__index">נספח</span>
+        <span>{glossaryTerms.length} מונחים, בעברית פשוטה</span>
+      </p>
+      <h2 id="mg-gloss-title" class="mg-gloss__title">מילון המונחים</h2>
+      <p class="mg-gloss__lede">
+        SEO, LCP, דומיין, נגישות: כל המילים שתשמעו כשבונים אתר, עם הסבר קצר ומדויק. במאמרים, מונח מהמילון מסומן בקו מנוקד.
+      </p>
+      <a href="/glossary/" class="nz-btn nz-btn--secondary mg-gloss__cta">
+        למילון המלא
+      </a>
+    </div>
+    <ol class="mg-gloss__entries">
+      {
+        sample.map((t) => (
+          <li class="mg-entry">
+            <a href={termHref(t!.slug)} class="mg-entry__link">
+              <span class="mg-entry__head">
+                <span class="mg-entry__term">{t!.name}</span>
+                {t!.alt && (
+                  <span class="mg-entry__alt" dir="auto">
+                    {t!.alt}
+                  </span>
+                )}
+              </span>
+              <span class="mg-entry__tag">{t!.tag}</span>
+              <span class="mg-entry__def">{t!.definition}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

@@ -1,0 +1,112 @@
+---
+/**
+ * Integrations — "החיבורים". Page-local section of /services/website-development/ (prefix wv-).
+ * It is also the page's opening essay (when a site needs development: when it has to talk to
+ * the business's other systems), so the page has no separate ServiceIntro.
+ * The site drawn as a hub in the middle of a round table, six systems around it, each joined by a
+ * line with a vermilion "parcel" halfway; beside it the ledger of what actually flows on each
+ * line. The diagram is decorative (aria-hidden); the numbered list is the content. The lines draw
+ * themselves once in view (html.nz-motion + [data-reveal] → [data-in]); no-JS = final drawing.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import Nb from "@/components/service/Nb.astro";
+import { LINKS } from "./data";
+import "./website-development.css";
+
+interface Props {
+  index?: string;
+}
+const { index = "01" } = Astro.props;
+
+const C = 200;
+const R = 150;
+const HUB = 62;
+const SAT = 36;
+const nodes = LINKS.map((l, i) => {
+  const a = ((-90 + 60 * i) * Math.PI) / 180;
+  const [dx, dy] = [Math.cos(a), Math.sin(a)];
+  const r1 = HUB + 6;
+  const r2 = R - SAT - 6;
+  return {
+    ...l,
+    i,
+    x: +(C + R * dx).toFixed(1),
+    y: +(C + R * dy).toFixed(1),
+    x1: +(C + r1 * dx).toFixed(1),
+    y1: +(C + r1 * dy).toFixed(1),
+    x2: +(C + r2 * dx).toFixed(1),
+    y2: +(C + r2 * dy).toFixed(1),
+    mx: +(C + ((r1 + r2) / 2) * dx).toFixed(1),
+    my: +(C + ((r1 + r2) / 2) * dy).toFixed(1),
+  };
+});
+const pad = (n: number) => String(n).padStart(2, "0");
+---
+
+<section class="nz-section nz-section--space-default wv-links" data-tone="paper" aria-labelledby="wv-links-title">
+  <div class="nz-container">
+    <ServiceOpener
+      variant="numeral"
+      index={index}
+      label="החיבורים"
+      id="wv-links-title"
+      title="אתר מציג. מערכת עושה."
+      accent="מערכת עושה."
+      lede="ברגע שאתר צריך לזכור משהו, להחליט משהו או לדבר עם מערכת אחרת, הוא כבר תוכנה קטנה. הלב שלה הוא בדרך כלל החיבורים: במקום להעתיק פרטים ממקום למקום, כל מערכת של העסק מקבלת את מה שהיא צריכה, בזמן שהיא צריכה."
+    />
+
+    <div class="wv-links__body">
+      <figure class="wv-table" data-reveal aria-hidden="true">
+        <svg class="wv-table__svg" viewBox="0 0 400 400" focusable="false">
+          <circle class="wv-ring" cx={C} cy={C} r={R} />
+          {
+            nodes.map((n) => (
+              <g class="wv-link" style={`--i:${n.i}`}>
+                <line class="wv-link__line" pathLength="1" x1={n.x1} y1={n.y1} x2={n.x2} y2={n.y2} />
+                <rect class="wv-link__parcel" x={n.mx - 4} y={n.my - 4} width="8" height="8" />
+              </g>
+            ))
+          }
+          <circle class="wv-hub" cx={C} cy={C} r={HUB} />
+          <text class="wv-hub__t" x={C} y={C - 4} text-anchor="middle">האתר</text>
+          <text class="wv-hub__s" x={C} y={C + 18} text-anchor="middle">שלכם</text>
+          <rect class="wv-hub__cube" x={C + 30} y={C - 30} width="9" height="9" />
+          {
+            nodes.map((n) => (
+              <g class="wv-sat" style={`--i:${n.i}`}>
+                <circle class="wv-sat__c" cx={n.x} cy={n.y} r={SAT} />
+                <text class="wv-sat__no" x={n.x} y={n.y - 10} text-anchor="middle">
+                  {pad(n.i + 1)}
+                </text>
+                <text class="wv-sat__t" x={n.x} y={n.y + 10} text-anchor="middle">
+                  {n.name}
+                </text>
+              </g>
+            ))
+          }
+        </svg>
+      </figure>
+
+      <ol class="wv-flows">
+        {
+          nodes.map((n) => (
+            <li class="wv-flow">
+              <span class="wv-flow__no" aria-hidden="true">
+                {pad(n.i + 1)}
+              </span>
+              <span class="wv-flow__name">{n.latin ? <bdi>{n.name}</bdi> : n.name}</span>
+              <span class="wv-flow__text">
+                <Nb text={n.flow} />
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <p class="wv-links__note">
+      כל חיבור נבדק בשלב האפיון: מה המערכת מאפשרת, מה עובר בה ומה קורה כשהיא לא זמינה. מערכות לקביעת תורים יש לנו גם כשירות שלם:{" "}
+      <a class="nz-link" href="/services/appointment-system/"><span class="nz-link__text">מערכת ניהול תורים לעסקים</span></a>.
+    </p>
+  </div>
+</section>

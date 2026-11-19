@@ -1,0 +1,245 @@
+---
+/**
+ * "בעמוד הזה" — the article's table of contents (H2s).
+ *   ≥1100px  a sticky rail beside the text: numbered chapters, the active one marked, a reading-
+ *            progress hairline (CSS scroll-driven where supported).
+ *   <1100px  a floating pill "בעמוד הזה · 02/06" that appears after the summary and opens a
+ *            bottom sheet (native <dialog>) with the chapters + how much has been read.
+ *            The sheet takes ONE history entry, so the phone's BACK button closes it; jumping to a
+ *            chapter re-uses that entry (replaceState) instead of adding another.
+ * No-JS: the rail still works (plain links); the pill is hidden.
+ * Behaviour: the bundled <script> below (no React, no scroll listeners — IntersectionObserver).
+ */
+import type { ArticleHeading } from "@/lib/blog";
+
+interface Props {
+  headings: ArticleHeading[];
+}
+const { headings } = Astro.props;
+const total = String(headings.length).padStart(2, "0");
+const num = (i: number) => String(i + 1).padStart(2, "0");
+---
+
+{
+  headings.length > 1 && (
+    <>
+      <nav class="ar-rail" aria-labelledby="ar-rail-title" data-toc>
+        <div class="ar-rail__sticky">
+          <p id="ar-rail-title" class="ar-rail__title">
+            <span>בעמוד הזה</span>
+            <span class="ar-rail__count" aria-hidden="true">
+              <span data-toc-current>01</span>/{total}
+            </span>
+          </p>
+          <span class="ar-rail__progress" aria-hidden="true">
+            <span />
+          </span>
+          <ol class="ar-toc">
+            {headings.map((h, i) => (
+              <li>
+                <a href={`#${h.id}`} data-toc-link={h.id}>
+                  <span class="ar-toc__num" aria-hidden="true">
+                    {num(i)}
+                  </span>
+                  <span class="ar-toc__text">{h.text}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </nav>
+
+      <button type="button" class="ar-pill" aria-haspopup="dialog" aria-controls="ar-sheet" data-toc-pill>
+        <span class="ar-pill__ring" aria-hidden="true">
+          <svg viewBox="0 0 36 36" focusable="false">
+            <circle cx="18" cy="18" r="15" class="ar-pill__track" />
+            <circle cx="18" cy="18" r="15" class="ar-pill__fill" pathLength="100" />
+          </svg>
+        </span>
+        <span class="ar-pill__label">בעמוד הזה</span>
+        <span class="ar-pill__count">
+          <span class="nz-sr">פרק </span>
+          <span data-toc-current>01</span>
+          <span aria-hidden="true">/</span>
+          <span class="nz-sr"> מתוך </span>
+          {total}
+        </span>
+      </button>
+
+      <dialog id="ar-sheet" class="ar-sheet" aria-labelledby="ar-sheet-title" data-toc-sheet>
+        <div class="ar-sheet__inner">
+          <span class="ar-sheet__handle" aria-hidden="true" />
+          <div class="ar-sheet__head">
+            <p id="ar-sheet-title" class="ar-sheet__title">בעמוד הזה</p>
+            <button type="button" class="ar-sheet__close" data-toc-close aria-label="סגירת תוכן העניינים">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+          <p class="ar-sheet__read">
+            <span class="ar-sheet__bar" aria-hidden="true">
+              <span data-toc-bar />
+            </span>
+            <span>
+              קראתם <span data-toc-percent>0%</span> מהמאמר
+            </span>
+          </p>
+          <ol class="ar-toc ar-toc--sheet">
+            {headings.map((h, i) => (
+              <li>
+                <a href={`#${h.id}`} data-toc-link={h.id} data-toc-jump>
+                  <span class="ar-toc__num" aria-hidden="true">
+                    {num(i)}
+                  </span>
+                  <span class="ar-toc__text">{h.text}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </dialog>
+    </>
+  )
+}
+
+<script>
+  const prose = document.getElementById("ar-prose");
+  const sheet = document.querySelector<HTMLDialogElement>("[data-toc-sheet]");
+  const pill = document.querySelector<HTMLButtonElement>("[data-toc-pill]");
+  const summary = document.querySelector(".ar-summary");
+  const endZone = document.querySelector(".ar-faq, .ar-related");
+
+  if (prose) {
+    /* margin notes: open as side-notes on wide screens (tap-to-open below) */
+    const wide = window.matchMedia("(min-width: 1360px)");
+    const syncNotes = () =>
+      prose.querySelectorAll<HTMLDetailsElement>("details.ar-note").forEach((d) => {
+        if (wide.matches) d.open = true;
+      });
+    syncNotes();
+    wide.addEventListener?.("change", syncNotes);
+  }
+
+  if (prose && sheet && pill) {
+    const headings = [...prose.querySelectorAll<HTMLElement>("h2[id]")];
+    const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]")];
+    const currents = [...document.querySelectorAll<HTMLElement>("[data-toc-current]")];
+    const fill = pill.querySelector<SVGCircleElement>(".ar-pill__fill");
+    const percentEl = sheet.querySelector<HTMLElement>("[data-toc-percent]");
+    const barEl = sheet.querySelector<HTMLElement>("[data-toc-bar]");
+    const html = document.documentElement;
+
+    /* ── active chapter: the last H2 whose top has passed 40% of the viewport ── */
+    let active = -1;
+    const readPercent = () => {
+      const r = prose.getBoundingClientRect();
+      const total = r.height - window.innerHeight * 0.6;
+      const done = -r.top + window.innerHeight * 0.4;
+      return Math.max(0, Math.min(100, Math.round((done / Math.max(total, 1)) * 100)));
+    };
+    const setActive = () => {
+      const line = window.innerHeight * 0.4;
+      let idx = 0;
+      headings.forEach((h, i) => {
+        if (h.getBoundingClientRect().top <= line) idx = i;
+      });
+      const pct = readPercent();
+      fill?.style.setProperty("stroke-dashoffset", String(100 - pct));
+      if (idx === active) return;
+      active = idx;
+      const label = String(idx + 1).padStart(2, "0");
+      currents.forEach((c) => (c.textContent = label));
+      links.forEach((a) => {
+        const on = a.dataset.tocLink === headings[idx]?.id;
+        a.classList.toggle("is-active", on);
+        if (on) a.setAttribute("aria-current", "location");
+        else a.removeAttribute("aria-current");
+      });
+    };
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(setActive, { rootMargin: "-40% 0px -59% 0px", threshold: 0 });
+      headings.forEach((h) => io.observe(h));
+      /* also refresh the ring at ~10% steps of the text (sentinels every few blocks) */
+      const blocks = [...prose.children].filter((_, i) => i % 4 === 0);
+      const io2 = new IntersectionObserver(setActive, { threshold: [0, 1] });
+      blocks.forEach((b) => io2.observe(b));
+    }
+    setActive();
+
+    /* ── pill visibility: after the summary card, until the FAQ / related reading ── */
+    let pastSummary = false;
+    let atEnd = false;
+    let overPlate = false;
+    const syncPill = () => pill.classList.toggle("is-visible", pastSummary && !atEnd && !overPlate);
+    /* step aside while the signature component (its own buttons sit low on the screen) is in view */
+    const plate = document.getElementById("signature");
+    if (plate && "IntersectionObserver" in window)
+      new IntersectionObserver(([e]) => {
+        overPlate = e.isIntersecting;
+        syncPill();
+      }, { rootMargin: "0px 0px -10% 0px" }).observe(plate);
+    if ("IntersectionObserver" in window && summary) {
+      new IntersectionObserver(([e]) => {
+        pastSummary = !e.isIntersecting && e.boundingClientRect.top < 0;
+        syncPill();
+      }).observe(summary);
+      if (endZone)
+        new IntersectionObserver(([e]) => {
+          atEnd = e.isIntersecting || e.boundingClientRect.top < 0;
+          syncPill();
+        }).observe(endZone);
+    }
+
+    /* ── the sheet: one history entry; BACK closes it ── */
+    const STATE = "ar-sheet";
+    let opener: HTMLElement | null = null;
+    const open = () => {
+      if (sheet.open) return;
+      opener = document.activeElement as HTMLElement | null;
+      const pct = readPercent();
+      if (percentEl) percentEl.textContent = `${pct}%`;
+      if (barEl) barEl.style.transform = `scaleX(${pct / 100})`;
+      history.pushState({ nz: STATE }, "");
+      html.classList.add("ar-sheet-open");
+      sheet.showModal();
+      sheet.querySelector<HTMLElement>(".is-active")?.scrollIntoView({ block: "center" });
+    };
+    const finishClose = () => {
+      if (sheet.open) sheet.close();
+      html.classList.remove("ar-sheet-open");
+      (opener ?? pill).focus({ preventScroll: true });
+    };
+    const requestClose = () => {
+      if (history.state?.nz === STATE) history.back();
+      else finishClose();
+    };
+    pill.addEventListener("click", open);
+    sheet.querySelector("[data-toc-close]")?.addEventListener("click", requestClose);
+    sheet.addEventListener("cancel", (e) => {
+      e.preventDefault();
+      requestClose();
+    });
+    sheet.addEventListener("click", (e) => {
+      if (e.target === sheet) requestClose(); /* backdrop */
+    });
+    window.addEventListener("popstate", () => {
+      if (sheet.open) finishClose();
+    });
+    sheet.querySelectorAll<HTMLAnchorElement>("[data-toc-jump]").forEach((a) =>
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const id = a.dataset.tocLink!;
+        const target = document.getElementById(id);
+        /* re-use the sheet's history entry for the jump: BACK then leaves the article as expected */
+        if (history.state?.nz === STATE) history.replaceState(null, "", `#${id}`);
+        else history.pushState(null, "", `#${id}`);
+        if (sheet.open) sheet.close();
+        html.classList.remove("ar-sheet-open");
+        target?.scrollIntoView({ block: "start" });
+        target?.setAttribute("tabindex", "-1");
+        target?.focus({ preventScroll: true });
+      }),
+    );
+  }
+</script>

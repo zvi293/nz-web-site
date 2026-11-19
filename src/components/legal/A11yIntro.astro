@@ -1,0 +1,45 @@
+---
+/**
+ * "מבוא" — a pull-quote opener: the intro set as a large serif statement, and beside it the four
+ * WCAG principles drawn as one square cut into four rooms (a diagram, not icon tiles).
+ */
+import type { LegalPageSection } from "@/content/types";
+import { pour, nobrParts } from "./content";
+
+interface Props {
+  section: LegalPageSection;
+}
+const { section } = Astro.props;
+---
+
+<section id={section.id} class="nz-section nz-section--space-default lg-intro" data-tone="bone" aria-labelledby="lg-intro-title">
+  <div class="nz-container lg-intro__grid">
+    <div class="lg-intro__quote" data-reveal="rise">
+      <h2 id="lg-intro-title" class="nz-label nz-label--rule lg-intro__label">
+        <span class="nz-label__index">01</span>
+        <span>{section.title}</span>
+      </h2>
+      <p class="lg-intro__text">
+        <span class="lg-intro__mark" aria-hidden="true">״</span>{nobrParts(section.content).map((p) => (p.ltr ? <bdi dir="ltr" class={p.nobr ? "lg-nobr" : undefined}>{p.t}</bdi> : p.t))}
+      </p>
+    </div>
+
+    <figure class="lg-pour" aria-labelledby="lg-pour-cap">
+      <figcaption id="lg-pour-cap" class="lg-pour__cap">
+        <span class="lg-pour__cap-title">ארבעת העקרונות</span>
+        <span class="lg-pour__cap-sub">שעליהם בנויות הנחיות <bdi dir="ltr">WCAG</bdi></span>
+      </figcaption>
+      <ol class="lg-pour__square" data-reveal="stagger">
+        {
+          pour.map((p, i) => (
+            <li class={`lg-pour__room lg-pour__room--${i + 1}`}>
+              <span class="lg-pour__num" aria-hidden="true">{`0${i + 1}`}</span>
+              <span class="lg-pour__name">{p.name}</span>
+              <span class="lg-pour__line">{p.line}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </figure>
+  </div>
+</section>

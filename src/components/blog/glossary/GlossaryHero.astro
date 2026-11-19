@@ -1,0 +1,49 @@
+---
+/**
+ * Glossary hero: room label, H1, the answer-first lead (.lead, speakable), and a type-specimen
+ * composition — a giant serif "א" on guide lines, with a callout to the first entry. Static.
+ */
+import { glossaryIntro, glossaryTerms, sortedTerms, termHref, usedLetters } from "@/content/glossary";
+
+const first = sortedTerms()[0];
+const tags = new Set(glossaryTerms.map((t) => t.tag)).size;
+---
+
+<section class="gl-hero" data-tone="bone" aria-labelledby="gl-title">
+  <div class="nz-container gl-hero__grid">
+    <div class="gl-hero__text">
+      <nav class="gl-crumbs" aria-label="מיקום בעמוד">
+        <a href="/blog/">המגזין</a>
+        <span aria-hidden="true">/</span>
+        <span>נספח</span>
+      </nav>
+      <p class="nz-label gl-hero__room">
+        <span class="gl-cube" aria-hidden="true"></span>
+        <span class="nz-label__index">אולם 06</span>
+        <span>נספח למגזין</span>
+      </p>
+      <h1 id="gl-title" class="gl-hero__title">{glossaryIntro.title}</h1>
+      <p class="lead gl-hero__lead">{glossaryIntro.lead}</p>
+      <dl class="gl-hero__facts">
+        <div><dt>מונחים</dt><dd>{glossaryTerms.length}</dd></div>
+        <div><dt>אותיות במפתח</dt><dd>{usedLetters().length}</dd></div>
+        <div><dt>תחומים</dt><dd>{tags}</dd></div>
+      </dl>
+    </div>
+
+    <figure class="gl-specimen" aria-label="האות א׳, פותחת המילון">
+      <div class="gl-specimen__plate" aria-hidden="true">
+        <span class="gl-specimen__guide gl-specimen__guide--cap"><span>קו עליון</span></span>
+        <span class="gl-specimen__guide gl-specimen__guide--base"><span>קו בסיס</span></span>
+        <span class="gl-specimen__glyph">א</span>
+        <span class="gl-specimen__corner gl-specimen__corner--a">01</span>
+        <span class="gl-specimen__corner gl-specimen__corner--b">{String(glossaryTerms.length).padStart(2, "0")}</span>
+      </div>
+      <figcaption class="gl-specimen__callout">
+        <span class="gl-specimen__k">המונח הראשון במילון</span>
+        <a href={termHref(first.slug)} class="gl-specimen__term">{first.name}</a>
+        <span class="gl-specimen__def">{first.definition}</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>

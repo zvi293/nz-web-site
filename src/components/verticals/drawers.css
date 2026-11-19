@@ -1,0 +1,381 @@
+/* המגירות — pull drawers (accountant). Prefix vl-dr-. A filing cabinet in ink with bone drawer
+   fronts; the open drawer's tray (the page) sits above its front: a hanging folder with the page's ledger sheet rising out of it. */
+.vl-dr {
+  display: grid;
+  gap: 28px;
+}
+@media (min-width: 1024px) {
+  .vl-dr {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 56px;
+    align-items: start;
+  }
+}
+
+/* ── the cabinet ── */
+.vl-dr__cabinet {
+  position: relative;
+  padding: 14px 12px 16px;
+  border-radius: 4px 4px 0 0;
+  background: var(--ink);
+  color: var(--bone);
+  box-shadow: 0 30px 60px -30px rgb(18 17 16 / 0.6), inset 0 0 0 1px rgb(255 255 255 / 0.04);
+}
+@media (min-width: 768px) {
+  .vl-dr__cabinet {
+    padding: 20px 22px 24px;
+  }
+}
+.vl-dr__crest {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 4px 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line-ink);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--ash);
+}
+.vl-dr__crest span:last-child {
+  color: #f3a08c;
+  font-variant-numeric: tabular-nums;
+}
+.vl-dr__list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.vl-dr__plinth {
+  position: absolute;
+  top: 100%;
+  inset-inline: 10px;
+  height: 14px;
+  background: var(--ink-3);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 92% 100%, 92% 40%, 8% 40%, 8% 100%, 0 100%);
+}
+
+/* drawer front */
+.vl-dr__front {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 10px 12px;
+  width: 100%;
+  min-height: 84px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--bone-2);
+  color: var(--ink);
+  text-align: start;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgb(18 17 16 / 0.12), inset 0 -6px 0 rgb(18 17 16 / 0.07), 0 1px 0 rgb(0 0 0 / 0.4);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.45s var(--ease-out), background-color 0.45s var(--ease-out);
+}
+.vl-dr__front:hover {
+  background: #ebe5db;
+}
+.vl-dr__front:focus-visible {
+  outline: 2px solid var(--vermilion);
+  outline-offset: 3px;
+}
+.vl-dr__drawer.is-open .vl-dr__front {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px rgb(18 17 16 / 0.12), inset 0 -6px 0 rgb(18 17 16 / 0.07), 0 18px 26px -10px rgb(0 0 0 / 0.65);
+}
+.vl-dr__holder {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  justify-self: start;
+  padding: 7px 14px 8px;
+  border: 1px solid #9c8f7c;
+  border-radius: 2px;
+  background: var(--paper);
+  box-shadow: inset 0 1px 0 #fff, 0 0 0 3px rgb(156 143 124 / 0.25);
+}
+.vl-dr__num {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--vermilion-deep);
+}
+.vl-dr__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.375rem);
+  line-height: 1.15;
+}
+.vl-dr__pull {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 44px;
+  cursor: grab;
+  touch-action: none;
+}
+.vl-dr__pull span {
+  width: 52px;
+  height: 12px;
+  border-radius: 6px 6px 10px 10px;
+  background: #8f8273;
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.35), 0 3px 4px rgb(0 0 0 / 0.25);
+}
+.vl-dr__drawer.is-open .vl-dr__pull span {
+  background: var(--vermilion);
+}
+.vl-dr__state {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: center;
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  color: var(--graphite);
+}
+
+/* the tray: the page inside the drawer */
+.vl-dr__tray {
+  margin: 4px 6px -6px;
+  padding: 22px 12px 18px;
+  border-radius: 3px 3px 0 0;
+  background: var(--ink-2);
+  box-shadow: inset 0 10px 18px rgb(0 0 0 / 0.45), inset 0 0 0 1px var(--line-ink);
+}
+.vl-dr__tray[hidden] {
+  display: none;
+}
+html:not(.js) .vl-dr__tray[hidden] {
+  display: block;
+}
+/* the hanging file folder in the tray, and the page's ledger sheet rising out of it */
+.vl-dr__folder {
+  position: relative;
+  padding: 18px 10px 0;
+  border-radius: 3px 3px 0 0;
+  background: #c9b38e;
+  box-shadow: inset 0 -12px 0 #b49a6e;
+}
+.vl-dr__folder-tab {
+  position: absolute;
+  top: -12px;
+  inset-inline-start: 14px;
+  padding: 3px 12px 2px;
+  border-radius: 4px 4px 0 0;
+  background: #c9b38e;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #3d3323;
+}
+.vl-dr__sheet {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 14px 14px 16px;
+  border-radius: 2px 2px 0 0;
+  background: #fbfaf6;
+  color: var(--ink);
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
+}
+/* the ledger's red margin rule */
+.vl-dr__sheet::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 30px;
+  width: 3px;
+  border-inline: 1px solid rgba(224, 64, 31, 0.45);
+}
+.vl-dr__sheet-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  padding-inline-start: 26px;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+}
+.vl-dr__h1 {
+  margin: 0;
+  padding-inline-start: 26px;
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.vl-dr__items {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: dr;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.vl-dr__items li {
+  counter-increment: dr;
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  padding-block: 7px;
+  border-bottom: 1px solid rgba(46, 96, 160, 0.22);
+}
+.vl-dr__items li::before {
+  content: counter(dr);
+  font-size: 0.6875rem;
+  color: var(--vermilion-deep);
+  font-variant-numeric: tabular-nums;
+}
+.vl-dr__total {
+  display: grid;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding-inline-start: 26px;
+  padding-bottom: 8px;
+  border-bottom: 4px double var(--ink);
+}
+.vl-dr__total-label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+}
+.vl-dr__query {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.vl-dr__lens {
+  flex: none;
+  position: relative;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--graphite);
+  border-radius: 50%;
+}
+.vl-dr__lens::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  inset-inline-start: -4px;
+  width: 6px;
+  height: 1.5px;
+  background: var(--graphite);
+  transform: rotate(-45deg);
+}
+
+/* ── the plan ── */
+.vl-dr__plan {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+@media (min-width: 1024px) {
+  .vl-dr__plan {
+    position: sticky;
+    top: calc(var(--header-h) + 32px);
+  }
+}
+.vl-dr__plan-head {
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--accent-text, var(--vermilion-deep));
+}
+.vl-dr__tree {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0 18px 0 0;
+  list-style: none;
+  font-size: 0.9375rem;
+}
+.vl-dr__tree::before {
+  content: "";
+  position: absolute;
+  inset-block: 14px;
+  inset-inline-start: 4px;
+  width: 1px;
+  background: var(--rule);
+}
+.vl-dr__tree li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  color: var(--fg-muted);
+  transition: color 0.4s var(--ease-out);
+}
+.vl-dr__root {
+  font-family: var(--font-display);
+  color: var(--fg) !important;
+}
+.vl-dr__tick {
+  position: absolute;
+  inset-inline-start: -18px;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--fg-muted);
+  background: var(--section-bg, var(--paper));
+}
+.vl-dr__tree li.is-seen {
+  color: var(--fg);
+}
+.vl-dr__tree li.is-seen .vl-dr__tick {
+  border-color: var(--fg);
+  background: var(--fg);
+}
+.vl-dr__tree li.is-open .vl-dr__tick {
+  border-color: var(--vermilion);
+  background: var(--vermilion);
+}
+.vl-dr__tree-num {
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-muted);
+}
+.vl-dr__say {
+  min-height: 4.8em;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--fg);
+}
+
+/* ── motion ── */
+html.nz-motion .vl-dr__drawer.is-open .vl-dr__tray {
+  animation: vl-dr-reveal 0.6s var(--ease-gallery) both;
+}
+html.nz-motion .vl-dr__drawer.is-open .vl-dr__sheet {
+  animation: vl-dr-rise 0.8s var(--ease-gallery) 0.2s both;
+}
+@keyframes vl-dr-reveal {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes vl-dr-rise {
+  from {
+    transform: translateY(46%);
+    clip-path: inset(0 0 46% 0);
+  }
+  to {
+    transform: none;
+    clip-path: inset(0 0 0 0);
+  }
+}

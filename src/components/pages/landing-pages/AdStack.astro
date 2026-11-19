@@ -1,0 +1,61 @@
+---
+/**
+ * AdStack — "למי מתאים דף נחיתה", told as what actually happens: each situation is a sponsored
+ * result (ממומן) and every one of them sends its click down the same coral thread into ONE
+ * landing page at the bottom. The ads hang staggered like cuttings pinned to a board; the target
+ * page is a small framed sheet with the coral light. The audiences are the content (a real list:
+ * each ad's headline = who, its line = why); the thread and the target are drawn (aria-hidden).
+ * The thread draws itself once in view (html.nz-motion + [data-in]). Prefix lnd-ads.
+ */
+import Nb from "@/components/service/Nb.astro";
+import type { AudienceItem } from "@/components/service/types";
+import "./landing-pages.css";
+
+interface Props {
+  title: string;
+  lede?: string;
+  items: AudienceItem[];
+  index?: string;
+}
+const { title, lede, items, index = "02" } = Astro.props;
+const SOURCES = ["Google", "Meta", "Google", "Meta", "Google"];
+---
+
+<section class="nz-section nz-section--space-default lnd-ads" data-tone="paper" aria-labelledby="lnd-ads-title">
+  <div class="nz-container lnd-ads__wrap">
+    <header class="lnd-ads__head">
+      <p class="lnd-ads__k"><span class="lnd-ads__k-i">{index}</span> למי זה מתאים</p>
+      <h2 id="lnd-ads-title" class="nz-display nz-display--h2 lnd-ads__title">{title}</h2>
+      {lede && <p class="nz-lede lnd-ads__lede"><Nb text={lede} /></p>}
+    </header>
+
+    <div class="lnd-ads__board" data-reveal="fade">
+      <span class="lnd-ads__thread" aria-hidden="true"></span>
+      <ul class="lnd-ads__list">
+        {
+          items.map((it, i) => (
+            <li class="lnd-ads__ad" style={`--i:${i}`}>
+              <p class="lnd-ads__meta">
+                <span class="lnd-ads__tag">ממומן</span>
+                <span dir="ltr" class="lnd-ads__src">{SOURCES[i % SOURCES.length]}</span>
+              </p>
+              <p class="lnd-ads__h">{it.title}</p>
+              <p class="lnd-ads__d"><Nb text={it.description} /></p>
+              <span class="lnd-ads__pin" aria-hidden="true"></span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="lnd-ads__target" aria-hidden="true">
+        <span class="lnd-ads__sheet">
+          <span class="lnd-ads__light"></span>
+          <span class="lnd-ads__line lnd-ads__line--h"></span>
+          <span class="lnd-ads__line"></span>
+          <span class="lnd-ads__line lnd-ads__line--s"></span>
+          <span class="lnd-ads__btn"></span>
+        </span>
+        <span class="lnd-ads__target-t">דף נחיתה אחד, פעולה אחת</span>
+      </div>
+    </div>
+  </div>
+</section>

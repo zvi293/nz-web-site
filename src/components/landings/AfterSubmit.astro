@@ -1,0 +1,74 @@
+---
+/**
+ * AfterSubmit — "אחרי השליחה" (lead-generation page): what happens to a lead in three moments,
+ * each shown as the actual object it becomes: the thank-you card the visitor sees, the
+ * notification on your phone, and the call note you start the conversation with. A hairline
+ * with a travelling vermilion dot joins them (CSS scroll-driven; static without support).
+ * Sample details only (a made-up visitor, a placeholder number). Static.
+ */
+import Nb from "@/components/service/Nb.astro";
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import type { AfterMoment } from "@/data/landings/types";
+import "./landings.css";
+
+interface Props {
+  data: { title: string; lede: string; moments: AfterMoment[] };
+  index?: string;
+  label?: string;
+  id?: string;
+}
+const { data, index = "03", label = "אחרי השליחה", id = "lp-after" } = Astro.props;
+const [m1, m2, m3] = data.moments;
+---
+
+<section class="nz-section nz-section--space-default lp-after" data-tone="bone" aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant="split" index={index} label={label} title={data.title} id={`${id}-title`} lede={data.lede} />
+
+    <ol class="lp-after__track">
+      <li class="lp-after__m sv-sd">
+        <p class="lp-after__when"><span class="lp-after__dot" aria-hidden="true" />{m1.when}</p>
+        <div class="lp-after__obj lp-after__obj--thanks" aria-hidden="true">
+          <span class="lp-after__check"><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+          <span class="lp-after__thx">תודה, דנה.</span>
+          <span class="lp-after__thxline">קיבלנו את הפרטים. נחזור אלייך עוד היום, בשעות הפעילות.</span>
+          <span class="lp-after__thxlink">בינתיים: איך נראית שיחת ייעוץ ראשונה</span>
+        </div>
+        <h3 class="lp-after__title"><Nb text={m1.title} /></h3>
+        <p class="lp-after__body"><Nb text={m1.body} /></p>
+      </li>
+      <li class="lp-after__m sv-sd">
+        <p class="lp-after__when"><span class="lp-after__dot" aria-hidden="true" />{m2.when}</p>
+        <div class="lp-after__obj lp-after__obj--phone" aria-hidden="true">
+          <span class="lp-after__clock">09:41</span>
+          <span class="lp-after__note">
+            <span class="lp-after__app"><span class="lp-after__appicon" />מייל · עכשיו</span>
+            <span class="lp-after__ntitle">פנייה חדשה מהדף</span>
+            <span class="lp-after__nline">דנה כ. · <bdi dir="ltr">050-000-0000</bdi></span>
+            <span class="lp-after__nline">צריכה: ייעוץ ראשוני · מתי: החודש</span>
+          </span>
+        </div>
+        <h3 class="lp-after__title"><Nb text={m2.title} /></h3>
+        <p class="lp-after__body"><Nb text={m2.body} /></p>
+      </li>
+      <li class="lp-after__m sv-sd">
+        <p class="lp-after__when"><span class="lp-after__dot" aria-hidden="true" />{m3.when}</p>
+        <div class="lp-after__obj lp-after__obj--call" aria-hidden="true">
+          <span class="lp-after__callhead">
+            <span class="lp-after__avatar">ד</span>
+            <span>
+              <span class="lp-after__cname">דנה כ.</span>
+              <span class="lp-after__cstate">שיחה יוצאת</span>
+            </span>
+          </span>
+          <span class="lp-after__known"><span>מי פנתה</span><i><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg></i></span>
+          <span class="lp-after__known"><span>מה היא צריכה</span><i><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg></i></span>
+          <span class="lp-after__known"><span>מתי</span><i><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg></i></span>
+        </div>
+        <h3 class="lp-after__title"><Nb text={m3.title} /></h3>
+        <p class="lp-after__body"><Nb text={m3.body} /></p>
+      </li>
+    </ol>
+    <p class="lp-after__fine">הפרטים בדוגמה בדויים.</p>
+  </div>
+</section>

@@ -1,0 +1,34 @@
+---
+/**
+ * The ink room that holds the signature "השפופרת" (a short phone call that writes the
+ * WhatsApp message). Opener: a split row — the H2 and lede beside a three-word "how it
+ * works" strip on a hairline (מרימים / עונים / שולחים). Only <ContactCall> hydrates
+ * (client:visible).
+ */
+import ContactCall from "./ContactCall";
+import { call as c } from "./content";
+---
+
+<section class="nz-section nz-section--space-default ct-room" data-tone="ink" aria-labelledby="ct-call-title" id="composer">
+  <div class="nz-container ct-room__grid">
+    <header class="ct-room__head">
+      <p class="nz-label nz-label--rule"><span class="nz-label__index">{c.room}</span><span>{c.label}</span></p>
+      <h2 id="ct-call-title" class="nz-display nz-display--h2 ct-room__title">{c.title}</h2>
+      <p class="nz-lede ct-room__lede">{c.lede}</p>
+      <ol class="ct-how">
+        {
+          c.how.map((s, i) => (
+            <li class="ct-how__step">
+              <span class="ct-how__n" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+              <span class="ct-how__k">{s.k}</span>
+              <span class="ct-how__v">{s.v}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </header>
+    <div class="ct-room__call">
+      <ContactCall client:visible />
+    </div>
+  </div>
+</section>

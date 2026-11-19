@@ -1,0 +1,93 @@
+---
+/**
+ * ServiceDeepDive — the long-form, keyword-rich H2 + H3 blocks.
+ *   ledger (default)  a catalogue raisonné: a contents index (dotted leaders, entry numbers;
+ *                     only when there are 4+ entries), then entries as ruled rows (index + H3 on
+ *                     the start side, the text, and the block's framed drawing (block.sketch)).
+ *                     Keep it short: 3–4 entries that the page's FAQ does NOT already answer.
+ *   spine             chapters on a vertical spine with nodes; a serif chapter word in the margin
+ * Each H3 gets an id (#<id>-1 …) so the contents and other pages can link to it.
+ */
+import Nb from "./Nb.astro";
+import ServiceOpener from "./ServiceOpener.astro";
+import Sketch from "./Sketch.astro";
+import type { OpenerVariant, SectionTone, ServiceDeepDiveData } from "./types";
+import "./service.css";
+
+interface Props {
+  data: ServiceDeepDiveData;
+  variant?: "ledger" | "spine";
+  tone?: SectionTone;
+  opener?: OpenerVariant;
+  index?: string;
+  label?: string;
+  id?: string;
+}
+
+const { data, variant = "ledger", tone = "paper", opener = "rule", index = "02", label = "לפני שמתחילים", id = "sv-deep" } = Astro.props;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+const words = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "שמיני"];
+---
+
+<section class:list={["nz-section nz-section--space-default sv-deep", `sv-deep--${variant}`]} data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant={opener} index={index} label={label} title={data.title} id={`${id}-title`} lede={data.lede} />
+
+    {
+      variant === "ledger" ? (
+        <>
+          {data.blocks.length > 3 && <nav class="sv-toc sv-sd" aria-label={`תוכן: ${data.title}`}>
+            <p class="sv-toc__head nz-label">
+              <span class="nz-label__index">{String(data.blocks.length).padStart(2, "0")}</span>
+              <span>ערכים בפרק</span>
+            </p>
+            <ol class="sv-toc__list">
+              {data.blocks.map((b, i) => (
+                <li>
+                  <a href={`#${id}-${i + 1}`} class="sv-toc__link">
+                    <span class="sv-toc__num">{pad(i)}</span>
+                    <span class="sv-toc__text">{b.heading}</span>
+                    <span class="sv-toc__dots" aria-hidden="true" />
+                    <span class="sv-toc__page" aria-hidden="true">{`ערך ${pad(i)}`}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>}
+          <ol class="sv-ledger">
+            {data.blocks.map((b, i) => (
+              <li class:list={["sv-ledger__row", "sv-sd", i === 0 && "sv-ledger__row--lead", b.sketch && "sv-ledger__row--fig"]}>
+                <div class="sv-ledger__head">
+                  <span class="sv-ledger__num" aria-hidden="true">{`ערך ${pad(i)}`}</span>
+                  <h3 id={`${id}-${i + 1}`} class="sv-ledger__title"><Nb text={b.heading} /></h3>
+                </div>
+                <p class="sv-ledger__body"><Nb text={b.body} /></p>
+                {b.sketch && (
+                  <figure class="sv-ledger__fig" aria-hidden="true">
+                    <Sketch kind={b.sketch} />
+                    <figcaption>{`לוח ${pad(i)}`}</figcaption>
+                  </figure>
+                )}
+              </li>
+            ))}
+          </ol>
+        </>
+      ) : (
+        <ol class="sv-spine">
+          {data.blocks.map((b, i) => (
+            <li class="sv-spine__item sv-sd">
+              <span class="sv-spine__node" aria-hidden="true" />
+              <p class="sv-spine__chapter" aria-hidden="true">
+                <span class="sv-spine__word">{`פרק ${words[i] ?? pad(i)}`}</span>
+              </p>
+              <div class="sv-spine__body">
+                <h3 id={`${id}-${i + 1}`} class="sv-spine__title"><Nb text={b.heading} /></h3>
+                <p><Nb text={b.body} /></p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      )
+    }
+  </div>
+</section>

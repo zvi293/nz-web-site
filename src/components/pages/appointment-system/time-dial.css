@@ -1,0 +1,376 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   חוגת הזמן (TimeDial) — prefix tdl-. Lives on ink (SignatureSlot).
+   Brass is the artwork's (brass-clockwork) and stays inside this exhibit.
+   One custom property drives everything: --rot (degrees) on .tdl.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.tdl {
+  --brass: #d6a656;
+  --brass-hi: #f3d68f;
+  display: grid;
+  gap: 18px;
+}
+
+/* ── days ─────────────────────────────────────────────────────────────── */
+.tdl__days {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+.tdl__day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 56px;
+  padding: 8px 4px;
+  border: 1px solid rgba(239, 234, 226, 0.16);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--bone);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease-gallery), background-color 0.3s var(--ease-gallery), color 0.3s;
+}
+.tdl__day-s {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1;
+}
+.tdl__day-n {
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--ash);
+}
+.tdl__day:hover {
+  border-color: rgba(214, 166, 86, 0.6);
+}
+.tdl__day.is-on {
+  border-color: var(--brass);
+  background: linear-gradient(rgba(214, 166, 86, 0.18), rgba(214, 166, 86, 0.06));
+}
+.tdl__day.is-on .tdl__day-n {
+  color: var(--brass-hi);
+}
+.tdl__day:focus-visible,
+.tdl-card__again:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ── the machine ──────────────────────────────────────────────────────── */
+.tdl__machine {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin-inline: auto;
+}
+.tdl__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 24px 30px rgba(0, 0, 0, 0.55));
+}
+.tdl__gear {
+  transform: rotate(calc(var(--rot) * var(--ratio) * 1deg));
+}
+.tdl__wheel {
+  transform: rotate(calc(var(--rot) * 1deg));
+  transform-origin: 180px 180px;
+}
+html.nz-motion .tdl__gear,
+html.nz-motion .tdl__wheel {
+  transition: transform 0.6s var(--ease-gallery);
+}
+/* The grip: an HTML circle laid exactly over the finger wheel (centre 180,180 · r 128 of the
+   360×380 viewBox). touch-action works here (not on SVG children), so a finger turns the
+   wheel while the rest of the exhibit scrolls the page. */
+.tdl__grip {
+  position: absolute;
+  inset-inline-start: 14.444%; /* symmetric: the wheel is centred horizontally */
+  top: 13.684%;
+  width: 71.111%;
+  height: 67.368%;
+  border-radius: 50%;
+  touch-action: none;
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+.tdl__grip:focus-visible {
+  box-shadow: 0 0 0 3px var(--focus), 0 0 0 6px rgba(0, 0, 0, 0.5);
+}
+.tdl.is-dragging .tdl__grip {
+  cursor: grabbing;
+}
+.tdl.is-dragging .tdl__wheel,
+.tdl.is-dragging .tdl__gear,
+.tdl.is-dragging .tdl__hole-t {
+  transition: none;
+}
+/* no JS: nothing to turn or book — hide those controls, say what the card is */
+.tdl__nojs {
+  display: none;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--ash);
+}
+html:not(.js) .tdl__nojs {
+  display: block;
+}
+html:not(.js) .tdl__days,
+html:not(.js) .tdl-card__go,
+html:not(.js) .tdl__grip {
+  display: none;
+}
+.tdl__wheel-disc {
+  fill: url(#tdl-brass);
+  stroke: #5a3c14;
+  stroke-width: 1.2;
+}
+.tdl__hole-c {
+  fill: url(#tdl-hole);
+  stroke: rgba(255, 236, 180, 0.5);
+  stroke-width: 1.2;
+  transition: stroke 0.3s, fill 0.3s;
+}
+.tdl__hole-t {
+  fill: var(--bone);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  transform: rotate(calc(var(--rot) * -1deg));
+}
+html.nz-motion .tdl__hole-t {
+  transition: transform 0.6s var(--ease-gallery);
+}
+.tdl__hole.is-taken .tdl__hole-c {
+  fill: #3b2a12;
+  stroke: rgba(0, 0, 0, 0.35);
+}
+.tdl__hole.is-taken .tdl__hole-t {
+  fill: rgba(239, 234, 226, 0.45);
+  font-size: 11px;
+}
+.tdl__hole.is-on .tdl__hole-c {
+  stroke: var(--vermilion);
+  stroke-width: 2.5;
+}
+.tdl__hub {
+  fill: #1c1a18;
+  stroke: rgba(255, 236, 180, 0.55);
+  stroke-width: 1.5;
+}
+.tdl__read-t {
+  fill: var(--bone);
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+.tdl__read-d {
+  fill: var(--brass-hi);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+.tdl__stop {
+  fill: var(--vermilion);
+  stroke: #7d2210;
+  stroke-width: 1;
+}
+
+/* ── the card ─────────────────────────────────────────────────────────── */
+.tdl__side {
+  display: grid;
+  gap: 12px;
+}
+.tdl-card {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 20px 20px 18px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 4px;
+  box-shadow: 0 30px 40px -28px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  min-height: 236px;
+}
+.tdl-card::before {
+  /* perforation along the top, like a ticket from a booking book */
+  content: "";
+  position: absolute;
+  inset-inline: 12px;
+  top: 6px;
+  height: 2px;
+  background: radial-gradient(circle, rgba(18, 17, 16, 0.25) 0 1px, transparent 1.5px) 0 0 / 8px 2px repeat-x;
+}
+.tdl-card__k {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--vermilion-deep);
+  margin-top: 4px;
+}
+.tdl-card__t {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.15;
+  padding-inline-end: 84px;
+  text-wrap: balance;
+}
+.tdl-card__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 0.875rem;
+  color: var(--graphite);
+}
+.tdl-card__list li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.tdl-card__list li::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--graphite);
+  transform: translateY(-1px);
+}
+.tdl-card__list li.is-done {
+  color: var(--ink);
+}
+.tdl-card__list li.is-done::before {
+  background: var(--ink);
+  box-shadow: none;
+}
+.tdl-card__go {
+  justify-self: start;
+  margin-top: 4px;
+}
+.tdl-card__go[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.tdl-card__again {
+  justify-self: start;
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--vermilion);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 6px;
+  cursor: pointer;
+}
+.tdl-card__stamp {
+  position: absolute;
+  top: 18px;
+  inset-inline-end: 16px;
+  display: grid;
+  place-items: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2.5px solid var(--vermilion-deep);
+  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5.5px var(--vermilion-deep);
+  color: var(--vermilion-deep);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.375rem;
+  letter-spacing: 0.04em;
+  transform: rotate(-14deg) scale(1);
+  opacity: 0;
+  mix-blend-mode: multiply;
+}
+.tdl-card.is-stamped .tdl-card__stamp {
+  opacity: 0.9;
+}
+html.nz-motion .tdl-card.is-stamped .tdl-card__stamp {
+  animation: tdl-thump 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+@keyframes tdl-thump {
+  0% {
+    opacity: 0;
+    transform: rotate(-24deg) scale(1.7);
+  }
+  60% {
+    opacity: 0.95;
+    transform: rotate(-12deg) scale(0.94);
+  }
+  100% {
+    opacity: 0.9;
+    transform: rotate(-14deg) scale(1);
+  }
+}
+html.nz-motion .tdl-card.is-stamped {
+  animation: tdl-press 0.5s ease-out both;
+}
+@keyframes tdl-press {
+  35% {
+    transform: translateY(3px) scale(0.995);
+  }
+}
+.tdl__note {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ash);
+  max-width: 30rem;
+}
+
+@media (min-width: 1024px) {
+  .tdl {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
+    grid-template-areas:
+      "days machine"
+      "side machine";
+    column-gap: clamp(48px, 6vw, 112px);
+    row-gap: 28px;
+    align-items: start;
+  }
+  .tdl__days {
+    grid-area: days;
+    align-self: end;
+  }
+  .tdl__machine {
+    grid-area: machine;
+    max-width: 460px;
+  }
+  .tdl__side {
+    grid-area: side;
+  }
+  .tdl__day {
+    min-height: 68px;
+  }
+  .tdl-card__t {
+    font-size: 1.875rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tdl *,
+  .tdl *::before,
+  .tdl *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+html:not(.nz-motion) .tdl__wheel,
+html:not(.nz-motion) .tdl__gear,
+html:not(.nz-motion) .tdl__hole-t {
+  transition: none;
+}

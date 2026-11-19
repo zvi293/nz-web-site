@@ -1,0 +1,247 @@
+/* ── הדלי הדולף (leaky-budget) · prefix as-lb ───────────────────────────── */
+.as-lb__live {
+  display: grid;
+  gap: 22px;
+}
+.as-lb__stage {
+  position: relative;
+  width: min(100%, 320px);
+  aspect-ratio: 300 / 390;
+  margin-inline: auto;
+}
+.as-lb__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.as-lb__spout rect {
+  fill: var(--paper);
+}
+.as-lb__spout text {
+  fill: var(--ink);
+  font: 500 14px var(--font-sans);
+}
+.as-lb__stream,
+.as-lb__spray,
+.as-lb__pipe {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 9;
+}
+.as-lb__stream {
+  stroke: var(--bone);
+  stroke-width: 5;
+}
+.as-lb__pipe {
+  stroke: var(--bone);
+  stroke-width: 5;
+  opacity: 0.35;
+  transition: opacity 0.6s ease;
+}
+.as-lb__spray {
+  stroke: #f07a5c;
+  stroke-width: 4;
+}
+.as-lb__glass {
+  fill: rgba(239, 234, 226, 0.04);
+  stroke: rgba(239, 234, 226, 0.55);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.as-lb__water {
+  fill: rgba(239, 234, 226, 0.1);
+}
+.as-lb__rim {
+  stroke: rgba(239, 234, 226, 0.7);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.as-lb__fill {
+  fill: var(--bone);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+html.nz-motion .as-lb__fill {
+  transition: transform 0.9s var(--ease-gallery);
+}
+.as-lb__bowl-line {
+  fill: none;
+  stroke: rgba(239, 234, 226, 0.7);
+  stroke-width: 1.5;
+}
+html.nz-motion .as-lb__stream,
+html.nz-motion .as-lb__pipe,
+html.nz-motion .as-lb__spray {
+  animation: as-lb-flow 0.7s linear infinite;
+}
+html.nz-motion .as-lb.is-paused .as-lb__stream,
+html.nz-motion .as-lb.is-paused .as-lb__pipe,
+html.nz-motion .as-lb.is-paused .as-lb__spray {
+  animation-play-state: paused;
+}
+@keyframes as-lb-flow {
+  to {
+    stroke-dashoffset: -9.1;
+  }
+}
+.as-lb.is-sealed .as-lb__pipe {
+  opacity: 1;
+}
+.as-lb__bowl-label {
+  fill: var(--ash);
+  font: 500 13px var(--font-sans);
+  letter-spacing: 0.06em;
+}
+
+/* holes = real buttons placed on the wall */
+.as-lb__hole {
+  position: absolute;
+  translate: 50% -50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.as-lb__cork {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ink);
+  box-shadow: 0 0 0 2px #f07a5c, 0 0 0 7px rgba(240, 122, 92, 0.18);
+  color: #f07a5c;
+  font: 700 0.75rem/1 var(--font-sans);
+  transition: transform 0.35s var(--ease-gallery), background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+}
+.as-lb__hole:hover .as-lb__cork {
+  transform: scale(1.12);
+}
+.as-lb__hole.is-plugged .as-lb__cork {
+  width: 30px;
+  height: 22px;
+  border-radius: 6px 6px 9px 9px;
+  background: #b58d5c;
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.5);
+  color: var(--ink);
+}
+html.nz-motion .as-lb__hole.is-plugged .as-lb__cork {
+  animation: as-lb-plug 0.45s var(--ease-gallery);
+}
+@keyframes as-lb-plug {
+  from {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+.as-lb__hole:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* the list */
+.as-lb__side {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.as-lb__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line-ink);
+}
+.as-lb__row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 12px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--line-ink);
+  background: transparent;
+  color: var(--bone);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.as-lb__n {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  border-radius: 50%;
+  border: 1.5px solid #f07a5c;
+  color: #f07a5c;
+  font: 700 0.75rem/1 var(--font-sans);
+}
+.as-lb__row.is-plugged .as-lb__n {
+  border-radius: 5px;
+  border-color: #b58d5c;
+  background: #b58d5c;
+  color: var(--ink);
+}
+.as-lb__t {
+  display: grid;
+  gap: 2px;
+}
+.as-lb__title {
+  font: 400 1.1875rem/1.25 var(--font-display);
+}
+.as-lb__line {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ash);
+}
+.as-lb__row.is-plugged .as-lb__line {
+  color: var(--bone);
+}
+.as-lb__state {
+  margin-top: 4px;
+  font: 500 0.75rem/1 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: #f07a5c;
+}
+.as-lb__row.is-plugged .as-lb__state {
+  color: var(--ash);
+}
+.as-lb__row:hover .as-lb__title {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+  text-decoration-thickness: 1px;
+}
+.as-lb__row:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.as-lb__lesson {
+  margin: 0;
+  padding-inline-start: 14px;
+  border-inline-start: 2px solid var(--line-ink);
+  font: 300 1.1875rem/1.45 var(--font-display);
+  color: var(--bone);
+}
+.as-lb__lesson.is-on {
+  border-inline-start-color: var(--vermilion);
+}
+@media (min-width: 640px) {
+  .as-lb__live {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 26px;
+    align-items: start;
+  }
+  .as-lb__stage {
+    position: sticky;
+    top: calc(var(--header-h, 72px) + 24px);
+  }
+}

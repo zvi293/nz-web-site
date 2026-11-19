@@ -1,0 +1,32 @@
+---
+/**
+ * Closing: "a letter to the editor" — a paper card with a postage stamp (the vermilion cube) and a
+ * postmark, inviting a topic suggestion over WhatsApp. Static.
+ */
+import { WhatsAppCta } from "@/components/nz";
+---
+
+<section class="mg-letter" data-tone="bone" aria-labelledby="mg-letter-title">
+  <div class="nz-container">
+    <div class="mg-letter__card">
+      <span class="mg-letter__stamp" aria-hidden="true">
+        <span class="mg-cube mg-cube--lg"></span>
+        <span class="mg-letter__stamp-txt">NZ-web</span>
+      </span>
+      <svg class="mg-letter__postmark" viewBox="0 0 160 60" aria-hidden="true" focusable="false">
+        <circle cx="30" cy="30" r="24" fill="none" stroke="currentColor" stroke-width="1" />
+        <circle cx="30" cy="30" r="17" fill="none" stroke="currentColor" stroke-width="0.6" />
+        <path d="M58 16 q 12 -6 24 0 t 24 0 t 24 0 t 24 0 M58 30 q 12 -6 24 0 t 24 0 t 24 0 t 24 0 M58 44 q 12 -6 24 0 t 24 0 t 24 0 t 24 0" fill="none" stroke="currentColor" stroke-width="1" />
+      </svg>
+      <p class="nz-label">
+        <span class="nz-label__index">למערכת</span>
+        <span>מכתב קצר בוואטסאפ</span>
+      </p>
+      <h2 id="mg-letter-title" class="mg-letter__title">יש שאלה על האתר שלכם שעוד לא כתבנו עליה?</h2>
+      <p class="mg-letter__body">
+        ספרו לנו מה הייתם רוצים לקרוא. שאלות טובות של בעלי עסקים הופכות לפעמים למאמר בגיליון הבא, ותמיד מקבלות תשובה אישית.
+      </p>
+      <WhatsAppCta size="lg" label="לכתוב למערכת" message="שלום, יש לי שאלה שהייתי רוצה לקרוא עליה במגזין:" />
+    </div>
+  </div>
+</section>

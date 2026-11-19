@@ -1,0 +1,87 @@
+---
+/**
+ * /contact/ hero: the statement, the answer-first lead with every direct line in it, the
+ * ceramic handsets hung on the wall (LCP), and "the switchboard": one number (write / call),
+ * the email and the hours. Static (no client JS).
+ */
+import { Artwork, MuseumLabel, getArt } from "@/components/art";
+import { studio } from "@/components/nz";
+import { contactInfo, getTelHref, getWhatsAppHref, getMailtoHref } from "@/lib/contact-utils";
+import { contactHero as h, contactLines as l } from "./content";
+
+interface Props {
+  /** Must equal the page's lcpArt.sizes. */
+  sizes: string;
+}
+const { sizes } = Astro.props;
+const art = getArt(h.art.slug);
+const phone = contactInfo.phone;
+const tel = getTelHref(phone);
+const wa = getWhatsAppHref(contactInfo);
+---
+
+<section class="nz-section nz-wall-light ct-hero" data-tone="bone" aria-labelledby="ct-title">
+  <div class="nz-container ct-hero__grid">
+    <div class="ct-hero__head">
+      <p class="nz-label ct-hero__room ct-enter" style="--d:0ms">
+        <span class="ct-cube" aria-hidden="true"></span>
+        <span>{h.room}</span>
+      </p>
+      <h1 id="ct-title" class="nz-display ct-hero__title">
+        <span class="ct-line"><span class="ct-line__in" style="--d:90ms">{h.h1[0]}</span></span>
+        {" "}
+        <span class="ct-line"><span class="ct-line__in" style="--d:170ms">{h.h1[1]}</span></span>
+        {" "}
+        <span class="ct-line"><span class="ct-line__in" style="--d:250ms"><span class="nz-accent">{h.h1Accent}</span></span></span>
+      </h1>
+      <p class="nz-lede lead ct-hero__lead ct-enter" style="--d:340ms">
+        {h.leadBefore}{" "}<bdi dir="ltr" class="ct-nowrap">{phone}</bdi>{h.leadMid}<bdi dir="ltr">{studio.email}</bdi>{h.leadHours}{" "}<span
+          class="ct-nowrap">{studio.days} <bdi dir="ltr">{studio.time}</bdi>.</span>{" "}{h.leadEnd}
+      </p>
+    </div>
+
+    <figure class="ct-hero__art">
+      <div class="ct-ring">
+        <Artwork slug={h.art.slug} sizes={sizes} priority frame alt={art.alt} />
+      </div>
+      <MuseumLabel as="figcaption" index={h.art.index} prefix={h.art.prefix} title={art.title} medium={h.art.medium} />
+    </figure>
+
+    <div class="ct-board ct-enter" style="--d:440ms">
+      <p class="nz-label ct-board__label" id="ct-board-label">{l.label}</p>
+      <ul class="ct-board__list" aria-labelledby="ct-board-label">
+        <li class="ct-line-item ct-line-item--phone">
+          <span class="ct-line-item__k">{l.phone.k}</span>
+          <bdi dir="ltr" class="ct-line-item__v">{phone}</bdi>
+          <span class="ct-line-item__acts">
+            <a class="ct-act ct-act--wa" href={wa} target="_blank" rel="noopener noreferrer">
+              {l.phone.write}<span class="nz-sr"> בוואטסאפ ל-{phone} (נפתח בכרטיסייה חדשה)</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M16 10H4.5M9 5 4 10l5 5" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>
+            </a>
+            <a class="ct-act" href={tel}>
+              {l.phone.call}<span class="nz-sr"> ל-{phone}</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M16 10H4.5M9 5 4 10l5 5" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>
+            </a>
+          </span>
+        </li>
+        <li class="ct-line-item ct-line-item--mail">
+          <span class="ct-line-item__k">{l.email.k}</span>
+          <bdi dir="ltr" class="ct-line-item__v">{studio.email}</bdi>
+          <span class="ct-line-item__acts">
+            <a class="ct-act" href={getMailtoHref(studio.email)}>
+              {l.email.action}<span class="nz-sr"> דוא״ל ל-{studio.email}</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M16 10H4.5M9 5 4 10l5 5" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>
+            </a>
+          </span>
+        </li>
+        <li class="ct-line-item ct-line-item--hours">
+          <span class="ct-line-item__k">{l.hours.k}</span>
+          <span class="ct-line-item__v">
+            {studio.days} <bdi dir="ltr">{studio.time}</bdi>
+          </span>
+          <span class="ct-line-item__note">{l.hours.note}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>

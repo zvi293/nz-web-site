@@ -1,0 +1,82 @@
+---
+/**
+ * The entrance of a legal room: wayfinding trail, H1, the answer-first lead (.lead — speakable),
+ * the hung artwork (LCP: priority + the SAME `sizes` as the page's lcpArt), and a catalogue card
+ * of facts (a <dl>). Mobile order: trail → title → lead → art → card. Desktop: text on the right,
+ * the art on the left spanning the rows.
+ */
+import { Artwork } from "@/components/art";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { nobrParts } from "./content";
+
+interface Fact {
+  term: string;
+  value: string;
+  href?: string;
+  ltr?: boolean;
+}
+interface Props {
+  path: string;
+  crumb: string;
+  title: string;
+  accent: string;
+  lead: string;
+  art: string;
+  sizes: string;
+  room: number;
+  medium: string;
+  facts: Fact[];
+  variant?: "a11y" | "doc" | "sheet";
+  /** Crop of the hung work (e.g. a portrait detail of the same artwork on /terms/). */
+  ratio?: string;
+  position?: string;
+}
+
+const { path, crumb, title, accent, lead, art, sizes, room, medium, facts, variant = "doc", ratio, position } = Astro.props;
+---
+
+<section class={`nz-section nz-wall-light lg-hero lg-hero--${variant}`} data-tone="bone" aria-labelledby="lg-h1">
+  <div class="nz-container lg-hero__grid">
+    <div class="lg-hero__trail lg-enter" style="--d:0ms">
+      <Breadcrumbs items={[{ label: crumb }]} path={path} />
+    </div>
+    <h1 id="lg-h1" class="nz-display nz-display--l lg-hero__title lg-enter" style="--d:80ms">
+      {title} <span class="nz-accent">{accent}</span>
+    </h1>
+    <p class="lead nz-lede lg-hero__lead lg-enter" style="--d:160ms">
+      {nobrParts(lead).map((p) => (p.ltr ? <bdi dir="ltr" class={p.nobr ? "lg-nobr" : undefined}>{p.t}</bdi> : p.t))}
+    </p>
+    <div class="lg-hero__art">
+      <Artwork
+        slug={art}
+        priority
+        sizes={sizes}
+        ratio={ratio}
+        position={position}
+        frame
+        lit
+        label={{ index: room, prefix: "מוצג", medium }}
+      />
+    </div>
+    <dl class="lg-facts lg-enter" style="--d:240ms" data-float-avoid>
+      {
+        facts.map((f) => (
+          <div class="lg-facts__row">
+            <dt>{f.term}</dt>
+            <dd>
+              {f.href ? (
+                <a href={f.href} class="lg-facts__link">
+                  {f.value}
+                </a>
+              ) : f.ltr ? (
+                <bdi dir="ltr">{f.value}</bdi>
+              ) : (
+                f.value
+              )}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>

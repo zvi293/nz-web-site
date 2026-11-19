@@ -1,25 +1,48 @@
 ---
 /**
- * /thank-you/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /thank-you/ — after a page opens WhatsApp with a brief (the offer page's bubble does; it saves the
+ * brief in sessionStorage "nz-wa-brief", and the retry button below re-opens that same message). Transactional: a real static file, never
+ * indexed (noindex + Disallow in robots.txt), left out of the sitemap.
+ * Static sections (src/components/thanks) + ONE island:
+ *   ThanksComet  client:load  the signature "השביט" (free-hand sewing: drag the needle hand to hand)
+ * Page CSS: src/components/thanks/thanks.css (prefix `ty-`).
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import ThankYou from "@/views/ThankYou";
+import ThanksHero, { THANKS_ART_SIZES, THANKS_ART_SLUG } from "@/components/thanks/ThanksHero";
+import ThanksComet from "@/components/thanks/ThanksComet";
+import ThanksMeanwhile from "@/components/thanks/ThanksMeanwhile";
+import "@/components/thanks/thanks.css";
+import { thanksCopy } from "@/components/thanks/copy";
 import type { PageSeo } from "@/lib/seo";
 
 const PATH = "/thank-you/";
-/* Transactional page: a real static file (refresh works) but never indexed (also Disallow-ed
-   in robots.txt) and left out of the sitemap. */
 const seo: PageSeo = {
   path: PATH,
-  title: "תודה על הפנייה | NZ-web",
-  description: "תודה שפנית אלינו! קיבלנו את הפנייה שלך ונחזור אליך בהקדם.",
+  title: thanksCopy.seo.title,
+  description: thanksCopy.seo.description,
   noindex: true,
-  breadcrumb: { name: "תודה על הפנייה", path: PATH },
+  lcpArt: { slug: THANKS_ART_SLUG, sizes: THANKS_ART_SIZES },
 };
 ---
 
-<BaseLayout seo={seo}>
-  <ThankYou client:load />
+<BaseLayout seo={seo} mainClass="relative bg-ink pt-[var(--header-h)]">
+  <ThanksHero>
+    <ThanksComet client:load />
+  </ThanksHero>
+  <ThanksMeanwhile />
 </BaseLayout>
+
+<script>
+  /* Re-open the visitor's own brief (saved by the page that sent them here), not a generic text. */
+  try {
+    const brief = sessionStorage.getItem("nz-wa-brief");
+    if (brief) {
+      document.querySelectorAll<HTMLAnchorElement>("a.ty-retry").forEach((a) => {
+        const url = new URL(a.href);
+        a.href = `${url.origin}${url.pathname}?text=${encodeURIComponent(brief)}`;
+      });
+    }
+  } catch {
+    /* storage blocked: the general message stays */
+  }
+</script>

@@ -1,0 +1,76 @@
+---
+/**
+ * The archive (an ink room): every earlier article, grouped by department (#dept-<key>). Each
+ * group is a [data-mg-dept] block for the filter. Rows: a small framed plate, the title, the
+ * excerpt (wider screens), the issue + reading time. Static.
+ */
+import { Artwork } from "@/components/art";
+import { hasArt } from "@/lib/art";
+import { DEPARTMENTS, getBlogPosts, getCurrentIssuePosts, getIssue } from "@/lib/blog";
+
+const inIssue = new Set(getCurrentIssuePosts().map((p) => p.slug));
+const all = getBlogPosts();
+const groups = DEPARTMENTS.map((d) => ({
+  dept: d,
+  posts: all.filter((p) => p.category === d.name && !inIssue.has(p.slug)),
+  inIssue: all.filter((p) => p.category === d.name && inIssue.has(p.slug)).length,
+}));
+---
+
+<section id="mg-archive" class="mg-archive" data-tone="ink" aria-labelledby="mg-archive-title" data-mg-section>
+  <div class="nz-container">
+    <header class="mg-archive__head">
+      <h2 id="mg-archive-title" class="mg-archive__title">הארכיון, לפי מדורים</h2>
+      <p class="mg-archive__lede">
+        מדריכים מהגיליונות הקודמים. כולם עודכנו, וכולם עדיין רלוונטיים למי שבונה או משפר אתר.
+      </p>
+    </header>
+
+    {
+      groups.map((g) => (
+        <section id={`dept-${g.dept.key}`} class="mg-dept" data-mg-dept={g.dept.key} aria-labelledby={`dept-${g.dept.key}-title`}>
+          <header class="mg-dept__head">
+            <h3 id={`dept-${g.dept.key}-title`} class="mg-dept__name">
+              {g.dept.name}
+            </h3>
+            <p class="mg-dept__blurb">{g.dept.blurb}</p>
+            <p class="mg-dept__count">
+              <span>{g.posts.length} בארכיון</span>
+              {g.inIssue > 0 && (
+                <a href="#mg-issue" class="mg-dept__more">
+                  {g.inIssue === 1 ? "ועוד אחד בגיליון הנוכחי" : `ועוד ${g.inIssue} בגיליון הנוכחי`}
+                </a>
+              )}
+            </p>
+          </header>
+          {g.posts.length > 0 ? (
+            <ol class="mg-rows">
+              {g.posts.map((p) => {
+                const iss = getIssue(p);
+                return (
+                  <li class="mg-row" data-mg-post={p.slug}>
+                    <a href={`/blog/${p.slug}/`} class="mg-row__link">
+                      <span class="mg-row__plate" aria-hidden="true">
+                        {hasArt(p.art) && <Artwork slug={p.art} sizes="(min-width: 1024px) 180px, 104px" ratio="4 / 3" alt="" />}
+                      </span>
+                      <span class="mg-row__body">
+                        <span class="mg-row__title">{p.title}</span>
+                        <span class="mg-row__excerpt">{p.excerpt}</span>
+                      </span>
+                      <span class="mg-row__meta">
+                        <span>גיליון {iss.index}</span>
+                        <span>{p.read_time} דקות</span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : (
+            <p class="mg-dept__empty">המאמרים של המדור הזה נמצאים כרגע בגיליון הנוכחי.</p>
+          )}
+        </section>
+      ))
+    }
+  </div>
+</section>

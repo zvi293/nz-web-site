@@ -1,0 +1,52 @@
+---
+/**
+ * Behaviour of the article's designed blocks (markup comes from renderArticle in src/lib/blog.ts).
+ * Checklists (:::checklist): ticks are kept in localStorage per article + list ("nz-check:<slug>:<n>"),
+ * the meter fills, the count is announced (aria-live), and a reset button appears once something is
+ * ticked. Without JS (or storage) the boxes are plain native checkboxes. No markup of its own.
+ */
+---
+
+<script>
+  const prose = document.getElementById("ar-prose");
+  const slug = prose?.dataset.arSlug ?? "";
+
+  document.querySelectorAll<HTMLElement>("[data-ar-check]").forEach((box) => {
+    const key = `nz-check:${slug}:${box.dataset.arCheck}`;
+    const inputs = [...box.querySelectorAll<HTMLInputElement>("input.ar-check__box")];
+    const count = box.querySelector<HTMLElement>("[data-ar-check-count]");
+    const live = box.querySelector<HTMLElement>("[data-ar-check-live]");
+    const reset = box.querySelector<HTMLButtonElement>("[data-ar-check-reset]");
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) ?? "[]") as unknown;
+      if (Array.isArray(saved)) inputs.forEach((inp, i) => (inp.checked = saved.includes(i)));
+    } catch {
+      /* storage blocked: start empty */
+    }
+
+    const update = (announce: boolean) => {
+      const done = inputs.filter((i) => i.checked).length;
+      if (count) count.textContent = String(done);
+      box.style.setProperty("--ar-done", String(inputs.length ? done / inputs.length : 0));
+      box.classList.toggle("is-complete", done === inputs.length);
+      if (reset) reset.hidden = done === 0;
+      if (announce && live)
+        live.textContent =
+          done === inputs.length ? `כל ${inputs.length} הסעיפים סומנו.` : `סומנו ${done} מתוך ${inputs.length}.`;
+      try {
+        localStorage.setItem(key, JSON.stringify(inputs.flatMap((x, i) => (x.checked ? [i] : []))));
+      } catch {
+        /* ignore */
+      }
+    };
+
+    box.addEventListener("change", () => update(true));
+    reset?.addEventListener("click", () => {
+      inputs.forEach((i) => (i.checked = false));
+      update(true);
+      inputs[0]?.focus();
+    });
+    update(false);
+  });
+</script>

@@ -1,0 +1,175 @@
+---
+/**
+ * TemplateVsCode — "שני קירות". Page-local section of /services/web-development/ (prefix wd-).
+ * Two plates hung side by side: a wall of plug-in bricks (a template site: every brick is someone
+ * else's code) and one continuous Möbius band (a site written for the business, like the hero
+ * work), projected at build time. Under them a ruled ledger compares the two in four plain lines (stacked on phones).
+ * Static; the bricks settle and the band draws itself when the plates enter (html.nz-motion +
+ * [data-reveal] → [data-in] from the global script). No-JS / reduced motion: final state.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import "./web-development.css";
+
+interface Props {
+  index?: string;
+}
+const { index = "04" } = Astro.props;
+
+const bricks = ["ערכת עיצוב", "בונה עמודים", "תוסף טפסים", "תוסף SEO", "תוסף מטמון", "תוסף אבטחה", "תוסף סליידר", "תוסף נגישות"];
+/* courses of the wall: 3 · 2 · 3; the middle course is offset half a brick (cut halves at its
+   edges), like real brickwork, and every brick has the same width */
+const courses = [bricks.slice(0, 3), bricks.slice(3, 5), bricks.slice(5)];
+
+/* the band: a true Möbius strip, projected at build time (no runtime JS). Quads along the strip
+   are painted back to front; each is copper or steel by the side it shows, lit by one light. The
+   seam of the parametrisation is put where the band is edge-on, so the colour swap hides in a
+   fold — the copper and the steel turn into each other at the twists, like the hero work. */
+const band = (() => {
+  const N = 132, Rr = 1, Wd = 0.45, tx = (62 * Math.PI) / 180, rz = (20 * Math.PI) / 180;
+  type V = [number, number, number];
+  const P = (u: number, v: number): V => {
+    let x = (Rr + v * Math.cos(u / 2)) * Math.cos(u);
+    let y = (Rr + v * Math.cos(u / 2)) * Math.sin(u);
+    let z = v * Math.sin(u / 2);
+    [x, y] = [x * Math.cos(rz) - y * Math.sin(rz), x * Math.sin(rz) + y * Math.cos(rz)];
+    [y, z] = [y * Math.cos(tx) - z * Math.sin(tx), y * Math.sin(tx) + z * Math.cos(tx)];
+    return [x, y, z];
+  };
+  const sub = (a: V, b: V): V => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const cross = (a: V, b: V): V => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const unit = (a: V): V => {
+    const m = Math.hypot(...a) || 1;
+    return [a[0] / m, a[1] / m, a[2] / m];
+  };
+  let seam = 0;
+  let best = 9;
+  for (let k = 0; k < 720; k++) {
+    const s0 = (k / 720) * 2 * Math.PI;
+    const nz = Math.abs(unit(cross(sub(P(s0 + 1e-3, 0), P(s0, 0)), sub(P(s0, Wd), P(s0, -Wd))))[2]);
+    if (nz < best) [best, seam] = [nz, s0];
+  }
+  const Lt = unit([-0.5, -0.7, 0.55]);
+  const du = (2 * Math.PI) / N;
+  const quads = Array.from({ length: N }, (_, i) => {
+    const u0 = seam + i * du;
+    const pts = [P(u0, -Wd), P(u0 + du, -Wd), P(u0 + du, Wd), P(u0, Wd)];
+    const n = unit(cross(sub(pts[1], pts[0]), sub(pts[3], pts[0])));
+    const lit = Math.abs(n[0] * Lt[0] + n[1] * Lt[1] + n[2] * Lt[2]);
+    return { i, pts, side: n[2] >= 0 ? 0 : 1, lit, depth: pts.reduce((a, p) => a + p[2], 0) / 4 };
+  }).sort((a, b) => a.depth - b.depth);
+  const xs = quads.flatMap((q) => q.pts.map((p) => p[0]));
+  const ys = quads.flatMap((q) => q.pts.map((p) => p[1]));
+  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  const S = 300 / (x1 - x0);
+  const W = 320;
+  const H = Math.round((y1 - y0) * S + 40);
+  const f = (p: V) => `${((p[0] - x0) * S + 10).toFixed(1)} ${((p[1] - y0) * S + 12).toFixed(1)}`;
+  const tones = [
+    [[96, 40, 22], [238, 146, 104]],
+    [[70, 68, 66], [236, 232, 226]],
+  ];
+  const mix = (a: number[], b: number[], t: number) => "#" + a.map((v, k) => Math.round(v + (b[k] - v) * t).toString(16).padStart(2, "0")).join("");
+  return {
+    W,
+    H,
+    shadow: { cx: W / 2, cy: H - 14, rx: W * 0.36 },
+    quads: quads.map((q) => ({
+      i: q.i,
+      d: `M${q.pts.map(f).join("L")}Z`,
+      fill: mix(tones[q.side][0], tones[q.side][1], 0.18 + 0.82 * q.lit),
+    })),
+  };
+})();
+
+const rows = [
+  { k: "מהירות", t: "טוענת את הקוד של התבנית ושל כל התוספים, בכל עמוד.", c: "כל עמוד טוען רק את מה שהוא משתמש בו." },
+  { k: "עיצוב", t: "מתחיל ממה שהתבנית מאפשרת לשנות.", c: "מתחיל מהעסק, ונבנה בשבילו מהשורה הראשונה." },
+  { k: "תחזוקה", t: "עדכון לתבנית ולכל תוסף בנפרד, וחשש שאחד ישבור את השני.", c: "בסיס קוד אחד, שמתעדכן ונבדק במקום אחד." },
+  { k: "הרחבה", t: "כל יכולת חדשה היא עוד תוסף על הקיר.", c: "יכולת חדשה נכתבת לתוך המבנה שכבר קיים." },
+];
+---
+
+<section class="nz-section nz-section--space-default wd-two" data-tone="bone" aria-labelledby="wd-two-title">
+  <div class="nz-container">
+    <ServiceOpener
+      variant="split"
+      index={index}
+      label="תבנית או קוד"
+      id="wd-two-title"
+      title="אתר על תבנית, או אתר שנכתב לעסק?"
+      accent="שנכתב לעסק"
+      lede="בשתי הדרכים אפשר להגיע לעמוד שנראה טוב. ההבדל נמצא במה שנטען מאחוריו, ובמה שיקרה לו בעוד שנה."
+    />
+
+    <div class="wd-two__plates">
+      <figure class="wd-plate wd-plate--wall" data-reveal>
+        <p class="wd-plate__tag"><span class="wd-plate__no">א</span> תבנית ותוספים</p>
+        <div class="wd-wall" aria-hidden="true">
+          {
+            courses.map((course, ci) => (
+              <div class:list={["wd-wall__course", ci === 1 && "wd-wall__course--offset"]}>
+                {ci === 1 && <span class="wd-brick wd-brick--half" style="--i:3" />}
+                {course.map((b, bi) => (
+                  <span class="wd-brick" style={`--i:${[0, 4, 7][ci] + bi}`}>
+                    <span class="wd-brick__t">{b}</span>
+                  </span>
+                ))}
+                {ci === 1 && <span class="wd-brick wd-brick--half" style="--i:6" />}
+              </div>
+            ))
+          }
+        </div>
+        <figcaption class="wd-plate__cap">
+          <strong>קיר של חלקים.</strong> כל לבנה היא קוד של מישהו אחר: עוד משהו שנטען, עוד עדכון שצריך לזכור, עוד מקום שבו
+          משהו יכול להישבר.
+        </figcaption>
+      </figure>
+
+      <figure class="wd-plate wd-plate--band" data-reveal>
+        <p class="wd-plate__tag"><span class="wd-plate__no">ב</span> קוד שנכתב לעסק</p>
+        <div class="wd-band" aria-hidden="true">
+          <svg class="wd-band__svg" viewBox={`0 0 ${band.W} ${band.H}`} focusable="false">
+            <ellipse class="wd-band__shadow" cx={band.shadow.cx} cy={band.shadow.cy} rx={band.shadow.rx} ry="9" />
+            {band.quads.map((q) => <path class="wd-band__q" d={q.d} fill={q.fill} stroke={q.fill} style={`--i:${q.i}`} />)}
+          </svg>
+          <ul class="wd-band__notes">
+            <li style="--i:0">רק מה שהאתר צריך</li>
+            <li style="--i:1">חלק אחד, מתוחזק במקום אחד</li>
+            <li style="--i:2">מוכן להרחבה</li>
+          </ul>
+        </div>
+        <figcaption class="wd-plate__cap">
+          <strong>רצועה אחת.</strong> כל חלק בה נכתב בשביל העסק הזה, ולכן יש פחות לטעון, פחות לעדכן, וקל להוסיף עליה.
+        </figcaption>
+      </figure>
+    </div>
+
+    <table class="wd-ledger">
+      <caption class="nz-sr">השוואה בין אתר על תבנית לאתר שנכתב לעסק</caption>
+      <thead>
+        <tr>
+          <th scope="col"><span class="nz-sr">נושא</span></th>
+          <th scope="col"><span class="wd-ledger__no">א</span> תבנית ותוספים</th>
+          <th scope="col"><span class="wd-ledger__no">ב</span> קוד שנכתב לעסק</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((r) => (
+            <tr>
+              <th scope="row">{r.k}</th>
+              <td data-side="תבנית">{r.t}</td>
+              <td data-side="קוד">{r.c}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+
+    <p class="wd-two__fair">
+      הוגנות מחייבת: תבנית יכולה להתאים לבלוג אישי או לניסיון ראשון. לעסק שהאתר מביא לו לקוחות, אתר שנכתב בשבילו משתלם לאורך זמן.
+      השוואה מפורטת יותר במגזין:{" "}
+      <a class="nz-link" href="/blog/react-vs-wordpress-2026/"><span class="nz-link__text">React או WordPress, מה נכון לעסק</span></a>.
+    </p>
+  </div>
+</section>

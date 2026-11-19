@@ -1,23 +1,116 @@
 ---
 /**
- * /services/business-website/<vertical>/ — one static page per entry in VERTICALS
- * (src/data/verticals*, getStaticPaths). LEGACY ServicePageTemplate as one island (client:load).
- * The island gets only the slug (configs hold icon components, which are not serialisable).
+ * /services/business-website/<vertical>/ — the 8 industry pages (אתר תדמית לפי תחום).
+ * One static page per entry in VERTICALS (src/data/verticals*, getStaticPaths). Built from the
+ * service system's static sections (src/components/service) in each page's own order, tones and
+ * openers (`page.sections`), plus the page's own trade composition (src/components/verticals/trade,
+ * static), so the 8 pages read as different rooms of the same wing. ONE island per page: its
+ * signature (src/components/verticals, client:visible). The verticals are sub-rooms of the
+ * business-website room, so the hero carries no room number of its own (room="").
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import VerticalBusinessWebsite from "@/views/services/VerticalBusinessWebsite";
-import { VERTICALS, buildVerticalConfig } from "@/data/verticals";
-import { servicePageSeo } from "@/lib/page-seo";
-import type { PageSeo } from "@/lib/seo";
+import ServiceHero from "@/components/service/ServiceHero.astro";
+import ServiceIntro from "@/components/service/ServiceIntro.astro";
+import SignatureSlot from "@/components/service/SignatureSlot.astro";
+import ServiceFeatures from "@/components/service/ServiceFeatures.astro";
+import ServiceDeepDive from "@/components/service/ServiceDeepDive.astro";
+import TradeRoom from "@/components/verticals/trade/TradeRoom.astro";
+import ServiceProcess from "@/components/service/ServiceProcess.astro";
+import ServiceOutcomes from "@/components/service/ServiceOutcomes.astro";
+import ServiceFaq from "@/components/service/ServiceFaq.astro";
+import ServiceRelated from "@/components/service/ServiceRelated.astro";
+import ServiceCta from "@/components/service/ServiceCta.astro";
+import Scales from "@/components/verticals/Scales";
+import Drawers from "@/components/verticals/Drawers";
+import ViewingOrder from "@/components/verticals/ViewingOrder";
+import QuietRoom from "@/components/verticals/QuietRoom";
+import Blueprint from "@/components/verticals/Blueprint";
+import NextMove from "@/components/verticals/NextMove";
+import Palette from "@/components/verticals/Palette";
+import Keystone from "@/components/verticals/Keystone";
+import { VERTICALS, verticalRelated, type VerticalPage } from "@/data/verticals";
+import { serviceSeo } from "@/lib/page-seo";
+import "@/components/verticals/vertical-page.css";
 
 export function getStaticPaths() {
   return Object.keys(VERTICALS).map((vertical) => ({ params: { vertical } }));
 }
 
 const { vertical } = Astro.params as { vertical: string };
-const seo: PageSeo = servicePageSeo(buildVerticalConfig(vertical)!);
+const page: VerticalPage = VERTICALS[vertical];
+const seo = serviceSeo(page);
+const sig = page.signature;
+const related = verticalRelated(page);
+
+/* Openers are numbered in page order; the live exhibit is "מוצג חי", not a number. */
+let n = 0;
+const rooms = page.sections.map((s) => ({ ...s, index: s.kind === "signature" ? "מוצג חי" : String(++n).padStart(2, "0") }));
+/* the FAQ's plaque card prints its own big count — no second number beside it */
+const indexOf = (s: (typeof rooms)[number]) => (s.kind === "faq" && s.card === "plaque" ? "" : s.index);
+const avoid = [page.hero.art];
 ---
 
-<BaseLayout seo={seo}>
-  <VerticalBusinessWebsite client:load vertical={vertical} />
+<BaseLayout seo={seo} mainClass={`relative bg-bone pt-[var(--header-h)] vl-page vl-page--${page.slug}`}>
+  <ServiceHero data={page.hero} variant={page.heroVariant} path={page.path} crumb={page.crumb} room="" position={page.heroPosition} />
+
+  {
+    rooms.map((s) => {
+      switch (s.kind) {
+        case "intro":
+          return <ServiceIntro data={page.intro!} tone={s.tone} opener={s.opener} index={s.index} label={s.label} />;
+        case "signature":
+          return (
+            <SignatureSlot name={sig.name} title={sig.title} lede={sig.lede} hint={sig.hint} keys={sig.keys} tone={s.tone} opener={s.opener}>
+              {sig.key === "scales" && <Scales client:visible />}
+              {sig.key === "drawers" && <Drawers client:visible />}
+              {sig.key === "viewing-order" && <ViewingOrder client:visible />}
+              {sig.key === "quiet-room" && <QuietRoom client:visible />}
+              {sig.key === "blueprint" && <Blueprint client:visible />}
+              {sig.key === "next-move" && <NextMove client:visible />}
+              {sig.key === "palette" && <Palette client:visible />}
+              {sig.key === "keystone" && <Keystone client:visible />}
+            </SignatureSlot>
+          );
+        case "features":
+          return (
+            <ServiceFeatures
+              title={page.features!.title}
+              lede={page.features!.lede}
+              items={page.features!.items}
+              variant={s.variant}
+              tone={s.tone}
+              opener={s.opener}
+              index={s.index}
+              label={s.label}
+              sheet={s.sheet}
+            />
+          );
+        case "deepDive":
+          return <ServiceDeepDive data={page.deepDive!} variant={s.variant} tone={s.tone} opener={s.opener} index={s.index} label={s.label} />;
+        case "trade":
+          return <TradeRoom variant={s.variant} data={page.whoFor!} tone={s.tone} opener={s.opener} index={s.index} label={s.label} />;
+        case "process":
+          return (
+            <ServiceProcess
+              title={page.process!.title}
+              lede={page.process!.lede}
+              steps={page.process!.steps}
+              tone={s.tone}
+              opener={s.opener}
+              index={s.index}
+              label={s.label}
+              avoid={avoid}
+            />
+          );
+        case "outcomes":
+          return <ServiceOutcomes title={page.outcomes!.title} lede={page.outcomes!.lede} items={page.outcomes!.items} tone={s.tone} opener={s.opener} index={s.index} label={s.label} />;
+        case "faq":
+          return <ServiceFaq items={page.faqs} title={s.title} lede={s.lede} note={s.note} card={s.card} tone={s.tone} opener={s.opener} index={indexOf(s)} label={s.label} />;
+      }
+    })
+  }
+
+  <ServiceRelated currentPath={page.path} items={related} title={page.relatedTitle} />
+
+  <ServiceCta data={page.cta!} />
 </BaseLayout>

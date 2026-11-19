@@ -1,11 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NZ-web favicon">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#081A2B" />
-      <stop offset="100%" stop-color="#0F2F4F" />
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="14" fill="url(#bg)" />
-  <path d="M15 49V16h6.5l10.2 18.3V16h6.6v33h-6.6L21.6 30.7V49z" fill="#ffffff" />
-  <path d="M41 16h14v4.8L45.8 43H55V49H41v-5.1l9.1-22H41z" fill="#7DD3FC" />
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="6" fill="#121110"/><g fill="#EFEAE2"><path transform="translate(9.040 44) scale(0.030000 -0.030000)" d="M527 -6L165 548L162 548L162 85Q162 57 173.5 45Q185 33 212 33L258 33L258 0L40 0L40 33L70 33Q117 33 117 85L117 570Q117 595 112.5 607Q108 619 91.5 623Q75 627 39 627L39 660L232 660L555 167L558 167L558 579Q558 627 507 627L462 627L462 660L679 660L679 627L649 627Q603 627 603 579L603 -6Z"/><path transform="translate(29.610 44) scale(0.030000 -0.030000)" d="M20 0L20 32L408 621L269 621Q208 621 173 609.5Q138 598 120.5 568Q103 538 94 484L68 484L68 660L557 660L557 630L163 39L332 39Q386 39 421.5 46.5Q457 54 478.5 71.5Q500 89 514 117.5Q528 146 539 187L565 187L553 0Z"/></g><rect x="47" y="38" width="7" height="7" fill="#E0401F"/></svg>

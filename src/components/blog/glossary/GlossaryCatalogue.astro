@@ -1,0 +1,40 @@
+---
+/**
+ * The glossary's signature room (ink): "מגירת הכרטיסים" — a card-catalogue drawer you riffle
+ * (GlossaryDrawer.tsx, client:visible). Opener: the drawer's brass label holder as the heading.
+ * Props are plain data (serialisable): every term with its letter and resolved "ראו גם" names.
+ */
+import GlossaryDrawer, { type DrawerTerm } from "./GlossaryDrawer";
+import { glossaryTerms, sortedTerms, termLetter } from "@/content/glossary";
+
+const nameOf = (slug: string) => glossaryTerms.find((t) => t.slug === slug)?.name;
+const terms: DrawerTerm[] = sortedTerms().map((t) => ({
+  slug: t.slug,
+  name: t.name,
+  alt: t.alt,
+  tag: t.tag,
+  definition: t.definition,
+  letter: termLetter(t),
+  seeAlso: (t.seeAlso ?? []).flatMap((s) => {
+    const name = nameOf(s);
+    return name ? [{ slug: s, name }] : [];
+  }),
+}));
+---
+
+<section class="gl-room" data-tone="ink" aria-labelledby="gl-room-title">
+  <div class="nz-container gl-room__grid">
+    <header class="gl-room__head">
+      <div class="gl-room__holder">
+        <span class="gl-room__k">מוצג 06א</span>
+        <h2 id="gl-room-title" class="gl-room__title">מגירת הכרטיסים</h2>
+        <span class="gl-room__k">{terms.length} כרטיסים, מסודרים לפי א–ת</span>
+      </div>
+      <p class="gl-room__lede">
+        כמו בקטלוג של ספרייה: כרטיס לכל מונח. העבירו אצבע על ראשי הכרטיסים והמגירה תדפדף, או לחצו על "ראו גם" כדי לעבור למונח
+        קרוב.
+      </p>
+    </header>
+    <GlossaryDrawer client:visible terms={terms} />
+  </div>
+</section>

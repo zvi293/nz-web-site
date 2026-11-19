@@ -1,0 +1,76 @@
+---
+/**
+ * ClickPath — "הדף בתוך הקמפיין" (campaign page): the page's place in the paid-campaign system,
+ * drawn as one vermilion line from the budget back to the next campaign, with four stations
+ * (the ad's own link, the quality score, the conversion sent back, the next A/B version).
+ * At each station a wire is plugged into the line: what gets connected there (UTM tags, the
+ * pixel, a conversion tag, a test). The far end loops back to the start.
+ * Phone: the line runs down the start edge; desktop: across the top, a column per station.
+ * The line draws itself as it scrolls in (CSS scroll-driven, complete without support). Static.
+ */
+import Nb from "@/components/service/Nb.astro";
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import type { ClickStation } from "@/data/landings/types";
+import "./landings.css";
+
+interface Props {
+  data: { title: string; lede: string; stations: ClickStation[] };
+  index?: string;
+  label?: string;
+  id?: string;
+}
+const { data, index = "02", label = "הדף בתוך הקמפיין", id = "lp-path" } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, "0");
+---
+
+<section class="nz-section nz-section--space-default lp-path" data-tone="bone" aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener
+      variant="stacked"
+      index={index}
+      label={label}
+      title={data.title}
+      id={`${id}-title`}
+      lede={data.lede}
+      lines={["מהתקציב ובחזרה אליו", `${pad(data.stations.length)} תחנות`]}
+    />
+    <div class="lp-path__map">
+      <p class="lp-path__end lp-path__end--start">
+        <span class="lp-path__tag">התקציב</span>
+        <span class="lp-path__endline">קליק שנקנה</span>
+      </p>
+      <ol class="lp-path__list">
+        {
+          data.stations.map((s, i) => (
+            <li class="lp-path__st sv-sd">
+              <p class="lp-path__node">
+                <span class="lp-path__dot" aria-hidden="true" />
+                <span class="lp-path__num">{`תחנה ${pad(i + 1)}`}</span>
+                <span class="lp-path__name">{s.name}</span>
+              </p>
+              <h3 class="lp-path__title"><Nb text={s.title} /></h3>
+              <p class="lp-path__body"><Nb text={s.body} /></p>
+              <p class="lp-path__wire">
+                <span class="lp-path__branch" aria-hidden="true" />
+                <span class="lp-path__plug" aria-hidden="true" />
+                <span class="lp-path__wiretext">
+                  <span class="lp-path__wirelabel">מחברים כאן:</span> <Nb text={s.wire} />
+                </span>
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="lp-path__end lp-path__end--goal">
+        <span class="lp-path__tag">הקמפיין הבא</span>
+        <span class="lp-path__endline">
+          <svg class="lp-path__loop" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M19 12a7 7 0 1 1-2.05-4.95" />
+            <path d="M17.5 3.5v4h-4" />
+          </svg>
+          מתחיל מהנתונים של הקודם
+        </span>
+      </p>
+    </div>
+  </div>
+</section>

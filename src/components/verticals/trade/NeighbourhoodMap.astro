@@ -1,0 +1,73 @@
+---
+/** Real estate — a neighbourhood map: blocks, streets, a park, numbered pins; the legend beside it. */
+import Nb from "@/components/service/Nb.astro";
+import type { AudienceItem } from "@/components/service/types";
+interface Props { items: AudienceItem[] }
+const { items } = Astro.props;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+/* pin spots on the 360 × 260 sheet (enough for 6) */
+const SPOTS = [
+  [262, 74],
+  [118, 58],
+  [196, 150],
+  [72, 186],
+  [300, 196],
+  [150, 226],
+];
+---
+
+<div class="vl-mp" data-reveal>
+  <figure class="vl-mp__sheet">
+    <svg class="vl-mp__svg" viewBox="0 0 360 260" role="img" aria-label="מפת שכונה לדוגמה עם סימון לכל סוג מתווך">
+      <rect width="360" height="260" class="vl-mp__ground" />
+      <!-- blocks -->
+      <g class="vl-mp__blocks">
+        <rect x="14" y="14" width="84" height="64" rx="3" /><rect x="112" y="14" width="96" height="30" rx="3" />
+        <rect x="222" y="14" width="124" height="40" rx="3" /><rect x="14" y="92" width="40" height="70" rx="3" />
+        <rect x="222" y="98" width="62" height="70" rx="3" /><rect x="298" y="98" width="48" height="70" rx="3" />
+        <rect x="14" y="206" width="40" height="40" rx="3" /><rect x="68" y="206" width="54" height="40" rx="3" />
+        <rect x="186" y="206" width="66" height="40" rx="3" /><rect x="266" y="216" width="80" height="30" rx="3" />
+      </g>
+      <!-- the park -->
+      <path d="M68 92h140v100H96q-28 0-28-28Z" class="vl-mp__park" />
+      <g class="vl-mp__trees">
+        <circle cx="96" cy="118" r="5" /><circle cx="118" cy="108" r="4" /><circle cx="150" cy="120" r="5" /><circle cx="178" cy="106" r="4" />
+        <circle cx="104" cy="160" r="4" /><circle cx="186" cy="172" r="5" /><circle cx="164" cy="166" r="3.5" />
+      </g>
+      <!-- streets -->
+      <path d="M0 84H360M0 198H360M60 0V260M214 0V260M290 84V198" class="vl-mp__street" />
+      <path d="M0 84H360M0 198H360M60 0V260M214 0V260M290 84V198" class="vl-mp__street-mid" />
+      <text x="330" y="80" class="vl-mp__label" text-anchor="end">רחוב הדקל</text>
+      <text x="330" y="212" class="vl-mp__label" text-anchor="end">שדרות הים</text>
+      <text x="220" y="255" class="vl-mp__label" text-anchor="start">רחוב הגפן</text>
+      <text x="138" y="146" class="vl-mp__label vl-mp__label--park" text-anchor="middle">הגינה</text>
+      <!-- compass -->
+      <g class="vl-mp__compass" transform="translate(30 236)">
+        <circle r="11" /><path d="M0 -8L3.5 3 0 1 -3.5 3Z" /><text y="-13" text-anchor="middle">צ</text>
+      </g>
+      <!-- pins -->
+      {
+        items.slice(0, SPOTS.length).map((_, i) => (
+          <g class="vl-mp__pin" transform={`translate(${SPOTS[i][0]} ${SPOTS[i][1]})`} style={`--i:${i}`}>
+            <g class="vl-mp__pin-in">
+              <path d="M0 0C-9 -12 -13 -17 -13 -24a13 13 0 0 1 26 0c0 7-4 12-13 24Z" />
+              <text y="-19.5" text-anchor="middle">{pad(i)}</text>
+            </g>
+          </g>
+        ))
+      }
+    </svg>
+    <figcaption class="vl-mp__cap">שכונה לדוגמה · כל סימון הוא סוג אחר של מתווך</figcaption>
+  </figure>
+  <ol class="vl-mp__legend">
+    {
+      items.map((it, i) => (
+        <li class="vl-mp__entry">
+          <span class="vl-mp__dot" aria-hidden="true"><span>{pad(i)}</span></span>
+          <h3 class="vl-mp__name"><Nb text={it.title} /></h3>
+          <p class="vl-mp__line"><Nb text={it.description} /></p>
+        </li>
+      ))
+    }
+  </ol>
+</div>

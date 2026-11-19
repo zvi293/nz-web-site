@@ -1,18 +1,72 @@
 ---
 /**
- * /services/web-development/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /services/web-development/ — בניית אתרים מקצועיים (room 02, art mobius-brick).
+ * Service system sections (src/components/service) + page-local pieces in
+ * src/components/pages/web-development/. Content: data.ts there.
+ * A lean page on purpose: hero → the signature → the materials board → "שני קירות" → FAQ.
+ * ONE island: the signature "הקוד מאחורי הקיר" (turn the canvas over, client:visible).
+ * `wd-page` on <main> lets web-development.css hang the hero work first on phones.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import WebDevelopment from "@/views/services/WebDevelopment";
-import { config } from "@/views/services/WebDevelopment";
-import { servicePageSeo } from "@/lib/page-seo";
-import type { PageSeo } from "@/lib/seo";
+import ServiceHero from "@/components/service/ServiceHero.astro";
+import SignatureSlot from "@/components/service/SignatureSlot.astro";
+import ServiceFeatures from "@/components/service/ServiceFeatures.astro";
+import ServiceFaq from "@/components/service/ServiceFaq.astro";
+import ServiceRelated from "@/components/service/ServiceRelated.astro";
+import ServiceCta from "@/components/service/ServiceCta.astro";
+import TemplateVsCode from "@/components/pages/web-development/TemplateVsCode.astro";
+import CodeBehindWall from "@/components/pages/web-development/CodeBehindWall";
+import { webDevelopment as page } from "@/components/pages/web-development/data";
+import { serviceSeo } from "@/lib/page-seo";
+import "@/components/pages/web-development/web-development.css";
 
-const seo: PageSeo = servicePageSeo(config);
+const seo = serviceSeo(page);
 ---
 
-<BaseLayout seo={seo}>
-  <WebDevelopment client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)] wd-page">
+  <ServiceHero data={page.hero} variant={page.heroVariant} path={page.path} crumb={page.crumb} position="30% 50%" />
+
+  <SignatureSlot
+    name="הקוד מאחורי הקיר"
+    title="חצי מהאתר נמצא מאחורי הקיר"
+    lede="מבחוץ רואים עמוד בית של מאפייה קטנה. הפכו כל חלק בו, כמו שהופכים ציור כדי לקרוא מה כתוב על הגב, ותראו את הקוד שמחזיק אותו. ההערות שליד העמוד מסבירות למה הוא כתוב כך."
+    hint="הקישו על חלק בעמוד, או על אחת ההערות, כדי להפוך אותו. 'להפוך את כל הבד' מראה את כל הקוד בבת אחת."
+    keys="במקלדת: Tab בין ההערות, רווח או Enter הופכים את החלק."
+    opener="quote"
+    index="מוצג חי"
+  >
+    <CodeBehindWall client:visible />
+  </SignatureSlot>
+
+  <ServiceFeatures
+    title={page.features!.title}
+    lede={page.features!.lede}
+    items={page.features!.items}
+    variant="specimens"
+    tone="paper"
+    opener="numeral"
+    index="01"
+    label="מה נכנס לאתר"
+  />
+
+  <TemplateVsCode index="02" />
+
+  <ServiceFaq
+    items={page.faqs}
+    title="שאלות על בניית אתרים"
+    tone="paper"
+    card="plaque"
+    opener="split"
+    index="03"
+    note={{
+      title: "יש לכם שאלה על האתר שלכם?",
+      body: "שלחו אותה בוואטסאפ, עם קישור לאתר הנוכחי אם יש, ותקבלו תשובה אישית בשפה פשוטה.",
+      cta: "לשאול בוואטסאפ",
+      message: "היי, יש לי שאלה על בניית אתר לעסק שלי",
+    }}
+  />
+
+  <ServiceRelated currentPath={page.path} items={page.related} />
+
+  <ServiceCta data={page.cta!} />
 </BaseLayout>

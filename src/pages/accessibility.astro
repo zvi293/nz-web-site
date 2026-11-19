@@ -1,23 +1,111 @@
 ---
 /**
- * /accessibility/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /accessibility/ — הצהרת נגישות (room 08). Static sections + ONE island:
+ *   Switchboard  client:visible   the signature "לוח הבקרה" (flips the real a11y settings)
+ * Sections come from src/content/site-settings.ts (accessibility.sections), in order:
+ *   intro → מבוא · standard → התקן · what-was-done → קטלוג · limitations → מגבלות · contact → רכז.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import Accessibility from "@/views/Accessibility";
-import type { PageSeo } from "@/lib/seo";
+import LegalHero from "@/components/legal/LegalHero.astro";
+import A11yIntro from "@/components/legal/A11yIntro.astro";
+import A11yStandard from "@/components/legal/A11yStandard.astro";
+import A11yCatalogue from "@/components/legal/A11yCatalogue.astro";
+import A11yLimits from "@/components/legal/A11yLimits.astro";
+import A11yContact from "@/components/legal/A11yContact.astro";
+import LegalDoors from "@/components/legal/LegalDoors.astro";
+import Switchboard from "@/components/legal/Switchboard";
+import { roomFor } from "@/components/Breadcrumbs";
+import "@/components/legal/rooms.css";
+import { siteSettings } from "@/content/site-settings";
+import { webPage } from "@/lib/schema";
+import { heroImage, type PageSeo } from "@/lib/seo";
 
 const PATH = "/accessibility/";
+const ART = "thermal-hand";
+const HERO_SIZES = "(min-width: 1024px) 46vw, 100vw";
+const a11y = siteSettings.accessibility;
+const byId = Object.fromEntries(a11y.sections.map((s) => [s.id, s]));
+const title = "הצהרת נגישות | NZ-web";
+const description =
+  "הצהרת הנגישות של NZ-web: האתר נבנה לפי ת״י 5568 ו-WCAG 2.1 ברמה AA. מה עשינו, מה עוד לא מושלם, לוח בקרה שמאפשר לנסות את ההתאמות ופרטי רכז הנגישות.";
+
 const seo: PageSeo = {
   path: PATH,
-  title: "הצהרת נגישות | NZ-web",
-  description:
-    'הצהרת הנגישות של NZ-web – עמידה בתקן WCAG 2.1 ברמת AA ובת"י 5568, תפריט נגישות מובנה ותמיכה מלאה בכלל המשתמשים.',
+  title,
+  description,
+  lcpArt: { slug: ART, sizes: HERO_SIZES },
   breadcrumb: { name: "הצהרת נגישות", path: PATH },
+  jsonLd: [
+    webPage({
+      path: PATH,
+      title,
+      description,
+      primaryImage: heroImage(ART, PATH),
+      dateModified: "2026-11-19",
+      speakable: true,
+    }),
+  ],
 };
 ---
 
-<BaseLayout seo={seo}>
-  <Accessibility client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)] lg-page">
+  <LegalHero
+    variant="a11y"
+    path={PATH}
+    crumb="הצהרת נגישות"
+    title="הצהרת"
+    accent="נגישות"
+    lead="האתר nz-web.com נבנה כך שכל אחד יוכל לגלוש בו, לקרוא ולפנות אלינו בעצמו: לפי התקן הישראלי ת״י 5568 והנחיות WCAG 2.1 ברמה AA, בנייד ובמחשב. כאן מפורט מה עשינו, מה עוד לא מושלם, ואיך פונים לרכז הנגישות כשמשהו לא עובד כמו שצריך."
+    art={ART}
+    sizes={HERO_SIZES}
+    room={roomFor(PATH) ?? 9}
+    medium="צילום תרמי · מה שהיד מרגישה, גם כשהעין לא רואה"
+    facts={[
+      { term: "תקן ישראלי", value: "ת״י 5568" },
+      { term: "הנחיות", value: "WCAG 2.1 AA", ltr: true },
+      { term: "עודכן", value: a11y.lastUpdated },
+      { term: "רכז הנגישות", value: a11y.coordinatorName, href: "#contact" },
+    ]}
+  />
+
+  <A11yIntro section={byId.intro} />
+
+  <section class="nz-section nz-section--space-default lg-board-room" data-tone="ink" aria-labelledby="lg-board-title" id="control-board">
+    <div class="nz-container">
+      <div class="lg-board-room__head">
+        <h2 id="lg-board-title" class="nz-display nz-display--h2 lg-board-room__title">
+          כל מתג כאן <span class="nz-accent">באמת</span> עובד
+        </h2>
+        <div class="lg-board-room__side">
+          <p class="lg-board-room__lede">
+            זה לא צילום של תפריט. כל מתג בלוח מפעיל את ההגדרה האמיתית של האתר, ברגע זה ועל העמוד שאתם קוראים, והחלון שבראש
+            הלוח מראה מה השתנה.
+          </p>
+          <ol class="lg-tries" aria-label="שלושה דברים לנסות">
+            <li>להגדיל את הטקסט</li>
+            <li>להעביר לניגודיות כהה</li>
+            <li>לאפס הכול</li>
+          </ol>
+        </div>
+      </div>
+      <Switchboard client:visible />
+    </div>
+  </section>
+
+  <A11yStandard section={byId.standard} />
+  <A11yCatalogue section={byId["what-was-done"]} />
+  <A11yLimits section={byId.limitations} />
+  <A11yContact
+    section={byId.contact}
+    name={a11y.coordinatorName}
+    phone={a11y.coordinatorPhone}
+    email={a11y.coordinatorEmail}
+    updated={a11y.lastUpdated}
+  />
+  <LegalDoors
+    current={PATH}
+    title="עוד חדרים במסמך"
+    line="המדיניות והתנאים של האתר, באותה שפה פשוטה. שאלה על נגישות שאינה תקלה? אפשר גם לכתוב לנו."
+    message="שלום צבי, יש לי שאלה על הנגישות באתר NZ-web:"
+  />
 </BaseLayout>

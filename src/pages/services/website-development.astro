@@ -1,18 +1,62 @@
 ---
 /**
- * /services/website-development/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /services/website-development/ — פיתוח אתרים (room 03, art shell-staircases).
+ * Service system sections (src/components/service) + page-local pieces in
+ * src/components/pages/website-development/. Content: data.ts there.
+ * ONE island: the signature "מסלול האתר" (sign-off gates, client:visible) — it is also the page's
+ * process, so ServiceProcess is not used here; its stations feed the HowTo JSON-LD.
+ * "החיבורים" (Integrations) doubles as the opening essay, so there is no ServiceIntro.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import WebsiteDevelopment from "@/views/services/WebsiteDevelopment";
-import { config } from "@/views/services/WebsiteDevelopment";
-import { servicePageSeo } from "@/lib/page-seo";
-import type { PageSeo } from "@/lib/seo";
+import ServiceHero from "@/components/service/ServiceHero.astro";
+import SignatureSlot from "@/components/service/SignatureSlot.astro";
+import ServiceDeepDive from "@/components/service/ServiceDeepDive.astro";
+import ServiceFaq from "@/components/service/ServiceFaq.astro";
+import ServiceRelated from "@/components/service/ServiceRelated.astro";
+import ServiceCta from "@/components/service/ServiceCta.astro";
+import Integrations from "@/components/pages/website-development/Integrations.astro";
+import SiteJourney from "@/components/pages/website-development/SiteJourney";
+import { websiteDevelopment as page, JOURNEY } from "@/components/pages/website-development/data";
+import { serviceSeo } from "@/lib/page-seo";
+import { howTo } from "@/lib/schema";
+import { getWhatsAppHref } from "@/lib/contact-utils";
 
-const seo: PageSeo = servicePageSeo(config);
+const seo = serviceSeo(page, {
+  jsonLd: [
+    howTo({
+      path: page.path,
+      name: "מסלול פיתוח אתר: מהאפיון ועד ההשקה",
+      description: "חמש התחנות של פיתוח אתר ב-NZ-web, עם אישור של הלקוח בין תחנה לתחנה.",
+      steps: JOURNEY.map((s) => ({ name: `${s.name}: ${s.line}`, text: s.body })),
+    }),
+  ],
+});
+const startHref = getWhatsAppHref(undefined, "היי, אשמח להתחיל באפיון של אתר או מערכת לעסק שלי");
 ---
 
-<BaseLayout seo={seo}>
-  <WebsiteDevelopment client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <ServiceHero data={page.hero} variant={page.heroVariant} path={page.path} crumb={page.crumb} position="40% 60%" />
+
+  <SignatureSlot
+    name="מסלול האתר"
+    title="אף תחנה לא נפתחת בלי האישור שלכם"
+    lede="חמש תחנות מהשיחה הראשונה ועד שהאתר באוויר, ובין כל שתיים חבל שרק אתם מורידים. קראו מה קורה בתחנה, מה מקבלים בסופה ומה נצטרך מכם, והטביעו את האישור כדי להמשיך."
+    hint="לחצו על החותמת 'אישור שלכם' בכרטיס: החבל לתחנה הבאה יורד והיא נפתחת. תחנות שעברתם נשארות פתוחות לקריאה."
+    keys="במקלדת: חצים בין התחנות הפתוחות, Home ו-End; רווח או Enter על החותמת."
+    tone="ink"
+    opener="split"
+    index="מוצג חי"
+  >
+    <SiteJourney client:visible stations={JOURNEY} startHref={startHref} />
+  </SignatureSlot>
+
+  <Integrations index="01" />
+
+  <ServiceDeepDive data={page.deepDive!} variant="ledger" tone="bone" opener="rule" index="02" label="מתחת לפני השטח" />
+
+  <ServiceFaq items={page.faqs} title="שאלות על פיתוח אתרים" tone="paper" card="book" opener="stacked" index="03" />
+
+  <ServiceRelated currentPath={page.path} items={page.related} tone="bone" />
+
+  <ServiceCta data={page.cta!} label="התחנה הראשונה" />
 </BaseLayout>

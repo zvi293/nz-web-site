@@ -1,0 +1,435 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   מירוץ האור (LightRace) — prefix race-. Lives on ink (SignatureSlot).
+   The light is the artwork's lime beam (lime-prism), used only inside this exhibit.
+   Per-frame values arrive as --p (progress 0–1) and --d (dial 0–1) on each lane.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.race {
+  --race-lime: #d4f25a;
+  --race-glow: rgba(212, 242, 90, 0.55);
+  display: grid;
+  gap: 16px;
+}
+
+/* ── controls ──────────────────────────────────────────────────────────── */
+.race__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+}
+.race__net {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink-2);
+  box-shadow: inset 0 0 0 1px var(--line-ink);
+}
+.race__net-k {
+  float: inline-start;
+  padding-inline: 12px 6px;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--ash);
+}
+.race__net-opt {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  color: var(--ash);
+  cursor: pointer;
+  transition: background-color 0.3s var(--ease-gallery), color 0.3s;
+}
+.race__net-opt input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.race__net-opt.is-on {
+  background: var(--bone);
+  color: var(--ink);
+}
+.race__net-opt:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.race__go[disabled] {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* ── a lane ────────────────────────────────────────────────────────────── */
+.race__lanes {
+  display: grid;
+  gap: 12px;
+}
+.race-lane {
+  padding: 16px 14px 14px;
+  background: #171513;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(239, 234, 226, 0.08);
+  transition: box-shadow 0.6s var(--ease-gallery);
+}
+.race-lane.is-winner {
+  box-shadow: inset 0 0 0 1px rgba(212, 242, 90, 0.45), 0 0 40px -20px var(--race-glow);
+}
+.race-lane__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.race-lane__name {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.1;
+  color: var(--bone);
+}
+.race-lane__line {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ash);
+}
+.race-lane__status {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 8.5em;
+  justify-content: flex-end;
+  font-size: 0.8125rem;
+  color: var(--bone);
+}
+.race-dial {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  transform: rotate(-90deg) scaleY(-1); /* fills clockwise from 12 o'clock */
+}
+.race-dial__track {
+  fill: none;
+  stroke: rgba(239, 234, 226, 0.16);
+  stroke-width: 4;
+}
+.race-dial__arc {
+  fill: none;
+  stroke: var(--vermilion);
+  stroke-width: 4;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--d, 0));
+}
+.race-lane--fast .race-dial__arc {
+  stroke: var(--race-lime);
+}
+.race-dial__pin {
+  fill: var(--bone);
+}
+
+.race-lane__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
+  gap: 14px;
+  align-items: center;
+  margin-top: 14px;
+}
+.race-lane__track {
+  position: relative;
+  height: 64px;
+  margin-inline-end: 8px;
+}
+.race-lane__rail {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(239, 234, 226, 0.2);
+}
+.race-lane__beam {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 50%;
+  height: 3px;
+  margin-top: -1px;
+  width: 100%;
+  border-radius: 2px;
+  background: var(--race-lime);
+  box-shadow: 0 0 10px 1px var(--race-glow);
+  transform: scaleX(var(--p, 0));
+  transform-origin: 100% 50%; /* RTL: light enters from the right */
+}
+.race-lane--heavy .race-lane__beam {
+  background: linear-gradient(to left, var(--race-lime), #b9c96b);
+}
+.race-lane__head-light {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: calc(var(--p, 0) * 100%);
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  margin-inline-start: -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 25%, var(--race-lime) 45%, transparent 70%);
+  box-shadow: 0 0 18px 6px var(--race-glow);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.race--running .race-lane:not(.is-done) .race-lane__head-light {
+  opacity: 1;
+}
+.race-lane__mark {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: calc(var(--at) * 100%);
+  width: 1px;
+  height: 12px;
+  margin-top: -6px;
+  background: rgba(239, 234, 226, 0.35);
+}
+.race-lane__mark.is-hit {
+  background: var(--race-lime);
+}
+.race-lane__mark-l {
+  position: absolute;
+  top: 16px;
+  inset-inline-start: 0;
+  transform: translateX(50%);
+  font-size: 0.6875rem;
+  white-space: nowrap;
+  color: var(--ash);
+  transition: color 0.3s;
+}
+.race-lane__mark.is-up .race-lane__mark-l {
+  top: auto;
+  bottom: 16px;
+}
+.race-lane__mark.is-hit .race-lane__mark-l {
+  color: var(--bone);
+}
+.race-lane__prism {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: -10px;
+  width: 16px;
+  height: 18px;
+  margin-top: -11px;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  background: rgba(120, 160, 255, 0.45);
+  transition: background-color 0.5s, filter 0.5s;
+}
+.race-lane.is-done .race-lane__prism {
+  background: rgba(212, 242, 90, 0.9);
+  filter: drop-shadow(0 0 8px var(--race-glow));
+}
+
+/* the small screen at the end of the lane builds itself */
+.race-screen {
+  position: relative;
+  width: 64px;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  background: var(--paper);
+  border: 3px solid #050505;
+  outline: 1px solid rgba(239, 234, 226, 0.14);
+  border-radius: 2px;
+}
+.race-screen__flow {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 7px 6px;
+  transition: transform 0.25s cubic-bezier(0.5, -0.3, 0.4, 1.4);
+}
+.race-screen.is-shifted .race-screen__flow {
+  transform: translateY(16px);
+}
+.race-screen__banner {
+  position: absolute;
+  z-index: 1;
+  inset-inline: 0;
+  top: 0;
+  height: 14px;
+  background: #e9d5a8;
+  transform: translateY(-100%);
+  transition: transform 0.25s;
+}
+.race-screen__banner.is-in {
+  transform: none;
+}
+.race-screen.is-shifted {
+  animation: race-jolt 0.6s ease-out 1;
+}
+@keyframes race-jolt {
+  0%,
+  100% {
+    box-shadow: none;
+  }
+  30% {
+    box-shadow: 0 0 0 2px var(--vermilion);
+  }
+}
+.race-screen__t,
+.race-screen__img,
+.race-screen__btn {
+  display: block;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease-gallery), transform 0.35s var(--ease-gallery);
+}
+.race-screen__t {
+  height: 3px;
+  width: 70%;
+  background: #b9b0a4;
+}
+.race-screen__t--h {
+  height: 5px;
+  width: 88%;
+  background: var(--ink);
+  margin-bottom: 1px;
+}
+.race-screen__img {
+  height: 38%;
+  background: #1b2a4a;
+  transform: scale(0.96);
+}
+.race-screen__btn {
+  height: 9px;
+  width: 60%;
+  border-radius: 999px;
+  background: var(--vermilion-fill);
+}
+.race-screen .is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* notes */
+.race-lane__notes {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid rgba(239, 234, 226, 0.08);
+  display: grid;
+  gap: 6px;
+}
+.race-lane__notes li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: rgba(168, 160, 151, 0.75);
+  transition: color 0.4s var(--ease-gallery);
+}
+.race-lane__notes li::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(239, 234, 226, 0.2);
+  transform: translateY(-1px);
+  transition: background-color 0.4s;
+}
+.race-lane__notes li.is-lit {
+  color: var(--bone);
+}
+.race-lane--heavy .race-lane__notes li.is-lit::before {
+  background: var(--vermilion);
+}
+.race-lane--fast .race-lane__notes li.is-lit::before {
+  background: var(--race-lime);
+}
+
+/* result */
+.race__result {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-ink);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--bone);
+  min-height: 6.2em;
+}
+.race__result-k {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--accent-text);
+}
+
+@media (min-width: 768px) {
+  .race-lane {
+    padding: 22px 24px 18px;
+  }
+  .race-lane__body {
+    grid-template-columns: minmax(0, 1fr) 132px;
+    gap: 36px;
+  }
+  .race-lane__track {
+    height: 88px;
+  }
+  .race-lane__beam {
+    height: 4px;
+    margin-top: -1.5px;
+  }
+  .race-screen {
+    width: 132px;
+  }
+  .race-screen__flow {
+    gap: 6px;
+    padding: 10px;
+  }
+  .race-lane__notes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .race-lane__name {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 14px;
+    font-size: 1.75rem;
+  }
+  .race-lane__mark-l {
+    font-size: 0.75rem;
+  }
+  .race__result {
+    flex-direction: row;
+    gap: 16px;
+    min-height: 0;
+  }
+}
+/* no JS: the finished race is the exhibit; nothing to press */
+html:not(.js) .race__bar {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .race-dial {
+    width: 56px;
+    height: 56px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .race *,
+  .race *::before,
+  .race *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

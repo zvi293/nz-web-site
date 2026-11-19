@@ -1,0 +1,99 @@
+---
+/**
+ * HubGuide (/services/ only) — "שלוש שאלות, והחדר הנכון": a decision diagram. Each question
+ * forks (a drawn hairline that branches) into two answers, and each answer is a DOOR to a room:
+ * a portrait doorway with the room's work glimpsed inside, its big serif room number and the
+ * answer that leads there. Phone: the fork branches downward into two doors side by side;
+ * desktop: question | fork | two doors. The hairlines draw themselves as they scroll in
+ * (CSS, @supports). Under the forks: "אתר תדמית לפי תחום" as a compact printed index (links to
+ * the 8 industry pages — their framed plates live on /services/business-website/).
+ */
+import { Artwork } from "@/components/art";
+import ServiceOpener from "../ServiceOpener.astro";
+import { roomFor } from "../rooms";
+import "../service.css";
+import "./hub.css";
+
+interface Row {
+  q: string;
+  a: { cond: string; href: string; why: string }[];
+}
+interface Props {
+  title: string;
+  lede?: string;
+  rows: Row[];
+  index?: string;
+  /** The industry pages, printed as a compact index under the guide. */
+  fields?: { label: string; href: string }[];
+}
+
+const { title, lede, rows, index = "01", fields = [] } = Astro.props;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+---
+
+<section class="nz-section nz-section--space-default hb-guide" data-tone="bone" aria-labelledby="hb-guide-title" id="guide">
+  <div class="nz-container">
+    <ServiceOpener variant="split" index={index} label="מדריך קצר" title={title} id="hb-guide-title" lede={lede} />
+    <ol class="hb-guide__list">
+      {
+        rows.map((row, i) => (
+          <li class="hb-fork sv-sd">
+            <div class="hb-fork__q">
+              <span class="hb-fork__idx">{`שאלה ${pad(i)}`}</span>
+              <h3 class="hb-fork__text">{row.q}</h3>
+            </div>
+            <svg class="hb-fork__svg hb-fork__svg--down" viewBox="0 0 200 48" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M100 0 V18 M100 18 C100 30 50 26 50 48 M100 18 C100 30 150 26 150 48" pathLength="1" />
+            </svg>
+            <svg class="hb-fork__svg hb-fork__svg--side" viewBox="0 0 64 200" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M64 100 H40 M40 100 C26 100 30 50 0 50 M40 100 C26 100 30 150 0 150" pathLength="1" />
+            </svg>
+            <ul class="hb-fork__ends">
+              {row.a.map((a) => {
+                const room = roomFor(a.href);
+                return (
+                  <li>
+                    <a href={a.href} class="hb-door">
+                      <span class="hb-door__way" aria-hidden="true">
+                        {room && <Artwork slug={room.art} ratio="4/5" sizes="(min-width: 1024px) 220px, 40vw" className="hb-door__art" />}
+                        {room && <span class="hb-door__big">{room.num}</span>}
+                      </span>
+                      <span class="hb-door__cond">{a.cond}</span>
+                      <span class="hb-door__room">
+                        {room && <span class="hb-door__num">{`חדר ${room.num}`}</span>}
+                        <span class="hb-door__name">{room?.name ?? a.href}</span>
+                      </span>
+                      <span class="hb-door__why">{a.why}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </li>
+        ))
+      }
+    </ol>
+
+    {
+      fields.length > 0 && (
+        <nav class="hb-index sv-sd" aria-labelledby="hb-index-title">
+          <p class="hb-index__head">
+            <span id="hb-index-title" class="hb-index__title">אתר תדמית לפי תחום</span>
+            <span class="hb-index__note">חדר 01 · אגף צדדי</span>
+          </p>
+          <ol class="hb-index__list">
+            {fields.map((f, i) => (
+              <li>
+                <a href={f.href} class="hb-index__link">
+                  <span class="hb-index__num" aria-hidden="true">{`01.${i + 1}`}</span>
+                  <span class="hb-index__label">{f.label}</span>
+                  <span class="hb-index__dots" aria-hidden="true" />
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+  </div>
+</section>

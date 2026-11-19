@@ -1,0 +1,35 @@
+---
+/** Accountant — a page of the office's ledger: index column, entries, a ticked column, a double-ruled total. */
+import Nb from "@/components/service/Nb.astro";
+import type { AudienceItem } from "@/components/service/types";
+interface Props { items: AudienceItem[] }
+const { items } = Astro.props;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+---
+
+<div class="vl-lg" data-reveal>
+  <div class="vl-lg__page">
+    <p class="vl-lg__head" aria-hidden="true">
+      <span class="vl-lg__c-no">שורה</span>
+      <span class="vl-lg__c-who">לקוח</span>
+      <span class="vl-lg__c-what">מה האתר מסדר לו</span>
+      <span class="vl-lg__c-tick">✓</span>
+    </p>
+    <ol class="vl-lg__rows">
+      {
+        items.map((it, i) => (
+          <li class="vl-lg__row" style={`--i:${i}`}>
+            <span class="vl-lg__c-no" aria-hidden="true">{pad(i)}</span>
+            <h3 class="vl-lg__c-who"><Nb text={it.title} /></h3>
+            <p class="vl-lg__c-what"><Nb text={it.description} /></p>
+            <svg class="vl-lg__c-tick vl-lg__tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13.5l5 5L20 6" pathLength="1" /></svg>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="vl-lg__total">
+      <span class="vl-lg__total-label">סה״כ</span>
+      <span class="vl-lg__total-sum">אתר אחד, מסודר לכל אחד מהם</span>
+    </p>
+  </div>
+</div>

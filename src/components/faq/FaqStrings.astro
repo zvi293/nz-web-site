@@ -1,0 +1,225 @@
+---
+// Signature component: המיתרים — pluck strings
+/**
+ * The FAQ as a harp. Every question is a string stretched between two pegs; tapping it plucks
+ * the string (a damped vibration, plus a short haptic tick on phones that support it) and the
+ * answer opens underneath. Like a real harp, strings get thicker as they go down and every
+ * C string is coloured (vermilion). With a fine pointer, the string bows under the cursor and
+ * rings softly when the cursor leaves.
+ *
+ * Underneath it is plain native <details>/<summary> (keyboard, screen readers, find-in-page,
+ * no-JS all work). The behaviour is a tiny bundled module below (no React): it only animates
+ * an SVG path for ~1s per pluck, under html.nz-motion (reduced motion / a11y pause = still
+ * strings). A pluck rings for ~2s (damped, slow enough to see), the two neighbouring strings
+ * answer faintly (sympathetic resonance), and the answer settles in. The visible Q&A text is rendered verbatim from src/content/faq.ts, the same data
+ * as the page's FAQPage JSON-LD.
+ */
+import { faqGroups, visibleFaqItems } from "@/content/faq";
+
+const ROMAN = ["I", "II", "III", "IV"];
+let n = 0;
+const groups = faqGroups.map((g) => ({
+  ...g,
+  items: visibleFaqItems
+    .filter((i) => i.group === g.id)
+    .map((item) => {
+      const index = n++;
+      return { ...item, index };
+    }),
+}));
+const total = n;
+
+/* The mini harp in each octave's head: pillar, curved neck, diagonal soundboard, and one
+   string per question (it lights and shivers while that question is open). */
+const neck = (t: number) => ({ x: 14 * (1 - t) ** 2 + 2 * 64 * t * (1 - t) + 110 * t * t, y: 24 * (1 - t) ** 2 + 2 * 2 * t * (1 - t) + 34 * t * t });
+const neckY = (x: number) => {
+  let lo = 0, hi = 1;
+  for (let k = 0; k < 30; k++) { const mid = (lo + hi) / 2; if (neck(mid).x < x) lo = mid; else hi = mid; }
+  return neck(lo).y;
+};
+const boardY = (x: number) => 34 + ((110 - x) * 98) / 86;
+const miniStrings = (count: number) =>
+  Array.from({ length: count }, (_, i) => {
+    const x = 32 + (i * 62) / Math.max(1, count - 1);
+    return { x, y1: neckY(x) + 1.5, y2: boardY(x) - 1.5 };
+  });
+---
+
+<div class="fq-harp" data-fq-harp>
+  {
+    groups.map((g, gi) => (
+      <section class="fq-octave" id={g.id} aria-labelledby={`fq-${g.id}-title`}>
+        <header class="fq-octave__head">
+          <div class="fq-octave__sticky">
+            <p class="nz-label nz-label--rule fq-octave__label">
+              <span class="nz-label__index">אוקטבה {ROMAN[gi]}</span>
+              <span>{g.items.length} מיתרים</span>
+            </p>
+            <h2 id={`fq-${g.id}-title`} class="nz-display fq-octave__title">
+              {g.title}
+            </h2>
+            <p class="fq-octave__note">{g.note}</p>
+            <svg class="fq-mini" viewBox="0 0 124 140" aria-hidden="true" focusable="false">
+              {miniStrings(g.items.length).map((st, si) => (
+                <line
+                  class:list={["fq-mini__string", g.items[si].index % 7 === 0 && "fq-mini__string--c"]}
+                  data-for={g.items[si].id}
+                  x1={st.x.toFixed(1)}
+                  y1={st.y1.toFixed(1)}
+                  x2={st.x.toFixed(1)}
+                  y2={st.y2.toFixed(1)}
+                />
+              ))}
+              <path class="fq-mini__neck" d="M14 24 Q64 2 110 34" />
+              <path class="fq-mini__board" d="M110 34 L24 132" />
+              <path class="fq-mini__pillar" d="M14 20 L14 134 M8 134 L32 134" />
+              <circle class="fq-mini__crown" cx="14" cy="18" r="4" />
+            </svg>
+          </div>
+        </header>
+
+        <div class="fq-octave__strings">
+          {g.items.map((item) => (
+            <details
+              class:list={["fq-q", item.index % 7 === 0 && "fq-q--c"]}
+              id={item.id}
+              style={`--w:${(1 + (item.index / Math.max(1, total - 1)) * 1.6).toFixed(2)};--f:${(7 - (item.index / Math.max(1, total - 1)) * 3).toFixed(2)};--short:${((1 - item.index / Math.max(1, total - 1)) * 24).toFixed(1)}%`}
+            >
+              <summary class="fq-q__sum">
+                <span class="fq-q__num" aria-hidden="true">
+                  {String(item.index + 1).padStart(2, "0")}
+                </span>
+                <span class="fq-q__text">{item.question}</span>
+                <span class="fq-q__icon" aria-hidden="true" />
+                <span class="fq-q__string" aria-hidden="true">
+                  <svg viewBox="0 0 1000 40" preserveAspectRatio="none" focusable="false">
+                    <path d="M0 20 Q500 20 1000 20" vector-effect="non-scaling-stroke" />
+                  </svg>
+                </span>
+              </summary>
+              <div class="fq-q__a">
+                <p>{item.answer}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</div>
+
+<script>
+  /* המיתרים — pluck behaviour. No scroll listeners; rAF only while a string rings. */
+  const harp = document.querySelector<HTMLElement>("[data-fq-harp]");
+  const motionOn = () => document.documentElement.classList.contains("nz-motion");
+  const coarse = matchMedia("(pointer: coarse)");
+  const fine = matchMedia("(hover: hover) and (pointer: fine)");
+
+  type Ring = { raf: number };
+  const rings = new WeakMap<Element, Ring>();
+
+  const setPath = (path: SVGPathElement, x: number, y: number) => {
+    path.setAttribute("d", `M0 20 Q${x.toFixed(1)} ${(20 + y * 2).toFixed(2)} 1000 20`);
+  };
+
+  /** A damped vibration at x (0–1000). amp in viewBox units (string sits at y=20 of 40). */
+  function pluck(d: HTMLDetailsElement, x: number, amp: number) {
+    const path = d.querySelector<SVGPathElement>(".fq-q__string path");
+    if (!path) return;
+    const prev = rings.get(d);
+    if (prev) cancelAnimationFrame(prev.raf);
+    if (!motionOn()) {
+      setPath(path, 500, 0);
+      return;
+    }
+    const f = parseFloat(getComputedStyle(d).getPropertyValue("--f")) || 8;
+    const t0 = performance.now();
+    const ring: Ring = { raf: 0 };
+    rings.set(d, ring);
+    d.classList.add("is-ringing");
+    const step = (now: number) => {
+      const t = (now - t0) / 1000;
+      const y = amp * Math.exp(-t / 0.55) * Math.cos(2 * Math.PI * f * t);
+      setPath(path, x, y);
+      if (t < 2.4) ring.raf = requestAnimationFrame(step);
+      else {
+        setPath(path, 500, 0);
+        d.classList.remove("is-ringing");
+        rings.delete(d);
+      }
+    };
+    ring.raf = requestAnimationFrame(step);
+  }
+
+  if (harp) {
+    const strings = Array.from(harp.querySelectorAll<HTMLDetailsElement>("details.fq-q"));
+    const lastX = new WeakMap<Element, number>();
+
+    strings.forEach((d) => {
+      const sum = d.querySelector<HTMLElement>("summary")!;
+      const path = d.querySelector<SVGPathElement>(".fq-q__string path");
+
+      const xOf = (e: PointerEvent) => {
+        const r = sum.getBoundingClientRect();
+        return Math.min(950, Math.max(50, ((e.clientX - r.left) / r.width) * 1000));
+      };
+
+      sum.addEventListener("pointerdown", (e) => lastX.set(d, xOf(e)));
+
+      const mini = harp.querySelector<SVGLineElement>(`.fq-mini__string[data-for="${d.id}"]`);
+      d.addEventListener("toggle", () => {
+        mini?.classList.toggle("is-open", d.open);
+        const x = lastX.get(d) ?? 500;
+        lastX.delete(d);
+        pluck(d, x, d.open ? 21 : 7);
+        /* sympathetic resonance: the neighbouring strings ring faintly */
+        if (d.open && motionOn()) {
+          const i = strings.indexOf(d);
+          [strings[i - 1], strings[i + 1]].forEach((nb) => {
+            if (nb && !rings.has(nb)) window.setTimeout(() => !rings.has(nb) && pluck(nb, 1000 - x, 4.5), 90);
+          });
+        }
+        if (d.open && motionOn() && coarse.matches && "vibrate" in navigator) {
+          try {
+            navigator.vibrate(12);
+          } catch {
+            /* not allowed: fine */
+          }
+        }
+      });
+
+      /* Fine pointer: the string bows under the cursor; it rings softly on leave. */
+      if (path) {
+        let raf = 0;
+        let hx = 500;
+        sum.addEventListener("pointermove", (e) => {
+          if (!fine.matches || !motionOn() || rings.has(d)) return;
+          hx = xOf(e);
+          if (!raf)
+            raf = requestAnimationFrame(() => {
+              raf = 0;
+              if (!rings.has(d)) setPath(path, hx, 3.4);
+            });
+        });
+        sum.addEventListener("pointerleave", () => {
+          if (!fine.matches || !motionOn() || rings.has(d)) return;
+          cancelAnimationFrame(raf);
+          raf = 0;
+          pluck(d, hx, 4.5);
+        });
+      }
+    });
+
+    /* /faq/#question-id opens (and plucks) that string. */
+    const openFromHash = () => {
+      const id = decodeURIComponent(location.hash.slice(1));
+      const target = id ? document.getElementById(id) : null;
+      if (target instanceof HTMLDetailsElement && target.classList.contains("fq-q")) {
+        target.open = true;
+        target.scrollIntoView({ block: "center" });
+      }
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+  }
+</script>

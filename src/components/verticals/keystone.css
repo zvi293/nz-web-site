@@ -1,0 +1,345 @@
+/* אבן הראשה — load test (contractor). Prefix vl-ks. An SVG arch on its centring; a cart rides the
+   extrados; weak stones crack and fall as it passes, re-cut stones rise back; the keystone locks
+   and the centring is struck. The scene is the slider (pan-y: vertical swipes still scroll). */
+.vl-ks {
+  display: grid;
+  gap: 24px;
+}
+@media (min-width: 1024px) {
+  .vl-ks {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 64px;
+    align-items: center;
+  }
+}
+.vl-ks__scene {
+  position: relative;
+  padding: 8px 0 0;
+  border-radius: 4px;
+  touch-action: pan-y;
+  cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.vl-ks__scene:active {
+  cursor: grabbing;
+}
+.vl-ks__scene:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+.vl-ks__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.vl-ks__form {
+  fill: rgb(176 132 82 / 0.16);
+  stroke: #b08452;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+.vl-ks__strut,
+.vl-ks__beam {
+  fill: none;
+  stroke: #b08452;
+  stroke-width: 2.5;
+}
+.vl-ks__beam {
+  stroke-width: 4;
+}
+.vl-ks__pier {
+  fill: #6e655b;
+}
+.vl-ks__ground {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+html.nz-motion .vl-ks__centring {
+  transition: transform 1.1s var(--ease-gallery) 0.3s, opacity 0.8s ease 0.5s;
+}
+.vl-ks.is-locked .vl-ks__centring {
+  transform: translateY(46px);
+  opacity: 0;
+}
+
+/* stones */
+.vl-ks__hole {
+  fill: rgba(239, 234, 226, 0.03);
+  stroke: rgba(239, 234, 226, 0.3);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.vl-ks__stone path:first-child {
+  fill: #cdbfae;
+  stroke: #8a7d6d;
+  stroke-width: 1;
+}
+.vl-ks__slot.is-weak .vl-ks__stone path:first-child {
+  fill: #e6ddd0;
+  stroke: #a3978a;
+  stroke-dasharray: 2 2;
+}
+.vl-ks__crack {
+  fill: none;
+  stroke: #5b5148;
+  stroke-width: 1.3;
+  stroke-linejoin: bevel;
+}
+.vl-ks__deck-top {
+  stroke: #8a7d6d;
+  stroke-width: 4;
+}
+.vl-ks__post {
+  stroke: rgba(205, 191, 174, 0.45);
+  stroke-width: 1.5;
+}
+.vl-ks__stone-label {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  fill: #2a241e;
+  pointer-events: none;
+}
+.vl-ks__slot.is-weak .vl-ks__stone-label {
+  font-weight: 500;
+  fill: #5b5148;
+}
+.vl-ks__slot.is-key.is-recut .vl-ks__stone path:first-child {
+  fill: #e9d4c4;
+}
+.vl-ks.is-locked .vl-ks__slot.is-key .vl-ks__stone path:first-child {
+  fill: var(--vermilion);
+  stroke: #ffb39f;
+}
+.vl-ks.is-locked .vl-ks__slot.is-key .vl-ks__stone-label {
+  fill: #fff;
+}
+.vl-ks__stone {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+/* a fallen stone lies tumbled on the ground under the arch (the centring still holds the rest) */
+.vl-ks__slot.is-fallen .vl-ks__stone {
+  transform: translate(var(--fx), var(--fy)) rotate(var(--fr)) scale(0.82);
+  opacity: 0.9;
+}
+.vl-ks__slot.is-fallen .vl-ks__stone-label {
+  opacity: 0;
+}
+html.nz-motion .vl-ks__stone {
+  transition: transform 0.9s cubic-bezier(0.55, 0, 0.9, 0.4);
+}
+html.nz-motion .vl-ks__slot.is-recut .vl-ks__stone {
+  animation: vl-ks-rise 0.8s var(--ease-gallery) both;
+}
+@keyframes vl-ks-rise {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+
+/* the cart */
+.vl-ks__crate {
+  fill: var(--vermilion-fill);
+  stroke: #ffb39f;
+  stroke-width: 1;
+}
+.vl-ks__crate-label {
+  font-family: var(--font-sans);
+  font-size: 8.5px;
+  font-weight: 700;
+  fill: #fff;
+}
+.vl-ks__wheel {
+  fill: var(--ink);
+  stroke: var(--bone);
+  stroke-width: 1.5;
+}
+.vl-ks__seal {
+  position: absolute;
+  top: 62%;
+  inset-inline-start: 50%;
+  translate: 50% 0;
+  padding: 5px 12px;
+  border: 2px solid #f3a48f;
+  border-radius: 3px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #f3a48f;
+  rotate: -5deg;
+  opacity: 0;
+  pointer-events: none;
+}
+.vl-ks.is-locked .vl-ks__seal {
+  opacity: 1;
+}
+html.nz-motion .vl-ks.is-locked .vl-ks__seal {
+  animation: vl-ks-seal 0.5s cubic-bezier(0.3, 1.4, 0.5, 1) 1s both;
+}
+@keyframes vl-ks-seal {
+  from {
+    opacity: 0;
+    scale: 1.6;
+  }
+}
+
+/* side */
+.vl-ks__side {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.vl-ks__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+.vl-ks__run {
+  min-height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--vermilion-fill);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+.vl-ks__run[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: default;
+}
+.vl-ks__run:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.vl-ks__under {
+  font-size: 0.8125rem;
+  color: var(--fg-muted);
+}
+.vl-ks__say {
+  margin: 0;
+  min-height: 4.6em;
+  font-family: var(--font-display);
+  font-size: clamp(1.1875rem, 1.05rem + 0.5vw, 1.5rem);
+  line-height: 1.4;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+.vl-ks__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 0 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+}
+.vl-ks__report {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.vl-ks__recut,
+.vl-ks__item-in {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  text-align: start;
+  font: inherit;
+  color: var(--fg);
+}
+.vl-ks__recut {
+  min-height: 44px;
+  border-color: #f3a48f;
+  background: rgba(224, 64, 31, 0.12);
+  cursor: pointer;
+}
+.vl-ks__recut:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .vl-ks__recut:hover {
+    background: rgba(224, 64, 31, 0.2);
+  }
+}
+.vl-ks__item-was {
+  font-size: 0.8125rem;
+  color: var(--fg-muted);
+  text-decoration: line-through;
+  text-decoration-color: rgba(243, 164, 143, 0.7);
+}
+.vl-ks__item.is-idle .vl-ks__item-was,
+.vl-ks__item.is-fallen .vl-ks__item-was {
+  text-decoration: none;
+}
+.vl-ks__item.is-fallen .vl-ks__item-was {
+  font-weight: 700;
+  color: #f3a48f;
+}
+.vl-ks__item-why {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.vl-ks__item-act {
+  margin-top: 4px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.vl-ks__item-now {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+.vl-ks__item-now span {
+  font-weight: 400;
+  color: var(--fg-muted);
+}
+.vl-ks__item.is-idle .vl-ks__item-now {
+  display: none;
+}
+.vl-ks__item-state {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+}
+.vl-ks__item.is-held .vl-ks__item-state {
+  color: #9fd3a8;
+}
+.vl-ks__reset {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+/* no JS: the full report (what fails → what replaces it), no controls */
+html:not(.js) .vl-ks__item.is-idle .vl-ks__item-now {
+  display: block;
+}
+html:not(.js) .vl-ks__item-state,
+html:not(.js) .vl-ks__controls,
+html:not(.js) .vl-ks__reset {
+  display: none;
+}

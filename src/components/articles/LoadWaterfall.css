@@ -1,0 +1,332 @@
+/* ── מפל הטעינה (load-waterfall) · prefix as-wf ─────────────────────────── */
+.as-wf__live {
+  display: grid;
+  gap: 18px;
+}
+
+/* the readout: where the main content lands against the target, in words and on a strip */
+.as-wf__readout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  padding: 14px 16px 12px;
+  border: 1px solid var(--line-ink);
+  border-radius: 4px;
+  transition: border-color 0.4s ease;
+}
+.as-wf__readout.is-ahead {
+  border-color: rgba(240, 122, 92, 0.6);
+}
+.as-wf__r-label {
+  margin: 0;
+  font: 500 0.75rem/1.3 var(--font-sans);
+  letter-spacing: 0.08em;
+  color: var(--ash);
+}
+.as-wf__r-value {
+  margin: 0;
+  font: 300 2.25rem/1.05 var(--font-display);
+  color: var(--bone);
+}
+.as-wf__readout.is-ahead .as-wf__r-value {
+  color: #f6a58f;
+}
+.as-wf__gauge {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(239, 234, 226, 0.1);
+}
+.as-wf__gauge-ok {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: calc(var(--target) * 100%);
+  border-radius: 999px;
+  background: repeating-linear-gradient(135deg, rgba(239, 234, 226, 0.28) 0 2px, transparent 2px 6px);
+  border: 1px dashed rgba(239, 234, 226, 0.6);
+}
+.as-wf__gauge-flag {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  inset-inline-start: calc(var(--lcp) * 100%);
+  width: 3px;
+  margin-inline-start: -1.5px;
+  border-radius: 2px;
+  background: var(--vermilion);
+}
+.as-wf__r-note {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ash);
+}
+
+/* the chart: each problem's heading above its lane on phones, beside it from 640px */
+.as-wf__chart {
+  --label-w: 0px;
+  --lane-w: calc(100% - var(--label-w));
+  position: relative;
+  padding-top: 26px;
+  margin-bottom: 20px;
+}
+.as-wf__axis {
+  position: absolute;
+  top: 0;
+  inset-inline: var(--label-w) 0;
+  height: 22px;
+  font: 500 0.75rem/22px var(--font-sans);
+  letter-spacing: 0.04em;
+}
+.as-wf__flag-l {
+  position: absolute;
+  top: 0;
+  inset-inline-start: calc(var(--lcp) * 100%);
+  translate: 50% 0;
+  white-space: nowrap;
+  color: #f6a58f;
+}
+.as-wf__flag-l::after {
+  content: " ▾";
+}
+.as-wf__target-l {
+  position: absolute;
+  bottom: 0;
+  inset-inline-start: calc(var(--label-w) + var(--lane-w) * var(--target));
+  translate: 50% 100%;
+  padding-top: 6px;
+  font: 500 0.75rem/1.2 var(--font-sans);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--bone);
+}
+.as-wf__axis-t {
+  position: absolute;
+  bottom: 0;
+  inset-inline-start: var(--label-w);
+  translate: 0 100%;
+  padding-top: 6px;
+  font: 500 0.75rem/1.2 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--ash);
+}
+.as-wf__groups {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line-ink);
+}
+.as-wf__row {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0 8px;
+  border-bottom: 1px solid var(--line-ink);
+}
+.as-wf__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  margin: 0;
+}
+.as-wf__name {
+  font: 400 1.0625rem/1.25 var(--font-display);
+  color: var(--bone);
+}
+.as-wf__state {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: #f07a5c;
+}
+.as-wf__row.is-fixed .as-wf__state {
+  color: var(--ash);
+}
+
+/* a lane: the time grid, the flag and the target drawn inside it (never across the headings) */
+.as-wf__lane {
+  position: relative;
+  display: block;
+  min-height: 44px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(to left, rgba(239, 234, 226, 0.06) 0 1px, transparent 1px calc(100% / 7.4));
+  touch-action: pan-y;
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.as-wf__lane:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.as-wf__row.is-drag .as-wf__lane {
+  cursor: grabbing;
+  background-color: rgba(239, 234, 226, 0.04);
+}
+.as-wf__lane::before,
+.as-wf__lane::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  width: 0;
+  pointer-events: none;
+}
+.as-wf__lane::before {
+  z-index: 3;
+  inset-inline-start: calc(var(--lcp) * 100%);
+  border-inline-start: 2px solid var(--vermilion);
+}
+.as-wf__lane::after {
+  z-index: 0;
+  inset-inline-start: calc(var(--target) * 100%);
+  border-inline-start: 1px dashed rgba(239, 234, 226, 0.6);
+}
+.as-wf__track {
+  position: absolute;
+  inset-inline: 0;
+  height: 30px;
+}
+.as-wf__bar {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  height: 14px;
+  min-width: 4px;
+  border-radius: 2px;
+  background: var(--ash);
+}
+html.nz-motion .as-wf__bar,
+html.nz-motion .as-wf__file {
+  transition: inset-inline-start 0.6s var(--ease-gallery), inset-inline-end 0.6s var(--ease-gallery), width 0.6s var(--ease-gallery), opacity 0.4s ease;
+}
+html.nz-motion .as-wf__lane::before,
+html.nz-motion .as-wf__flag-l,
+html.nz-motion .as-wf__gauge-flag {
+  transition: inset-inline-start 0.6s var(--ease-gallery);
+}
+/* while a finger holds a bar the chart follows it 1:1 */
+html.nz-motion .as-wf__chart.is-dragging .as-wf__bar,
+html.nz-motion .as-wf__chart.is-dragging .as-wf__file,
+html.nz-motion .as-wf__chart.is-dragging .as-wf__lane::before,
+html.nz-motion .as-wf__chart.is-dragging .as-wf__flag-l,
+html.nz-motion .as-wf__live:has(.is-dragging) .as-wf__gauge-flag {
+  transition: none;
+}
+.as-wf__bar--doc {
+  background: var(--bone);
+}
+.as-wf__bar--css,
+.as-wf__bar--font {
+  background: #9c9387;
+}
+.as-wf__bar--js {
+  background: #d0673f;
+}
+.as-wf__bar--img {
+  background: #d1ab82;
+}
+.as-wf__bar--cached {
+  background: rgba(239, 234, 226, 0.55);
+}
+/* deferred scripts: hatched, transparency on the fill only (the name stays full contrast) */
+.as-wf__bar.is-after {
+  background: repeating-linear-gradient(135deg, rgba(208, 103, 63, 0.75) 0 3px, rgba(208, 103, 63, 0.18) 3px 6px);
+}
+/* the grip: a notch on the edge the finger moves */
+.as-wf__row:not(.is-fixed) .as-wf__lane:not(.is-later) .as-wf__track:last-child .as-wf__bar:not(.is-ghost)::after,
+.as-wf__row:not(.is-fixed) .as-wf__lane.is-later .as-wf__track:first-child .as-wf__bar:not(.is-ghost)::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 6px;
+  border-radius: 2px;
+  background: var(--bone);
+  box-shadow: 0 0 0 2px var(--ink);
+}
+.as-wf__lane:not(.is-later) .as-wf__bar::after {
+  inset-inline-end: -3px;
+}
+.as-wf__lane.is-later .as-wf__bar::after {
+  inset-inline-start: -3px;
+}
+/* the slot the bars belong in (and, once fixed, the faint outline of where they were) */
+.as-wf__bar.is-ghost {
+  z-index: 2;
+  height: 18px;
+  bottom: -2px;
+  background: transparent;
+  border: 1.5px dashed rgba(246, 165, 143, 0.9);
+  cursor: pointer;
+}
+.as-wf__bar.is-ghost--from {
+  border-color: rgba(239, 234, 226, 0.22);
+}
+.as-wf__row.is-nudge .as-wf__bar.is-ghost--to {
+  border-color: var(--vermilion);
+  background: rgba(224, 64, 31, 0.18);
+}
+html.nz-motion .as-wf__row.is-nudge .as-wf__bar.is-ghost--to {
+  animation: as-wf-nudge 0.7s ease 2;
+}
+@keyframes as-wf-nudge {
+  50% {
+    background: rgba(224, 64, 31, 0.4);
+  }
+}
+.as-wf__file {
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  font: 500 0.75rem/14px ui-monospace, Menlo, monospace;
+  color: var(--bone);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.as-wf__bar--cached ~ .as-wf__file,
+.as-wf__bar--css ~ .as-wf__file {
+  font-family: var(--font-sans);
+}
+.as-wf__gone {
+  font-family: var(--font-sans);
+  color: #f6a58f;
+}
+
+.as-wf__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+.as-wf__say {
+  flex: 1 1 20rem;
+  margin: 0;
+  min-height: 4.4em;
+  padding-inline-start: 14px;
+  border-inline-start: 2px solid var(--vermilion);
+  font: 300 1.125rem/1.45 var(--font-display);
+  color: var(--bone);
+}
+@media (min-width: 640px) {
+  .as-wf__chart {
+    --label-w: 190px;
+  }
+  .as-wf__row {
+    grid-template-columns: var(--label-w) minmax(0, 1fr);
+    align-items: center;
+    gap: 0;
+  }
+  .as-wf__head {
+    display: grid;
+    padding-inline-end: 16px;
+  }
+  .as-wf__readout {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    column-gap: 24px;
+  }
+  .as-wf__r-note {
+    grid-column: 1 / -1;
+  }
+}

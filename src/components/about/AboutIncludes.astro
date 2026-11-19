@@ -1,0 +1,94 @@
+---
+/**
+ * "What every site includes" as the anatomy of a vessel: a cross-section drawing (hatched
+ * wall, vermilion glaze, a water line inside: it holds water) with numbered callouts that
+ * match the list. The drawing draws itself when it enters view (stroke-dashoffset, only under
+ * html.nz-motion); hovering a list item lights its callout (CSS :has, pointer only).
+ * Opener: stacked label. Static (no client JS).
+ */
+import { aboutIncludes } from "@/content/about";
+
+const inc = aboutIncludes;
+/* Callout anchor (dot) + where its number sits, in the drawing's 340×456 space. */
+const callouts = [
+  { n: 1, dot: [222, 42], end: [300, 42] },
+  { n: 2, dot: [263, 176], end: [318, 176] },
+  { n: 3, dot: [170, 262], end: [170, 262] },
+  { n: 4, dot: [77, 300], end: [24, 300] },
+  { n: 5, dot: [170, 418], end: [52, 440] },
+];
+const OUTER =
+  "M120 42 C116 72 140 88 142 102 C144 124 70 152 68 236 C66 306 116 346 128 378 L120 392 L120 418 L220 418 L220 392 L212 378 C224 346 274 306 272 236 C270 152 196 124 198 102 C200 88 224 72 220 42";
+const INNER =
+  "M211 42 C214 68 190 86 189 102 C187 130 258 160 260 236 C262 300 216 340 204 370 L204 406 L136 406 L136 370 C124 340 78 300 80 236 C82 160 153 130 151 102 C150 86 126 68 129 42";
+/* The hatched wall: outer contour, across the rim, back along the inner contour. */
+const WALL = `${OUTER} L${INNER.slice(1)} Z`;
+---
+
+<section class="nz-section nz-section--space-default ab-includes" data-tone="paper" aria-labelledby="ab-includes-title">
+  <div class="nz-container ab-includes__grid">
+    <header class="ab-stack">
+      <p class="nz-label ab-stack__room">{inc.room}</p>
+      <p class="nz-label ab-stack__label"><span class="ab-cube" aria-hidden="true"></span>{inc.label}</p>
+      <h2 id="ab-includes-title" class="nz-display nz-display--h2">{inc.title}</h2>
+      <p class="nz-lede">{inc.lede}</p>
+    </header>
+
+    <figure class="ab-anatomy" data-reveal="draw" data-reveal-margin="0px 0px -20% 0px">
+      <svg class="ab-vessel" viewBox="0 0 340 456" role="img" aria-labelledby="ab-vessel-title">
+        <title id="ab-vessel-title">חתך של כלי קרמיקה עם חמישה חלקים ממוספרים: השפה, הזיגוג, הגוף, הדופן והבסיס</title>
+        <defs>
+          <pattern id="ab-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="7" stroke="currentColor" stroke-width="1.1"></line>
+          </pattern>
+        </defs>
+        <!-- the wall in section: outer contour + inner contour, hatched between -->
+        <path class="ab-vessel__wall" d={WALL} fill="url(#ab-hatch)" />
+        <path class="ab-vessel__line" d={OUTER} pathLength="1" />
+        <path class="ab-vessel__line ab-vessel__line--in" d={INNER} pathLength="1" />
+        <path class="ab-vessel__rim" d="M120 42 L129 42 M211 42 L220 42" />
+        <!-- glaze: the outer surface, shoulder to belly -->
+        <path
+          class="ab-vessel__glaze"
+          d="M220 42 C224 72 200 88 198 102 C196 124 270 152 272 236 C273 280 256 312 240 336"
+          pathLength="1"
+        />
+        <!-- it holds water -->
+        <path class="ab-vessel__water" d="M84 214 Q98 208 112 214 T140 214 T168 214 T196 214 T224 214 T256 214" />
+        <!-- ground line -->
+        <path class="ab-vessel__ground" d="M30 419 L310 419" />
+        {
+          callouts.map((c) => (
+            <g class="ab-callout" data-n={c.n}>
+              {(c.end[0] !== c.dot[0] || c.end[1] !== c.dot[1]) && (
+                <path class="ab-callout__lead" d={`M${c.dot[0]} ${c.dot[1]} L${c.end[0]} ${c.end[1]}`} />
+              )}
+              <circle class="ab-callout__dot" cx={c.dot[0]} cy={c.dot[1]} r="3.5" />
+              <circle class="ab-callout__badge" cx={c.end[0]} cy={c.end[1] - (c.n === 3 ? 26 : 0)} r="12" />
+              <text class="ab-callout__num" x={c.end[0]} y={c.end[1] - (c.n === 3 ? 26 : 0)} dy="0.36em" text-anchor="middle">
+                {String(c.n).padStart(2, "0")}
+              </text>
+            </g>
+          ))
+        }
+      </svg>
+    </figure>
+
+    <ol class="ab-parts">
+      {
+        inc.parts.map((part, i) => (
+          <li class="ab-part" data-n={i + 1} data-reveal="rise" style={`--reveal-delay:${i * 50}ms`}>
+            <span class="ab-part__num" aria-hidden="true">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <div>
+              <p class="ab-part__where">{part.part}</p>
+              <h3 class="ab-part__title">{part.title}</h3>
+              <p class="ab-part__body">{part.body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

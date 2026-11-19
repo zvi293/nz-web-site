@@ -230,7 +230,7 @@ for (const pg of pages.values()) {
   /* duplicated head tags */
   const count = (sel) => doc.querySelectorAll(sel).length;
   for (const [sel, name] of [
-    ["title", "<title>"], ['meta[name="description" i]', "meta description"],
+    ["head > title", "<title>"], ['meta[name="description" i]', "meta description"],
     ['link[rel="canonical"]', "canonical"], ['meta[name="robots" i]', "meta robots"],
     ['meta[property="og:title"]', "og:title"], ['meta[property="og:url"]', "og:url"],
   ]) {
@@ -243,7 +243,7 @@ for (const pg of pages.values()) {
   if (h1s.length !== 1) (indexable ? E : W)(G, `${h1s.length} <h1> elements (exactly one required)`);
 
   /* title */
-  const title = ws(doc.querySelector("title")?.textContent);
+  const title = ws(doc.querySelector("head > title")?.textContent);
   if (!title) E(G, "missing <title>");
   else {
     if (title.length > TITLE_MAX) E(G, `title is ${title.length} chars (max ${TITLE_MAX}): "${title}"`);

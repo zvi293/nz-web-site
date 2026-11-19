@@ -1,0 +1,36 @@
+---
+/** Architect — the lobby directory of the portfolio "building": felt letter board, one floor per kind of studio. */
+import Nb from "@/components/service/Nb.astro";
+import type { AudienceItem } from "@/components/service/types";
+interface Props { items: AudienceItem[] }
+const { items } = Astro.props;
+const floor = (i: number) => String(items.length - i).padStart(2, "0");
+---
+
+<div class="vl-dy" data-reveal>
+  <div class="vl-dy__board">
+    <p class="vl-dy__crest" aria-hidden="true">
+      <span>בניין הפורטפוליו</span>
+      <span class="vl-dy__arrow">מעליות ↑</span>
+    </p>
+    <ol class="vl-dy__rows">
+      {
+        items.map((it, i) => (
+          <li class="vl-dy__row" style={`--i:${i}`}>
+            <span class="vl-dy__floor" aria-hidden="true">
+              <span class="vl-dy__floor-label">קומה</span>
+              {floor(i)}
+            </span>
+            <h3 class="vl-dy__name"><Nb text={it.title} /></h3>
+            <p class="vl-dy__line"><Nb text={it.description} /></p>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="vl-dy__foot" aria-hidden="true">
+      <span>קומת כניסה</span>
+      <span>יצירת קשר · פגישה על הפרויקט הבא</span>
+    </p>
+  </div>
+  <span class="vl-dy__shadow" aria-hidden="true" />
+</div>

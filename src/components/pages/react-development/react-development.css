@@ -1,0 +1,653 @@
+/* /services/react-development/ — page-local sections. Prefix rd-.
+   "כרטיס הנול" (PunchCard): a punched card, rows of practices beside strips of punch positions. */
+
+.rd-card {
+  --card: #ece3cf;
+  --card-ink: #2a241b;
+  --card-muted: #5d5444;
+  --card-rule: rgba(42, 36, 27, 0.16);
+  position: relative;
+  color: var(--card-ink);
+  background: var(--card);
+  border-radius: 6px;
+  /* the cut corner every punched card has (top, inline-end) */
+  clip-path: polygon(0 28px, 28px 0, 100% 0, 100% 100%, 0 100%);
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.7);
+  padding: 22px 18px 18px;
+}
+@media (min-width: 768px) {
+  .rd-card {
+    padding: 34px 40px 26px;
+    clip-path: polygon(0 40px, 40px 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+.rd-card__head {
+  display: grid;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--card-rule);
+}
+.rd-card__id {
+  margin: 0;
+  font: 500 0.75rem/1.4 var(--font-sans);
+  letter-spacing: 0.06em;
+  color: #9a3a1f;
+}
+.rd-card__cols {
+  display: none;
+}
+
+.rd-card__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rd-row {
+  display: grid;
+  gap: 12px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--card-rule);
+}
+.rd-row:last-child {
+  border-bottom: 0;
+}
+.rd-row__text {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 2px 10px;
+}
+.rd-row__no {
+  grid-row: span 2;
+  font: 500 0.75rem/2 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: #9a3a1f;
+  font-variant-numeric: tabular-nums;
+}
+.rd-row__title {
+  margin: 0;
+  font: 400 1.3125rem/1.25 var(--font-display);
+  color: var(--card-ink);
+}
+.rd-row__body {
+  margin: 4px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--card-muted);
+  text-wrap: pretty;
+}
+
+/* the strip of punch positions: 12 on phones (the first half), 24 from tablets */
+.rd-row__strip {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 4px;
+  align-items: center;
+  justify-items: center;
+}
+.rd-row__strip > :nth-child(n + 13) {
+  display: none;
+}
+.rd-pos,
+.rd-hole {
+  width: 100%;
+  max-width: 14px;
+  height: 22px;
+}
+.rd-pos {
+  display: grid;
+  place-items: center;
+  font: 500 10px/1 var(--font-sans);
+  color: rgba(42, 36, 27, 0.42);
+  font-variant-numeric: tabular-nums;
+}
+.rd-hole {
+  border-radius: 2px;
+  background: var(--ink);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.55);
+  transition: transform 0.35s var(--ease-out);
+  transition-delay: calc(0.2s + var(--r, 0) * 0.12s + var(--j) * 22ms);
+}
+html.nz-motion .rd-card[data-reveal]:not([data-in]) .rd-hole {
+  transform: scale(0);
+}
+
+@media (min-width: 768px) {
+  .rd-card__cols {
+    display: grid;
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+    gap: 4px;
+    margin: 0;
+    font: 500 9px/1 var(--font-sans);
+    color: rgba(42, 36, 27, 0.45);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .rd-card__head {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+  }
+  .rd-row {
+    grid-template-columns: minmax(0, 44%) minmax(0, 1fr);
+    gap: 32px;
+    align-items: center;
+  }
+  .rd-row__strip {
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+  }
+  .rd-row__strip > :nth-child(n + 13) {
+    display: grid;
+  }
+  .rd-row__strip > .rd-hole:nth-child(n + 13) {
+    display: block;
+  }
+  .rd-pos,
+  .rd-hole {
+    height: 26px;
+  }
+}
+@media (min-width: 768px) {
+  /* the column numbers line up over the strips: same 56% share */
+  .rd-card__head {
+    grid-template-columns: minmax(0, 44%) minmax(0, 1fr);
+    gap: 32px;
+  }
+}
+
+.rd-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 6px 0 0;
+  font: 400 1rem/1 var(--font-display);
+  color: var(--card-muted);
+}
+.rd-card__cube {
+  width: 8px;
+  height: 8px;
+  background: var(--vermilion);
+}
+
+.rd-card-sec__note {
+  max-width: 68ch;
+  margin: 28px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}
+
+/* ── "רכיב אחד, מקרוב" — the opening essay + its framed detail (OneComponent.astro) ── */
+.rd-one__grid {
+  display: grid;
+  gap: 32px;
+}
+@media (min-width: 960px) {
+  .rd-one__grid {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(48px, 5vw, 96px);
+    align-items: center;
+  }
+}
+.rd-one__p {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+.rd-one__p + .rd-one__p {
+  margin-top: 1.1em;
+}
+.rd-one__p--first {
+  font: 400 clamp(1.25rem, 1.05rem + 0.8vw, 1.625rem) / 1.55 var(--font-display);
+}
+
+.rd-detail {
+  margin: 0;
+  padding: clamp(18px, 3vw, 32px);
+  background: var(--bone);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  box-shadow:
+    0 0 0 8px var(--paper),
+    0 0 0 9px var(--line),
+    0 30px 50px -30px rgba(18, 17, 16, 0.4);
+}
+.rd-detail__tag {
+  margin: 0 0 18px;
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font: 500 0.8125rem/1.4 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+}
+.rd-detail__flow {
+  display: grid;
+  justify-items: stretch;
+}
+.rd-step {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 3px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.rd-step__k {
+  font: 500 0.75rem/1.2 var(--font-sans);
+  letter-spacing: 0.05em;
+  color: var(--fg-muted);
+}
+.rd-l {
+  display: block;
+}
+.rd-step__code {
+  display: block;
+  white-space: pre;
+  text-align: left;
+  font: 400 0.875rem/1.6 ui-monospace, "SFMono-Regular", Menlo, Consolas, "Heebo", monospace;
+  color: var(--ink);
+}
+.rd-c-a {
+  color: #5a4d40;
+}
+.rd-c-s {
+  color: #6a4210;
+  unicode-bidi: isolate;
+}
+.rd-c-v {
+  color: var(--vermilion-deep);
+  font-weight: 600;
+}
+.rd-step--comp {
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bone);
+}
+.rd-step--comp .rd-step__k {
+  color: var(--ash);
+}
+.rd-step__tagname {
+  font: 400 1rem/1.2 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color: #f3a48f;
+}
+.rd-step__count {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--vermilion-deep);
+  color: #fff;
+  font: 600 0.75rem/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+.rd-mini {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: #fff;
+}
+.rd-mini__name {
+  font: 400 1.125rem/1.2 var(--font-display);
+  color: var(--ink);
+}
+.rd-mini__btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bone);
+  font: 500 0.8125rem/1 var(--font-sans);
+}
+.rd-arrow {
+  justify-self: center;
+  width: 2px;
+  height: 26px;
+  background: var(--graphite);
+  position: relative;
+}
+.rd-arrow::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-inline-end: 2px solid var(--vermilion);
+  border-bottom: 2px solid var(--vermilion);
+  transform: rotate(45deg);
+}
+.rd-detail__cap {
+  margin: 16px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+/* the change: false → true, ×1 → ×2, "לסל" → "בסל ✓". Final state by default (no JS, reduced
+   motion); with motion the detail plays it once when it comes into view. */
+.rd-c-v,
+.rd-step__count,
+.rd-mini__btn {
+  display: inline-grid;
+}
+.rd-off,
+.rd-on {
+  grid-area: 1 / 1;
+}
+.rd-off {
+  visibility: hidden;
+}
+html.nz-motion .rd-detail[data-reveal]:not([data-in]) .rd-off {
+  visibility: visible;
+}
+html.nz-motion .rd-detail[data-reveal]:not([data-in]) .rd-on {
+  visibility: hidden;
+}
+html.nz-motion .rd-detail[data-in] .rd-off {
+  animation: rd-swap-off 1.9s both;
+}
+html.nz-motion .rd-detail[data-in] .rd-on {
+  animation: rd-swap-on 1.9s both;
+}
+html.nz-motion .rd-detail[data-in] .rd-step--comp,
+html.nz-motion .rd-detail[data-in] .rd-mini {
+  animation: rd-render 0.9s var(--ease-out) 1.9s;
+}
+@keyframes rd-swap-off {
+  0%,
+  99% {
+    visibility: visible;
+  }
+  100% {
+    visibility: hidden;
+  }
+}
+@keyframes rd-swap-on {
+  0%,
+  99% {
+    visibility: hidden;
+  }
+  100% {
+    visibility: visible;
+  }
+}
+@keyframes rd-render {
+  0% {
+    box-shadow: 0 0 0 3px var(--vermilion);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(224, 64, 31, 0);
+  }
+}
+
+/* ── "מתי React" — the decision diagram (ReactDecision.astro) ── */
+.rd-flow {
+  --rd-spine: 18px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  display: grid;
+}
+/* the "כן" spine on the start edge, from the start dot to the final answer */
+.rd-flow::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc(var(--rd-spine) - 1px);
+  top: 14px;
+  bottom: 40px;
+  width: 3px;
+  background: var(--vermilion);
+  transform-origin: top;
+}
+html.nz-motion .rd-flow::before {
+  transition: transform 1.4s var(--ease-gallery);
+}
+html.nz-motion .rd-flow[data-reveal]:not([data-in])::before {
+  transform: scaleY(0);
+}
+.rd-flow__start {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 30px;
+  margin-bottom: 18px;
+  padding-inline-start: calc(var(--rd-spine) * 2 + 8px);
+  font: 500 0.875rem/1.4 var(--font-sans);
+  letter-spacing: 0.03em;
+  color: var(--fg-muted);
+}
+.rd-flow__dot {
+  position: absolute;
+  inset-inline-start: calc(var(--rd-spine) - 7px);
+  top: 50%;
+  width: 15px;
+  height: 15px;
+  margin-top: -7.5px;
+  border-radius: 999px;
+  background: var(--vermilion);
+  box-shadow: 0 0 0 5px var(--bg, var(--bone));
+}
+.rd-row {
+  position: relative;
+  display: grid;
+  padding-inline-start: calc(var(--rd-spine) * 2 + 8px);
+}
+.rd-q {
+  position: relative;
+  padding: 18px 20px 20px;
+  background: var(--paper);
+  border: 1px solid var(--fg);
+  border-radius: 3px;
+}
+/* the node where the question sits on the spine */
+.rd-q::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc((var(--rd-spine) + 9px) * -1);
+  top: 26px;
+  width: calc(var(--rd-spine) + 9px);
+  height: 2px;
+  background: var(--vermilion);
+}
+.rd-q__no {
+  margin: 0 0 6px;
+  font: 500 0.75rem/1.3 var(--font-sans);
+  letter-spacing: 0.06em;
+  color: var(--vermilion-deep);
+}
+.rd-q__q {
+  margin: 0;
+  font: 400 clamp(1.375rem, 1.15rem + 1vw, 1.875rem) / 1.25 var(--font-display);
+  color: var(--fg);
+  text-wrap: balance;
+}
+.rd-q__hint {
+  margin: 8px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--fg-muted);
+}
+/* the "לא" branch: a dashed drop that leaves the spine */
+.rd-no {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding-inline-start: 26px;
+}
+.rd-no__line {
+  position: absolute;
+  inset-inline-start: 26px;
+  top: 0;
+  bottom: 0;
+  border-inline-start: 2px dashed var(--graphite);
+}
+.rd-no__label {
+  margin-inline-start: 14px;
+  font: 500 0.8125rem/1 var(--font-sans);
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+}
+.rd-exit {
+  margin-inline-start: 14px;
+  padding: 16px 18px 18px;
+  background: var(--bone-2);
+  border: 1px dashed var(--graphite);
+  border-radius: 3px;
+}
+.rd-exit__tag {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--fg-muted);
+  font: 500 0.75rem/1.3 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--fg);
+}
+.rd-exit__title {
+  margin: 0;
+  font: 400 1.25rem/1.3 var(--font-display);
+  color: var(--fg);
+}
+.rd-exit__body {
+  margin: 6px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+.rd-exit__here {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  font: 500 0.8125rem/1.3 var(--font-sans);
+  color: var(--vermilion-deep);
+}
+.rd-exit__cube {
+  width: 9px;
+  height: 9px;
+  background: var(--vermilion);
+}
+/* the "כן" label on the spine between rows */
+.rd-yes {
+  position: relative;
+  height: 52px;
+}
+.rd-yes span {
+  position: absolute;
+  inset-inline-start: calc((var(--rd-spine) * 2 + 8px) * -1 + var(--rd-spine) + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  font: 500 0.8125rem/1 var(--font-sans);
+  letter-spacing: 0.06em;
+  color: var(--vermilion-deep);
+}
+.rd-final {
+  position: relative;
+  margin-inline-start: calc(var(--rd-spine) * 2 + 8px);
+  padding: 22px 22px 24px;
+  background: var(--ink);
+  color: var(--bone);
+  border-radius: 3px;
+  box-shadow: 0 24px 40px -24px rgba(18, 17, 16, 0.6);
+}
+.rd-final::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc((var(--rd-spine) + 9px) * -1);
+  top: 30px;
+  width: calc(var(--rd-spine) + 9px);
+  height: 3px;
+  background: var(--vermilion);
+}
+.rd-final .rd-exit__tag {
+  border-color: #f07a5c;
+  color: #f3a48f;
+}
+.rd-final__title {
+  margin: 0;
+  font: 400 clamp(1.625rem, 1.3rem + 1.4vw, 2.5rem) / 1.15 var(--font-display);
+}
+.rd-final__body {
+  margin: 8px 0 0;
+  max-width: 56ch;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--ash);
+}
+
+/* wide: the exits stand across a dashed connector from their question */
+@media (min-width: 900px) {
+  .rd-flow {
+    --rd-spine: 22px;
+  }
+  .rd-row {
+    grid-template-columns: minmax(0, 1fr) 110px minmax(0, 0.9fr);
+    align-items: center;
+  }
+  .rd-q {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .rd-no {
+    grid-column: 2;
+    grid-row: 1;
+    height: auto;
+    justify-content: center;
+    padding: 0;
+  }
+  .rd-no__line {
+    inset: 50% 0 auto;
+    border-inline-start: 0;
+    border-top: 2px dashed var(--graphite);
+  }
+  .rd-no__label {
+    position: relative;
+    margin: 0 0 26px;
+    padding: 0 8px;
+  }
+  .rd-exit {
+    grid-column: 3;
+    grid-row: 1;
+    margin: 0;
+  }
+  .rd-yes {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .rd-final {
+    max-width: calc((100% - var(--rd-spine) * 2 - 8px) * 0.6);
+  }
+}
+
+/* Hero on phones and tablets: the work hangs first (on its wires), so the first screen is never
+   text only (the owner's rule); cropped wide so the H1 still starts on the first screen. */
+@media (max-width: 1023.98px) {
+  .rd-page .sv-hero__exhibit {
+    order: -1;
+    margin-top: 4px;
+  }
+  .rd-page .sv-hero__wires {
+    height: 22px;
+  }
+  .rd-page .sv-hero__frame .nz-art__canvas {
+    aspect-ratio: 16 / 10 !important;
+  }
+  .rd-page .sv-hero__label {
+    margin-top: 12px;
+  }
+}

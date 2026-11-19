@@ -1,0 +1,66 @@
+---
+/**
+ * "How we work" as two hands across a table: for each stage, one line for what you do and
+ * one for what צבי does. Between the two hands a small ceramic cup is handed over, from
+ * "אתם" to "צבי", as the row crosses the viewport (CSS scroll-driven transform inside
+ * @supports; otherwise it rests on צבי's side). Opener: split title / lede row.
+ * Static (no client JS).
+ */
+import { Button } from "@/components/nz";
+import { aboutProcess } from "@/content/about";
+
+const p = aboutProcess;
+---
+
+<section class="nz-section nz-section--space-default ab-process" data-tone="ink" aria-labelledby="ab-process-title">
+  <div class="nz-container">
+    <header class="ab-split">
+      <div class="ab-split__title">
+        <p class="nz-label"><span class="nz-label__index">{p.room}</span><span>{p.label}</span></p>
+        <h2 id="ab-process-title" class="nz-display nz-display--h2">{p.title}</h2>
+      </div>
+      <p class="nz-lede ab-split__lede">{p.lede}</p>
+    </header>
+
+    <div class="ab-hands" role="table" aria-label={p.title}>
+      <div class="ab-hands__head" role="row">
+        <span class="nz-sr" role="columnheader">שלב</span>
+        <span class="ab-hands__who ab-hands__who--you" role="columnheader">{p.youLabel}</span>
+        <span class="ab-hands__table" aria-hidden="true"></span>
+        <span class="ab-hands__who ab-hands__who--us" role="columnheader">{p.usLabel}</span>
+      </div>
+      {
+        p.rows.map((row, i) => (
+          <div class="ab-hands__row" role="row">
+            <div class="ab-hands__stage" role="rowheader">
+              <span class="ab-hands__num">{String(i + 1).padStart(2, "0")}</span>
+              <span class="ab-hands__name">{row.stage}</span>
+            </div>
+            <p class="ab-hands__cell ab-hands__cell--you" role="cell">
+              <span class="nz-sr">{p.youLabel}: </span>
+              {row.you}
+            </p>
+            <div class="ab-hands__pass" aria-hidden="true">
+              <span class="ab-hands__track"></span>
+              <span class="ab-cup">
+                <svg viewBox="0 0 32 32" focusable="false">
+                  <path class="ab-cup__body" d="M6 9 H26 L24 25 Q23.5 28 20.5 28 H11.5 Q8.5 28 8 25 Z" />
+                  <ellipse class="ab-cup__mouth" cx="16" cy="9" rx="10" ry="2.6" />
+                  <path class="ab-cup__ember" d="M16 13.5 q2.6 3 0 6.4 q-2.6 -3.4 0 -6.4 Z" />
+                </svg>
+              </span>
+            </div>
+            <p class="ab-hands__cell ab-hands__cell--us" role="cell">
+              <span class="nz-sr">{p.usLabel}: </span>
+              {row.us}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="ab-process__foot">
+      <Button to={p.link.href} variant="quiet">{p.link.label}</Button>
+    </div>
+  </div>
+</section>

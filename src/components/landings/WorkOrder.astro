@@ -1,0 +1,66 @@
+---
+/**
+ * WorkOrder — "פנקס העבודה" (trades page): what a tradesperson's landing page needs, set as a
+ * work-order pad from a contractor's van: a perforated top, printed field names with the entry
+ * "filled in" beside them, and under each line the H3 + why it matters. The pad is stamped
+ * "מוכן לעבודה" when the last line is filled. A carbon copy peeks from behind on wide screens.
+ * Static; the lines rule themselves in as they scroll in (CSS scroll-driven, complete without).
+ */
+import Nb from "@/components/service/Nb.astro";
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import type { OrderLine } from "@/data/landings/types";
+import "./landings.css";
+
+interface Props {
+  data: { title: string; lede: string; lines: OrderLine[] };
+  index?: string;
+  label?: string;
+  id?: string;
+}
+const { data, index = "02", label = "פנקס העבודה", id = "lp-order" } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, "0");
+---
+
+<section class="nz-section nz-section--space-default lp-order" data-tone="bone" aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container lp-order__grid">
+    <ServiceOpener variant="rule" index={index} label={label} title={data.title} id={`${id}-title`} lede={data.lede} class="lp-order__op" />
+
+    <div class="lp-order__stack">
+      <span class="lp-order__carbon" aria-hidden="true" />
+      <article class="lp-order__pad" aria-label="הזמנת עבודה: דף נחיתה לבעל מקצוע">
+        <header class="lp-order__head">
+          <p class="lp-order__kind">הזמנת עבודה</p>
+          <p class="lp-order__meta" aria-hidden="true">
+            <span>דף נחיתה · בעל מקצוע</span>
+            <span class="lp-order__no">מס׳ 0001</span>
+          </p>
+        </header>
+        <ol class="lp-order__lines">
+          {
+            data.lines.map((l, i) => (
+              <li class="lp-order__line sv-sd">
+                <p class="lp-order__row">
+                  <span class="lp-order__n" aria-hidden="true">{pad(i + 1)}</span>
+                  <span class="lp-order__field">{l.field}</span>
+                  <span class="lp-order__entry">{l.entry}</span>
+                </p>
+                <h3 class="lp-order__title"><Nb text={l.title} /></h3>
+                <p class="lp-order__body"><Nb text={l.body} /></p>
+              </li>
+            ))
+          }
+        </ol>
+        <footer class="lp-order__foot">
+          <p class="lp-order__sign" aria-hidden="true">
+            <span>חתימת הלקוח</span>
+            <span class="lp-order__signline" />
+          </p>
+          <p class="lp-order__stamp">
+            <span>מוכן</span>
+            <span>לעבודה</span>
+          </p>
+        </footer>
+      </article>
+    </div>
+  </div>
+</section>

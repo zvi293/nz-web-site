@@ -1,0 +1,53 @@
+---
+/**
+ * "מגבלות ידועות" — opened by a placard hung on two wires ("הודעה למבקרים"), the way a museum
+ * tells visitors what is closed; each limit is a wall label at a doorway ("outside our walls"),
+ * with an arrow pointing out of the room. The closing line signs off under the placard.
+ */
+import type { LegalPageSection } from "@/content/types";
+import { parseBlocks } from "./content";
+
+interface Props {
+  section: LegalPageSection;
+}
+const { section } = Astro.props;
+const blocks = parseBlocks(section.content);
+const items = blocks.flatMap((b) => (b.type === "ul" ? b.items : []));
+const firstList = blocks.findIndex((b) => b.type === "ul");
+const before = blocks.slice(0, firstList < 0 ? blocks.length : firstList).flatMap((b) => (b.type === "p" ? [b.text] : []));
+const after = firstList < 0 ? [] : blocks.slice(firstList + 1).flatMap((b) => (b.type === "p" ? [b.text] : []));
+const words = ["אחת", "שתיים", "שלוש", "ארבע", "חמש", "שש"];
+---
+
+<section id={section.id} class="nz-section nz-section--space-default lg-limits" data-tone="ink" aria-labelledby="lg-limits-title">
+  <div class="nz-container lg-limits__grid">
+    <div class="lg-limits__head">
+      <div class="lg-placard">
+        <span class="lg-placard__wires" aria-hidden="true"></span>
+        <p class="lg-placard__k">הודעה למבקרים · {items.length} מגבלות</p>
+        <h2 id="lg-limits-title" class="nz-display nz-display--h2 lg-placard__title">{section.title}</h2>
+      </div>
+      {before.map((p) => <p class="lg-limits__intro">{p}</p>)}
+      {after.map((p) => <p class="lg-limits__outro">{p}</p>)}
+    </div>
+
+    <ul class="lg-limits__list" aria-label={`${words[items.length - 1] ?? items.length} מגבלות`}>
+      {
+        items.map((item, i) => (
+          <li class="lg-door lg-sd">
+            <span class="lg-door__arch" aria-hidden="true">
+              <svg viewBox="0 0 40 56" class="lg-door__svg">
+                <path d="M4 56V20a16 16 0 0 1 32 0v36" fill="none" stroke="currentColor" stroke-width="1" />
+                <path d="M26 30 14 30M18 25l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.2" />
+              </svg>
+            </span>
+            <span class="lg-door__body">
+              <span class="lg-door__tag">מחוץ לאולם · {String(i + 1).padStart(2, "0")}</span>
+              <span class="lg-door__text">{item}</span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

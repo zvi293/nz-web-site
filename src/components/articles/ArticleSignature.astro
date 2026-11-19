@@ -1,0 +1,61 @@
+---
+/**
+ * Mounts an article's signature component as an island (client:visible) on a catalogue "plate":
+ * a caption with its name + what to do, then the component. One explicit branch per key — Astro
+ * hydrates only statically imported components. Registry + rules: ./index.ts.
+ */
+import KeyboardRun from "./KeyboardRun";
+import QuoteSorter from "./QuoteSorter";
+import StoreCompass from "./StoreCompass";
+import SharpSentence from "./SharpSentence";
+import ProfileBlink from "./ProfileBlink";
+import ReminderDay from "./ReminderDay";
+import LeakyBudget from "./LeakyBudget";
+import ServiceScissors from "./ServiceScissors";
+import FoldedQuote from "./FoldedQuote";
+import ExplodedStack from "./ExplodedStack";
+import OneAccent from "./OneAccent";
+import RootDig from "./RootDig";
+import LoadWaterfall from "./LoadWaterfall";
+import DominoChain from "./DominoChain";
+import { getSignatureMeta } from "./index";
+import "./articles.css";
+
+interface Props {
+  signature: string;
+}
+const meta = getSignatureMeta(Astro.props.signature);
+---
+
+{
+  meta && (
+    <figure class="as-plate" id="signature" aria-labelledby="as-plate-name">
+      <figcaption class="as-plate__cap">
+        <span class="as-plate__kicker">
+          <span class="as-plate__cube" aria-hidden="true" />
+          מוצג אינטראקטיבי
+        </span>
+        <span id="as-plate-name" class="as-plate__name">
+          {meta.name}
+        </span>
+        <span class="as-plate__hint">{meta.hint}</span>
+      </figcaption>
+      <div class="as-plate__stage">
+        {meta.key === "keyboard-run" && <KeyboardRun client:visible />}
+        {meta.key === "quote-sorter" && <QuoteSorter client:visible />}
+        {meta.key === "store-compass" && <StoreCompass client:visible />}
+        {meta.key === "sharp-sentence" && <SharpSentence client:visible />}
+        {meta.key === "profile-blink" && <ProfileBlink client:visible />}
+        {meta.key === "reminder-day" && <ReminderDay client:visible />}
+        {meta.key === "leaky-budget" && <LeakyBudget client:visible />}
+        {meta.key === "service-scissors" && <ServiceScissors client:visible />}
+        {meta.key === "folded-quote" && <FoldedQuote client:visible />}
+        {meta.key === "exploded-stack" && <ExplodedStack client:visible />}
+        {meta.key === "one-accent" && <OneAccent client:visible />}
+        {meta.key === "root-dig" && <RootDig client:visible />}
+        {meta.key === "load-waterfall" && <LoadWaterfall client:visible />}
+        {meta.key === "domino-chain" && <DominoChain client:visible />}
+      </div>
+    </figure>
+  )
+}

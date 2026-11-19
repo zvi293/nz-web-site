@@ -1,0 +1,12 @@
+---
+/**
+ * Nb — renders a copy string with its hyphen-joined tokens kept on one line ("ב-NZ-web",
+ * "ו-SEO", "חד-פעמית", "ת״י 5568"), so a phone never breaks "ב-" from "NZ" (playbook §3.2).
+ * Text content is unchanged (FAQPage JSON-LD still matches the visible text).
+ */
+interface Props {
+  text: string;
+}
+const parts = Astro.props.text.split(/(\S*-\S+|ת״י \d+)/g);
+---
+{parts.map((p, i) => (i % 2 ? <span class="sv-nb">{p}</span> : p))}

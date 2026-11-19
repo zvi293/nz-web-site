@@ -1,23 +1,108 @@
 ---
 /**
- * /privacy/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /privacy/ — מדיניות פרטיות (room 09). Static sections + ONE island:
+ *   PrivacyLock  client:visible   the signature "קבוצת המנעול" (the policy in short, traced as a padlock)
+ * The sections come from src/content/site-settings.ts (privacy.sections); the star summaries and
+ * the document's plain-language notes from src/components/legal/content.ts.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import Privacy from "@/views/Privacy";
-import type { PageSeo } from "@/lib/seo";
+import LegalHero from "@/components/legal/LegalHero.astro";
+import LegalDocument from "@/components/legal/LegalDocument.astro";
+import LegalDoors from "@/components/legal/LegalDoors.astro";
+import PrivacyLock from "@/components/legal/PrivacyLock";
+import PrivacyServices from "@/components/legal/PrivacyServices.astro";
+import CookieChoice from "@/components/legal/CookieChoice.astro";
+import { roomFor } from "@/components/Breadcrumbs";
+import "@/components/legal/rooms.css";
+import { siteSettings } from "@/content/site-settings";
+import { privacyLock, privacyPlain, readingMinutes, readingLabel } from "@/components/legal/content";
+import { webPage } from "@/lib/schema";
+import { heroImage, type PageSeo } from "@/lib/seo";
 
 const PATH = "/privacy/";
+const ART = "ice-constellation";
+const HERO_SIZES = "(min-width: 1024px) 46vw, 100vw";
+const doc = siteSettings.privacy;
+const title = "מדיניות פרטיות | NZ-web";
+const description =
+  "מדיניות הפרטיות של NZ-web: אילו פרטים נאספים באתר ובפניות, למה הם משמשים, מתי נטענות עוגיות מדידה, ואיך מבקשים לעיין במידע, לתקן אותו או למחוק אותו.";
+
 const seo: PageSeo = {
   path: PATH,
-  title: "מדיניות פרטיות | NZ-web",
-  description:
-    "מדיניות הפרטיות של NZ-web – כיצד אנו אוספים, מנהלים ומגינים על המידע שלכם בהתאם לחוק הגנת הפרטיות הישראלי.",
+  title,
+  description,
+  lcpArt: { slug: ART, sizes: HERO_SIZES },
   breadcrumb: { name: "מדיניות פרטיות", path: PATH },
+  jsonLd: [
+    webPage({
+      path: PATH,
+      title,
+      description,
+      primaryImage: heroImage(ART, PATH),
+      dateModified: "2026-11-19",
+      speakable: true,
+    }),
+  ],
 };
 ---
 
-<BaseLayout seo={seo}>
-  <Privacy client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)] lg-page">
+  <LegalHero
+    path={PATH}
+    crumb="מדיניות פרטיות"
+    title="מדיניות"
+    accent="פרטיות"
+    lead="האתר nz-web.com לא שומר את הפרטים שלכם בשרת. פנייה יוצאת דרך וואטסאפ רק כשאתם לוחצים שלח, וכלי מדידה נטענים רק אחרי שאישרתם עוגיות. אנחנו לא מוכרים מידע, ואפשר לבקש לעיין בו, לתקן אותו או למחוק אותו בכל רגע. הנוסח המלא, סעיף אחר סעיף, מופיע למטה."
+    art={ART}
+    sizes={HERO_SIZES}
+    room={roomFor(PATH) ?? 9}
+    medium="קרח, אור ומים · מה שעובר דרכנו נשאר צלול ושקוף"
+    facts={[
+      { term: "עודכן", value: doc.lastUpdated },
+      { term: "זמן קריאה", value: readingLabel(readingMinutes(doc.sections)) },
+      { term: "סעיפים", value: `${doc.sections.length} סעיפים` },
+      { term: "תקציר", value: "6 נקודות בשפה פשוטה", href: "#in-short" },
+    ]}
+  />
+
+  <section class="nz-section nz-section--space-default lg-lock-room" data-tone="ink" id="in-short" aria-labelledby="lg-lock-title">
+    <div class="nz-container lg-lock-room__grid">
+      <div class="lg-lock-room__head">
+        <p class="lg-lock-room__dial" aria-hidden="true">{String(privacyLock.stars.length).padStart(2, "0")}</p>
+        <h2 id="lg-lock-title" class="nz-display nz-display--h2">שש נקודות, <span class="nz-accent">מנעול</span> אחד</h2>
+        <p class="lg-lock-room__lede">
+          המדיניות כולה בשש נקודות בשפה פשוטה, ששמורות בכוכבים של קבוצה אחת. החליקו אצבע מכוכב לכוכב, וכשכולם דולקים המנעול
+          נסגר.
+        </p>
+      </div>
+      <PrivacyLock client:visible data={privacyLock} idPrefix="lg-privacy" />
+    </div>
+  </section>
+
+  <LegalDocument sections={doc.sections} notes={privacyPlain} label="מדיניות הפרטיות, הנוסח המלא" updated={doc.lastUpdated}>
+    <Fragment slot="after-collected">
+      <figure class="lg-flow" aria-labelledby="lg-flow-cap">
+        <figcaption id="lg-flow-cap" class="lg-flow__cap">הדרך של פנייה מהאתר</figcaption>
+        <ol class="lg-flow__steps">
+          <li class="lg-flow__step"><span class="lg-flow__k">הטופס באתר</span><span class="lg-flow__v">מנסח הודעה</span></li>
+          <li class="lg-flow__step"><span class="lg-flow__k">הוואטסאפ שלכם</span><span class="lg-flow__v">אתם לוחצים שלח</span></li>
+          <li class="lg-flow__step"><span class="lg-flow__k">צבי</span><span class="lg-flow__v">קורא ועונה</span></li>
+        </ol>
+        <p class="lg-flow__none"><s>שרת שמאחסן את הפנייה</s> אין שלב כזה</p>
+      </figure>
+    </Fragment>
+    <Fragment slot="after-third-parties">
+      <PrivacyServices />
+    </Fragment>
+    <Fragment slot="after-rights">
+      <CookieChoice />
+    </Fragment>
+  </LegalDocument>
+
+  <LegalDoors
+    current={PATH}
+    title="שאלה על הפרטיות?"
+    line="בקשה לעיין במידע, לתקן אותו או למחוק אותו, או כל שאלה על המדיניות: כתבו לנו ונחזור אליכם."
+    message="שלום צבי, יש לי שאלה על מדיניות הפרטיות של NZ-web:"
+  />
 </BaseLayout>

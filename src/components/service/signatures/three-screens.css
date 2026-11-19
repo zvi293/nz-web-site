@@ -1,0 +1,627 @@
+/* סרט אחד, שלושה מסכים — drag-to-resize. Prefix ts- (the exhibit) / ts-site (the mini site).
+   1 virtual px = --u = 100cqw / 1280 of the track (a CSS container); JS only sets --v. */
+@property --v {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 390;
+}
+.ts {
+  --vmax: 1024;
+  --vh: 820;
+  display: grid;
+  gap: 18px;
+}
+.ts.is-snapping {
+  transition: --v 0.85s var(--ease-gallery);
+}
+@media (min-width: 768px) {
+  .ts {
+    --vmax: 1280;
+    --vh: 760;
+  }
+}
+@media (min-width: 1024px) {
+  .ts {
+    --vh: 700;
+  }
+}
+
+/* controls */
+.ts__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+.ts__stops {
+  display: flex;
+  gap: 8px;
+}
+.ts__stop {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fg-muted);
+  font: 500 0.9375rem/1 var(--font-sans);
+  cursor: pointer;
+  transition: background-color 0.35s var(--ease-out), color 0.35s var(--ease-out), border-color 0.35s var(--ease-out);
+}
+.ts__stop:hover {
+  color: var(--fg);
+  border-color: var(--fg-muted);
+}
+.ts__stop.is-on {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--ink);
+}
+[data-tone="bone"] .ts__stop.is-on,
+[data-tone="paper"] .ts__stop.is-on {
+  color: var(--bone);
+}
+.ts__glyph {
+  display: inline-block;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+}
+.ts__glyph--phone {
+  width: 8px;
+  height: 13px;
+  border-radius: 2.5px;
+}
+.ts__glyph--tablet {
+  width: 11px;
+  height: 14px;
+}
+.ts__glyph--desktop {
+  width: 16px;
+  height: 11px;
+}
+.ts__readout {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+}
+.ts__px {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums lining-nums;
+  min-width: 4.2ch;
+  text-align: start;
+}
+.ts__layout {
+  color: var(--accent-text);
+}
+
+/* stage */
+.ts__stage {
+  padding-inline-end: 26px; /* room for the handle at full width */
+}
+.ts__track {
+  container-type: inline-size;
+  position: relative;
+}
+.ts__frame {
+  --u: calc(100cqw / var(--vmax));
+  position: relative;
+  z-index: 1;
+  width: calc(var(--u) * var(--v));
+  height: calc(var(--u) * var(--vh));
+  border: max(3px, calc(var(--u) * 12)) solid #0c0b0a;
+  border-radius: calc(var(--u) * 22);
+  background: #0c0b0a;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 40px 70px -40px rgba(0, 0, 0, 0.9);
+}
+.ts[data-layout="phone"] .ts__frame {
+  border-radius: calc(var(--u) * 56);
+}
+.ts.is-dragging .ts__frame {
+  box-shadow: 0 0 0 1px rgba(224, 64, 31, 0.6), 0 40px 70px -40px rgba(0, 0, 0, 0.9);
+}
+
+/* the handle — a slider on the screen's end edge */
+.ts__handle {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: calc(-22px - max(3px, var(--u) * 12));
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  cursor: ew-resize;
+  touch-action: pan-y;
+  border-radius: 999px;
+  -webkit-tap-highlight-color: transparent;
+}
+.ts__grip {
+  position: relative;
+  width: 10px;
+  height: min(88px, 46%);
+  border-radius: 999px;
+  background: var(--vermilion);
+  box-shadow: 0 0 0 4px rgba(224, 64, 31, 0.18), 0 6px 14px -4px rgba(0, 0, 0, 0.6);
+  transition: transform 0.4s var(--ease-gallery), box-shadow 0.4s var(--ease-out);
+}
+.ts__grip::before,
+.ts__grip::after {
+  content: "";
+  position: absolute;
+  inset-inline: 3px;
+  height: 1.5px;
+  background: rgba(255, 255, 255, 0.85);
+  top: calc(50% - 4px);
+}
+.ts__grip::after {
+  top: calc(50% + 3px);
+}
+.ts__handle:hover .ts__grip,
+.ts.is-dragging .ts__grip {
+  transform: scaleX(1.25);
+  box-shadow: 0 0 0 7px rgba(224, 64, 31, 0.22), 0 6px 14px -4px rgba(0, 0, 0, 0.6);
+}
+.ts__handle:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+/* the ruler */
+.ts__ruler {
+  --u: calc(100cqw / var(--vmax));
+  position: relative;
+  height: 46px;
+  margin-top: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.ts__ruler-line {
+  position: absolute;
+  top: 8px;
+  inset-inline: 0;
+  height: 1px;
+  background: var(--rule);
+}
+.ts__tick {
+  position: absolute;
+  top: 2px;
+  inset-inline-start: calc(var(--u) * var(--at));
+  width: 1px;
+  height: 13px;
+  background: var(--fg-muted);
+}
+.ts__tick-label {
+  position: absolute;
+  top: 18px;
+  inset-inline-start: 0;
+  transform: translateX(50%);
+  white-space: nowrap;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  color: var(--fg-muted);
+  transition: color 0.3s var(--ease-out);
+}
+.ts__tick--end .ts__tick-label {
+  transform: translateX(100%);
+}
+.ts__tick.is-on {
+  background: var(--accent-text);
+}
+.ts__tick.is-on .ts__tick-label {
+  color: var(--fg);
+}
+.ts__marker {
+  position: absolute;
+  top: 3px;
+  inset-inline-start: calc(var(--u) * var(--v));
+  width: 11px;
+  height: 11px;
+  background: var(--vermilion);
+  transform: translateX(50%);
+}
+
+/* ── the mini site ("אדמה", a made-up ceramics studio) ── */
+.ts-site {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: calc(var(--u) * 10);
+  background: #f5efe7;
+  color: #2b2420;
+  font-family: var(--font-sans);
+  user-select: none;
+  pointer-events: none;
+}
+.ts[data-layout="phone"] .ts-site {
+  border-radius: calc(var(--u) * 42);
+}
+.ts-site i {
+  display: block;
+  font-style: normal;
+}
+.ts-site__bar {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 28);
+  height: calc(var(--u) * 72);
+  padding-inline: calc(var(--u) * 30);
+  border-bottom: max(1px, calc(var(--u) * 1)) solid rgba(43, 36, 32, 0.1);
+}
+.ts-site__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--u) * 6);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: calc(var(--u) * 30);
+  line-height: 1;
+}
+.ts-site__logo i {
+  width: calc(var(--u) * 11);
+  height: calc(var(--u) * 11);
+  border-radius: 50%;
+  background: #b4532a;
+}
+.ts-site__nav {
+  display: none;
+  gap: calc(var(--u) * 30);
+  margin-inline-start: auto;
+  font-size: calc(var(--u) * 16);
+  color: #5a4d44;
+}
+.ts-site__pill {
+  display: none;
+  padding: calc(var(--u) * 10) calc(var(--u) * 20);
+  border-radius: 999px;
+  background: #2f5d47;
+  color: #fff;
+  font-size: calc(var(--u) * 15);
+  font-weight: 500;
+  line-height: 1;
+}
+.ts-site__burger {
+  display: grid;
+  gap: calc(var(--u) * 7);
+  margin-inline-start: auto;
+}
+.ts-site__burger i {
+  width: calc(var(--u) * 30);
+  height: max(1px, calc(var(--u) * 3));
+  background: #2b2420;
+}
+.ts-site__hero {
+  display: grid;
+  gap: calc(var(--u) * 26);
+  padding: calc(var(--u) * 30);
+}
+.ts-site__copy {
+  display: grid;
+  gap: calc(var(--u) * 14);
+  align-content: center;
+  justify-items: start;
+}
+.ts-site__kicker {
+  font-size: calc(var(--u) * 15);
+  font-weight: 500;
+  color: #b4532a;
+}
+.ts-site__h {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: calc(var(--u) * 48);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+}
+.ts-site__lines {
+  display: grid;
+  gap: calc(var(--u) * 11);
+  width: 100%;
+}
+.ts-site__lines i {
+  height: calc(var(--u) * 9);
+  border-radius: 99px;
+  background: rgba(43, 36, 32, 0.16);
+}
+.ts-site__lines i:nth-child(2) {
+  width: 88%;
+}
+.ts-site__lines i:nth-child(3) {
+  width: 64%;
+}
+.ts-site__cta {
+  margin-top: calc(var(--u) * 8);
+  padding: calc(var(--u) * 14) calc(var(--u) * 26);
+  border-radius: 999px;
+  background: #b4532a;
+  color: #fff;
+  font-size: calc(var(--u) * 16);
+  font-weight: 500;
+  line-height: 1;
+}
+.ts-site__img {
+  position: relative;
+  height: calc(var(--u) * 320);
+  border-radius: calc(var(--u) * 12);
+  background: #c9744a;
+  overflow: hidden;
+}
+.ts-site__img::after {
+  /* the shelf */
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 22%;
+  background: #a85a36;
+}
+.ts-vase {
+  position: absolute;
+  bottom: 18%;
+  z-index: 1;
+  display: block;
+}
+.ts-vase--a {
+  inset-inline-start: 18%;
+  width: 24%;
+  height: 52%;
+  border-radius: 46% 46% 32% 32% / 62% 62% 30% 30%;
+  background: #efe6da;
+}
+.ts-vase--b {
+  inset-inline-start: 46%;
+  width: 16%;
+  height: 34%;
+  border-radius: 40% 40% 46% 46% / 40% 40% 54% 54%;
+  background: #2b2420;
+}
+.ts-vase--c {
+  inset-inline-start: 66%;
+  width: 20%;
+  height: 22%;
+  border-radius: 12% 12% 50% 50% / 20% 20% 80% 80%;
+  background: #e8d3b8;
+}
+.ts-site__cards {
+  display: grid;
+  gap: calc(var(--u) * 20);
+  padding: 0 calc(var(--u) * 30) calc(var(--u) * 30);
+}
+.ts-card {
+  display: grid;
+  gap: calc(var(--u) * 10);
+  padding: calc(var(--u) * 14);
+  border-radius: calc(var(--u) * 10);
+  background: #fff;
+  box-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 10) rgba(43, 36, 32, 0.08);
+}
+.ts-card__img {
+  height: calc(var(--u) * 120);
+  border-radius: calc(var(--u) * 6);
+  background: hsl(calc(18 + var(--c) * 14) 45% calc(72% - var(--c) * 6%));
+}
+.ts-card__t {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: calc(var(--u) * 20);
+}
+.ts-card__l {
+  height: calc(var(--u) * 8);
+  border-radius: 99px;
+  background: rgba(43, 36, 32, 0.14);
+}
+.ts-card__l--short {
+  width: 60%;
+}
+
+/* tablet */
+.ts[data-layout="tablet"] .ts-site__nav,
+.ts[data-layout="desktop"] .ts-site__nav,
+.ts[data-layout="tablet"] .ts-site__pill,
+.ts[data-layout="desktop"] .ts-site__pill {
+  display: flex;
+}
+.ts[data-layout="tablet"] .ts-site__burger,
+.ts[data-layout="desktop"] .ts-site__burger {
+  display: none;
+}
+.ts[data-layout="tablet"] .ts-site__nav {
+  gap: calc(var(--u) * 22);
+  font-size: calc(var(--u) * 15);
+}
+.ts[data-layout="tablet"] .ts-site__hero {
+  grid-template-columns: 1fr 1fr;
+  padding: calc(var(--u) * 40);
+  gap: calc(var(--u) * 32);
+}
+.ts[data-layout="tablet"] .ts-site__h {
+  font-size: calc(var(--u) * 50);
+}
+.ts[data-layout="tablet"] .ts-site__img {
+  height: calc(var(--u) * 300);
+}
+.ts[data-layout="tablet"] .ts-card__img,
+.ts[data-layout="desktop"] .ts-card__img {
+  height: calc(var(--u) * 92);
+}
+.ts[data-layout="tablet"] .ts-site__cards {
+  grid-template-columns: 1fr 1fr;
+  padding-inline: calc(var(--u) * 40);
+}
+/* desktop */
+.ts[data-layout="desktop"] .ts-site__bar {
+  height: calc(var(--u) * 80);
+  padding-inline: calc(var(--u) * 64);
+}
+.ts[data-layout="desktop"] .ts-site__hero {
+  grid-template-columns: 1.15fr 1fr;
+  gap: calc(var(--u) * 64);
+  padding: calc(var(--u) * 40) calc(var(--u) * 64);
+}
+.ts[data-layout="desktop"] .ts-site__h {
+  font-size: calc(var(--u) * 64);
+}
+.ts[data-layout="desktop"] .ts-site__lines {
+  width: 80%;
+}
+.ts[data-layout="desktop"] .ts-site__img {
+  height: calc(var(--u) * 300);
+}
+.ts[data-layout="desktop"] .ts-site__cards {
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(var(--u) * 28);
+  padding-inline: calc(var(--u) * 64);
+}
+
+/* the two wider screens, drawn as dashed outlines on the wall: where the edge can go */
+.ts__ghost {
+  --u: calc(100cqw / var(--vmax));
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
+  height: calc(var(--u) * var(--vh) + 2 * max(3px, var(--u) * 12));
+  border: 1px dashed var(--rule);
+  border-radius: calc(var(--u) * 22);
+  pointer-events: none;
+}
+.ts__ghost--tablet {
+  width: calc(var(--u) * 768 + 2 * max(3px, var(--u) * 12));
+}
+.ts__ghost--desktop {
+  width: calc(var(--u) * var(--vmax) + 2 * max(3px, var(--u) * 12));
+}
+.ts__ghost span {
+  position: absolute;
+  bottom: 10px;
+  inset-inline-end: 12px;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--fg-muted);
+}
+@media (max-width: 767.98px) {
+  .ts__tick-label bdi,
+  .ts__ghost span {
+    display: none;
+  }
+}
+
+/* the free wall: live notes on what the current layout does */
+.ts__notes {
+  --u: calc(100cqw / var(--vmax));
+  position: absolute;
+  top: clamp(16px, 9%, 72px);
+  margin-block-start: clamp(0px, 6cqw, 96px);
+  inset-inline-start: calc(var(--u) * var(--v) + 2 * max(3px, var(--u) * 12) + clamp(14px, 3cqw, 48px));
+  inset-inline-end: clamp(10px, 2cqw, 40px);
+  max-width: 400px;
+  z-index: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s var(--ease-out), visibility 0s linear 0.4s;
+  pointer-events: none;
+}
+.ts__notes.is-on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s var(--ease-out) 0.1s, visibility 0s;
+}
+.ts__notes-head {
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--accent-text);
+}
+.ts__notes ol {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ts__notes li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--fg);
+}
+.ts__notes-num {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--fg-muted);
+  border-radius: 50%;
+  font-size: 0.6875rem;
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.ts__notes li::before {
+  /* leader line toward the screen */
+  content: "";
+  position: absolute;
+  top: 10px;
+  inset-inline-start: calc(-1 * clamp(8px, 2.6cqw, 40px) - 6px);
+  width: clamp(8px, 2.6cqw, 40px);
+  height: 1px;
+  background: var(--fg-muted);
+  opacity: 0.6;
+}
+html.nz-motion .ts__notes.is-on li {
+  animation: ts-note 0.6s var(--ease-gallery) both;
+  animation-delay: calc(var(--k) * 70ms);
+}
+@keyframes ts-note {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
+@media (min-width: 1024px) {
+  .ts__notes-head {
+    font-size: 0.8125rem;
+  }
+  .ts__notes li {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 12px;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    line-height: 1.25;
+  }
+  .ts__notes-num {
+    width: 26px;
+    height: 26px;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+  }
+  .ts__notes ol {
+    gap: 18px;
+  }
+  .ts__notes li::before {
+    top: 13px;
+  }
+}
+.ts__notes {
+  padding: 6px 10px 10px;
+  background: var(--ink);
+}
+[data-tone="bone"] .ts__notes {
+  background: var(--bone);
+}
+[data-tone="paper"] .ts__notes {
+  background: var(--paper);
+}

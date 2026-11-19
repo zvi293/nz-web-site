@@ -1,0 +1,41 @@
+---
+/**
+ * "רמת הנגישות והתקן" — a split title/lede opener, then the chain behind the standard drawn as
+ * three plates linked by a hairline: the law → the Israeli standard → the WCAG guidelines.
+ */
+import type { LegalPageSection } from "@/content/types";
+import { layers } from "./content";
+
+interface Props {
+  section: LegalPageSection;
+}
+const { section } = Astro.props;
+---
+
+<section id={section.id} class="nz-section nz-section--space-default lg-std" data-tone="paper" aria-labelledby="lg-std-title">
+  <div class="nz-container">
+    <div class="lg-split">
+      <div class="lg-split__title">
+        <p class="nz-label"><span class="nz-label__index">03</span><span>התקן</span></p>
+        <h2 id="lg-std-title" class="nz-display nz-display--h2">{section.title}</h2>
+      </div>
+      <p class="lg-split__lede">{section.content}</p>
+    </div>
+
+    <ol class="lg-chain" data-reveal="stagger">
+      {
+        layers.map((l, i) => (
+          <li class="lg-chain__plate">
+            <span class="lg-chain__node" aria-hidden="true" />
+            <span class="lg-chain__tag">
+              <span class="lg-chain__num">{`0${i + 1}`}</span>
+              {l.tag}
+            </span>
+            <span class="lg-chain__name">{l.name}</span>
+            <span class="lg-chain__line">{l.line}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

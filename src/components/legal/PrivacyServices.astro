@@ -1,0 +1,42 @@
+---
+/**
+ * /privacy/ §04 exhibit — "מי נוגע במידע, ומתי": a wiring diagram from the site to each outside
+ * service. The wire itself says when: solid = always (hosting), dashed = only when you press send
+ * (WhatsApp), cut by an open switch = only after you allow cookies (measurement).
+ */
+const rows = [
+  { when: "always", k: "Netlify", v: "מארח את האתר", tag: "תמיד" },
+  { when: "send", k: "WhatsApp", v: "מעביר את הפנייה שלכם", tag: "רק כשלוחצים שלח" },
+  { when: "consent", k: "Google · Meta", v: "מודדים ביקורים", tag: "רק אחרי אישור עוגיות" },
+];
+---
+
+<figure class="lg-svc" aria-labelledby="lg-svc-cap">
+  <figcaption id="lg-svc-cap" class="lg-svc__cap">מי נוגע במידע, ומתי</figcaption>
+  <ol class="lg-svc__rows">
+    {
+      rows.map((r) => (
+        <li class="lg-svc__row" data-when={r.when}>
+          <span class="lg-svc__from" aria-hidden="true">האתר</span>
+          <span class="lg-svc__wire" aria-hidden="true">
+            <span class="lg-svc__line" />
+            {r.when === "consent" && (
+              <svg class="lg-svc__switch" viewBox="0 0 28 14">
+                <circle cx="3" cy="10" r="2" />
+                <circle cx="25" cy="10" r="2" />
+                <path d="M4.6 9 19 2.5" />
+              </svg>
+            )}
+            <span class="lg-svc__line" />
+          </span>
+          <span class="lg-svc__to">
+            <bdi dir="ltr" class="lg-svc__k">{r.k}</bdi>
+            <span class="lg-svc__v">{r.v}</span>
+            <span class="lg-svc__tag">{r.tag}</span>
+          </span>
+        </li>
+      ))
+    }
+  </ol>
+  <p class="lg-svc__note">לכל אחד מהשירותים מדיניות פרטיות משלו, וייתכן שהמידע נשמר בשרתים מחוץ לישראל.</p>
+</figure>

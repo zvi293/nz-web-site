@@ -1,0 +1,58 @@
+---
+/**
+ * "What happens after you send": four steps strung on a coiled telephone cord (the glass
+ * cord of the handsets piece). The cord winds down the side on phones and across the room
+ * on desktop, and draws itself as the room scrolls into view (CSS scroll-driven
+ * stroke-dashoffset in @supports; otherwise simply drawn). Static (no client JS).
+ */
+import { contactNext as n } from "./content";
+
+/** A coil (looped trochoid) as an SVG path. */
+function coil({ loops, length, amp, loop, vertical }: { loops: number; length: number; amp: number; loop: number; vertical: boolean }) {
+  const a = length / (loops * 2 * Math.PI);
+  const pts: string[] = [];
+  const end = loops * 2 * Math.PI;
+  for (let t = 0; t <= end + 0.001; t += 0.18) {
+    const along = a * t - loop * Math.sin(t) + loop;
+    const across = amp - amp * 0.82 * Math.cos(t);
+    const [x, y] = vertical ? [across, along] : [along, across];
+    pts.push(`${x.toFixed(1)} ${y.toFixed(1)}`);
+  }
+  return `M${pts.join(" L")}`;
+}
+const H = coil({ loops: 15, length: 1170, amp: 20, loop: 24, vertical: false });
+const V = coil({ loops: 24, length: 975, amp: 15, loop: 13, vertical: true });
+---
+
+<section class="nz-section nz-section--space-default ct-next" data-tone="paper" aria-labelledby="ct-next-title">
+  <div class="nz-container">
+    <header class="ct-next__head">
+      <div class="ct-next__titles">
+        <p class="nz-label ct-next__room"><span class="nz-label__index">{n.room}</span><span>{n.label}</span></p>
+        <h2 id="ct-next-title" class="nz-display nz-display--h2 ct-next__title">{n.title}</h2>
+      </div>
+      <p class="ct-next__aside">{n.aside}</p>
+    </header>
+
+    <div class="ct-cord">
+      <svg class="ct-cord__svg ct-cord__svg--h" viewBox="0 0 1210 46" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d={H} pathLength="1" vector-effect="non-scaling-stroke"></path>
+      </svg>
+      <svg class="ct-cord__svg ct-cord__svg--v" viewBox="0 0 34 1000" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d={V} pathLength="1" vector-effect="non-scaling-stroke"></path>
+      </svg>
+      <ol class="ct-steps">
+        {
+          n.steps.map((s, i) => (
+            <li class="ct-step" data-reveal="rise" style={`--reveal-delay:${i * 80}ms`}>
+              <span class="ct-step__node" aria-hidden="true" />
+              <span class="ct-step__num">{String(i + 1).padStart(2, "0")}</span>
+              <h3 class="ct-step__title">{s.title}</h3>
+              <p class="ct-step__body">{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>

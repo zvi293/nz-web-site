@@ -1,0 +1,72 @@
+---
+/**
+ * /terms/ exhibits inside the document:
+ *   kind="binding"  §02 — two sheets: what the site says (general information) beside the personal
+ *                   quote + agreement (the only thing that binds), with a seal on the second.
+ *   kind="exit"     §04 — a threshold: a link out of nz-web.com crosses into someone else's site,
+ *                   and responsibility changes hands at the door.
+ */
+interface Props {
+  kind: "binding" | "exit";
+}
+const { kind } = Astro.props;
+---
+
+{
+  kind === "binding" ? (
+    <figure class="lg-bind" aria-labelledby="lg-bind-cap">
+      <figcaption id="lg-bind-cap" class="lg-bind__cap">
+        מה מחייב, ומה לא
+      </figcaption>
+      <div class="lg-bind__sheets">
+        <div class="lg-bind__sheet">
+          <span class="lg-bind__lines" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+          </span>
+          <p class="lg-bind__k">מה שכתוב באתר</p>
+          <p class="lg-bind__v">מידע כללי. לא הצעה ולא ייעוץ.</p>
+          <span class="lg-bind__stamp lg-bind__stamp--soft">לא מחייב</span>
+        </div>
+        <div class="lg-bind__sheet lg-bind__sheet--signed">
+          <span class="lg-bind__lines" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+          </span>
+          <p class="lg-bind__k">הצעה אישית והסכם</p>
+          <p class="lg-bind__v">היקף, לוחות זמנים ותמורה, לכל לקוח בנפרד.</p>
+          <svg class="lg-bind__sign" viewBox="0 0 80 20" aria-hidden="true">
+            <path d="M2 14c6-9 10-9 9 0s6-10 12-4 6 6 12-2 8 4 14 2 10-6 16-4 9 3 13 1" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+          </svg>
+          <span class="lg-bind__stamp">מחייב</span>
+        </div>
+      </div>
+    </figure>
+  ) : (
+    <figure class="lg-exit" aria-labelledby="lg-exit-cap">
+      <figcaption id="lg-exit-cap" class="lg-exit__cap">
+        כשקישור יוצא מהאתר
+      </figcaption>
+      <div class="lg-exit__plan">
+        <div class="lg-exit__room">
+          <bdi dir="ltr" class="lg-exit__k">nz-web.com</bdi>
+          <span class="lg-exit__v">באחריות NZ-web</span>
+        </div>
+        <div class="lg-exit__door" aria-hidden="true">
+          <svg viewBox="0 0 40 64">
+            <path d="M6 62V18a14 14 0 0 1 28 0v44" fill="none" stroke="currentColor" stroke-width="1.2" />
+            <path d="M30 40H8m5-5-5 5 5 5" fill="none" stroke="var(--vermilion)" stroke-width="1.6" />
+          </svg>
+        </div>
+        <div class="lg-exit__room lg-exit__room--out">
+          <span class="lg-exit__k">אתר של מישהו אחר</span>
+          <span class="lg-exit__v">אתר לקוח, וואטסאפ: באחריות מי שמפעיל אותו</span>
+        </div>
+      </div>
+    </figure>
+  )
+}

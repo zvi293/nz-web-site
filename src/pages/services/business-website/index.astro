@@ -1,18 +1,79 @@
 ---
 /**
- * /services/business-website/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /services/business-website/ — אתר תדמית לעסקים. The reference core service page of the
+ * service system (src/components/service, README there). Content: src/components/service/data.
+ * Static sections; ONE island: the signature "סרט אחד, שלושה מסכים" (client:visible).
+ * Hub of the 8 industry pages (/services/business-website/<vertical>/).
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import BusinessWebsite from "@/views/services/BusinessWebsite";
-import { config } from "@/views/services/BusinessWebsite";
-import { servicePageSeo } from "@/lib/page-seo";
-import type { PageSeo } from "@/lib/seo";
+import ServiceHero from "@/components/service/ServiceHero.astro";
+import ServiceIntro from "@/components/service/ServiceIntro.astro";
+import SignatureSlot from "@/components/service/SignatureSlot.astro";
+import ServiceFeatures from "@/components/service/ServiceFeatures.astro";
+import ServiceDeepDive from "@/components/service/ServiceDeepDive.astro";
+import ServiceWhoFor from "@/components/service/ServiceWhoFor.astro";
+import IndustriesGrid from "@/components/service/IndustriesGrid.astro";
+import ServiceProcess from "@/components/service/ServiceProcess.astro";
+import ServiceOutcomes from "@/components/service/ServiceOutcomes.astro";
+import ServiceFaq from "@/components/service/ServiceFaq.astro";
+import ServiceRelated from "@/components/service/ServiceRelated.astro";
+import ServiceCta from "@/components/service/ServiceCta.astro";
+import ThreeScreens from "@/components/service/signatures/ThreeScreens";
+import { businessWebsite as page } from "@/components/service/data/business-website";
+import { VERTICAL_CARDS } from "@/data/verticals";
+import { serviceSeo } from "@/lib/page-seo";
 
-const seo: PageSeo = servicePageSeo(config);
+const seo = serviceSeo(page);
+const industries = VERTICAL_CARDS.map((v) => ({ label: v.label, href: v.href, art: v.art }));
 ---
 
-<BaseLayout seo={seo}>
-  <BusinessWebsite client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <ServiceHero data={page.hero} variant={page.heroVariant} path={page.path} crumb={page.crumb} />
+
+  <ServiceIntro data={page.intro!} tone="paper" opener="split" index="01" label="מבוא · מסה קצרה" />
+
+  <SignatureSlot
+    name="סרט אחד, שלושה מסכים"
+    title="אותו אתר, בכל מסך"
+    lede="רוב המבקרים יגיעו מהנייד, חלקם מהמחשב בעבודה. גררו את קצה המסך וראו איך אתר תדמית אחד מסדר את עצמו מחדש: התפריט מתקפל, העמודות מתחלקות, והתוכן נשאר אותו תוכן."
+    hint="גררו את הידית האדומה שבקצה המסך, הקישו על הסרגל או בחרו נייד, טאבלט או מחשב."
+    keys="במקלדת: חיצים, PageUp ו-PageDown, Home ו-End על הידית."
+    index="מוצג חי"
+  >
+    <ThreeScreens client:visible />
+  </SignatureSlot>
+
+  <ServiceFeatures
+    title={page.features!.title}
+    lede={page.features!.lede}
+    items={page.features!.items}
+    variant="diagram"
+    opener="numeral"
+    index="02"
+    label="מה כלול"
+    sheet="גיליון 02 · מבנה אתר תדמית"
+  />
+
+  <ServiceDeepDive data={page.deepDive!} variant="ledger" tone="paper" opener="rule" index="03" label="לפני שמתחילים" />
+
+  <ServiceWhoFor title={page.whoFor!.title} lede={page.whoFor!.lede} items={page.whoFor!.items} opener="stacked" index="04" />
+
+  <IndustriesGrid
+    title="אתר תדמית לפי תחום"
+    lede="לכל מקצוע יש שאלות משלו. בחרו את התחום שלכם וראו מה חשוב שיהיה באתר."
+    items={industries}
+    opener="split"
+    index="05"
+    label="לפי תחום"
+  />
+
+  <ServiceProcess title={page.process!.title} lede={page.process!.lede} steps={page.process!.steps} opener="rule" index="06" />
+
+  <ServiceOutcomes title={page.outcomes!.title} items={page.outcomes!.items} index="07" />
+
+  <ServiceFaq items={page.faqs} title="שאלות על בניית אתר תדמית" index="08" />
+
+  <ServiceRelated currentPath={page.path} items={page.related} />
+
+  <ServiceCta data={page.cta!} />
 </BaseLayout>

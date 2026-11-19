@@ -1,0 +1,61 @@
+---
+/**
+ * The founder card — an artist's wall text. A vermilion potter's chop mark (his initials)
+ * is "stamped" beside the serif name when it enters view, the story with a drop cap, and a
+ * "who does what" ledger with dotted leaders (the honest answer: one person does it all).
+ * Static (no client JS). The Person entity is #founder in the page's JSON-LD (site graph).
+ */
+import { Button, WhatsAppCta, studio } from "@/components/nz";
+import { aboutFounder } from "@/content/about";
+
+const f = aboutFounder;
+---
+
+<section class="nz-section nz-section--space-default ab-founder" data-tone="paper" aria-labelledby="ab-founder-title" id="founder">
+  <div class="nz-container ab-founder__grid">
+    <p class="nz-label nz-label--rule ab-founder__room">
+      <span class="nz-label__index">{f.room}</span>
+      <span>{f.label}</span>
+    </p>
+
+    <div class="ab-founder__text">
+      <div class="ab-founder__namerow">
+        <div class="ab-founder__mark">
+          <div class="ab-seal" data-reveal="stamp" aria-hidden="true">
+            <span class="ab-seal__ink">
+              <span class="ab-seal__letters">{f.seal}</span>
+            </span>
+          </div>
+          <p class="nz-label ab-seal__caption">{f.sealCaption}</p>
+        </div>
+        <div>
+          <h2 id="ab-founder-title" class="nz-display ab-founder__name">{f.name}</h2>
+          <p class="ab-founder__role">{f.role}</p>
+        </div>
+      </div>
+      <div class="ab-founder__story" data-reveal="rise">
+        {f.paragraphs.map((p, i) => <p class:list={[i === 0 && "ab-dropcap"]}>{p}</p>)}
+      </div>
+    </div>
+
+    <div class="ab-founder__aside">
+      <p class="nz-label ab-ledger-title">{f.ledgerTitle}</p>
+      <dl class="ab-who" data-reveal="stagger">
+        {
+          f.ledger.map((row) => (
+            <div class="ab-who__row">
+              <dt>{row.q}</dt>
+              <dd>{row.a}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <div class="ab-founder__actions">
+        <WhatsAppCta label={f.cta} message={f.whatsappMessage} variant="secondary" />
+        <Button href={`mailto:${studio.email}`} variant="quiet" icon="none" className="ab-founder__mail">
+          <bdi dir="ltr">{studio.email}</bdi>
+        </Button>
+      </div>
+    </div>
+  </div>
+</section>

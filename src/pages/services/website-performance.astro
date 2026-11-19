@@ -1,32 +1,63 @@
 ---
 /**
- * /services/website-performance/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /services/website-performance/ — שיפור מהירות אתר. Service system page (src/components/service).
+ * Content: src/components/pages/website-performance/data.ts. Static sections (page-born:
+ * LoadWaterfall — which also carries the audiences as symptoms — and VitalsPlates); ONE island:
+ * the signature "מירוץ האור" (race playback, client:visible), first after the hero.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import WebsitePerformance from "@/views/services/WebsitePerformance";
-import { FAQS } from "@/views/services/WebsitePerformance";
-import { faqPage, service, webPage } from "@/lib/schema";
-import type { PageSeo } from "@/lib/seo";
+import ServiceHero from "@/components/service/ServiceHero.astro";
+import SignatureSlot from "@/components/service/SignatureSlot.astro";
+import ServiceDeepDive from "@/components/service/ServiceDeepDive.astro";
+import ServiceProcess from "@/components/service/ServiceProcess.astro";
+import ServiceFaq from "@/components/service/ServiceFaq.astro";
+import ServiceRelated from "@/components/service/ServiceRelated.astro";
+import ServiceCta from "@/components/service/ServiceCta.astro";
+import LoadWaterfall from "@/components/pages/website-performance/LoadWaterfall.astro";
+import VitalsPlates from "@/components/pages/website-performance/VitalsPlates.astro";
+import LightRace from "@/components/pages/website-performance/LightRace";
+import { websitePerformance as page } from "@/components/pages/website-performance/data";
+import { serviceSeo } from "@/lib/page-seo";
 
-const PATH = "/services/website-performance/";
-const title = "שיפור מהירות אתרים | אופטימיזציית Core Web Vitals | NZ-web";
-const description =
-  "שיפור ביצועי אתרים וציוני Core Web Vitals. אופטימיזציה לתמונות, קיצור זמני טעינה ושיפור דירוג בגוגל. audit מלא עם דוח לפני ואחרי.";
-const seo: PageSeo = {
-  path: PATH,
-  title,
-  description,
-  breadcrumb: { name: "שיפור מהירות אתרים", path: PATH, parent: { name: "שירותים", path: "/services/" } },
-  jsonLd: [
-    webPage({ path: PATH, title, description }),
-    service({ path: PATH, name: "שיפור מהירות אתרים", description, serviceType: "Website Performance Optimization" }),
-    faqPage(FAQS.map((f) => ({ question: f.q, answer: f.a })), PATH),
-  ],
-};
+const seo = serviceSeo(page);
 ---
 
-<BaseLayout seo={seo}>
-  <WebsitePerformance client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <ServiceHero data={page.hero} variant={page.heroVariant} path={page.path} crumb={page.crumb} />
+
+  <SignatureSlot
+    name="מירוץ האור"
+    title="אותו דף, פעמיים: מי נטען ראשון?"
+    lede="אותו עמוד נטען פעמיים: פעם כמו שהוא בנוי היום, ופעם אחרי שיפור מהירות. קרן האור רצה לאורך כל מסלול בזמן שהדף נטען, והמסך הקטן בסוף בונה את עצמו מול העיניים."
+    hint="הקישו על הכפתור כדי להתחיל. אפשר להחליף לרשת סלולרית חלשה ולהריץ שוב, ולראות מי נפגע יותר."
+    opener="rule"
+    index="01"
+    id="wp-sig"
+  >
+    <LightRace client:visible />
+  </SignatureSlot>
+
+  <LoadWaterfall index="02" />
+
+  <VitalsPlates index="03" />
+
+  <ServiceDeepDive data={page.deepDive!} variant="ledger" tone="paper" opener="split" index="04" label="מה מתקנים" id="wp-deep" />
+
+  <ServiceProcess
+    title={page.process!.title}
+    lede={page.process!.lede}
+    steps={page.process!.steps}
+    tone="bone"
+    opener="numeral"
+    index="05"
+    art={["cobalt-glass", "ultramarine-spill", "kinetic-balance", "amber-sun-stair"]}
+    avoid={[page.hero.art, "indigo-loom", "mobius-brick", "coral-ladders"]}
+    id="wp-process"
+  />
+
+  <ServiceFaq items={page.faqs} title="שאלות על שיפור מהירות אתר" index="06" opener="stacked" id="wp-faq" />
+
+  <ServiceRelated currentPath={page.path} items={page.related} />
+
+  <ServiceCta data={page.cta!} label="הזמנה לבדיקה" />
 </BaseLayout>

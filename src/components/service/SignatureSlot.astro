@@ -1,0 +1,56 @@
+---
+/**
+ * SignatureSlot — the room's live exhibit. Frames the page's own signature island with an
+ * opener ("מוצג חי") and a wall label that says how to use it. Put the island inside:
+ *
+ *   <SignatureSlot name="סרט אחד, שלושה מסכים" title="…" hint="גררו את הידית…">
+ *     <ThreeScreens client:visible />
+ *   </SignatureSlot>
+ *
+ * The island's server-rendered HTML is its no-JS fallback — make that a meaningful static state.
+ */
+import ServiceOpener from "./ServiceOpener.astro";
+import type { OpenerVariant, SectionTone } from "./types";
+import "./service.css";
+
+interface Props {
+  /** The signature's name (from the playbook registry). */
+  name: string;
+  title: string;
+  lede?: string;
+  /** One line: how to use it by touch / pointer. */
+  hint?: string;
+  /** The keyboard sentence — shown only with a fine pointer (never to phone users). */
+  keys?: string;
+  tone?: SectionTone;
+  opener?: OpenerVariant;
+  index?: string;
+  id?: string;
+  /** Let the stage run full container width (default) or narrow (reading width). */
+  width?: "full" | "narrow";
+}
+
+const { name, title, lede, hint, keys, tone = "ink", opener = "rule", index = "מוצג חי", id = "sv-signature", width = "full" } = Astro.props;
+---
+
+<section class:list={["nz-section nz-section--space-default sv-sig", width === "narrow" && "sv-sig--narrow"]} data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant={opener} index={index} label={name} title={title} id={`${id}-title`} lede={lede} />
+    <div class="sv-sig__stage">
+      <slot />
+    </div>
+    {
+      hint && (
+        <p class="nz-museum sv-sig__hint">
+          <span class="nz-museum__head">
+            <span class="nz-museum__index">איך משתמשים</span>
+          </span>
+          <span class="nz-museum__medium">
+            {hint}
+            {keys && <span class="sv-sig__keys"> {keys}</span>}
+          </span>
+        </p>
+      )
+    }
+  </div>
+</section>

@@ -1,0 +1,88 @@
+---
+/**
+ * Illustrated plates between the glossary's letter groups — like the engraved plates in a printed
+ * dictionary, each one draws how a few related terms fit together, and links to their entries.
+ * They break the long list into rooms; hidden while the list is filtered ([data-gl-plate]).
+ * Facts only: everything restates the entries themselves (the Core Web Vitals thresholds are the
+ * "good" values Google publishes, as the entries say).
+ */
+interface Props {
+  kind: "address" | "vitals" | "journey";
+}
+const { kind } = Astro.props;
+---
+
+{
+  kind === "address" && (
+    <figure class="gl-plate gl-plate--address" data-gl-plate>
+      <p class="gl-plate__no">לוח א</p>
+      <div class="gl-plate__art" role="img" aria-label="שרטוט: הגולש מקליד דומיין, ה-DNS מתרגם אותו לכתובת של שרת האחסון, והאתר נטען משם בחיבור מוצפן SSL.">
+        <span class="gl-addr__sign"><bdi>nz-web.com</bdi></span>
+        <span class="gl-addr__wire"><span class="gl-addr__lock">SSL</span></span>
+        <span class="gl-addr__book">DNS</span>
+        <span class="gl-addr__wire" />
+        <span class="gl-addr__house"><span>שרת</span></span>
+      </div>
+      <figcaption class="gl-plate__cap">
+        <span class="gl-plate__title">הכתובת, ספר הטלפונים והבית</span>
+        <span>
+          ה<a href="#term-domain">דומיין</a> הוא הכתובת, ה-<a href="#term-dns">DNS</a> מתרגם אותה לשרת,
+          וה<a href="#term-hosting">אחסון</a> הוא הבית שבו האתר גר. <a href="#term-ssl">SSL</a> מצפין את הדרך ביניהם.
+        </span>
+      </figcaption>
+    </figure>
+  )
+}
+
+{
+  kind === "journey" && (
+    <figure class="gl-plate gl-plate--journey" data-gl-plate>
+      <p class="gl-plate__no">לוח ב</p>
+      <ol class="gl-journey" role="img" aria-label="שרטוט: הדרך של לקוח מחיפוש לפנייה. חיפוש בגוגל או בעוזר AI, עמוד שעונה על השאלה, כפתור קריאה לפעולה, ופנייה שהיא המרה.">
+        <li><span class="gl-journey__n">1</span><span class="gl-journey__t">חיפוש</span><span class="gl-journey__s">גוגל או עוזר AI</span></li>
+        <li><span class="gl-journey__n">2</span><span class="gl-journey__t">עמוד</span><span class="gl-journey__s">שעונה על השאלה</span></li>
+        <li><span class="gl-journey__n">3</span><span class="gl-journey__t gl-journey__t--cta">CTA</span><span class="gl-journey__s">צעד אחד ברור</span></li>
+        <li><span class="gl-journey__n">4</span><span class="gl-journey__t">פנייה</span><span class="gl-journey__s">המרה</span></li>
+      </ol>
+      <figcaption class="gl-plate__cap">
+        <span class="gl-plate__title">מהחיפוש לפנייה</span>
+        <span>
+          <a href="#term-seo">SEO</a> ו-<a href="#term-geo">GEO</a> מביאים את הגולש, <a href="#term-landing-page">דף נחיתה</a> עונה לו,
+          <a href="#term-cta">CTA</a> מראה לו מה לעשות, וכשהוא עושה את זה זו <a href="#term-conversion">המרה</a>.
+        </span>
+      </figcaption>
+    </figure>
+  )
+}
+
+{
+  kind === "vitals" && (
+    <figure class="gl-plate gl-plate--vitals" data-gl-plate>
+      <p class="gl-plate__no">לוח ג</p>
+      <div class="gl-vitals" role="img" aria-label="שרטוט: שלושת מדדי Core Web Vitals. LCP, טעינת האלמנט הגדול, טוב עד 2.5 שניות. INP, תגובה ללחיצה, טוב עד 200 אלפיות שנייה. CLS, קפיצות בעמוד, טוב עד 0.1. הספים לפי גוגל.">
+        <div class="gl-vital">
+          <span class="gl-vital__k">LCP</span>
+          <span class="gl-vital__sk gl-vital__sk--lcp"><i /><b /><b /></span>
+          <span class="gl-vital__v">עד <bdi>2.5</bdi> שניות</span>
+        </div>
+        <div class="gl-vital">
+          <span class="gl-vital__k">INP</span>
+          <span class="gl-vital__sk gl-vital__sk--inp"><i /><b /></span>
+          <span class="gl-vital__v">עד <bdi>200</bdi> אלפיות</span>
+        </div>
+        <div class="gl-vital">
+          <span class="gl-vital__k">CLS</span>
+          <span class="gl-vital__sk gl-vital__sk--cls"><i /><b /><b /></span>
+          <span class="gl-vital__v">עד <bdi>0.1</bdi></span>
+        </div>
+      </div>
+      <figcaption class="gl-plate__cap">
+        <span class="gl-plate__title">שלושת המדדים של גוגל</span>
+        <span>
+          <a href="#term-core-web-vitals">Core Web Vitals</a>: <a href="#term-lcp">LCP</a> מודד טעינה, <a href="#term-inp">INP</a> תגובה
+          ו-<a href="#term-cls">CLS</a> יציבות. הערכים הם הספים שגוגל מגדיר כ"טובים".
+        </span>
+      </figcaption>
+    </figure>
+  )
+}

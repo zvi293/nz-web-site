@@ -1,0 +1,111 @@
+---
+/**
+ * The document itself, typeset for reading on a paper surface: a table of contents (a <details>
+ * on phones, a sticky rail with a reading-progress hairline on desktop), numbered sections with
+ * serif heads, and room for an exhibit inside a section through named slots:
+ *   <Fragment slot="after-ip">…</Fragment>   (rendered at the end of the section with id "ip")
+ * Section ids come from site-settings and are the anchors other pages link to (/terms/#ip).
+ * `notes` (optional, by section id): a one-line plain-language note that opens the section.
+ */
+import type { LegalPageSection } from "@/content/types";
+import { parseBlocks, nobrParts } from "./content";
+
+interface Props {
+  sections: LegalPageSection[];
+  /** Accessible name of the document region, e.g. "מדיניות הפרטיות, הנוסח המלא". */
+  label: string;
+  updated: string;
+  notes?: Record<string, string>;
+}
+const { sections, label, updated, notes = {} } = Astro.props;
+const slotHtml: Record<string, string> = {};
+for (const s of sections) {
+  const name = `after-${s.id}`;
+  if (Astro.slots.has(name)) slotHtml[s.id] = await Astro.slots.render(name);
+}
+const two = (n: number) => String(n).padStart(2, "0");
+---
+
+<section class="nz-section nz-section--space-default lg-doc" data-tone="paper" aria-labelledby="lg-doc-title">
+  <div class="nz-container lg-doc__grid">
+    <aside class="lg-toc" aria-label="תוכן העניינים">
+      <div class="lg-toc__sticky">
+        <p class="lg-toc__title" id="lg-toc-title">תוכן העניינים</p>
+        <details class="lg-toc__details">
+          <summary class="lg-toc__summary">
+            <span>תוכן העניינים</span>
+            <span class="lg-toc__count">{sections.length} סעיפים</span>
+            <span class="lg-toc__chev" aria-hidden="true"></span>
+          </summary>
+          <ol class="lg-toc__list">
+            {
+              sections.map((s, i) => (
+                <li>
+                  <a href={`#${s.id}`} class="lg-toc__link">
+                    <span class="lg-toc__num">{two(i + 1)}</span>
+                    <span>{s.title}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+        </details>
+        <nav class="lg-toc__rail" aria-labelledby="lg-toc-title">
+          <ol class="lg-toc__list">
+            {
+              sections.map((s, i) => (
+                <li>
+                  <a href={`#${s.id}`} class="lg-toc__link">
+                    <span class="lg-toc__num">{two(i + 1)}</span>
+                    <span>{s.title}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+        </nav>
+        <span class="lg-toc__progress" aria-hidden="true"><span class="lg-toc__progress-fill"></span></span>
+      </div>
+    </aside>
+
+    <article class="lg-doc__body" aria-labelledby="lg-doc-title">
+      <h2 id="lg-doc-title" class="nz-sr">{label}</h2>
+      {
+        sections.map((s, i) => (
+          <section id={s.id} class="lg-sec" aria-labelledby={`lg-sec-${s.id}`}>
+            <h3 id={`lg-sec-${s.id}`} class="lg-sec__head">
+              <span class="lg-sec__num">§ {two(i + 1)}</span>
+              <span class="lg-sec__title">{s.title}</span>
+            </h3>
+            {notes[s.id] && (
+              <p class="lg-sec__plain">
+                <span class="lg-sec__plain-k">בשורה אחת</span>
+                <span class="lg-sec__plain-v">
+                  {nobrParts(notes[s.id]).map((p) => (p.ltr ? <bdi dir="ltr">{p.t}</bdi> : p.t))}
+                </span>
+              </p>
+            )}
+            <div class="lg-sec__body">
+              {parseBlocks(s.content).map((b) =>
+                b.type === "p" ? (
+                  <p>{nobrParts(b.text).map((p) => (p.ltr ? <bdi dir="ltr" class={p.nobr ? (p.long ? "lg-nobr lg-nobr--long" : "lg-nobr") : undefined}>{p.t}</bdi> : p.t))}</p>
+                ) : (
+                  <ul>
+                    {b.items.map((it) => (
+                      <li>{nobrParts(it).map((p) => (p.ltr ? <bdi dir="ltr" class={p.nobr ? (p.long ? "lg-nobr lg-nobr--long" : "lg-nobr") : undefined}>{p.t}</bdi> : p.t))}</li>
+                    ))}
+                  </ul>
+                ),
+              )}
+            </div>
+            {slotHtml[s.id] && <Fragment set:html={slotHtml[s.id]} />}
+          </section>
+        ))
+      }
+      <p class="lg-doc__end">
+        <span class="nzc-cube" aria-hidden="true"></span>
+        סוף המסמך · עודכן לאחרונה ב-{updated}
+      </p>
+    </article>
+  </div>
+</section>

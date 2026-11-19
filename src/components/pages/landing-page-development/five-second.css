@@ -1,0 +1,633 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   מבחן חמש השניות (FiveSecondTest) — prefix fsec-. Lives on a bone SignatureSlot.
+   Phone: the framed screen on top, the panel under it. Desktop: panel ⟷ screen.
+   The sample pages (fsec-pg) are drawn in container units: 1u = 1/320 of the screen.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.fsec {
+  display: grid;
+  gap: 22px;
+  scroll-margin-top: calc(var(--header-h) + 12px);
+}
+.fsec__stage {
+  display: grid;
+  gap: 12px;
+}
+.fsec__frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  max-width: 540px;
+  margin-inline: auto;
+  border: 10px solid var(--ink);
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(18, 17, 16, 0.4), 0 30px 50px -30px rgba(18, 17, 16, 0.55), 0 6px 14px -8px rgba(18, 17, 16, 0.35);
+  overflow: hidden;
+}
+.fsec__screen {
+  position: absolute;
+  inset: 0;
+  container-type: inline-size;
+  overflow: hidden;
+  background: #fff;
+}
+.fsec__shutter {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  /* a roller blind: slats with a little light between them */
+  background:
+    radial-gradient(120% 70% at 50% 0%, rgba(255, 252, 246, 0.55), transparent 60%),
+    repeating-linear-gradient(to bottom, #e8e1d6 0 21px, #cfc6b8 21px 22px, #f1ebe2 22px 24px);
+  color: var(--ink);
+  clip-path: inset(0 0 0 0);
+}
+.fsec__shutter::after {
+  /* the blind's pull */
+  content: "";
+  position: absolute;
+  bottom: 14px;
+  inset-inline-start: 50%;
+  width: 34px;
+  height: 6px;
+  margin-inline-start: -17px;
+  border-radius: 3px;
+  background: var(--ink);
+}
+.fsec__shutter-plate {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 18px 30px 16px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--line), 0 18px 30px -18px rgba(18, 17, 16, 0.45);
+}
+.fsec.is-open .fsec__shutter {
+  clip-path: inset(0 0 100% 0);
+}
+html.nz-motion .fsec__shutter {
+  transition: clip-path 0.7s var(--ease-gallery);
+}
+.fsec__shutter-n {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(4.5rem, 22vw, 7rem);
+  line-height: 0.9;
+}
+.fsec__shutter-k {
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  color: var(--graphite);
+}
+.fsec__plane {
+  position: absolute;
+  width: 52px;
+  inset-inline-end: 14%;
+  top: 18%;
+  transform: rotate(-8deg);
+  filter: drop-shadow(0 8px 6px rgba(18, 17, 16, 0.18));
+}
+.fsec__timer {
+  width: 100%;
+  max-width: 540px;
+  margin-inline: auto;
+  height: 3px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.fsec__bar {
+  display: block;
+  height: 100%;
+  background: var(--vermilion);
+  transform: scaleX(0);
+  transform-origin: 0% 50%;
+}
+.fsec__bar.is-running {
+  transform: scaleX(1);
+}
+html.nz-motion .fsec__bar.is-running {
+  animation: fsec-time 5s linear both;
+}
+@keyframes fsec-time {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* ── the panel ─────────────────────────────────────────────────────────── */
+.fsec__panel {
+  min-height: 25.5rem;
+}
+.fsec__step {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+html.nz-motion .fsec__step {
+  animation: fsec-in 0.6s var(--ease-gallery) both;
+}
+@keyframes fsec-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.fsec__k {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+  align-self: stretch;
+}
+.fsec__k-n {
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+.fsec__t {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.875rem, 1.5rem + 1.6vw, 3rem);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.fsec__t:focus {
+  outline: none; /* a heading that receives focus programmatically, not a control */
+}
+.fsec__p {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--fg-muted);
+  max-width: 34rem;
+  text-wrap: pretty;
+}
+.fsec__go {
+  margin-top: 6px;
+}
+.fsec__count {
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+.fsec__num {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 6.5rem;
+  line-height: 0.8;
+  color: var(--vermilion-deep);
+  font-variant-numeric: tabular-nums;
+  min-width: 0.6em;
+  text-align: center;
+}
+.fsec__opts {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  margin-top: 4px;
+}
+.fsec__opt {
+  min-height: 52px;
+  padding: 12px 22px;
+  text-align: start;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid rgba(18, 17, 16, 0.22);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease-gallery), background-color 0.3s var(--ease-gallery), transform 0.3s var(--ease-gallery);
+}
+.fsec__opt:hover {
+  border-color: var(--ink);
+  background: #fff;
+  transform: translateY(-1px);
+}
+.fsec__opt:focus-visible,
+.fsec__quiet:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.fsec__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--bone-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.fsec__tag-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--vermilion);
+}
+.fsec__tag.is-ok .fsec__tag-dot {
+  background: var(--ink);
+  box-shadow: 0 0 0 3px rgba(18, 17, 16, 0.12);
+}
+.fsec__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 22px;
+  margin-top: 6px;
+}
+.fsec__quiet {
+  min-height: 44px;
+  padding: 0;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-decoration-color: var(--vermilion);
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1.5px;
+  cursor: pointer;
+}
+.fsec__sum {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+.fsec__sum li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--paper);
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--line);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+}
+.fsec__sum-k {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+}
+.fsec__lessons {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: fl;
+  display: grid;
+  gap: 8px;
+}
+.fsec__lessons li {
+  counter-increment: fl;
+  display: flex;
+  gap: 12px;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.fsec__lessons li::before {
+  content: counter(fl, decimal-leading-zero);
+  flex: none;
+  font-size: 0.8125rem;
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+  padding-top: 2px;
+}
+
+/* ── done: both pages side by side ────────────────────────────────────── */
+.fsec__pair {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px;
+  background: var(--bone-2);
+}
+.fsec__mini {
+  position: relative;
+  container-type: inline-size;
+  background: #fff;
+  overflow: hidden;
+  align-self: center;
+  aspect-ratio: 4 / 5;
+  box-shadow: 0 8px 18px -10px rgba(18, 17, 16, 0.45);
+}
+.fsec__mini:first-child::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(239, 234, 226, 0.25);
+}
+
+/* ── the sample pages ─────────────────────────────────────────────────── */
+.fsec-pg {
+  --u: calc(100cqw / 320);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  overflow: hidden;
+}
+.fsec-pg__logo {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: calc(14 * var(--u));
+}
+/* busy */
+.fsec-pg--busy {
+  background: #f4f2ee;
+}
+.fsec-pg__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(8 * var(--u));
+  padding: calc(10 * var(--u)) calc(12 * var(--u));
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+.fsec-pg__menu {
+  display: flex;
+  gap: calc(7 * var(--u));
+  font-size: calc(8 * var(--u));
+  color: #6b655d;
+}
+.fsec-pg__banner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: calc(6 * var(--u));
+  padding: calc(16 * var(--u)) calc(14 * var(--u)) calc(22 * var(--u));
+  background: #cfd6d8;
+  color: #23303a;
+}
+.fsec-pg__bh {
+  font-weight: 700;
+  font-size: calc(17 * var(--u));
+  line-height: 1.15;
+}
+.fsec-pg__bs {
+  font-size: calc(9.5 * var(--u));
+}
+.fsec-pg__brow {
+  display: flex;
+  gap: calc(6 * var(--u));
+}
+.fsec-pg__chip {
+  display: inline-block;
+  align-self: flex-start;
+  padding: calc(4 * var(--u)) calc(10 * var(--u));
+  border-radius: calc(3 * var(--u));
+  background: #3f6e8c;
+  color: #fff;
+  font-size: calc(8.5 * var(--u));
+}
+.fsec-pg__chip--o {
+  background: transparent;
+  color: #23303a;
+  box-shadow: inset 0 0 0 1px #23303a;
+}
+.fsec-pg__dots {
+  position: absolute;
+  bottom: calc(8 * var(--u));
+  inset-inline-start: 50%;
+  width: calc(36 * var(--u));
+  height: calc(5 * var(--u));
+  transform: translateX(50%);
+  background: radial-gradient(circle, #23303a 0 45%, transparent 50%) 0 0 / calc(9 * var(--u)) 100%;
+  opacity: 0.5;
+}
+.fsec-pg__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(6 * var(--u));
+  padding: calc(12 * var(--u));
+}
+.fsec-pg__card {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4 * var(--u));
+  padding: calc(30 * var(--u)) calc(6 * var(--u)) calc(8 * var(--u));
+  background: #fff;
+  border: 1px solid #e2dfda;
+  font-size: calc(8 * var(--u));
+  color: #6b655d;
+}
+.fsec-pg__card b {
+  font-size: calc(9 * var(--u));
+  color: #23303a;
+}
+.fsec-pg__lines {
+  margin: 0 calc(12 * var(--u));
+  height: calc(40 * var(--u));
+  background: repeating-linear-gradient(#d8d4ce 0 calc(3 * var(--u)), transparent calc(3 * var(--u)) calc(9 * var(--u)));
+}
+.fsec-pg__popup {
+  position: absolute;
+  inset-inline-end: calc(14 * var(--u));
+  bottom: calc(40 * var(--u));
+  width: calc(170 * var(--u));
+  display: flex;
+  flex-direction: column;
+  gap: calc(5 * var(--u));
+  padding: calc(12 * var(--u));
+  background: #fff;
+  border-radius: calc(4 * var(--u));
+  box-shadow: 0 calc(8 * var(--u)) calc(24 * var(--u)) rgba(0, 0, 0, 0.28);
+  font-size: calc(8.5 * var(--u));
+  color: #555;
+}
+.fsec-pg__popup b {
+  font-size: calc(11 * var(--u));
+  color: #222;
+}
+.fsec-pg__x {
+  position: absolute;
+  inset-inline-end: calc(8 * var(--u));
+  top: calc(4 * var(--u));
+  font-size: calc(12 * var(--u));
+  color: #999;
+}
+.fsec-pg__chat {
+  position: absolute;
+  inset-inline-start: calc(12 * var(--u));
+  bottom: calc(12 * var(--u));
+  display: grid;
+  place-items: center;
+  width: calc(40 * var(--u));
+  height: calc(40 * var(--u));
+  border-radius: 50%;
+  background: #3f6e8c;
+  color: #fff;
+  font-size: calc(8 * var(--u));
+}
+/* clear */
+.fsec-pg--clear {
+  gap: calc(8 * var(--u));
+  padding: calc(14 * var(--u)) calc(18 * var(--u)) 0;
+  background: var(--paper);
+}
+.fsec-pg__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: calc(8 * var(--u));
+  border-bottom: 1px solid var(--line);
+  margin-bottom: calc(6 * var(--u));
+}
+.fsec-pg__call {
+  padding: calc(4 * var(--u)) calc(10 * var(--u));
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--ink);
+  font-size: calc(9 * var(--u));
+}
+.fsec-pg__kick {
+  font-size: calc(9.5 * var(--u));
+  letter-spacing: 0.06em;
+  color: var(--vermilion-deep);
+}
+.fsec-pg__h {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: calc(27 * var(--u));
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.fsec-pg__sub {
+  font-size: calc(10.5 * var(--u));
+  line-height: 1.5;
+  color: var(--graphite);
+}
+.fsec-pg__cta {
+  margin-top: calc(4 * var(--u));
+  padding: calc(9 * var(--u)) 0;
+  text-align: center;
+  border-radius: 999px;
+  background: var(--vermilion-fill);
+  color: #fff;
+  font-size: calc(11.5 * var(--u));
+  font-weight: 500;
+}
+.fsec-pg__wa {
+  text-align: center;
+  font-size: calc(9 * var(--u));
+  color: var(--graphite);
+  text-decoration: underline;
+}
+.fsec-pg__art {
+  display: block;
+  width: calc(100% + 36 * var(--u));
+  margin-inline: calc(-18 * var(--u));
+  margin-top: auto;
+  height: auto;
+}
+
+/* ── phones: while the page is closed, the frame folds to a shutter strip ── */
+@media (max-width: 1023px) {
+  .fsec--ask .fsec__frame,
+  .fsec--verdict:not(.is-open) .fsec__frame {
+    aspect-ratio: auto;
+    height: 112px;
+  }
+  .fsec--ask .fsec__shutter-plate,
+  .fsec--verdict:not(.is-open) .fsec__shutter-plate {
+    grid-auto-flow: column;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 20px;
+  }
+  .fsec--ask .fsec__shutter-n,
+  .fsec--verdict:not(.is-open) .fsec__shutter-n {
+    font-size: 2.75rem;
+  }
+  .fsec--ask .fsec__plane,
+  .fsec--verdict:not(.is-open) .fsec__plane,
+  .fsec--ask .fsec__shutter::after,
+  .fsec--verdict:not(.is-open) .fsec__shutter::after {
+    display: none;
+  }
+  .fsec__panel {
+    min-height: 0;
+  }
+}
+
+/* ── no JS: the end of the test as a still ─────────────────────────────── */
+.fsec__static {
+  display: none;
+  margin: 0;
+  gap: 22px;
+}
+.fsec__frame--still {
+  aspect-ratio: 8 / 5;
+  max-width: 640px;
+}
+html:not(.js) .fsec__static {
+  display: grid;
+}
+html:not(.js) .fsec__stage,
+html:not(.js) .fsec__panel {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .fsec__static {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 640px);
+    column-gap: clamp(48px, 7vw, 120px);
+    align-items: center;
+  }
+  .fsec__frame--still {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+  }
+  .fsec {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 540px);
+    column-gap: clamp(48px, 7vw, 120px);
+    align-items: center;
+  }
+  .fsec__stage {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .fsec__panel {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 0;
+  }
+  .fsec__num {
+    font-size: 9rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fsec *,
+  .fsec *::before,
+  .fsec *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

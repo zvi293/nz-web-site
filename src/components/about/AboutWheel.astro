@@ -1,0 +1,425 @@
+---
+// Signature component: מהאפר לכלי — flick-to-spin potter's wheel (momentum builds the vessel)
+/**
+ * The potter's wheel. A lump of ash-grey clay sits on a wheel head; the visitor throws it into
+ * a vessel by spinning the wheel: drag/flick it sideways (touch or mouse; the wheel keeps
+ * turning with momentum and slows down), or press the button (one stage per press). The turns
+ * themselves do the work: every ~1½ turns the clay passes one stage of throwing (מרכזים →
+ * פותחים → מושכים → מהדקים → שורפים), its silhouette morphs (lump → dome → open bowl → tall
+ * cylinder → vase), and the matching line of the log lights: each stage is also a stage of
+ * building the site (הקשבה → אפיון → עיצוב → קוד → השקה). The last stage fires it: the clay
+ * glows like an ember and cools into a bone-white glaze with a vermilion lip.
+ *
+ * Small bundled vanilla script (no React, no libraries); rAF runs only while the wheel turns.
+ * Accessibility: a real button drives it (one stage per press), the figure's label and a
+ * polite live region say the stage in words, the current log item has aria-current="step".
+ * No JS: the finished vessel and the whole log are shown. Reduced motion / a11y pause: the
+ * button and drag still work, but every change is instant (no momentum, no nudge).
+ */
+import { aboutWheel as w } from "@/content/about";
+
+const n = w.stages.length;
+const CX = 200;
+const BASE = 318;
+/* The finished vessel (server render = the no-JS state). Same math as the script below. */
+const K4: [number, number][] = [
+  [56, 0], [78, 28], [92, 64], [92, 100], [80, 136], [56, 168], [40, 192], [42, 210], [52, 224],
+];
+function outline(pts: [number, number][]) {
+  const R = pts.map(([r, h]) => [CX + r, BASE - h]);
+  const L = pts.map(([r, h]) => [CX - r, BASE - h]).reverse();
+  const curve = (P: number[][]) => {
+    let d = "";
+    for (let i = 0; i < P.length - 1; i++) {
+      const p0 = P[i - 1] ?? P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] ?? P[i + 1];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+    }
+    return d;
+  };
+  return `M${L[L.length - 1][0]} ${L[L.length - 1][1]} L${R[0][0]} ${R[0][1]}${curve(R)} L${L[0][0]} ${L[0][1]}${curve(L)} Z`;
+}
+const finalD = outline(K4);
+const top = K4[K4.length - 1];
+const stagesJson = JSON.stringify(w.stages.map((s) => ({ verb: s.verb, work: s.work })));
+---
+
+<section class="nz-section nz-section--space-default ab-wheel" data-tone="ink" aria-labelledby="ab-wheel-title">
+  <div class="nz-container ab-wheel__grid">
+    <header class="ab-wheel__head">
+      <p class="nz-label ab-wheel__room">
+        <span class="nz-label__index">{w.room}</span>
+        <span>{w.label}</span>
+      </p>
+      <h2 id="ab-wheel-title" class="nz-display nz-display--h2 ab-wheel__title">{w.title}</h2>
+      <p class="nz-lede ab-wheel__lede">{w.lede}</p>
+    </header>
+
+    <div class="ab-wheel__stage" data-ab-wheel data-stages={stagesJson} data-done={w.done} data-done-work={w.doneWork} data-spin={w.spin} data-again={w.again}>
+      <figure class="ab-wheel__fig">
+        <p class="ab-wheel__caption" aria-hidden="true">
+          <span class="ab-wheel__count" data-ab-count>{w.done}</span>
+          <span class="ab-wheel__verb" data-ab-verb>{w.doneWork}</span>
+        </p>
+        <svg class="ab-wheel__svg" viewBox="0 0 400 400" role="img" aria-label={`כלי על האבניים: ${w.done}`} data-ab-svg>
+          <defs>
+            <linearGradient id="ab-shade" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stop-color="#000" stop-opacity="0.5"></stop>
+              <stop offset="0.38" stop-color="#fff" stop-opacity="0.16"></stop>
+              <stop offset="0.55" stop-color="#fff" stop-opacity="0.04"></stop>
+              <stop offset="1" stop-color="#000" stop-opacity="0.58"></stop>
+            </linearGradient>
+            <radialGradient id="ab-light" cx="0.5" cy="0.42" r="0.5">
+              <stop offset="0" stop-color="#efeae2" stop-opacity="0.13"></stop>
+              <stop offset="1" stop-color="#efeae2" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <rect x="0" y="0" width="400" height="400" fill="url(#ab-light)"></rect>
+          <!-- floor shadow + the wheel's body -->
+          <ellipse cx="200" cy="378" rx="170" ry="14" fill="#000" opacity="0.45"></ellipse>
+          <path class="ab-wheel__pan" d="M88 340 L312 340 L292 372 L108 372 Z"></path>
+          <!-- wheel head: side band, top face, turning marks -->
+          <path class="ab-wheel__side" d="M50 318 A150 26 0 0 0 350 318 L350 332 A150 26 0 0 1 50 332 Z"></path>
+          <ellipse class="ab-wheel__head-top" cx="200" cy="318" rx="150" ry="26"></ellipse>
+          <ellipse class="ab-wheel__ticks" cx="200" cy="318" rx="128" ry="21" pathLength="360" data-ab-ticks></ellipse>
+          <!-- the clay -->
+          <path class="ab-clay__glow" d={finalD} data-ab-glow></path>
+          <path class="ab-clay__body" d={finalD} fill="#ebe4d9" data-ab-body></path>
+          <path class="ab-clay__shade" d={finalD} fill="url(#ab-shade)" data-ab-shade></path>
+          <g class="ab-clay__specks" data-ab-specks>
+            <rect width="3" height="9" rx="1.5"></rect>
+            <rect width="3" height="7" rx="1.5"></rect>
+            <rect width="3" height="11" rx="1.5"></rect>
+            <rect width="3" height="6" rx="1.5"></rect>
+            <rect width="3" height="8" rx="1.5"></rect>
+            <rect width="3" height="10" rx="1.5"></rect>
+          </g>
+          <ellipse class="ab-clay__mouth" cx="200" cy={BASE - top[1]} rx={top[0]} ry={top[0] * 0.2} fill="#c9461f" data-ab-mouth></ellipse>
+        </svg>
+      </figure>
+
+      <div class="ab-wheel__controls">
+        <button type="button" class="ab-wheel__spin" data-ab-spin aria-describedby="ab-wheel-hint">
+          <span class="ab-wheel__spin-icon" aria-hidden="true"></span>
+          <span data-ab-spin-label>{w.spin}</span>
+        </button>
+        <p class="ab-wheel__hint" id="ab-wheel-hint">{w.hint}</p>
+      </div>
+      <p class="nz-sr" aria-live="polite" data-ab-live></p>
+    </div>
+
+    <div class="ab-wheel__logwrap">
+      <p class="nz-label ab-wheel__loglabel" id="ab-wheel-log">{w.logLabel}</p>
+      <ol class="ab-log" aria-labelledby="ab-wheel-log" data-ab-log>
+        {
+          w.stages.map((s, i) => (
+            <li class="ab-log__item" data-state="done">
+              <span class="ab-log__dot" aria-hidden="true" />
+              <p class="ab-log__name">
+                <span class="ab-log__n" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                <span class="ab-log__verb">{s.verb}</span>
+                <span class="ab-log__work">· {s.work}</span>
+              </p>
+              <p class="ab-log__line">{s.line}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="ab-wheel__sig">
+        <span class="ab-wheel__name">{w.signature}</span>
+        <span class="nz-label">
+          <span class="ab-cube" aria-hidden="true"></span>
+          <span>{w.signatureRole} <bdi dir="ltr">NZ-web</bdi></span>
+        </span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  /* מהאפר לכלי — the wheel. No scroll listeners; rAF only while it turns. */
+  type Pt = [number, number];
+  const CX = 200;
+  const BASE = 318;
+  const DEG_PER_STAGE = 540;
+  /* silhouettes after each stage: lump, centred dome, opened bowl, pulled cylinder, vase (= fired) */
+  const K: Pt[][] = [
+    [[92, 0], [96, 14], [94, 30], [86, 46], [74, 60], [58, 72], [40, 82], [20, 89], [0, 92]],
+    [[78, 0], [80, 18], [78, 40], [72, 62], [62, 84], [50, 102], [36, 116], [20, 125], [0, 128]],
+    [[84, 0], [88, 16], [90, 34], [90, 52], [89, 68], [88, 82], [87, 94], [86, 104], [84, 110]],
+    [[70, 0], [72, 30], [72, 62], [71, 94], [70, 126], [69, 158], [68, 186], [67, 208], [66, 224]],
+    [[56, 0], [78, 28], [92, 64], [92, 100], [80, 136], [56, 168], [40, 192], [42, 210], [52, 224]],
+    [[56, 0], [78, 28], [92, 64], [92, 100], [80, 136], [56, 168], [40, 192], [42, 210], [52, 224]],
+  ];
+  const SPECKS: [number, number][] = [
+    [0.12, 0.3], [0.3, 2.1], [0.45, 4.0], [0.6, 1.2], [0.78, 3.1], [0.9, 5.2],
+  ];
+
+  const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+  const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const mix = (a: string, b: string, t: number) => {
+    const A = hex(a), B = hex(b);
+    return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * Math.min(1, Math.max(0, t)))).join(",")})`;
+  };
+  /** colour ramps along p (0–5): [p, body, mouth] */
+  const RAMP: [number, string, string][] = [
+    [0, "#77716a", "#2e2a26"],
+    [1, "#8a6b55", "#3a2c23"],
+    [3, "#946f55", "#3a2c23"],
+    [4, "#a07f66", "#4a3427"],
+    [4.5, "#e2622d", "#7a2a12"],
+    [5, "#ebe4d9", "#c9461f"],
+  ];
+  const ramp = (p: number, k: 1 | 2) => {
+    for (let i = 0; i < RAMP.length - 1; i++) {
+      const [a, b] = [RAMP[i], RAMP[i + 1]];
+      if (p <= b[0]) return mix(a[k], b[k], (p - a[0]) / (b[0] - a[0]));
+    }
+    return RAMP[RAMP.length - 1][k];
+  };
+
+  function profile(p: number): Pt[] {
+    const i = Math.min(4, Math.floor(p));
+    const t = ease(Math.min(1, p - i));
+    return K[i].map(([r, h], j) => [r + (K[i + 1][j][0] - r) * t, h + (K[i + 1][j][1] - h) * t]);
+  }
+  function outline(pts: Pt[]) {
+    const R = pts.map(([r, h]) => [CX + r, BASE - h]);
+    const L = pts.map(([r, h]) => [CX - r, BASE - h]).reverse();
+    const curve = (P: number[][]) => {
+      let d = "";
+      for (let i = 0; i < P.length - 1; i++) {
+        const p0 = P[i - 1] ?? P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] ?? P[i + 1];
+        d += ` C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)} ${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)} ${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+      }
+      return d;
+    };
+    return `M${L[L.length - 1][0].toFixed(1)} ${L[L.length - 1][1].toFixed(1)} L${R[0][0].toFixed(1)} ${R[0][1].toFixed(1)}${curve(R)} L${L[0][0].toFixed(1)} ${L[0][1].toFixed(1)}${curve(L)} Z`;
+  }
+  /** half-width of the profile at height h (linear between samples) */
+  function radiusAt(pts: Pt[], h: number) {
+    for (let j = 0; j < pts.length - 1; j++) {
+      if (h <= pts[j + 1][1]) {
+        const t = (h - pts[j][1]) / Math.max(0.001, pts[j + 1][1] - pts[j][1]);
+        return pts[j][0] + (pts[j + 1][0] - pts[j][0]) * t;
+      }
+    }
+    return pts[pts.length - 1][0];
+  }
+
+  const root = document.querySelector<HTMLElement>("[data-ab-wheel]");
+  if (root) {
+    const q = <T extends Element>(s: string) => root.querySelector<T>(s)!;
+    const svg = q<SVGSVGElement>("[data-ab-svg]");
+    const body = q<SVGPathElement>("[data-ab-body]");
+    const shade = q<SVGPathElement>("[data-ab-shade]");
+    const glow = q<SVGPathElement>("[data-ab-glow]");
+    const mouth = q<SVGEllipseElement>("[data-ab-mouth]");
+    const ticks = q<SVGEllipseElement>("[data-ab-ticks]");
+    const specks = Array.from(root.querySelectorAll<SVGRectElement>("[data-ab-specks] rect"));
+    const btn = q<HTMLButtonElement>("[data-ab-spin]");
+    const btnLabel = q<HTMLElement>("[data-ab-spin-label]");
+    const count = q<HTMLElement>("[data-ab-count]");
+    const verb = q<HTMLElement>("[data-ab-verb]");
+    const live = q<HTMLElement>("[data-ab-live]");
+    const fig = q<HTMLElement>(".ab-wheel__fig");
+    const log = Array.from(document.querySelectorAll<HTMLElement>("[data-ab-log] > li"));
+    const stages: { verb: string; work: string }[] = JSON.parse(root.dataset.stages || "[]");
+    const N = stages.length;
+    const motionOn = () => document.documentElement.classList.contains("nz-motion");
+
+    let p = 0;
+    let angle = 0;
+    let v = 0; // deg/s
+    let dragging = false;
+    let lastX = 0;
+    let lastT = 0;
+    let free = false; // a spin that does not work the clay (the first-view nudge)
+    let tween: { from: number; to: number; t0: number; dur: number; a0: number; a1: number } | null = null;
+    let raf = 0;
+    let shownStage = -1;
+
+    const stageOf = (x: number) => (x >= N - 0.001 ? N : Math.floor(x));
+
+    function render() {
+      const pts = profile(Math.min(5, p));
+      const d = outline(pts);
+      body.setAttribute("d", d);
+      shade.setAttribute("d", d);
+      glow.setAttribute("d", d);
+      body.setAttribute("fill", ramp(p, 1));
+      const top = pts[pts.length - 1];
+      mouth.setAttribute("cy", String(BASE - top[1]));
+      mouth.setAttribute("rx", top[0].toFixed(1));
+      mouth.setAttribute("ry", (top[0] * 0.2).toFixed(1));
+      mouth.setAttribute("fill", ramp(p, 2));
+      glow.style.opacity = String(Math.max(0, 1 - Math.abs(p - 4.5) / 0.5) * 0.95);
+      ticks.style.strokeDashoffset = String(-angle % 360);
+      const rad = (angle * Math.PI) / 180;
+      const height = top[1];
+      const glazed = p > 4.4;
+      specks.forEach((s, i) => {
+        const [fh, ph] = SPECKS[i];
+        const h = height * fh;
+        const r = radiusAt(pts, h) - 4;
+        const a = rad + ph;
+        const front = Math.cos(a);
+        const vis = !glazed && r > 6 && front > 0;
+        s.style.opacity = vis ? String(Math.min(1, front * 1.4) * 0.7) : "0";
+        s.setAttribute("x", (CX + r * Math.sin(a) - 1.5).toFixed(1));
+        s.setAttribute("y", (BASE - h - 4).toFixed(1));
+      });
+
+      const st = stageOf(p);
+      if (st !== shownStage) {
+        shownStage = st;
+        log.forEach((li, i) => {
+          const state = i < st ? "done" : i === st ? "current" : "todo";
+          li.dataset.state = state;
+          if (state === "current") li.setAttribute("aria-current", "step");
+          else li.removeAttribute("aria-current");
+        });
+        if (st >= N) {
+          count.textContent = root!.dataset.done || "";
+          verb.textContent = root!.dataset.doneWork || "";
+          btnLabel.textContent = root!.dataset.again || "";
+          svg.setAttribute("aria-label", `כלי על האבניים: ${root!.dataset.done}, ${root!.dataset.doneWork}`);
+        } else {
+          count.textContent = `${String(st + 1).padStart(2, "0")} / ${String(N).padStart(2, "0")}`;
+          verb.textContent = `${stages[st].verb} · ${stages[st].work}`;
+          btnLabel.textContent = root!.dataset.spin || "";
+          svg.setAttribute("aria-label", `כלי על האבניים, שלב ${st + 1} מתוך ${N}: ${stages[st].verb}, ${stages[st].work}`);
+        }
+        root!.dataset.stage = String(st);
+      }
+    }
+
+    function announce() {
+      const st = stageOf(p);
+      live.textContent =
+        st >= N
+          ? `${root!.dataset.done}: ${root!.dataset.doneWork}.`
+          : `שלב ${st + 1} מתוך ${N}: ${stages[st].verb}, ${stages[st].work}.`;
+    }
+
+    function frame(now: number) {
+      const dt = Math.min(0.05, (now - lastT) / 1000 || 0.016);
+      lastT = now;
+      let active = false;
+      if (tween) {
+        const t = Math.min(1, (now - tween.t0) / tween.dur);
+        const e = ease(t);
+        p = tween.from + (tween.to - tween.from) * e;
+        angle = tween.a0 + (tween.a1 - tween.a0) * e;
+        if (t >= 1) {
+          tween = null;
+          announce();
+        } else active = true;
+      } else if (!dragging && Math.abs(v) > 6) {
+        const da = v * dt;
+        angle += da;
+        if (!free && p < N) {
+          const before = stageOf(p);
+          p = Math.min(N, p + Math.abs(da) / DEG_PER_STAGE);
+          if (stageOf(p) !== before) announce();
+        }
+        v *= Math.exp(-dt * 1.35);
+        active = true;
+      } else if (dragging) active = true;
+      else free = false;
+      render();
+      raf = active ? requestAnimationFrame(frame) : 0;
+    }
+    const run = () => {
+      if (!raf) {
+        lastT = performance.now();
+        raf = requestAnimationFrame(frame);
+      }
+    };
+
+    /* the button: one stage per press; at the end, throw a new vessel */
+    btn.addEventListener("click", () => {
+      v = 0;
+      free = false;
+      const from = p;
+      const to = p >= N - 0.001 ? 0 : Math.min(N, Math.floor(p + 0.0001) + 1);
+      if (!motionOn()) {
+        p = to;
+        render();
+        announce();
+        return;
+      }
+      const back = to < from;
+      tween = {
+        from,
+        to,
+        t0: performance.now(),
+        dur: back ? 700 : 1300,
+        a0: angle,
+        a1: angle + (back ? -200 : DEG_PER_STAGE * Math.max(0.4, to - from)),
+      };
+      run();
+    });
+
+    /* drag / flick the wheel sideways (vertical drags keep scrolling the page: touch-action) */
+    fig.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      dragging = true;
+      tween = null;
+      free = false;
+      v = 0;
+      lastX = e.clientX;
+      fig.setPointerCapture(e.pointerId);
+      root.classList.add("is-dragging");
+      run();
+    });
+    fig.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const scale = 400 / fig.getBoundingClientRect().width;
+      const dx = (e.clientX - lastX) * scale;
+      lastX = e.clientX;
+      const da = -dx * 1.35; // pushing the near side of the wheel
+      angle += da;
+      if (p < N) {
+        const before = stageOf(p);
+        p = Math.min(N, p + Math.abs(da) / DEG_PER_STAGE);
+        if (stageOf(p) !== before) announce();
+      }
+      const now = performance.now();
+      const inst = da / Math.max(0.008, (now - lastT) / 1000);
+      v = v * 0.6 + inst * 0.4;
+      lastT = now;
+      render();
+    });
+    const release = () => {
+      if (!dragging) return;
+      dragging = false;
+      root.classList.remove("is-dragging");
+      if (!motionOn()) v = 0;
+      v = Math.max(-1600, Math.min(1600, v));
+      lastT = performance.now();
+      run();
+    };
+    fig.addEventListener("pointerup", release);
+    fig.addEventListener("pointercancel", release);
+
+    /* start from a lump of ash; a single nudge of the wheel the first time it is seen */
+    p = 0;
+    render();
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          io.disconnect();
+          if (!motionOn() || p > 0) return;
+          free = true;
+          v = 420;
+          run();
+        },
+        { threshold: 0.6 },
+      );
+      io.observe(fig);
+    }
+  }
+</script>

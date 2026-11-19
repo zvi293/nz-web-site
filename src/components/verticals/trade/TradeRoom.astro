@@ -1,0 +1,65 @@
+---
+/**
+ * TradeRoom — the industry page's own static composition (no JS): an object born from the trade
+ * that carries the page's `whoFor` (who the site is for). One per vertical, never repeated:
+ *   case-files    lawyer      manila case files with staggered tabs, tied with red tape
+ *   ledger        accountant  a ruled ledger page: index column, entries, ticks, a double-ruled total
+ *   map           real-estate a neighbourhood map with numbered pins + its legend
+ *   appointments  clinic      appointment cards with a perforated stub and a circled day
+ *   directory     architect   a lobby directory board (felt letters, floors)
+ *   whiteboard    consultant  a whiteboard in the consultant's office, marker circles and arrows
+ *   menu          beauty      a printed treatment menu (dotted leaders to a course number, no prices)
+ *   site-sign     contractor  the building-site sign on two posts, hazard tape at its foot
+ * Living touches only under html.nz-motion + [data-reveal] (global.ts adds [data-in]); without JS
+ * or with reduced motion everything is in its final state.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import type { OpenerVariant, SectionTone, ServiceWhoForData } from "@/components/service/types";
+import type { TradeVariant } from "@/data/verticals";
+import CaseFiles from "./CaseFiles.astro";
+import Ledger from "./Ledger.astro";
+import NeighbourhoodMap from "./NeighbourhoodMap.astro";
+import Appointments from "./Appointments.astro";
+import Directory from "./Directory.astro";
+import Whiteboard from "./Whiteboard.astro";
+import TreatmentMenu from "./TreatmentMenu.astro";
+import SiteSign from "./SiteSign.astro";
+import "./trade.css";
+
+interface Props {
+  variant: TradeVariant;
+  data: ServiceWhoForData;
+  tone?: SectionTone;
+  opener?: OpenerVariant;
+  index?: string;
+  label?: string;
+  id?: string;
+}
+
+const { variant, data, tone = "bone", opener = "rule", index, label, id = "vl-trade" } = Astro.props;
+const n = String(data.items.length).padStart(2, "0");
+const LINES: Record<TradeVariant, string[]> = {
+  "case-files": ["ארכיון המשרד", `${n} תיקים`],
+  ledger: ["ספר הלקוחות", `${n} שורות`],
+  map: ["מפת השכונה", `${n} נקודות`],
+  appointments: ["כרטיסי התור", `${n} כרטיסים`],
+  directory: ["לוח הדיירים", `${n} קומות`],
+  whiteboard: ["הלוח במשרד", `${n} עיגולים`],
+  menu: ["תפריט הטיפולים", `${n} שורות`],
+  "site-sign": ["שלט האתר", `${n} תחומים`],
+};
+---
+
+<section class:list={["nz-section nz-section--space-default vl-tr", `vl-tr--${variant}`]} data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant={opener} index={index} label={label} title={data.title} id={`${id}-title`} lede={data.lede} lines={LINES[variant]} />
+    {variant === "case-files" && <CaseFiles items={data.items} />}
+    {variant === "ledger" && <Ledger items={data.items} />}
+    {variant === "map" && <NeighbourhoodMap items={data.items} />}
+    {variant === "appointments" && <Appointments items={data.items} />}
+    {variant === "directory" && <Directory items={data.items} />}
+    {variant === "whiteboard" && <Whiteboard items={data.items} />}
+    {variant === "menu" && <TreatmentMenu items={data.items} />}
+    {variant === "site-sign" && <SiteSign items={data.items} />}
+  </div>
+</section>

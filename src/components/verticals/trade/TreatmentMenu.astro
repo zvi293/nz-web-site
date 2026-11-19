@@ -1,0 +1,36 @@
+---
+/** Beauty — the studio's printed treatment menu: dotted leaders run to a course number (never a price). */
+import Nb from "@/components/service/Nb.astro";
+import type { AudienceItem } from "@/components/service/types";
+interface Props { items: AudienceItem[] }
+const { items } = Astro.props;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+---
+
+<div class="vl-mn" data-reveal>
+  <div class="vl-mn__card">
+    <span class="vl-mn__corner vl-mn__corner--a" aria-hidden="true" />
+    <span class="vl-mn__corner vl-mn__corner--b" aria-hidden="true" />
+    <span class="vl-mn__corner vl-mn__corner--c" aria-hidden="true" />
+    <span class="vl-mn__corner vl-mn__corner--d" aria-hidden="true" />
+    <p class="vl-mn__crest" aria-hidden="true">
+      <span class="vl-mn__crest-small">הסטודיו · אתר עם יומן</span>
+      <span class="vl-mn__crest-big">תפריט</span>
+    </p>
+    <ol class="vl-mn__list">
+      {
+        items.map((it, i) => (
+          <li class="vl-mn__item" style={`--i:${i}`}>
+            <div class="vl-mn__row">
+              <h3 class="vl-mn__name"><Nb text={it.title} /></h3>
+              <span class="vl-mn__leader" aria-hidden="true" />
+              <span class="vl-mn__no" aria-hidden="true">{pad(i)}</span>
+            </div>
+            <p class="vl-mn__line"><Nb text={it.description} /></p>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="vl-mn__foot">קביעת תור מהאתר, בכל שעה</p>
+  </div>
+</div>

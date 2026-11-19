@@ -1,0 +1,47 @@
+---
+/**
+ * "Before you write" — three questions set as telephone message slips ("הודעה טלפונית"):
+ * a perforated paper slip with the printed form (אל / מאת / הנושא), the question written
+ * on it, and the answer under a vermilion "נענה" stamp. Always open (no hidden text); the
+ * page's FAQPage JSON-LD is built from the same items, verbatim and in this order.
+ * Static (no client JS).
+ */
+import { Button } from "@/components/nz";
+import { contactFaq as f } from "./content";
+
+/* Keep phone numbers and times on one line (same text, so it still equals the JSON-LD). */
+const LTR = /(\d[\d:–-]*\d)/;
+const parts = (t: string) => t.split(LTR);
+---
+
+<section class="nz-section nz-section--space-default ct-faq" data-tone="bone" aria-labelledby="ct-faq-title">
+  <div class="nz-container ct-faq__grid">
+    <header class="ct-faq__head">
+      <p class="nz-label nz-label--rule"><span class="nz-label__index">{f.room}</span><span>{f.label}</span></p>
+      <h2 id="ct-faq-title" class="nz-display nz-display--h2">{f.title}</h2>
+      <Button to={f.allLink.href} variant="quiet" className="ct-faq__all">{f.allLink.label}</Button>
+    </header>
+
+    <ol class="ct-slips">
+      {
+        f.items.map((item, i) => (
+          <li class="ct-slip" data-reveal="rise" style={`--reveal-delay:${i * 80}ms;--tilt:${[-1.1, 0.8, -0.5][i % 3]}deg`}>
+            <p class="ct-slip__form" aria-hidden="true">
+              <span class="ct-slip__kind">הודעה טלפונית</span>
+              <span class="ct-slip__no">{String(i + 1).padStart(2, "0")}</span>
+            </p>
+            <p class="ct-slip__fields" aria-hidden="true">
+              <span><b>אל:</b> צבי</span>
+              <span><b>מאת:</b> מי שעוד לא כתב</span>
+            </p>
+            <h3 class="ct-slip__q">{item.question}</h3>
+            <div class="ct-slip__a">
+              <span class="ct-slip__stamp" aria-hidden="true">נענה</span>
+              <p>{parts(item.answer).map((x, k) => (k % 2 ? <bdi dir="ltr" class="ct-nowrap">{x}</bdi> : x))}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

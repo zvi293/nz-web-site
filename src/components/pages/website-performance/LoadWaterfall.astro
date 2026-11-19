@@ -1,0 +1,92 @@
+---
+/**
+ * LoadWaterfall — "למה האתר נטען לאט?": an illustrated network waterfall of a heavy page (no
+ * numbers — relative bars, labelled as an illustration). Each row: the file, its bar on a shared
+ * time axis (RTL: time runs right → left), what it does to the visitor and the fix. A vertical
+ * vermilion rule marks the moment the main content appears (LCP). Bars grow in once, in their
+ * own start order, when the chart is in view (html.nz-motion + [data-in]). Rows tagged "מי מרגיש
+ * את זה" carry the page's audiences as symptoms (no separate who-for list). Prefix wp-.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import Nb from "@/components/service/Nb.astro";
+import { WATERFALL } from "./data";
+import "./website-performance.css";
+
+interface Props {
+  index?: string;
+}
+const { index = "01" } = Astro.props;
+const lcp = WATERFALL.find((r) => r.kind === "lcp")!;
+const lcpAt = lcp.start + lcp.len;
+const KIND: Record<string, string> = {
+  doc: "מסמך",
+  css: "עיצוב",
+  block: "חוסם",
+  font: "גופן",
+  lcp: "תוכן ראשי",
+  third: "צד שלישי",
+};
+---
+
+<section class="nz-section nz-section--space-default wp-fall" data-tone="paper" aria-labelledby="wp-fall-title">
+  <div class="nz-container">
+    <ServiceOpener
+      variant="split"
+      index={index}
+      label="מה קורה בזמן הטעינה"
+      title="למה האתר נטען לאט?"
+      accent="לאט?"
+      id="wp-fall-title"
+      lede="כי הדפדפן מחכה. לפני שהוא מצייר את התוכן הראשי הוא מוריד ומריץ קבצים, ובאתר איטי חלקם גדולים מדי, מגיעים מאוחר או חוסמים את כל השאר. כך זה נראה, שורה אחרי שורה, ולצד כל שורה: איזה אתר מרגיש אותה הכי חזק."
+    />
+
+    <figure class="wp-fall__chart" data-reveal="fade" style={`--lcp:${lcpAt}`}>
+      <div class="wp-fall__axis" aria-hidden="true">
+        <span class="wp-fall__axis-name">הקובץ</span>
+        <span class="wp-fall__axis-time">
+          <span>תחילת הטעינה</span>
+          <svg viewBox="0 0 60 10" class="wp-fall__arrow"><path d="M58 5H3m0 0 4-4M3 5l4 4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span>הזמן</span>
+        </span>
+        <span class="wp-fall__axis-fix">מה זה עושה, ומה מתקנים</span>
+      </div>
+      <p class="wp-fall__key" aria-hidden="true">הקו המקווקו: כאן מופיע התוכן הראשי</p>
+
+      <div class="wp-fall__plot">
+      <ol class="wp-fall__rows">
+        {
+          WATERFALL.map((r, i) => (
+            <li class:list={["wp-row", `wp-row--${r.kind}`]} style={`--s:${r.start};--l:${r.len};--i:${i}`}>
+              <span class="wp-row__name">
+                {r.name}
+                <span class="wp-row__kind">{KIND[r.kind]}</span>
+              </span>
+              <span class="wp-row__track" aria-hidden="true">
+                <span class="wp-row__bar" />
+              </span>
+              <span class="wp-row__note"><Nb text={r.note} /></span>
+              <span class="wp-row__fix">
+                <span class="wp-row__fix-k">התיקון:</span> {r.fix}
+              </span>
+              {"who" in r && r.who && (
+                <span class="wp-row__who">
+                  <span class="wp-row__who-k">מי מרגיש את זה:</span> {r.who}
+                </span>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+      <div class="wp-fall__lcp" aria-hidden="true">
+        <span class="wp-fall__lcp-line" />
+        <span class="wp-fall__lcp-tag">כאן מופיע התוכן הראשי</span>
+      </div>
+      </div>
+
+      <figcaption class="nz-museum wp-fall__cap">
+        <span class="nz-museum__head"><span class="nz-museum__index">המחשה</span><span class="nz-museum__title">טעינה של דף כבד, קובץ אחרי קובץ</span></span>
+        <span class="nz-museum__medium">אורכי הפסים יחסיים ומדגימים דף טיפוסי. זו לא מדידה של אתר מסוים: את האתר שלכם מודדים בכלים של Google.</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>

@@ -1,0 +1,66 @@
+---
+/**
+ * The colophon — the last page of the catalogue: what this issue was, who wrote it, and the
+ * invitation (WhatsApp) tuned to the article's department, with the matching service link. Static.
+ */
+import { WhatsAppCta } from "@/components/nz";
+import type { BlogPost, Department, Issue } from "@/lib/blog";
+
+interface Props {
+  post: BlogPost;
+  dept: Department;
+  issue: Issue;
+}
+const { post, dept, issue } = Astro.props;
+
+const CALL: Record<string, { title: string; body: string }> = {
+  build: {
+    title: "מתכננים אתר חדש לעסק?",
+    body: "ספרו לנו בכמה מילים מה העסק עושה ומה האתר צריך להשיג. נחזור עם שאלות טובות והצעה מסודרת.",
+  },
+  seo: {
+    title: "רוצים שימצאו אתכם, גם בגוגל וגם ב-AI?",
+    body: "נבדוק איך האתר שלכם נראה בעיני מנועי חיפוש ומה הכי שווה לתקן קודם. בלי הבטחות למקום ראשון.",
+  },
+  dev: {
+    title: "יש לכם אתר איטי או מסובך לתחזוקה?",
+    body: "שלחו קישור, ונגיד לכם מה מאט אותו ומה הדרך הנכונה לבנות אותו מחדש או לתקן.",
+  },
+  design: {
+    title: "רוצים אתר שכל אחד יכול להשתמש בו?",
+    body: "עיצוב ונגישות הם חלק מכל אתר שאנחנו בונים. נשמח לעבור איתכם על האתר הקיים או לתכנן חדש.",
+  },
+};
+const call = CALL[dept.key] ?? CALL.build;
+const message = `שלום, קראתי במגזין את המאמר "${post.title}" ורציתי לשאול`;
+---
+
+<section class="ar-colophon" data-tone="ink" aria-labelledby="ar-colophon-title">
+  <div class="nz-container ar-colophon__grid">
+    <div class="ar-colophon__call">
+      <p class="nz-label nz-label--rule">
+        <span class="nz-label__index">אחרי הקריאה</span>
+        <span>שיחה קצרה בוואטסאפ</span>
+      </p>
+      <h2 id="ar-colophon-title" class="ar-colophon__title">{call.title}</h2>
+      <p class="ar-colophon__body">{call.body}</p>
+      <div class="ar-colophon__ctas">
+        <WhatsAppCta size="lg" label="לשיחה בוואטסאפ" message={message} />
+        <a class="nz-link" href={dept.service.href}>
+          <span class="nz-link__text">{dept.service.label}</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="ar-colophon__page">
+      <p class="ar-colophon__mark" aria-hidden="true"><span class="ar-cube"></span>NZ-web</p>
+      <dl aria-label="קולופון">
+      <div><dt>גיליון</dt><dd>{issue.index} · {issue.month}</dd></div>
+      <div><dt>מדור</dt><dd>{dept.name}</dd></div>
+      <div><dt>כתיבה</dt><dd><a href="/about/">צבי משה</a></dd></div>
+      <div><dt>זמן קריאה</dt><dd>{post.read_time} דקות</dd></div>
+      <div><dt>עוד במגזין</dt><dd><a href="/glossary/">מילון המונחים</a></dd></div>
+      </dl>
+    </div>
+  </div>
+</section>

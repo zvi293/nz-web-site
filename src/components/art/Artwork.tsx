@@ -125,6 +125,9 @@ const Artwork = ({
         className,
       )}
       style={style}
+      /* global.ts marks a loaded image's wrapper .is-loaded before hydration (so static art un-blurs
+         without React); the class then matches once the effect below sees img.complete. */
+      suppressHydrationWarning
       data-art={art.slug}
     >
       {frame ? <div className="nz-art__frame">{canvas}</div> : canvas}

@@ -1,0 +1,71 @@
+---
+/**
+ * ServiceIntro — "the catalogue essay": a serif drop cap, a pull quote lifted into the margin
+ * (its vermilion rule draws in), numbered margin notes and a printed folio line.
+ * Desktop: essay column + a sticky margin; phone: the pull quote breaks the text after ¶1.
+ */
+import Nb from "./Nb.astro";
+import ServiceOpener from "./ServiceOpener.astro";
+import type { OpenerVariant, SectionTone, ServiceIntroData } from "./types";
+import "./service.css";
+
+interface Props {
+  data: ServiceIntroData;
+  tone?: SectionTone;
+  opener?: OpenerVariant;
+  index?: string;
+  label?: string;
+  id?: string;
+}
+
+const { data, tone = "bone", opener = "split", index = "01", label = "מבוא", id = "sv-intro" } = Astro.props;
+const [first, ...rest] = data.paragraphs;
+const notes = (data.notes ?? []).slice(0, 3);
+---
+
+<section class="nz-section nz-section--space-default sv-intro" data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant={opener} index={index} label={label} title={data.title} id={`${id}-title`} />
+    <div class="sv-intro__grid">
+      <div class="sv-intro__essay">
+        {first && <p class="sv-intro__p sv-intro__p--first sv-sd"><Nb text={first} /></p>}
+        {
+          data.pull && (
+            <blockquote class="sv-pull sv-pull--inline sv-sd">
+              <p><Nb text={data.pull} /></p>
+            </blockquote>
+          )
+        }
+        {rest.map((p) => <p class="sv-intro__p sv-sd"><Nb text={p} /></p>)}
+        <p class="sv-folio" aria-hidden="true">
+          <span>{index}</span>
+          <span class="sv-folio__rule" />
+          <span>NZ-web · קטלוג השירותים</span>
+        </p>
+      </div>
+      <aside class="sv-intro__margin" aria-label="הערות שוליים">
+        <div class="sv-intro__sticky">
+          {
+            data.pull && (
+              <blockquote class="sv-pull sv-pull--margin">
+                <p><Nb text={data.pull} /></p>
+              </blockquote>
+            )
+          }
+          {
+            notes.length > 0 && (
+              <ol class="sv-notes">
+                {notes.map((n, i) => (
+                  <li class="sv-sd">
+                    <span class="sv-notes__num">{`*${i + 1}`}</span>
+                    <span><Nb text={n} /></span>
+                  </li>
+                ))}
+              </ol>
+            )
+          }
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>

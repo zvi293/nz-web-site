@@ -1,0 +1,68 @@
+---
+/**
+ * ServiceRelated — "wayfinding": the next rooms as museum direction signs (ink plates, a big
+ * arrow, the room number, the room's name and one line). Hub-and-spoke internal links with
+ * descriptive Hebrew anchors. Default: up to 3 other rooms of the services wing.
+ * Pass `items` to choose (rooms by href get their number automatically) — keep 2–4.
+ */
+import { Artwork } from "@/components/art";
+import { roomFor, SERVICE_ROOMS, SERVICES_WING } from "./rooms";
+import type { SectionTone, ServiceLink } from "./types";
+import "./service.css";
+
+interface Props {
+  /** This page's path (excluded from the default list). */
+  currentPath: string;
+  items?: ServiceLink[];
+  title?: string;
+  tone?: SectionTone;
+  id?: string;
+}
+
+const { currentPath, items, title = "החדרים הבאים באגף", tone = "bone", id = "sv-related" } = Astro.props;
+const norm = (p: string) => p.replace(/\/+$/, "");
+const list: ServiceLink[] = (
+  items ??
+  SERVICE_ROOMS.filter((r) => norm(r.href) !== norm(currentPath))
+    .slice(0, 3)
+    .map((r) => ({ label: r.name, href: r.href, desc: r.line, art: r.art }))
+).slice(0, 4);
+const signs = list.map((item) => {
+  const room = roomFor(item.href);
+  const it = { ...item, desc: item.desc ?? room?.line, art: item.art ?? room?.art };
+  return { ...it, place: room ? `אולם ${SERVICES_WING} · חדר ${room.num}` : it.href === "/services/" ? `אולם ${SERVICES_WING}` : "המשך הסיור" };
+});
+---
+
+<section class="nz-section nz-section--space-tight sv-way" data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <div class="sv-way__head sv-sd">
+      <h2 id={`${id}-title`} class="sv-way__title">{title}</h2>
+      <span class="sv-way__rule" aria-hidden="true" />
+      <a href="/services/" class="nz-link sv-way__all"><span class="nz-link__text">מפת האגף</span></a>
+    </div>
+    <ul class:list={["sv-way__list", `sv-way__list--${signs.length}`]}>
+      {
+        signs.map((s) => (
+          <li class="sv-sd">
+            <a href={s.href} class="sv-sign" data-tone="ink">
+              <span class="sv-sign__top">
+                <span class="sv-sign__place">{s.place}</span>
+                <svg class="sv-sign__arrow" viewBox="0 0 40 24" aria-hidden="true">
+                  <path d="M38 12H3m0 0 9-9M3 12l9 9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" />
+                </svg>
+              </span>
+              <span class="sv-sign__name">{s.label}</span>
+              {s.desc && <span class="sv-sign__desc">{s.desc}</span>}
+              {s.art && (
+                <span class="sv-sign__thumb" aria-hidden="true">
+                  <Artwork slug={s.art} sizes="72px" ratio="1 / 1" alt="" />
+                </span>
+              )}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

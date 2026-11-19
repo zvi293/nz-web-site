@@ -32,6 +32,7 @@ const imageImportsAsUrl = {
 };
 
 export default defineConfig({
+  devToolbar: { enabled: false },
   site: "https://nz-web.com",
   output: "static",
   trailingSlash: "always",

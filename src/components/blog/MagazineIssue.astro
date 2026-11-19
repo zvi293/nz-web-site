@@ -1,0 +1,90 @@
+---
+/**
+ * The current issue as a broadsheet front page: the issue numeral as masthead, the lead story with
+ * its cover hung large, the other stories in ruled columns. Each card names the article's
+ * interactive exhibit. Cards carry [data-mg-dept] for the department filter. Static.
+ */
+import { Artwork } from "@/components/art";
+import { getSignatureMeta } from "@/components/articles";
+import { hasArt } from "@/lib/art";
+import { formatDate, getCurrentIssuePosts, getDepartment, getIssue } from "@/lib/blog";
+
+const posts = getCurrentIssuePosts();
+const issue = getIssue(posts[0]);
+const [lead, ...rest] = posts;
+const sig = (key?: string) => getSignatureMeta(key)?.name;
+---
+
+<section id="mg-issue" class="mg-issue" data-tone="paper" aria-labelledby="mg-issue-title" data-mg-section>
+  <div class="nz-container">
+    <header class="mg-mast">
+      <p class="mg-mast__num" aria-hidden="true">{issue.index}</p>
+      <div class="mg-mast__text">
+        <p class="nz-label">
+          <span class="nz-label__index">גיליון {issue.index}</span>
+          <span>{issue.month}</span>
+        </p>
+        <h2 id="mg-issue-title" class="mg-mast__title">בגיליון הזה: {posts.length} מאמרים, {posts.length} מוצגים</h2>
+        <p class="mg-mast__lede">
+          כל מאמר בגיליון מגיע עם רכיב אינטראקטיבי משלו, שמראה את הרעיון בפועל במקום רק להסביר אותו.
+        </p>
+      </div>
+    </header>
+
+    <div class="mg-sheet">
+      {
+        lead && (
+          <article class="mg-story mg-story--lead" data-mg-dept={getDepartment(lead.category).key} data-mg-post={lead.slug}>
+            <a href={`/blog/${lead.slug}/`} class="mg-story__link">
+              <span class="mg-story__plate" aria-hidden="true">
+                {hasArt(lead.art) && <Artwork slug={lead.art} sizes="(min-width: 1024px) 48vw, 100vw" ratio="3 / 2" alt="" />}
+              </span>
+              <span class="mg-story__body">
+                <span class="mg-story__meta">
+                  <span class="mg-story__dept">{getDepartment(lead.category).name}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{lead.read_time} דקות קריאה</span>
+                </span>
+                <h3 class="mg-story__title">{lead.title}</h3>
+                <span class="mg-story__excerpt">{lead.excerpt}</span>
+                {sig(lead.signature) && (
+                  <span class="mg-story__exhibit">
+                    <span class="mg-cube" aria-hidden="true" />
+                    בתוך המאמר: {sig(lead.signature)}
+                  </span>
+                )}
+              </span>
+            </a>
+          </article>
+        )
+      }
+      {
+        rest.map((p, i) => (
+          <article class="mg-story" data-mg-dept={getDepartment(p.category).key} data-mg-post={p.slug}>
+            <a href={`/blog/${p.slug}/`} class="mg-story__link">
+              <span class="mg-story__plate" aria-hidden="true">
+                {hasArt(p.art) && <Artwork slug={p.art} sizes="(min-width: 1024px) 22vw, 34vw" ratio="4 / 3" alt="" />}
+              </span>
+              <span class="mg-story__body">
+                <span class="mg-story__meta">
+                  <span class="mg-story__idx">{String(i + 2).padStart(2, "0")}</span>
+                  <span class="mg-story__dept">{getDepartment(p.category).name}</span>
+                </span>
+                <h3 class="mg-story__title">{p.title}</h3>
+                {sig(p.signature) && (
+                  <span class="mg-story__exhibit">
+                    <span class="mg-cube" aria-hidden="true" />
+                    בתוך המאמר: {sig(p.signature)}
+                  </span>
+                )}
+                <span class="mg-story__date">
+                  <time datetime={p.published_at.slice(0, 10)}>{formatDate(p.published_at)}</time> · {p.read_time} דקות
+                </span>
+              </span>
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

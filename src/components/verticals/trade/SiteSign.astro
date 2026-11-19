@@ -1,0 +1,38 @@
+---
+/** Contractor — the building-site sign: a vermilion band, one row per trade, two posts, hazard tape at its foot. */
+import Nb from "@/components/service/Nb.astro";
+import type { AudienceItem } from "@/components/service/types";
+interface Props { items: AudienceItem[] }
+const { items } = Astro.props;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+---
+
+<div class="vl-ss" data-reveal>
+  <div class="vl-ss__sign">
+    <p class="vl-ss__band" aria-hidden="true">
+      <span class="vl-ss__band-small">כאן נבנה</span>
+      <span class="vl-ss__band-big">אתר לבעל מקצוע</span>
+    </p>
+    <ol class="vl-ss__rows">
+      {
+        items.map((it, i) => (
+          <li class="vl-ss__row" style={`--i:${i}`}>
+            <span class="vl-ss__role" aria-hidden="true">{`תחום ${pad(i)}`}</span>
+            <h3 class="vl-ss__name"><Nb text={it.title} /></h3>
+            <p class="vl-ss__line"><Nb text={it.description} /></p>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="vl-ss__foot" aria-hidden="true">
+      <span>לבירורים</span>
+      <span class="vl-ss__foot-call">חיוג או וואטסאפ בלחיצה</span>
+    </p>
+    <span class="vl-ss__tape" aria-hidden="true" />
+  </div>
+  <div class="vl-ss__posts" aria-hidden="true">
+    <span class="vl-ss__post" />
+    <span class="vl-ss__post" />
+  </div>
+  <span class="vl-ss__ground" aria-hidden="true" />
+</div>

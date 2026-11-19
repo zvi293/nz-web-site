@@ -1,0 +1,55 @@
+---
+/**
+ * MessageTrail — "מה הלקוח מקבל אחרי שקבע תור?": one appointment followed along a brass thread,
+ * from the booking to the next visit. Each knot on the thread is a moment (מיד / יום לפני …) and
+ * hangs the real thing that happens then: the message the client gets, the block in the
+ * business's calendar, the slot returning to the board. A sample business, marked as such.
+ * Phone: the thread on the start side, cards beside it. Desktop: the thread in the middle,
+ * cards alternating. The thread draws itself once in view (html.nz-motion + [data-in]). Prefix ap-.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import Nb from "@/components/service/Nb.astro";
+import { TRAIL } from "./data";
+import "./appointment-system.css";
+
+interface Props {
+  index?: string;
+}
+const { index = "01" } = Astro.props;
+const kind = (ch: string) => (ch === "היומן שלכם" ? "cal" : ch === "המערכת" ? "sys" : "note");
+---
+
+<section class="nz-section nz-section--space-default ap-trail-sec" data-tone="paper" aria-labelledby="ap-trail-title">
+  <div class="nz-container">
+    <ServiceOpener
+      variant="split"
+      index={index}
+      label="תור אחד, מההתחלה"
+      title="מה הלקוח מקבל אחרי שקבע תור?"
+      accent="אחרי שקבע תור?"
+      id="ap-trail-title"
+      lede="אישור מיד, תזכורת לפני התור וקישור לשינוי. כך נראה תור אחד במערכת, מהרגע שנקבע ועד הביקור הבא."
+    />
+
+    <ol class="ap-trail" data-reveal="fade">
+      {
+        TRAIL.map((s, i) => (
+          <li class:list={["ap-stop", `ap-stop--${kind(s.channel)}`]} style={`--i:${i}`}>
+            <span class="ap-stop__when">{s.when}</span>
+            <span class="ap-stop__knot" aria-hidden="true" />
+            <div class="ap-msg">
+              <p class="ap-msg__ch">{s.channel}</p>
+              <p class="ap-msg__t">{s.title}</p>
+              <p class="ap-msg__b"><Nb text={s.body} /></p>
+              {s.link && <p class="ap-msg__link">{s.link}</p>}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="nz-museum ap-trail__cap">
+      <span class="nz-museum__head"><span class="nz-museum__index">דוגמה</span><span class="nz-museum__title">סטודיו עור, עסק לדוגמה</span></span>
+      <span class="nz-museum__medium">הנוסח, הערוצים והתזמון של כל הודעה נקבעים איתכם לפי העסק.</span>
+    </p>
+  </div>
+</section>

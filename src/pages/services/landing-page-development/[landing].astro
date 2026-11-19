@@ -1,22 +1,143 @@
 ---
 /**
  * /services/landing-page-development/<landing>/ — one static page per entry in LANDINGS
- * (src/data/landings*, getStaticPaths). LEGACY ServicePageTemplate as one island (client:load).
+ * (src/data/landings.ts + src/data/landings/*.ts, getStaticPaths): campaign, lead-generation,
+ * trades. Built from the service system (src/components/service, README there) + each page's own
+ * section and signature (src/components/landings). Each page has its own composition (hero
+ * variant, section order, tones, openers) and ONE island: its signature (client:visible).
+ *   campaign         ההתאמה (match pairs)            + ClickPath, FeedCrops  · art ruby-amphora
+ *   lead-generation  פחות שדות (declutter/remove)    + AfterSubmit           · art luminous-net
+ *   trades           שיחה בלחיצה (tap-flow)           + WorkOrder, ToolBoard  · art terracotta-waterfall
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import LandingPageVertical from "@/views/services/LandingPageVertical";
-import { LANDINGS, buildLandingConfig } from "@/data/landings";
-import { servicePageSeo } from "@/lib/page-seo";
-import type { PageSeo } from "@/lib/seo";
+import ServiceHero from "@/components/service/ServiceHero.astro";
+import ServiceIntro from "@/components/service/ServiceIntro.astro";
+import SignatureSlot from "@/components/service/SignatureSlot.astro";
+import ServiceFeatures from "@/components/service/ServiceFeatures.astro";
+import ServiceProcess from "@/components/service/ServiceProcess.astro";
+import ServiceFaq from "@/components/service/ServiceFaq.astro";
+import ServiceRelated from "@/components/service/ServiceRelated.astro";
+import ServiceCta from "@/components/service/ServiceCta.astro";
+import ClickPath from "@/components/landings/ClickPath.astro";
+import AfterSubmit from "@/components/landings/AfterSubmit.astro";
+import WorkOrder from "@/components/landings/WorkOrder.astro";
+import FeedCrops from "@/components/landings/FeedCrops.astro";
+import ToolBoard from "@/components/landings/ToolBoard.astro";
+import MatchPairs from "@/components/landings/MatchPairs";
+import FewerFields from "@/components/landings/FewerFields";
+import TapToCall from "@/components/landings/TapToCall";
+import { LANDINGS } from "@/data/landings";
+import { serviceSeo } from "@/lib/page-seo";
 
 export function getStaticPaths() {
   return Object.keys(LANDINGS).map((landing) => ({ params: { landing } }));
 }
 
 const { landing } = Astro.params as { landing: string };
-const seo: PageSeo = servicePageSeo(buildLandingConfig(landing)!);
+const page = LANDINGS[landing]!;
+const seo = serviceSeo(page);
+const hero = { data: page.hero, variant: page.heroVariant, path: page.path, crumb: page.crumb, room: page.room };
+const relatedTitle = "דפי נחיתה נוספים";
 ---
 
-<BaseLayout seo={seo}>
-  <LandingPageVertical client:load landing={landing} />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  {
+    landing === "campaign" && (
+      <>
+        <ServiceHero {...hero} />
+        <ServiceIntro data={page.intro!} tone="paper" opener="split" index="01" label="מבוא · מסה קצרה" />
+        <SignatureSlot
+          name="ההתאמה"
+          title="איזה דף ממשיך את המודעה?"
+          lede="שלוש מודעות של משתלה אחת, ושישה דפים שנראים כמעט אותו דבר. רק אחד מהם ממשיך כל מודעה עד הסוף. חברו כל מודעה לדף שלה, וראו איפה החוט נקרע: בכותרת, בתמונה או בכפתור."
+          hint="בחרו מודעה, ואז הקישו על הדף שאליו תשלחו את מי שלחץ עליה. אפשר לחבר מחדש בכל רגע."
+          keys="במקלדת: Tab בין המודעות והדפים, Enter כדי לבחור."
+        >
+          <MatchPairs client:visible />
+        </SignatureSlot>
+        <ClickPath data={page.journey!} index="02" />
+        <ServiceFeatures
+          title={page.features!.title}
+          lede={page.features!.lede}
+          items={page.features!.items}
+          variant="specimens"
+          tone="paper"
+          opener="numeral"
+          index="03"
+          label="מה כלול"
+        />
+        <FeedCrops data={page.channels!} index="04" />
+        <ServiceProcess title={page.process!.title} lede={page.process!.lede} steps={page.process!.steps} opener="split" index="05" />
+        <ServiceFaq items={page.faqs} title="שאלות על דף נחיתה לקמפיין" index="06" />
+        <ServiceRelated currentPath={page.path} items={page.related} title={relatedTitle} />
+        <ServiceCta data={page.cta!} />
+      </>
+    )
+  }
+
+  {
+    landing === "lead-generation" && (
+      <>
+        <ServiceHero {...hero} />
+        <SignatureSlot
+          name="פחות שדות"
+          title="כמה שאלות הטופס באמת צריך?"
+          lede="טופס לדוגמה עם שתים-עשרה שאלות. הורידו את מה שלא הייתם שואלים, וראו את שני המדדים זזים: כמה קל למלא, וכמה תדעו על הלקוח לפני שאתם מתקשרים."
+          hint="הקישו על × ליד שדה כדי להוריד אותו. שדה שהוסר מחכה למטה, והקשה עליו מחזירה אותו."
+          keys="במקלדת: Tab בין כפתורי ההסרה, Enter כדי להסיר."
+          opener="stacked"
+        >
+          <FewerFields client:visible />
+        </SignatureSlot>
+        <ServiceIntro data={page.intro!} tone="paper" opener="rule" index="01" label="מבוא" />
+        <ServiceFeatures
+          title={page.features!.title}
+          lede={page.features!.lede}
+          items={page.features!.items}
+          variant="diagram"
+          opener="numeral"
+          index="02"
+          label="מה כלול"
+          sheet="גיליון 02 · מבנה דף לידים"
+        />
+        <AfterSubmit data={page.afterSubmit!} index="03" />
+        <ServiceProcess
+          title={page.process!.title}
+          lede={page.process!.lede}
+          steps={page.process!.steps}
+          tone="paper"
+          opener="stacked"
+          index="04"
+        />
+        <ServiceFaq items={page.faqs} title="שאלות על דף נחיתה לייצור לידים" index="05" card="plaque" tone="bone" />
+        <ServiceRelated currentPath={page.path} items={page.related} title={relatedTitle} tone="paper" />
+        <ServiceCta data={page.cta!} />
+      </>
+    )
+  }
+
+  {
+    landing === "trades" && (
+      <>
+        <ServiceHero {...hero} position="72% 50%" />
+        <SignatureSlot
+          name="שיחה בלחיצה"
+          title="כמה לחיצות מהחיפוש עד השיחה?"
+          lede="מישהו מחפש צבעי באזור שלו. היו הלקוח: הקישו מהתוצאה בחיפוש עד שהטלפון מצלצל, פעם בדף נחיתה ופעם באתר רגיל, וספרו את הלחיצות."
+          hint="הקישו בטלפון כמו שהייתם עושים באמת. כל הקשה נספרת, ואם נתקעתם, הדרך תסומן באדום אחרי כמה שניות. הבורר מעל הטלפון מחליף בין דף נחיתה לאתר רגיל."
+          keys="במקלדת: Tab בין הכפתורים בטלפון, Enter לוחץ."
+          opener="split"
+        >
+          <TapToCall client:visible />
+        </SignatureSlot>
+        <ServiceIntro data={page.intro!} tone="paper" opener="numeral" index="01" label="מבוא" />
+        <WorkOrder data={page.workOrder!} index="02" />
+        <ToolBoard data={page.tools!} index="03" />
+        <ServiceProcess title={page.process!.title} lede={page.process!.lede} steps={page.process!.steps} opener="split" index="04" />
+        <ServiceFaq items={page.faqs} title="שאלות על דף נחיתה לבעלי מקצוע" index="05" />
+        <ServiceRelated currentPath={page.path} items={page.related} title={relatedTitle} />
+        <ServiceCta data={page.cta!} />
+      </>
+    )
+  }
 </BaseLayout>

@@ -1,0 +1,71 @@
+---
+/**
+ * Article title page: breadcrumb trail, issue line, the H1, the byline (E-E-A-T), the answer-first
+ * summary card (slot "summary") and the cover artwork hung with its wall label. Static.
+ * Order: phones read H1 → byline → summary → cover (the answer first); ≥1024px the cover hangs
+ * beside the title and the summary runs under both.
+ */
+import { Artwork, MuseumLabel, getArt } from "@/components/art";
+import { formatDate, type BlogPost, type Department, type Issue } from "@/lib/blog";
+
+interface Props {
+  post: BlogPost;
+  dept: Department;
+  issue: Issue;
+  artSlug: string;
+  sizes: string;
+}
+const { post, dept, issue, artSlug, sizes } = Astro.props;
+const art = getArt(artSlug);
+const modified = post.updated_at ?? post.published_at.slice(0, 10);
+---
+
+<header class="ar-head" data-tone="bone">
+  <div class="ar-head__light" aria-hidden="true"></div>
+  <div class="nz-container ar-head__grid">
+    <div class="ar-head__text">
+      <nav class="ar-crumbs" aria-label="מיקום בעמוד">
+        <ol>
+          <li><a href="/">דף הבית</a></li>
+          <li><a href="/blog/">המגזין</a></li>
+          <li><a href={`/blog/#dept-${dept.key}`}>{dept.name}</a></li>
+        </ol>
+      </nav>
+
+      <p class="ar-head__issue nz-label">
+        <span class="nz-label__index">גיליון {issue.index}</span>
+        <span>{issue.month}</span>
+        <span class="ar-head__dot" aria-hidden="true"></span>
+        <span>{dept.name}</span>
+      </p>
+
+      <h1 id="ar-title" class="ar-head__title">{post.title}</h1>
+
+      <div class="ar-byline">
+        <span class="ar-byline__mark" aria-hidden="true">צ״מ</span>
+        <p class="ar-byline__text">
+          נכתב על ידי <a href="/about/" rel="author">צבי משה, מייסד NZ-web</a>
+          <span class="ar-byline__meta">
+            <span>עודכן ב-<time datetime={modified}>{formatDate(modified)}</time></span>
+            <span aria-hidden="true">·</span>
+            <span>{post.read_time} דקות קריאה</span>
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div class="ar-head__summary"><slot name="summary" /></div>
+
+    <figure class="ar-cover">
+      <Artwork slug={artSlug} sizes={sizes} priority frame ratio="3 / 2" alt={art.alt} className="ar-cover__art" />
+      <MuseumLabel
+        as="figcaption"
+        index={issue.index}
+        prefix="שער הגיליון"
+        title={art.title}
+        medium={`${dept.name} · ${issue.month}`}
+        className="ar-cover__label"
+      />
+    </figure>
+  </div>
+</header>

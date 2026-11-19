@@ -1,0 +1,405 @@
+/* המאזניים — weigh (lawyer). Prefix vl-sc-. The beam angle is --tilt (set inline);
+   the hangers counter-rotate so the pans stay level. Motion only under html.nz-motion. */
+.vl-sc {
+  --pivot: 64px;
+  --hang: 232px;
+  display: grid;
+  gap: 24px;
+}
+@media (min-width: 1024px) {
+  .vl-sc {
+    --hang: 290px;
+    --pivot: 80px;
+  }
+}
+
+/* status line: five question lamps + the live sentence */
+.vl-sc__status {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 14px;
+  min-height: 4.9em;
+  max-width: 62ch;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--fg);
+}
+.vl-sc__meter {
+  display: inline-flex;
+  gap: 4px;
+  padding-top: 7px;
+}
+.vl-sc__meter i {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--fg-muted);
+  transition: background-color 0.5s var(--ease-out), border-color 0.5s var(--ease-out);
+}
+.vl-sc__meter i.is-on {
+  background: var(--vermilion);
+  border-color: var(--vermilion);
+}
+
+.vl-sc__grid {
+  display: grid;
+  gap: 28px;
+}
+@media (min-width: 1024px) {
+  .vl-sc__grid {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    gap: 64px;
+    align-items: center;
+  }
+}
+
+/* ── the balance ── */
+.vl-sc__stage {
+  --pan: clamp(140px, 42cqw, 250px);
+  position: relative;
+  container-type: inline-size;
+  height: calc(var(--pivot) + var(--hang) + 92px);
+  user-select: none;
+}
+/* the floor under the balance */
+.vl-sc__stage::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  inset-inline: 18%;
+  height: 1px;
+  background: var(--rule);
+}
+.vl-sc__column {
+  position: absolute;
+  top: var(--pivot);
+  bottom: 22px;
+  inset-inline: 0;
+  margin-inline: auto;
+  width: 5px;
+  background: var(--fg);
+  opacity: 0.85;
+}
+.vl-sc__base {
+  position: absolute;
+  bottom: 0;
+  inset-inline: 0;
+  margin-inline: auto;
+  width: 132px;
+  height: 24px;
+  background: var(--fg);
+  clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%);
+  opacity: 0.9;
+}
+.vl-sc__beam {
+  position: absolute;
+  top: var(--pivot);
+  inset-inline: calc(var(--pan) / 2);
+  height: 0;
+  transform: rotate(var(--tilt));
+  transform-origin: 50% 50%;
+}
+.vl-sc__bar {
+  position: absolute;
+  top: -2px;
+  inset-inline: -12px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--fg);
+}
+.vl-sc__pivot {
+  position: absolute;
+  top: -8px;
+  inset-inline: 0;
+  margin-inline: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--vermilion);
+  box-shadow: 0 0 0 4px var(--section-bg, transparent);
+}
+.vl-sc__end {
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+.vl-sc__end--doubt {
+  inset-inline-start: 0;
+}
+.vl-sc__end--trust {
+  inset-inline-end: 0;
+}
+.vl-sc__hanger {
+  position: absolute;
+  top: 0;
+  inset-inline-start: calc(var(--pan) / -2);
+  width: var(--pan);
+  height: var(--hang);
+  transform: rotate(calc(-1 * var(--tilt)));
+  transform-origin: 50% 0;
+}
+.vl-sc__strings {
+  position: absolute;
+  inset: 0 0 14px;
+  width: 100%;
+  height: calc(100% - 14px);
+  overflow: visible;
+}
+.vl-sc__strings path {
+  fill: none;
+  stroke: var(--fg-muted);
+  stroke-width: 1;
+}
+.vl-sc__pan {
+  position: absolute;
+  bottom: 0;
+  inset-inline: 0;
+  height: 16px;
+  border: 2px solid var(--fg);
+  border-top-width: 1px;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  background: color-mix(in srgb, var(--fg) 8%, transparent);
+  transition: border-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+}
+.vl-sc__hanger.is-hot .vl-sc__pan {
+  border-color: var(--vermilion);
+  box-shadow: 0 0 0 6px rgb(224 64 31 / 0.18);
+}
+.vl-sc__tag {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline: 0;
+  text-align: center;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+}
+.vl-sc__pile {
+  position: absolute;
+  inset-inline: 10px;
+  bottom: 17px;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: stretch;
+  gap: 4px;
+}
+.vl-sc__q {
+  position: relative;
+  padding: 5px 8px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--fg) 9%, transparent);
+  font-size: clamp(0.6875rem, 0.6rem + 0.9cqw, 0.875rem);
+  line-height: 1.3;
+  text-align: center;
+  color: var(--fg);
+  transition: opacity 0.6s var(--ease-out), border-color 0.6s var(--ease-out);
+}
+.vl-sc__q.is-answered {
+  opacity: 0.55;
+  border-color: rgb(224 64 31 / 0.6);
+  text-decoration: line-through;
+  text-decoration-color: var(--vermilion);
+}
+.vl-sc__chip {
+  min-height: 0;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--bone);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(0.8125rem, 0.7rem + 1cqw, 1.0625rem);
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.25);
+}
+.vl-sc__chip--trap {
+  background: var(--vermilion);
+  color: #fff;
+}
+.vl-sc__empty {
+  padding: 8px;
+  border: 1px dashed var(--rule);
+  border-radius: 3px;
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--fg-muted);
+}
+.vl-sc__seal {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  margin-inline: auto;
+  width: max-content;
+  padding: 8px 16px;
+  border: 1.5px solid var(--vermilion);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  color: var(--fg);
+  opacity: 0;
+  transform: scale(0.7);
+}
+.vl-sc.is-level .vl-sc__seal {
+  opacity: 1;
+  transform: none;
+}
+.vl-sc.is-level .vl-sc__bar {
+  background: var(--vermilion);
+}
+
+/* ── the shelf ── */
+.vl-sc__shelf {
+  display: grid;
+  gap: 12px;
+}
+.vl-sc__shelf-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+}
+.vl-sc__shelf-head span:first-child {
+  color: var(--accent-text, var(--vermilion));
+}
+.vl-sc__weights {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 1024px) {
+  .vl-sc__weights {
+    grid-template-columns: 1fr;
+  }
+}
+.vl-sc__weight {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 2px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--fg) 5%, transparent);
+  color: var(--fg);
+  text-align: start;
+  cursor: grab;
+  touch-action: manipulation;
+  transition: background-color 0.35s var(--ease-out), border-color 0.35s var(--ease-out), opacity 0.35s var(--ease-out);
+}
+.vl-sc__weight:hover {
+  border-color: var(--fg-muted);
+}
+.vl-sc__weight:focus-visible {
+  outline: 2px solid var(--focus, var(--vermilion));
+  outline-offset: 2px;
+}
+.vl-sc__weight.is-dragging {
+  z-index: 5;
+  cursor: grabbing;
+  background: var(--ink-2);
+  border-color: var(--vermilion);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.45);
+}
+.vl-sc__glyph {
+  grid-row: 1 / span 2;
+  width: 18px;
+  height: 18px;
+  background: var(--fg-muted);
+  clip-path: polygon(38% 0, 62% 0, 62% 22%, 80% 22%, 100% 100%, 0 100%, 20% 22%, 38% 22%);
+}
+.vl-sc__label {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1.25;
+}
+.vl-sc__state {
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  color: var(--fg-muted);
+}
+.vl-sc__weight.is-placed {
+  border-style: dashed;
+  background: transparent;
+}
+.vl-sc__weight.is-placed .vl-sc__label {
+  opacity: 0.5;
+}
+.vl-sc__weight.is-placed .vl-sc__glyph {
+  background: transparent;
+  outline: 1px dashed var(--fg-muted);
+}
+.vl-sc__reset {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--fg-muted);
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.vl-sc__reset:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ── motion (only when allowed) ── */
+html.nz-motion .vl-sc__beam,
+html.nz-motion .vl-sc__hanger {
+  transition: transform 1.25s cubic-bezier(0.34, 1.32, 0.5, 1);
+}
+html.nz-motion .vl-sc__seal {
+  transition: opacity 0.6s var(--ease-out) 0.5s, transform 0.8s cubic-bezier(0.34, 1.5, 0.5, 1) 0.5s;
+}
+html.nz-motion .vl-sc__bar {
+  transition: background-color 0.6s var(--ease-out) 0.4s;
+}
+html.nz-motion .vl-sc.is-nudge .vl-sc__beam {
+  animation: vl-sc-swing 1.8s cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
+@keyframes vl-sc-swing {
+  0% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(calc(var(--tilt) + 5deg));
+  }
+  65% {
+    transform: rotate(calc(var(--tilt) - 2deg));
+  }
+  100% {
+    transform: rotate(var(--tilt));
+  }
+}
+
+/* touch: a short press lifts the weight (then it can be dragged; the page stays still) */
+.vl-sc__weight {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.vl-sc__weight.is-lifted {
+  z-index: 5;
+  box-shadow: 0 0 0 2px #f3a48f, 0 18px 30px -12px rgba(0, 0, 0, 0.8);
+}
+html.nz-motion .vl-sc__weight.is-lifted:not(.is-dragging) {
+  transform: scale(1.04);
+  transition: transform 0.15s ease;
+}

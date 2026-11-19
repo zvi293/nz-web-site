@@ -1,0 +1,92 @@
+---
+/**
+ * ServiceProcess — "the plinths": each step stands on a plinth one level higher than the last,
+ * and the finished work (the vermilion cube) is placed on the final one. Desktop: plinths in a
+ * row rising toward the end; phone: a staircase down the page, a plinth beside each step.
+ * Each plinth carries a small work (art map "process steps": marble-maze → kinetic-balance →
+ * indigo-loom → amber-sun-stair) — the project growing into a sculpture — and the last one gets
+ * the vermilion "sold" dot: the work is done. A slug the page already uses (its room's signature
+ * art, or anything in `avoid`) is swapped for a spare, so each slug appears once per page.
+ * The plinths rise into place as they scroll in (CSS scroll-driven, static without support).
+ */
+import Nb from "./Nb.astro";
+import { Artwork } from "@/components/art";
+import ServiceOpener from "./ServiceOpener.astro";
+import { roomFor } from "./rooms";
+import type { OpenerVariant, SectionTone, StepItem } from "./types";
+import "./service.css";
+
+interface Props {
+  title: string;
+  lede?: string;
+  steps: StepItem[];
+  tone?: SectionTone;
+  opener?: OpenerVariant;
+  index?: string;
+  label?: string;
+  id?: string;
+  /** Works on the plinths, one per step (default: the art map's process works). `[]` = none. */
+  art?: string[];
+  /** Slugs this page already shows (hero etc.) — never repeated on a plinth. */
+  avoid?: string[];
+}
+
+const PROCESS_ART = ["marble-maze", "kinetic-balance", "indigo-loom", "amber-sun-stair"];
+const SPARES = ["emerald-curtain", "porcelain-shockwave", "silver-droplet", "turquoise-fans"];
+const {
+  title,
+  lede,
+  steps,
+  tone = "bone",
+  opener = "split",
+  index = "05",
+  label = "איך עובדים",
+  id = "sv-process",
+  art = PROCESS_ART,
+  avoid = [],
+} = Astro.props;
+const taken = new Set([...avoid, roomFor(Astro.url.pathname)?.art].filter(Boolean) as string[]);
+const spares = SPARES.filter((x) => !taken.has(x));
+const works = steps.map((_, i) => {
+  if (!art.length) return undefined;
+  const slug = art[i % art.length];
+  return taken.has(slug) ? spares.shift() : slug;
+});
+const n = steps.length;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+---
+
+<section class="nz-section nz-section--space-default sv-proc" data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant={opener} index={index} label={label} title={title} id={`${id}-title`} lede={lede} />
+    <ol class="sv-proc__list" style={`--n: ${n}`}>
+      {
+        steps.map((s, i) => (
+          <li class="sv-proc__step" style={`--i: ${i}`}>
+            <div class="sv-proc__text sv-sd">
+              <p class="nz-label">
+                <span class="nz-label__index">{`שלב ${pad(i)}`}</span>
+                <span>{`מתוך ${String(n).padStart(2, "0")}`}</span>
+              </p>
+              <h3 class="sv-proc__title">{s.title}</h3>
+              <p class="sv-proc__desc"><Nb text={s.description} /></p>
+            </div>
+            <div class="sv-proc__plinth" aria-hidden="true">
+              {works[i] ? (
+                <span class="sv-proc__piece">
+                  <Artwork slug={works[i]!} sizes="(min-width: 1024px) 140px, 64px" ratio="4/5" />
+                  {i === n - 1 && <span class="sv-proc__dot" />}
+                </span>
+              ) : (
+                i === n - 1 && <span class="sv-proc__work" />
+              )}
+              <span class="sv-proc__block">
+                <span class="sv-proc__plate">{pad(i)}</span>
+              </span>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

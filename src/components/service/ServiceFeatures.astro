@@ -1,0 +1,186 @@
+---
+/**
+ * ServiceFeatures — what the service includes.
+ *   diagram (default)  an annotated drawing sheet of a site (architect's hairlines, no browser
+ *                      chrome): numbered vermilion markers sit on the parts each feature lives in
+ *                      (item.zone), and the numbered list beside it explains them. Hovering a list
+ *                      row (pointer) lifts its marker. Static — no JS.
+ *   plate              a specification plate: a double-ruled plaque with the features as a
+ *                      two-column technical sheet (index · serif title · line)
+ *   specimens          a materials sample board: every item is pinned beside its own small
+ *                      drawn specimen (item.sketch — see Sketch.astro; a default per position).
+ *                      Phone: specimen + text rows; desktop: a 3-column board of mounted cards.
+ */
+import Nb from "./Nb.astro";
+import Sketch from "./Sketch.astro";
+import ServiceOpener from "./ServiceOpener.astro";
+import type { FeatureItem, FeatureZone, OpenerVariant, SectionTone, SketchKind } from "./types";
+import "./service.css";
+
+interface Props {
+  title: string;
+  lede?: string;
+  items: FeatureItem[];
+  variant?: "diagram" | "plate" | "specimens";
+  tone?: SectionTone;
+  opener?: OpenerVariant;
+  index?: string;
+  label?: string;
+  id?: string;
+  /** Sheet caption (diagram), e.g. "גיליון 01 · מבנה אתר תדמית". */
+  sheet?: string;
+}
+
+const {
+  title,
+  lede,
+  items,
+  variant = "diagram",
+  tone = "bone",
+  opener = "numeral",
+  index = "03",
+  label = "מה כלול",
+  id = "sv-features",
+  sheet = "גיליון 01 · מבנה העמוד",
+} = Astro.props;
+
+const ZONES: Record<FeatureZone, [number, number]> = {
+  nav: [252, 26],
+  headline: [238, 68],
+  text: [226, 110],
+  cta: [306, 138],
+  image: [139, 104],
+  cards: [226, 196],
+  form: [230, 260],
+  footer: [126, 258],
+  phone: [34, 236],
+  speed: [312, 9],
+};
+const ORDER: FeatureZone[] = ["headline", "image", "cta", "cards", "text", "nav", "form", "phone", "speed", "footer"];
+const used = new Map<string, number>();
+const marks = items.map((it, i) => {
+  const zone = it.zone ?? ORDER[i % ORDER.length];
+  const [x, y] = ZONES[zone];
+  const k = used.get(zone) ?? 0;
+  used.set(zone, k + 1);
+  return { n: i + 1, x: x - k * 22, y: y + k * 4 };
+});
+const pad = (n: number) => String(n).padStart(2, "0");
+const SPEC_DEFAULT: SketchKind[] = ["code", "a11y", "mobile", "speed", "seo", "care", "form", "calendar", "layers"];
+---
+
+<section
+  class:list={["nz-section nz-section--space-default sv-feat", `sv-feat--${variant}`]}
+  data-tone={tone}
+  aria-labelledby={`${id}-title`}
+  id={id}
+>
+  <div class="nz-container">
+    <ServiceOpener variant={opener} index={index} label={label} title={title} id={`${id}-title`} lede={lede} />
+
+    {
+      variant === "diagram" ? (
+        <div class="sv-feat__grid">
+          <figure class="sv-sheet sv-sd">
+            <svg class="sv-sheet__svg" viewBox="0 0 420 300" role="img" aria-label={`שרטוט: ${title}`}>
+              <g class="sv-sheet__draw" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke">
+                <rect x="40" y="8" width="372" height="284" class="sv-sheet__paper" />
+                <line x1="40" y1="44" x2="412" y2="44" />
+                <rect x="362" y="20" width="38" height="12" class="sv-sheet__ink" />
+                <line x1="214" y1="26" x2="234" y2="26" /><line x1="246" y1="26" x2="266" y2="26" />
+                <line x1="278" y1="26" x2="298" y2="26" /><line x1="310" y1="26" x2="330" y2="26" />
+                <rect x="52" y="19" width="48" height="14" rx="7" class="sv-sheet__accent-line" />
+                <line x1="40" y1="8" x2="300" y2="8" class="sv-sheet__load" />
+                <rect x="250" y="58" width="150" height="12" class="sv-sheet__ink" />
+                <rect x="282" y="76" width="118" height="12" class="sv-sheet__ink" />
+                <line x1="240" y1="100" x2="400" y2="100" /><line x1="254" y1="108" x2="400" y2="108" /><line x1="270" y1="116" x2="400" y2="116" />
+                <rect x="320" y="130" width="80" height="16" rx="8" class="sv-sheet__accent" />
+                <rect x="52" y="58" width="174" height="92" />
+                <line x1="52" y1="58" x2="226" y2="150" class="sv-sheet__faint" /><line x1="226" y1="58" x2="52" y2="150" class="sv-sheet__faint" />
+                <circle cx="190" cy="82" r="11" />
+                <rect x="52" y="168" width="108" height="54" /><rect x="172" y="168" width="108" height="54" /><rect x="292" y="168" width="108" height="54" />
+                <line x1="64" y1="206" x2="148" y2="206" /><line x1="64" y1="213" x2="128" y2="213" />
+                <line x1="184" y1="206" x2="268" y2="206" /><line x1="184" y1="213" x2="248" y2="213" />
+                <line x1="304" y1="206" x2="388" y2="206" /><line x1="304" y1="213" x2="368" y2="213" />
+                <rect x="64" y="178" width="16" height="16" class="sv-sheet__faint" /><rect x="184" y="178" width="16" height="16" class="sv-sheet__faint" /><rect x="304" y="178" width="16" height="16" class="sv-sheet__faint" />
+                <line x1="40" y1="232" x2="412" y2="232" class="sv-sheet__faint" />
+                <rect x="240" y="242" width="160" height="10" /><rect x="240" y="256" width="160" height="10" />
+                <rect x="340" y="270" width="60" height="12" class="sv-sheet__ink" />
+                <line x1="76" y1="248" x2="200" y2="248" /><line x1="96" y1="258" x2="200" y2="258" /><line x1="116" y1="268" x2="200" y2="268" />
+                <rect x="8" y="176" width="52" height="118" rx="7" class="sv-sheet__phone" />
+                <rect x="16" y="190" width="36" height="6" class="sv-sheet__ink" /><rect x="16" y="200" width="28" height="6" class="sv-sheet__ink" />
+                <line x1="16" y1="214" x2="52" y2="214" /><line x1="16" y1="220" x2="46" y2="220" />
+                <rect x="16" y="268" width="36" height="9" rx="4.5" class="sv-sheet__accent" />
+              </g>
+              <g class="sv-marks">
+                {marks.map((m) => (
+                  <g class="sv-mark" data-n={m.n} transform={`translate(${m.x} ${m.y})`}>
+                    <rect x="-9" y="-9" width="18" height="18" />
+                    <text x="0" y="0.5" text-anchor="middle" dominant-baseline="middle">{m.n}</text>
+                  </g>
+                ))}
+              </g>
+            </svg>
+            <figcaption class="sv-sheet__cap">
+              <span class="nz-label__index">{sheet.split("·")[0]?.trim()}</span>
+              <span>{sheet.split("·").slice(1).join("·").trim()}</span>
+              <span class="sv-sheet__scale" aria-hidden="true">קנ״מ 1:10</span>
+            </figcaption>
+          </figure>
+
+          <ol class="sv-feat__list">
+            {items.map((it, i) => (
+              <li class="sv-feat__item sv-sd" data-n={i + 1}>
+                <span class="sv-feat__num" aria-hidden="true">{i + 1}</span>
+                <div>
+                  <h3 class="sv-feat__title"><Nb text={it.title} /></h3>
+                  <p class="sv-feat__desc"><Nb text={it.description} /></p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : variant === "specimens" ? (
+        <div class="sv-spec">
+          <p class="sv-spec__head" aria-hidden="true">
+            <span>לוח דוגמאות</span>
+            <span class="sv-spec__rule" />
+            <span>{`${pad(items.length)} דגימות`}</span>
+          </p>
+          <ol class:list={["sv-spec__board", items.length % 3 === 0 ? "sv-spec__board--3" : "sv-spec__board--2"]}>
+            {items.map((it, i) => (
+              <li class="sv-spec__item sv-sd">
+                <div class="sv-spec__mount">
+                  <span class="sv-spec__pin" aria-hidden="true" />
+                  <Sketch kind={it.sketch ?? SPEC_DEFAULT[i % SPEC_DEFAULT.length]} />
+                </div>
+                <div class="sv-spec__text">
+                  <p class="sv-spec__num" aria-hidden="true">{`דגימה ${pad(i + 1)}`}</p>
+                  <h3 class="sv-spec__title"><Nb text={it.title} /></h3>
+                  <p class="sv-spec__desc"><Nb text={it.description} /></p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : (
+        <div class="sv-plate sv-sd">
+          <p class="sv-plate__head" aria-hidden="true">
+            <span>מפרט</span>
+            <span class="sv-plate__cube" />
+            <span>{`${pad(items.length)} רכיבים`}</span>
+          </p>
+          <ol class="sv-plate__list">
+            {items.map((it, i) => (
+              <li class="sv-plate__row">
+                <span class="sv-plate__num" aria-hidden="true">{pad(i + 1)}</span>
+                <h3 class="sv-plate__title"><Nb text={it.title} /></h3>
+                <p class="sv-plate__desc"><Nb text={it.description} /></p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )
+    }
+  </div>
+</section>

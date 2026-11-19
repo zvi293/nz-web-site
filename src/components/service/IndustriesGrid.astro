@@ -1,0 +1,55 @@
+---
+/**
+ * IndustriesGrid — hub → every spoke (verticals, landing types) as catalogue plates: a framed
+ * thumbnail of the spoke's signature artwork, "תחום 01" and the name + one line. The column
+ * count always divides the item count (no orphans): 8 → 2/4, 3 → 1/3, 6 → 2/3.
+ */
+import { Artwork } from "@/components/art";
+import ServiceOpener from "./ServiceOpener.astro";
+import type { OpenerVariant, SectionTone, ServiceLink } from "./types";
+import "./service.css";
+
+interface Props {
+  title: string;
+  lede?: string;
+  items: ServiceLink[];
+  tone?: SectionTone;
+  opener?: OpenerVariant;
+  index?: string;
+  label?: string;
+  /** Word before the plate number ("תחום", "סוג"). */
+  prefix?: string;
+  id?: string;
+}
+
+const { title, lede, items, tone = "ink", opener = "rule", index = "08", label = "לפי תחום", prefix = "תחום", id = "sv-industries" } = Astro.props;
+const n = items.length;
+const desk = n % 4 === 0 ? 4 : n % 3 === 0 ? 3 : 2;
+const phone = n % 2 === 0 ? 2 : 1;
+---
+
+<section class="nz-section nz-section--space-default sv-ind" data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant={opener} index={index} label={label} title={title} id={`${id}-title`} lede={lede} />
+    <ul class:list={["sv-ind__grid", `sv-ind__grid--p${phone}`, `sv-ind__grid--d${desk}`]}>
+      {
+        items.map((it, i) => (
+          <li class="sv-sd" style={`--i: ${i}`}>
+            <a href={it.href} class="sv-plate-card">
+              {it.art && (
+                <span class="sv-plate-card__art" aria-hidden="true">
+                  <Artwork slug={it.art} sizes={`(min-width: 1024px) ${Math.round(90 / desk)}vw, ${phone === 2 ? 44 : 30}vw`} ratio="4 / 5" frame hover alt="" />
+                </span>
+              )}
+              <span class="sv-plate-card__label">
+                <span class="sv-plate-card__idx">{`${prefix} ${String(i + 1).padStart(2, "0")}`}</span>
+                <span class="sv-plate-card__name">{it.label}</span>
+                {it.desc && <span class="sv-plate-card__desc">{it.desc}</span>}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

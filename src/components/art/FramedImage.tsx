@@ -71,6 +71,9 @@ const FramedImage = ({
     <Tag
       className={cn("nz-art", frame && "nz-art--frame", hover && "nz-art--hover", loaded && "is-loaded", className)}
       style={style}
+      /* global.ts marks a loaded image's wrapper .is-loaded before hydration (so static art un-blurs
+         without React); the class then matches once the effect below sees img.complete. */
+      suppressHydrationWarning
     >
       {frame ? <div className="nz-art__frame">{canvas}</div> : canvas}
       {label && <MuseumLabel as="figcaption" {...label} />}

@@ -1,0 +1,515 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   /services/website-performance/ — page sections. Prefix wp-.
+   LoadWaterfall (paper): an illustrated load waterfall with an LCP rule.
+   VitalsPlates (bone): three instrument plates for LCP / INP / CLS.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── LoadWaterfall ─────────────────────────────────────────────────────── */
+.wp-fall__chart {
+  --wn: 0px; /* name column (desktop) */
+  --wf: 0px; /* fix column (desktop) */
+  --wg: 0px;
+  margin: clamp(32px, 5vw, 64px) 0 0;
+  padding: 18px 16px 20px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--line), 0 24px 44px -30px rgba(18, 17, 16, 0.4);
+}
+.wp-fall__axis {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+}
+.wp-fall__axis-name,
+.wp-fall__axis-fix {
+  display: none;
+}
+.wp-fall__axis-time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  justify-content: space-between;
+}
+.wp-fall__arrow {
+  flex: 1;
+  height: 10px;
+  color: var(--graphite);
+}
+.wp-fall__plot {
+  position: relative;
+}
+.wp-fall__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.wp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.wp-row__name {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  line-height: 1.2;
+}
+.wp-row__kind {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--graphite);
+  padding: 2px 8px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.wp-row--block .wp-row__kind,
+.wp-row--lcp .wp-row__kind {
+  color: var(--vermilion-deep);
+  box-shadow: inset 0 0 0 1px rgba(184, 50, 26, 0.4);
+}
+.wp-row__track {
+  position: relative;
+  height: 14px;
+  background: repeating-linear-gradient(to left, transparent 0 calc(10% - 1px), rgba(18, 17, 16, 0.07) calc(10% - 1px) 10%);
+}
+.wp-row__bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  inset-inline-start: calc(var(--s) * 1%);
+  width: calc(var(--l) * 1%);
+  border-radius: 2px;
+  background: var(--graphite);
+  transform-origin: 100% 50%; /* RTL: grows from its start (right) */
+}
+.wp-row--css .wp-row__bar,
+.wp-row--doc .wp-row__bar {
+  background: #8d857b;
+}
+.wp-row--font .wp-row__bar {
+  background: #a8a097;
+}
+.wp-row--block .wp-row__bar {
+  background: var(--vermilion);
+}
+.wp-row--lcp .wp-row__bar {
+  background: var(--ink);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--vermilion);
+}
+.wp-row--third .wp-row__bar {
+  background: repeating-linear-gradient(135deg, #8d857b 0 5px, #c9c1b6 5px 9px);
+}
+.wp-row__note {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--graphite);
+  text-wrap: pretty;
+}
+.wp-row__fix {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  justify-self: start;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+.wp-row__fix::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--vermilion);
+  transform: translateY(-1px);
+}
+.wp-row__fix-k {
+  font-weight: 400;
+  color: var(--graphite);
+}
+.wp-row__who {
+  justify-self: start;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--bone-2);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  font-weight: 500;
+  color: var(--ink);
+}
+.wp-row__who-k {
+  font-weight: 400;
+  color: var(--graphite);
+}
+.wp-row__track::after {
+  /* phones: the LCP moment marked inside every track */
+  content: "";
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  inset-inline-start: calc(var(--lcp) * 1%);
+  border-inline-start: 1.5px dashed var(--vermilion);
+}
+.wp-fall__key {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 0.75rem;
+  color: var(--vermilion-deep);
+}
+.wp-fall__key::before {
+  content: "";
+  width: 0;
+  height: 14px;
+  border-inline-start: 1.5px dashed var(--vermilion);
+}
+.wp-fall__lcp {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  inset-inline-start: calc(var(--wn) + var(--wg));
+  inset-inline-end: calc(var(--wf) + var(--wg));
+  pointer-events: none;
+}
+.wp-fall__lcp-line {
+  position: absolute;
+  top: 6px;
+  bottom: 0;
+  inset-inline-start: calc(var(--lcp) * 1%);
+  width: 0;
+  border-inline-start: 1.5px dashed var(--vermilion);
+}
+.wp-fall__lcp-tag {
+  position: absolute;
+  top: -11px;
+  inset-inline-start: calc(var(--lcp) * 1%);
+  transform: translateX(50%);
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--vermilion-fill);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.wp-fall__cap {
+  margin-top: 18px;
+  max-width: 40rem;
+}
+
+@media (min-width: 1024px) {
+  .wp-fall__chart {
+    --wn: 200px;
+    --wf: 320px;
+    --wg: 32px;
+    padding: 28px 36px 30px;
+  }
+  .wp-fall__axis {
+    display: grid;
+    grid-template-columns: var(--wn) minmax(0, 1fr) var(--wf);
+    column-gap: var(--wg);
+  }
+  .wp-fall__axis-name,
+  .wp-fall__axis-fix {
+    display: block;
+  }
+  .wp-fall__key,
+  .wp-row__track::after {
+    display: none;
+  }
+  .wp-fall__lcp {
+    display: block;
+  }
+  .wp-row {
+    grid-template-columns: var(--wn) minmax(0, 1fr) var(--wf);
+    grid-template-areas:
+      "name track note"
+      "name track fix"
+      "name track who";
+    column-gap: var(--wg);
+    row-gap: 8px;
+    align-items: center;
+    padding: 20px 0;
+  }
+  .wp-row__name {
+    grid-area: name;
+    flex-direction: column;
+    gap: 6px;
+    align-self: start;
+  }
+  .wp-row__kind {
+    align-self: flex-start;
+  }
+  .wp-row__track {
+    grid-area: track;
+    height: 16px;
+  }
+  .wp-row__note {
+    grid-area: note;
+    align-self: end;
+    font-size: 0.875rem;
+  }
+  .wp-row__fix {
+    grid-area: fix;
+    align-self: start;
+  }
+  .wp-row__who {
+    grid-area: who;
+  }
+}
+
+/* growth: each bar draws in, in its own start order */
+html.nz-motion .wp-fall__chart .wp-row__bar {
+  transform: scaleX(0);
+  transition: transform 0.9s var(--ease-gallery);
+  transition-delay: calc(0.2s + var(--s) * 0.022s);
+}
+html.nz-motion .wp-fall__chart[data-in] .wp-row__bar {
+  transform: scaleX(1);
+}
+html.nz-motion .wp-fall__chart .wp-fall__lcp,
+html.nz-motion .wp-fall__chart .wp-row__track::after {
+  opacity: 0;
+  transition: opacity 0.8s var(--ease-gallery) 1.9s;
+}
+html.nz-motion .wp-fall__chart[data-in] .wp-fall__lcp,
+html.nz-motion .wp-fall__chart[data-in] .wp-row__track::after {
+  opacity: 1;
+}
+
+/* ── VitalsPlates ──────────────────────────────────────────────────────── */
+.wp-vitals__plates {
+  list-style: none;
+  margin: clamp(32px, 5vw, 64px) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 20px;
+}
+@media (min-width: 900px) {
+  .wp-vitals__plates {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(20px, 2.4vw, 36px);
+  }
+}
+.wp-plate {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 18px 22px;
+  background: var(--paper);
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--line), 0 1px 0 #fff inset, 0 20px 36px -28px rgba(18, 17, 16, 0.5);
+}
+.wp-plate__draw {
+  margin: -6px -6px 4px;
+  padding: 10px;
+  background: var(--bone-2);
+  border-radius: 2px;
+}
+.wp-plate__draw svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 150px;
+}
+.wp-plate__key {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.wp-plate__key bdi {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 2.5rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.wp-plate__key span {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.wp-plate__what {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--graphite);
+  text-wrap: pretty;
+}
+.wp-scale {
+  margin-top: 4px;
+}
+.wp-scale__bar {
+  display: grid;
+  grid-template-columns: 2fr 1.4fr 1.6fr;
+  gap: 3px;
+  height: 8px;
+}
+.wp-scale__z {
+  border-radius: 2px;
+}
+.wp-scale__z--good {
+  background: var(--ink);
+}
+.wp-scale__z--mid {
+  background: #a8a097;
+}
+.wp-scale__z--poor {
+  background: repeating-linear-gradient(135deg, var(--vermilion) 0 3px, #f3c3b6 3px 6px);
+}
+.wp-scale__labels {
+  display: grid;
+  grid-template-columns: 2fr 1.4fr 1.6fr;
+  gap: 3px;
+  margin-top: 6px;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--graphite);
+}
+.wp-plate__good {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1.2;
+}
+.wp-plate__good span {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  color: var(--graphite);
+}
+.wp-plate__fix {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+.wp-plate__fix-k {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--vermilion-deep);
+  margin-bottom: 4px;
+}
+.wp-vitals__src {
+  margin-top: 20px;
+  font-size: 0.8125rem;
+  color: var(--graphite);
+  max-width: 48rem;
+}
+
+/* the drawings' vocabulary */
+.wp-d-sheet {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 1.2;
+}
+.wp-d-ink {
+  fill: var(--ink);
+}
+.wp-d-mute {
+  fill: #c3bbb0;
+}
+.wp-d-img {
+  fill: #1b2a4a;
+}
+.wp-d-prism {
+  fill: rgba(140, 180, 255, 0.55);
+  stroke: #cfe0ff;
+  stroke-width: 1;
+}
+.wp-d-beam {
+  stroke: #d4f25a;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.wp-d-ver {
+  fill: var(--vermilion-fill);
+}
+.wp-d-btn {
+  fill: var(--vermilion-fill);
+}
+.wp-d-ring {
+  fill: none;
+  stroke: var(--vermilion);
+  stroke-width: 1.2;
+}
+.wp-d-ring--2 {
+  opacity: 0.45;
+}
+.wp-d-hand {
+  fill: var(--bone);
+  stroke: var(--ink);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+.wp-d-menu {
+  fill: var(--bone-2);
+  stroke: var(--ink);
+  stroke-width: 1;
+}
+.wp-d-banner {
+  fill: #e9d5a8;
+  stroke: #b89a5a;
+  stroke-width: 0.8;
+}
+.wp-d-ghost {
+  fill: none;
+  stroke: var(--graphite);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.wp-d-arrow {
+  fill: none;
+  stroke: var(--vermilion);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* the drawings play once */
+html.nz-motion .wp-vitals__plates .wp-d-img {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.1s var(--ease-gallery) 0.5s;
+}
+html.nz-motion .wp-vitals__plates[data-in] .wp-d-img {
+  clip-path: inset(0 0 0 0);
+}
+html.nz-motion .wp-vitals__plates .wp-d-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.3);
+  opacity: 0;
+  transition: transform 0.9s var(--ease-gallery) 0.9s, opacity 0.9s var(--ease-gallery) 0.9s;
+}
+html.nz-motion .wp-vitals__plates[data-in] .wp-d-ring {
+  transform: scale(1);
+  opacity: 1;
+}
+html.nz-motion .wp-vitals__plates[data-in] .wp-d-ring--2 {
+  opacity: 0.45;
+}
+html.nz-motion .wp-vitals__plates .wp-d-moved {
+  transform: translateY(-40px);
+  transition: transform 0.6s cubic-bezier(0.5, -0.4, 0.4, 1.6) 1.4s;
+}
+html.nz-motion .wp-vitals__plates[data-in] .wp-d-moved {
+  transform: translateY(0);
+}

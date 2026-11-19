@@ -1,0 +1,67 @@
+---
+/**
+ * ToolBoard — "לוח הכלים" (trades page): who a tradesperson's landing page is for, as a
+ * workshop shadow board. Each trade hangs as its tool (roller, hammer, trowel, plug, tape
+ * measure), drawn in bone line over its painted vermilion outline on a pegboard, with the
+ * trade's name (H3) and one line under it. Phone: two columns, the last tool spans the row;
+ * desktop: five across. Static, no JS.
+ */
+import Nb from "@/components/service/Nb.astro";
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import type { TradeItem, TradeTool } from "@/data/landings/types";
+import "./landings.css";
+
+interface Props {
+  data: { title: string; lede: string; items: TradeItem[] };
+  index?: string;
+  label?: string;
+  id?: string;
+}
+const { data, index = "03", label = "לוח הכלים", id = "lp-tools" } = Astro.props;
+
+/** Each tool as SVG path data in a 120×80 box (stroked, no fill), and how it hangs. */
+const TILT: Partial<Record<TradeTool, string>> = { hammer: "rotate(-24 60 44)", trowel: "rotate(12 60 44)" };
+const TOOLS: Record<TradeTool, string[]> = {
+  roller: ["M22 14h62a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H22a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6z", "M90 25h10v20H60v8", "M55 53h10v22H55z"],
+  hammer: ["M30 14h36v18H30z", "M66 16c10 0 20 3 28 11", "M66 30c7 0 13 2 18 6", "M42 32h12v44H42z"],
+  trowel: ["M20 54L60 12l40 42z", "M60 54v8", "M50 62h20v14H50z"],
+  plug: ["M40 28h40a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H40a6 6 0 0 1-6-6V34a6 6 0 0 1 6-6z", "M50 28V12M70 28V12", "M60 58c0 12 18 14 34 16"],
+  tape: ["M50 18a26 26 0 1 1 0 52a26 26 0 0 1 0-52z", "M50 36a8 8 0 1 1 0 16a8 8 0 0 1 0-16z", "M76 56h32v10H76", "M84 56v4M92 56v6M100 56v4"],
+};
+---
+
+<section class="nz-section nz-section--space-default lp-tools" data-tone="ink" aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant="stacked" index={index} label={label} title={data.title} id={`${id}-title`} lede={data.lede} lines={["לכל מקצוע הכלי שלו", "ודף משלו"]} />
+    <ul class="lp-tools__board">
+      {
+        data.items.map((it) => (
+          <li class="lp-tools__slot sv-sd">
+            <span class="lp-tools__peg" aria-hidden="true">
+              <svg class="lp-tools__svg" viewBox="0 0 120 80" focusable="false">
+                <g transform={TILT[it.tool]}>
+                <g class="lp-tools__paint">
+                  {TOOLS[it.tool].map((d) => (
+                    <path d={d} />
+                  ))}
+                </g>
+                <g class="lp-tools__line">
+                  {TOOLS[it.tool].map((d) => (
+                    <path d={d} />
+                  ))}
+                </g>
+                </g>
+              </svg>
+            </span>
+            <h3 class="lp-tools__name">
+              <Nb text={it.title} />
+            </h3>
+            <p class="lp-tools__desc">
+              <Nb text={it.description} />
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

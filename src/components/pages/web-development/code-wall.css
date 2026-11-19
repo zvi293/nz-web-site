@@ -1,0 +1,574 @@
+/* הקוד מאחורי הקיר — turn the canvas over. Prefix cw- (exhibit) / cw-f (the bakery's front) /
+   cw-v (the verso: linen, stretcher bars, sticker, code). Six panels share the page's rows
+   (--cw-rows); a panel's inner box turns on its horizontal axis (rotateX 180deg) and its back face
+   is pre-turned so it reads upright. Motion only under html.nz-motion; otherwise it swaps. */
+
+.cw {
+  --cw-rows: 13fr 15fr 10fr 23fr 22fr 17fr;
+  --cw-linen: #ddd0b6;
+  --cw-wood: #a87a4c;
+  display: grid;
+  gap: 28px;
+}
+@media (min-width: 1024px) {
+  .cw {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(40px, 4vw, 72px);
+    align-items: start;
+  }
+}
+
+/* bar above the frame: counter + the two ends */
+.cw__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 12px;
+  margin-bottom: 14px;
+}
+.cw__count {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.cw__count-n {
+  font: 300 2.25rem/1 var(--font-display);
+  color: var(--fg);
+}
+.cw__count-of {
+  font: 400 1rem/1 var(--font-display);
+  color: var(--fg-muted);
+}
+.cw__count-l {
+  font: 500 0.75rem/1.2 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  margin-inline-start: 4px;
+}
+.cw__ends {
+  display: flex;
+  gap: 8px;
+}
+.cw__end {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fg-muted);
+  font: 500 0.875rem/1 var(--font-sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.35s var(--ease-out),
+    color 0.35s var(--ease-out),
+    border-color 0.35s var(--ease-out);
+}
+.cw__end:hover {
+  color: var(--fg);
+  border-color: var(--fg-muted);
+}
+.cw__end[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--ink);
+  border-color: var(--fg);
+}
+.cw__end:focus-visible {
+  outline: 2px solid var(--focus, #f3a48f);
+  outline-offset: 3px;
+}
+
+/* the frame: a dark moulding around the canvas */
+.cw__frame {
+  position: relative;
+  padding: 12px;
+  background: var(--ink-3);
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.4) inset,
+    0 30px 60px -30px rgba(0, 0, 0, 0.8);
+}
+.cw__page {
+  position: relative;
+  display: grid;
+  grid-template-rows: var(--cw-rows);
+  aspect-ratio: 0.54;
+  container-type: inline-size;
+  perspective: 1600px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+@media (min-width: 560px) {
+  .cw__page {
+    aspect-ratio: 0.8;
+  }
+}
+@media (min-width: 768px) {
+  .cw__page {
+    aspect-ratio: 0.95;
+  }
+}
+
+/* ── a panel: one part of the page, two faces ── */
+.cw-panel {
+  position: relative;
+  min-height: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.cw-panel__in {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(0deg);
+}
+.cw-panel.is-turned .cw-panel__in {
+  transform: rotateX(180deg);
+}
+.cw-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.cw-face--front {
+  background: #f6f1e8;
+}
+.cw-face--front > .cw-f {
+  height: 100%;
+}
+.cw-face--back {
+  transform: rotateX(180deg);
+}
+/* a thin seam between parts of the canvas, so each reads as its own panel */
+.cw-panel + .cw-panel .cw-face--front {
+  box-shadow: inset 0 1px 0 rgba(43, 33, 22, 0.1);
+}
+
+html.nz-motion .cw-panel__in {
+  transition: transform 0.85s cubic-bezier(0.55, 0, 0.25, 1);
+}
+html.nz-motion .cw.is-cascade .cw-panel__in {
+  transition-delay: calc(var(--i) * 90ms);
+}
+/* while a panel turns it passes in front of its neighbours */
+html.nz-motion .cw-panel:active,
+html.nz-motion .cw-panel.is-turned {
+  z-index: 1;
+}
+@media (hover: hover) and (pointer: fine) {
+  html.nz-motion .cw-panel:not(.is-turned):hover .cw-panel__in {
+    transform: rotateX(-9deg);
+    transition-duration: 0.45s;
+  }
+  html.nz-motion .cw-panel.is-turned:hover .cw-panel__in {
+    transform: rotateX(171deg);
+    transition-duration: 0.45s;
+  }
+  .cw-panel:hover .cw-face {
+    outline: 1px dashed rgba(224, 64, 31, 0.75);
+    outline-offset: -1px;
+  }
+}
+/* first view: the picture panel lifts its edge once, then settles */
+html.nz-motion .cw.is-lift .cw-panel--3:not(.is-turned) .cw-panel__in {
+  animation: cw-lift 1.5s var(--ease-gallery) 0.3s both;
+}
+@keyframes cw-lift {
+  0%,
+  100% {
+    transform: rotateX(0deg);
+  }
+  40% {
+    transform: rotateX(-38deg);
+  }
+}
+
+/* ── the front: a bakery's home page ── */
+.cw-face--front {
+  color: #2b2116;
+  font-family: var(--font-sans);
+}
+.cw-f {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  padding-inline: 6cqi;
+}
+.cw-f--nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(43, 33, 22, 0.12);
+}
+.cw-f__logo {
+  font: 500 clamp(15px, 5.4cqi, 24px) / 1 var(--font-display);
+  letter-spacing: -0.01em;
+}
+.cw-f__logo i {
+  display: inline-block;
+  width: 0.28em;
+  height: 0.28em;
+  margin-inline-start: 0.12em;
+  background: #b8603f;
+}
+.cw-f__links {
+  display: none;
+  gap: 3.4cqi;
+  font-size: clamp(9px, 1.9cqi, 14px);
+  color: #5a4b3b;
+}
+.cw-f__burger {
+  display: grid;
+  gap: 3px;
+  width: 18px;
+}
+.cw-f__burger i {
+  height: 2px;
+  background: #2b2116;
+  border-radius: 2px;
+}
+@container (min-width: 520px) {
+  .cw-f__links {
+    display: flex;
+  }
+  .cw-f__burger {
+    display: none;
+  }
+}
+.cw-f--h1 {
+  display: grid;
+  align-content: center;
+  gap: 1.2cqi;
+}
+.cw-f__kicker {
+  font-size: clamp(9px, 2.8cqi, 13px);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #a2532f;
+}
+.cw-f__title {
+  font: 400 clamp(18px, 7.4cqi, 46px) / 1.02 var(--font-display);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.cw-f__sub {
+  font-size: clamp(10px, 3.2cqi, 16px);
+  color: #5a4b3b;
+}
+@container (min-width: 520px) {
+  .cw-f__title {
+    font-size: clamp(24px, 6cqi, 48px);
+  }
+  .cw-f__kicker {
+    font-size: clamp(10px, 1.8cqi, 13px);
+  }
+  .cw-f__sub {
+    font-size: clamp(11px, 2.1cqi, 16px);
+  }
+}
+.cw-f--cta {
+  display: flex;
+  align-items: center;
+  gap: 4cqi;
+}
+.cw-f__btn {
+  display: inline-flex;
+  align-items: center;
+  height: clamp(28px, 10cqi, 44px);
+  padding-inline: 4.4cqi;
+  border-radius: 999px;
+  background: #2f7a4a;
+  color: #fff;
+  font-size: clamp(10px, 3.4cqi, 15px);
+  font-weight: 500;
+}
+.cw-f__more {
+  font-size: clamp(10px, 3.2cqi, 14px);
+  border-bottom: 1px solid currentColor;
+  color: #5a4b3b;
+}
+@container (min-width: 520px) {
+  .cw-f__btn {
+    height: clamp(30px, 6.2cqi, 46px);
+    padding-inline: 3cqi;
+    font-size: clamp(11px, 2.1cqi, 15px);
+  }
+  .cw-f__more {
+    font-size: clamp(11px, 2cqi, 14px);
+  }
+}
+.cw-f--img {
+  padding-inline: 0;
+}
+.cw-f--img svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.cw-f--cards {
+  display: grid;
+  align-content: center;
+  gap: 2.6cqi;
+}
+.cw-f__h2 {
+  font: 400 clamp(13px, 4.6cqi, 26px) / 1.1 var(--font-display);
+}
+.cw-f__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3cqi;
+}
+.cw-f__card {
+  display: grid;
+  gap: 1.6cqi;
+  font-size: clamp(9px, 2.9cqi, 14px);
+  color: #3d3024;
+}
+.cw-f__thumb {
+  aspect-ratio: 4 / 3;
+  border-radius: 2px;
+  background: #c98a4f;
+}
+.cw-f__thumb--1 {
+  background: #e3b7a0;
+}
+.cw-f__thumb--2 {
+  background: #9aa77c;
+}
+@container (min-width: 520px) {
+  .cw-f__h2 {
+    font-size: clamp(16px, 3.2cqi, 26px);
+  }
+  .cw-f__card {
+    font-size: clamp(10px, 1.9cqi, 14px);
+  }
+  .cw-f__thumb {
+    aspect-ratio: 16 / 7;
+  }
+}
+.cw-f--foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #2b2116;
+  color: #efe6d8;
+}
+.cw-f__logo--sm {
+  font-size: clamp(13px, 4.4cqi, 20px);
+}
+.cw-f__hours {
+  font-size: clamp(9px, 2.8cqi, 13px);
+  color: #cfc2ae;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── the verso: raw linen on the stretcher bars, a sticker and the code ── */
+.cw-v {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: start;
+  gap: 0.35em;
+  padding: 0.55em calc(2.6cqi + 7px) 0.4em;
+  background:
+    repeating-linear-gradient(0deg, rgba(90, 70, 40, 0.07) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(90, 70, 40, 0.06) 0 1px, transparent 1px 3px),
+    var(--cw-linen);
+  color: #1d1a17;
+  font: 400 clamp(10px, 3.25cqi, 13.5px) / 1.5 ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", "Heebo", monospace;
+  text-align: left;
+}
+@container (min-width: 520px) {
+  .cw-v {
+    font-size: clamp(11px, 1.8cqi, 13px);
+  }
+}
+/* the stretcher: wooden bars along both sides, and across the top / bottom of the canvas */
+.cw-v::before,
+.cw-v::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.22), transparent 30%, transparent 70%, rgba(0, 0, 0, 0.18)),
+    repeating-linear-gradient(0deg, rgba(60, 35, 15, 0.18) 0 2px, transparent 2px 9px),
+    var(--cw-wood);
+}
+.cw-v::before {
+  left: 0;
+}
+.cw-v::after {
+  right: 0;
+}
+.cw-panel--0 .cw-v {
+  border-top: 7px solid var(--cw-wood);
+}
+.cw-panel--5 .cw-v {
+  border-bottom: 7px solid var(--cw-wood);
+}
+.cw-v__sticker {
+  justify-self: start;
+  padding: 0.12em 0.55em 0.18em;
+  background: #fbf8f2;
+  color: #3b332b;
+  font-size: 0.8em;
+  letter-spacing: 0.02em;
+  box-shadow: 0 1px 2px rgba(43, 33, 22, 0.25);
+  transform: rotate(-1.2deg);
+}
+.cw-v__no {
+  color: #9c2f14;
+  font-weight: 600;
+}
+.cw-v__code {
+  display: grid;
+  font: inherit;
+  white-space: pre;
+}
+.cw-line {
+  display: block;
+}
+.cw-line > span {
+  unicode-bidi: isolate;
+}
+.cw-line > .cw-t {
+  unicode-bidi: plaintext;
+}
+.cw-g {
+  color: #9c2f14;
+}
+.cw-a {
+  color: #5a4d40;
+}
+.cw-s {
+  color: #6a4210;
+}
+.cw-t {
+  color: #1d1a17;
+}
+
+.cw__caption {
+  margin: 12px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
+/* ── the notes ── */
+.cw__notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+.cw__notes li {
+  border-bottom: 1px solid var(--rule);
+}
+.cw-note {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 16px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  font: inherit;
+  cursor: pointer;
+}
+.cw-note::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -14px;
+  top: 16px;
+  bottom: 16px;
+  width: 2px;
+  background: var(--vermilion);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.5s var(--ease-gallery);
+}
+.is-lit > .cw-note::before {
+  transform: scaleY(1);
+}
+.cw-note__no {
+  font: 400 1.125rem/1.3 var(--font-display);
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.4s var(--ease-out);
+}
+.is-lit .cw-note__no {
+  color: var(--accent-text, #f07a5c);
+}
+.cw-note__body {
+  display: grid;
+  gap: 4px;
+}
+.cw-note__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.cw-note__title {
+  font: 400 1.1875rem/1.3 var(--font-display);
+  color: var(--fg-muted);
+  transition: color 0.4s var(--ease-out);
+}
+.is-lit .cw-note__title {
+  color: var(--fg);
+}
+.cw-note__tag {
+  font: 400 0.8125rem/1.3 ui-monospace, "SFMono-Regular", Menlo, Consolas, "Heebo", monospace;
+  color: var(--fg-muted);
+}
+.is-lit .cw-note__tag {
+  color: #f3a48f;
+}
+.cw-note__why {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}
+.cw-note:hover .cw-note__title {
+  color: var(--fg);
+}
+.cw-note:focus-visible {
+  outline: 2px solid var(--focus, #f3a48f);
+  outline-offset: 2px;
+}
+@media (min-width: 1024px) {
+  .cw__notes {
+    margin-top: 58px;
+  }
+}
+
+.cw-note__turn {
+  align-self: start;
+  margin-top: 3px;
+  padding: 3px 8px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font: 500 0.6875rem/1.2 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+.is-lit .cw-note__turn {
+  border-color: rgba(224, 64, 31, 0.6);
+  color: #f3a48f;
+}

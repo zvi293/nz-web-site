@@ -1,37 +1,61 @@
 ---
 /**
- * /blog/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /blog/ — the magazine hub (המגזין). Static sections; behaviour in two small bundled scripts:
+ *   MagazineHero      the H1 + lead + the signature "הרוכסן" (MagazineZipper.astro, its own script)
+ *   MagazineFilter    sticky department chips (with counts) — filters issue + archive
+ *   MagazineIssue     the current issue as a broadsheet front page
+ *   MagazineArchive   the earlier articles by department (#dept-<key>), an ink room
+ *   MagazineGlossary  the glossary, previewed as a dictionary page
+ *   MagazineLetter    closing: a letter to the editor (WhatsApp)
+ * JSON-LD: CollectionPage + ItemList (every article) + the Blog node.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import Blog from "@/views/Blog";
+import MagazineHero from "@/components/blog/MagazineHero.astro";
+import MagazineFilter from "@/components/blog/MagazineFilter.astro";
+import MagazineIssue from "@/components/blog/MagazineIssue.astro";
+import MagazineArchive from "@/components/blog/MagazineArchive.astro";
+import MagazineGlossary from "@/components/blog/MagazineGlossary.astro";
+import MagazineLetter from "@/components/blog/MagazineLetter.astro";
+import "@/components/blog/magazine.css";
 import { collectionPage, BLOG_ID, ORG_ID, pageUrl, OG_IMAGES } from "@/lib/schema";
 import { getBlogPosts } from "@/lib/blog";
-import type { PageSeo } from "@/lib/seo";
+import { getArt } from "@/lib/art";
+import { heroImage, type PageSeo } from "@/lib/seo";
 
 const PATH = "/blog/";
-const title = "בלוג בניית אתרים | מדריכים ו-SEO | NZ-web";
+const title = "בלוג בניית אתרים: מדריכים לבעלי עסקים | NZ-web";
 const description =
-  "מדריכים, טיפים ותובנות מקצועיות על בניית אתרים, פיתוח אתרים, עיצוב UI/UX וקידום SEO בישראל. תוכן מניסיון אמיתי מהשטח.";
+  "בלוג בניית אתרים של NZ-web: מדריכים בעברית פשוטה על תכנון אתר לעסק, קידום בגוגל ובמנועי AI, נגישות, עיצוב ומהירות, עם תשובה קצרה בראש כל מאמר.";
+/* Must equal the <Artwork priority sizes> in MagazineZipper.astro (passed down from here). */
+const HERO_SIZES = "(min-width: 1440px) 760px, (min-width: 1024px) 54vw, 100vw";
 const posts = getBlogPosts();
+
 const seo: PageSeo = {
   path: PATH,
   title,
   description,
   ogImage: OG_IMAGES.blog,
-  breadcrumb: { name: "בלוג", path: PATH },
+  lcpArt: { slug: "zipper-library", sizes: HERO_SIZES },
+  breadcrumb: { name: "מגזין", path: PATH },
   jsonLd: [
     ...collectionPage({
       path: PATH,
       title,
       description,
-      items: posts.map((p) => ({ name: p.title, path: `/blog/${p.slug}/`, description: p.excerpt })),
+      primaryImage: heroImage("zipper-library", PATH),
+      dateModified: posts[0]?.updated_at ?? posts[0]?.published_at.slice(0, 10),
+      speakable: ["h1", ".lead"],
+      items: posts.map((p) => ({
+        name: p.title,
+        path: `/blog/${p.slug}/`,
+        description: p.excerpt,
+        image: p.art ? getArt(p.art).src : undefined,
+      })),
     }),
     {
       "@type": "Blog",
       "@id": BLOG_ID,
-      name: "הבלוג של NZ-web",
+      name: "המגזין של NZ-web",
       url: pageUrl(PATH),
       inLanguage: "he",
       publisher: { "@id": ORG_ID },
@@ -40,6 +64,13 @@ const seo: PageSeo = {
 };
 ---
 
-<BaseLayout seo={seo}>
-  <Blog client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <MagazineHero sizes={HERO_SIZES} />
+  <div class="mg-browse">
+    <MagazineFilter />
+    <MagazineIssue />
+    <MagazineArchive />
+  </div>
+  <MagazineGlossary />
+  <MagazineLetter />
 </BaseLayout>

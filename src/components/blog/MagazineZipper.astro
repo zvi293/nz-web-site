@@ -1,0 +1,306 @@
+---
+// Signature component: הרוכסן — unzip reveal + filter
+/**
+ * "The zipper" — the hub's signature (/blog/). The tower artwork (zipper-library) hangs as one
+ * tall framed object; under it the tower's glass facade carries on, drawn in the same pencil and
+ * grey wash, with the zipper still closed. Pull it (drag the pull, tap it, or use the arrow keys —
+ * it is a slider) and the glass opens in a lens along the seam, exactly like the drawing, lighting
+ * the library inside: one shelf per department, its count in serif and one book spine per article.
+ * Fully open, the lens stays a lens (glass slivers at the top and bottom corners). Choosing a shelf
+ * filters the magazine below (shared filter script in MagazineFilter.astro, via [data-mg-filter]).
+ * DOM order = reading order: the pull, then the shelves (so Tab goes pull → shelves → filter).
+ * Static fallback (no JS): the facade and the pull are not shown — the shelves are plain links to
+ * the departments in the archive (#dept-<key>). Reduced motion: the zipper jumps open / closed.
+ */
+import { Artwork, MuseumLabel, getArt } from "@/components/art";
+import { DEPARTMENTS, departmentCounts, getBlogPosts } from "@/lib/blog";
+
+interface Props {
+  sizes: string;
+}
+const { sizes } = Astro.props;
+const art = getArt("zipper-library");
+const counts = departmentCounts();
+const total = getBlogPosts().length;
+const shelves = [
+  { key: "all", name: "כל המגזין", blurb: "כל המאמרים, מהחדש לישן", count: total, href: "#mg-issue" },
+  ...DEPARTMENTS.map((d) => ({ key: d.key, name: d.name, blurb: d.blurb, count: counts[d.key] ?? 0, href: `#dept-${d.key}` })),
+];
+
+/* The facade drawing (viewBox 100×100, stretched): grey-blue wash, cloud reflections, mullions
+   that lean out a little toward the bottom (the tower widens as it comes down), floor bands, and
+   a few pencil hatches. Deterministic, so the SSR markup is stable. */
+const S = 48.5; /* the tower's seam, % of the width (measured on the artwork) */
+const mullions = [3, 13, 23, 33.5, 43, 54, 63.5, 73.5, 84, 94].map((x) => ({
+  x1: S + (x - S) * 0.9,
+  x2: x,
+}));
+const floors = [9, 19, 29, 39.5, 50, 60.5, 71, 81.5, 92];
+const clouds = [
+  { cx: 14, cy: 16, rx: 9, ry: 3.2 },
+  { cx: 30, cy: 47, rx: 11, ry: 3.8 },
+  { cx: 9, cy: 74, rx: 7, ry: 2.6 },
+  { cx: 71, cy: 22, rx: 12, ry: 3.6 },
+  { cx: 86, cy: 55, rx: 9, ry: 3 },
+  { cx: 64, cy: 83, rx: 10, ry: 3.4 },
+  { cx: 41, cy: 90, rx: 6, ry: 2.2 },
+];
+const hatches = Array.from({ length: 14 }, (_, i) => {
+  const x = (i * 7.3 + 2) % 100;
+  const y = (i * 13.7 + 5) % 92;
+  return { x1: x, y1: y + 6, x2: x + 3.5, y2: y };
+});
+---
+
+<figure class="mg-zip" data-mg-zip aria-labelledby="mg-zip-label">
+  <div class="mg-zip__object">
+    <div class="mg-zip__canvas">
+      <Artwork slug="zipper-library" sizes={sizes} priority ratio="3 / 2" alt={art.alt} />
+    </div>
+
+    <div class="mg-zip__panel" data-mg-zip-panel style="--mg-p: 0">
+      <button
+        type="button"
+        class="mg-zip__pull"
+        role="slider"
+        aria-label="רוכסן המגזין: משכו למטה כדי לפתוח את מדפי המדורים"
+        aria-orientation="vertical"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+        aria-valuetext="סגור"
+        aria-controls="mg-zip-shelves"
+        data-mg-zip-pull
+      >
+        <span class="mg-zip__tab" aria-hidden="true"><span></span></span>
+      </button>
+
+      <ol id="mg-zip-shelves" class="mg-zip__shelves" data-mg-zip-shelves aria-label="מדורי המגזין">
+        {
+          shelves.map((s, i) => (
+            <li class="mg-zip__shelf" style={`--i: ${i}`}>
+              <a href={s.href} data-mg-filter={s.key} class="mg-zip__link">
+                <span class="mg-zip__count">{String(s.count).padStart(2, "0")}</span>
+                <span class="mg-zip__name">{s.name}</span>
+                <span class="mg-zip__books" aria-hidden="true">
+                  {Array.from({ length: s.count }, () => (
+                    <span />
+                  ))}
+                </span>
+                <span class="mg-zip__blurb">{s.blurb}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="mg-zip__facade" aria-hidden="true">
+        <svg class="mg-zip__glass" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
+          <defs>
+            <linearGradient id="mgz-wash" x1="0" y1="0" x2="0.35" y2="1">
+              <stop offset="0" stop-color="#aeb5bc" />
+              <stop offset="0.55" stop-color="#c3c8cc" />
+              <stop offset="1" stop-color="#b3b9bf" />
+            </linearGradient>
+            <filter id="mgz-soft" x="-30%" y="-60%" width="160%" height="220%">
+              <feGaussianBlur stdDeviation="1.4" />
+            </filter>
+            <mask id="mgz-lens" maskUnits="userSpaceOnUse" x="-10" y="-40" width="120" height="180">
+              <rect x="-10" y="-40" width="120" height="180" fill="#fff" />
+              <path data-mg-lens d="" fill="#000" />
+            </mask>
+          </defs>
+          <g mask="url(#mgz-lens)">
+            <rect x="0" y="0" width="100" height="100" fill="url(#mgz-wash)" />
+            <g class="mg-zip__clouds" filter="url(#mgz-soft)">
+              {clouds.map((c) => <ellipse cx={c.cx} cy={c.cy} rx={c.rx} ry={c.ry} />)}
+            </g>
+            <g class="mg-zip__floors">
+              {floors.map((y) => <line x1="0" y1={y} x2="100" y2={y} />)}
+            </g>
+            <g class="mg-zip__mullions">
+              {mullions.map((m) => <line x1={m.x1} y1="0" x2={m.x2} y2="100" />)}
+            </g>
+            <g class="mg-zip__hatch">
+              {hatches.map((h) => <line x1={h.x1} y1={h.y1} x2={h.x2} y2={h.y2} />)}
+            </g>
+          </g>
+          <path class="mg-zip__lip" data-mg-lens-edge d="" />
+          <path class="mg-zip__teeth" data-mg-lens-teeth d="" />
+          <line class="mg-zip__seam" data-mg-seam x1={S} y1="0" x2={S} y2="100" />
+        </svg>
+        <span class="mg-zip__hint">משכו את הרוכסן</span>
+      </div>
+    </div>
+  </div>
+
+  <MuseumLabel
+    as="figcaption"
+    id="mg-zip-label"
+    index="06"
+    prefix="מוצג"
+    title={art.title}
+    medium={`חומרים: ${total} מאמרים, ${DEPARTMENTS.length} מדורים, רוכסן אחד`}
+    className="mg-zip__label"
+  />
+  <p class="nz-sr" aria-live="polite" data-mg-zip-live></p>
+</figure>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-mg-zip]");
+  const panel = root?.querySelector<HTMLElement>("[data-mg-zip-panel]");
+  const pull = root?.querySelector<HTMLButtonElement>("[data-mg-zip-pull]");
+  const shelves = root?.querySelector<HTMLElement>("[data-mg-zip-shelves]");
+  const live = root?.querySelector<HTMLElement>("[data-mg-zip-live]");
+  const lens = root?.querySelector<SVGPathElement>("[data-mg-lens]");
+  const edge = root?.querySelector<SVGPathElement>("[data-mg-lens-edge]");
+  const teeth = root?.querySelector<SVGPathElement>("[data-mg-lens-teeth]");
+  const seam = root?.querySelector<SVGLineElement>("[data-mg-seam]");
+
+  if (root && panel && pull && shelves) {
+    const S = 48.5; /* the seam, % of the width */
+    const motion = () => document.documentElement.classList.contains("nz-motion");
+    let p = 0;
+    let isOpen = false;
+    let raf = 0;
+
+    root.classList.add("is-ready");
+    shelves.inert = true;
+
+    /* The opening: a lens from the top of the facade down to the pull. Past 70% it relaxes into
+       the open lens, whose tips sit above and below the panel, so the corners keep their glass. */
+    const lensPath = (v: number) => {
+      if (v < 0.002) return "";
+      const e = Math.max(0, (v - 0.7) / 0.3);
+      const y0 = -32 * e;
+      const y1 = v * 100 + 32 * e;
+      const A = 44 * v + 20 * e;
+      const N = 24;
+      const l: string[] = [];
+      const r: string[] = [];
+      for (let i = 0; i <= N; i++) {
+        const t = i / N;
+        const y = (y0 + t * (y1 - y0)).toFixed(2);
+        const w = A * Math.sin(Math.PI * t);
+        l.push(`${(S - w).toFixed(2)},${y}`);
+        r.unshift(`${(S + w).toFixed(2)},${y}`);
+      }
+      return `M${l.join(" L")} L${r.join(" L")} Z`;
+    };
+
+    const render = (v: number) => {
+      p = v;
+      panel.style.setProperty("--mg-p", v.toFixed(4));
+      root.classList.toggle("is-moved", v > 0.02);
+      const d = lensPath(v);
+      lens?.setAttribute("d", d);
+      edge?.setAttribute("d", d);
+      teeth?.setAttribute("d", d);
+      seam?.setAttribute("y1", String(Math.min(100, v * 100)));
+      const pct = Math.round(v * 100);
+      pull.setAttribute("aria-valuenow", String(pct));
+      pull.setAttribute("aria-valuetext", pct >= 100 ? "פתוח" : pct === 0 ? "סגור" : `פתוח ב-${pct}%`);
+    };
+
+    const setOpen = (open: boolean) => {
+      if (open === isOpen) return;
+      isOpen = open;
+      root.classList.toggle("is-open", open);
+      shelves.inert = !open;
+      if (live)
+        live.textContent = open
+          ? "הרוכסן נפתח: חמישה מדפים, אחד לכל מדור. בחרו מדור כדי לסנן את המגזין."
+          : "הרוכסן נסגר.";
+    };
+
+    const animateTo = (target: number, done?: () => void) => {
+      cancelAnimationFrame(raf);
+      if (!motion()) {
+        render(target);
+        done?.();
+        return;
+      }
+      const from = p;
+      const t0 = performance.now();
+      const dur = 650 + Math.abs(target - from) * 550;
+      const ease = (x: number) => 1 - Math.pow(1 - x, 3);
+      const step = (now: number) => {
+        const k = Math.min(1, (now - t0) / dur);
+        render(from + (target - from) * ease(k));
+        if (k < 1) raf = requestAnimationFrame(step);
+        else done?.();
+      };
+      raf = requestAnimationFrame(step);
+    };
+
+    const open = () =>
+      animateTo(1, () => {
+        setOpen(true);
+        render(1);
+      });
+    const close = () => {
+      setOpen(false);
+      animateTo(0);
+    };
+
+    /* drag */
+    let dragging = false;
+    let startY = 0;
+    let moved = false;
+    const fromPointer = (y: number) => {
+      const r = panel.getBoundingClientRect();
+      return Math.max(0, Math.min(1, (y - r.top) / r.height));
+    };
+    pull.addEventListener("pointerdown", (e) => {
+      if (isOpen) return; /* tap toggles closed via click */
+      dragging = true;
+      moved = false;
+      startY = e.clientY;
+      cancelAnimationFrame(raf);
+      pull.setPointerCapture(e.pointerId);
+      root.classList.add("is-dragging");
+    });
+    pull.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      if (Math.abs(e.clientY - startY) > 6) moved = true;
+      if (moved) render(fromPointer(e.clientY));
+    });
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      root.classList.remove("is-dragging");
+      if (moved) (p > 0.3 ? open : close)();
+    };
+    pull.addEventListener("pointerup", endDrag);
+    pull.addEventListener("pointercancel", endDrag);
+    pull.addEventListener("click", () => {
+      if (moved) {
+        moved = false;
+        return;
+      }
+      (isOpen ? close : open)();
+    });
+
+    /* keyboard: a vertical slider (down / end = open) */
+    pull.addEventListener("keydown", (e) => {
+      const steps: Record<string, number> = { ArrowDown: 0.25, ArrowRight: 0.25, ArrowUp: -0.25, ArrowLeft: -0.25 };
+      if (e.key in steps) {
+        e.preventDefault();
+        const next = Math.max(0, Math.min(1, (isOpen ? 1 : p) + steps[e.key]));
+        if (next >= 1) open();
+        else {
+          setOpen(false);
+          animateTo(next);
+        }
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        close();
+      } else if (e.key === "End") {
+        e.preventDefault();
+        open();
+      }
+    });
+
+    render(0);
+  }
+</script>

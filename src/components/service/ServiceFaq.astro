@@ -1,0 +1,91 @@
+---
+/**
+ * ServiceFaq — set like a printed interview: "ש." / "ת." in vermilion serif, native
+ * <details> (one open at a time, smooth height where supported), a sticky "visitor book" card.
+ * The FAQPage JSON-LD is built by serviceSeo() from the SAME `items` — pass the same array, in
+ * the same order, and never edit one without the other. Static (no client JS).
+ */
+import Nb from "./Nb.astro";
+import { WhatsAppCta } from "@/components/nz";
+import ServiceOpener from "./ServiceOpener.astro";
+import type { OpenerVariant, SectionTone, ServiceFaqItem } from "./types";
+import "./service.css";
+
+interface Props {
+  items: ServiceFaqItem[];
+  title?: string;
+  lede?: string;
+  tone?: SectionTone;
+  opener?: OpenerVariant;
+  index?: string;
+  label?: string;
+  id?: string;
+  /** The side card: "book" (visitor book on bone, default) or "plaque" (an ink plaque). */
+  card?: "book" | "plaque";
+  /** The side card's text. */
+  note?: { title: string; body: string; cta?: string; message?: string };
+}
+
+const {
+  items,
+  title = "שאלות ותשובות",
+  lede,
+  tone = "paper",
+  opener = "split",
+  index = "07",
+  label = "שאלות שחוזרות",
+  id = "sv-faq",
+  card = "book",
+  note = {
+    title: "לא מצאתם את השאלה שלכם?",
+    body: "שלחו אותה בוואטסאפ ותקבלו תשובה אישית, בשפה פשוטה.",
+    cta: "לשאול בוואטסאפ",
+  },
+} = Astro.props;
+---
+
+<section class="nz-section nz-section--space-default sv-faq" data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant={opener} index={index} label={label} title={title} id={`${id}-title`} lede={lede} />
+    <div class="sv-faq__grid">
+      <ol class="sv-faq__list">
+        {
+          items.map((it) => (
+            <li class="sv-sd">
+              <details class="sv-qa" name={id}>
+                <summary class="sv-qa__q">
+                  <span class="sv-qa__mark" aria-hidden="true">ש.</span>
+                  <span class="sv-qa__text"><Nb text={it.q} /></span>
+                  <span class="sv-qa__icon" aria-hidden="true" />
+                </summary>
+                <div class="sv-qa__a">
+                  <span class="sv-qa__mark sv-qa__mark--a" aria-hidden="true">ת.</span>
+                  <p><Nb text={it.a} /></p>
+                </div>
+              </details>
+            </li>
+          ))
+        }
+      </ol>
+      <aside class:list={["sv-book", `sv-book--${card}`]} aria-labelledby={`${id}-book`}>
+        <div class="sv-book__card" data-tone={card === "plaque" ? "ink" : undefined}>
+          {card === "plaque" ? (
+            <p class="sv-book__count" aria-hidden="true">
+              <span class="sv-book__count-num">{String(items.length).padStart(2, "0")}</span>
+              <span>שאלות בעמוד הזה</span>
+            </p>
+          ) : (
+            <p class="nz-label sv-book__label">
+              <span class="nz-label__index">{String(items.length).padStart(2, "0")}</span>
+              <span>שאלות בעמוד הזה · ספר המבקרים פתוח</span>
+            </p>
+          )}
+          <p id={`${id}-book`} class="sv-book__title">{note.title}</p>
+          <p class="sv-book__body">{note.body}</p>
+          <WhatsAppCta label={note.cta ?? "לשאול בוואטסאפ"} message={note.message} size="md" />
+          <a href="/faq/" class="nz-link sv-book__all"><span class="nz-link__text">לכל השאלות הנפוצות</span></a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>

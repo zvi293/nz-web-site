@@ -1,0 +1,68 @@
+---
+/**
+ * ServiceOpener — a section header in one of five styles (playbook §10: vary the openers).
+ *   rule     hairline + vermilion index + label, then the H2 (classic wall label)
+ *   split    H2 on the start side, lede + label on the other (a split title/lede row)
+ *   numeral  a giant solid serif numeral beside the label + H2
+ *   stacked  a stacked museum label (wing / room / label) in a column beside the H2
+ *   quote    a large vermilion quotation mark hanging before the H2
+ * Slot "aside": extra content under the lede (a link, a note).
+ */
+import Nb from "./Nb.astro";
+import "./service.css";
+
+interface Props {
+  variant?: "rule" | "split" | "numeral" | "stacked" | "quote";
+  /** Vermilion index ("02") — for numeral it is the big numeral. */
+  index?: string;
+  label?: string;
+  title: string;
+  /** One word/phrase of the title set in vermilion. */
+  accent?: string;
+  id: string;
+  lede?: string;
+  /** Stacked variant: extra lines above the label (e.g. ["אולם 03", "חדר 01"]). */
+  lines?: string[];
+  center?: boolean;
+  class?: string;
+}
+
+const { variant = "rule", index, label, title, accent, id, lede, lines = [], center = false, class: cls } = Astro.props;
+const at = accent ? title.indexOf(accent) : -1;
+const parts = at >= 0 ? [title.slice(0, at), accent!, title.slice(at + accent!.length)] : [title, "", ""];
+---
+
+<header class:list={["sv-op", `sv-op--${variant}`, center && "sv-op--center", "sv-sd", cls]}>
+  {variant === "numeral" && index && <span class="sv-op__numeral" aria-hidden="true">{index}</span>}
+  {variant === "quote" && <span class="sv-op__quote" aria-hidden="true">”</span>}
+  {
+    variant === "stacked" ? (
+      <p class="sv-op__stack">
+        {lines.map((l) => <span>{l}</span>)}
+        {label && (
+          <span class="sv-op__stack-label">
+            {index && <span class="nz-label__index">{index}</span>} {label}
+          </span>
+        )}
+      </p>
+    ) : (
+      label && (
+        <p class:list={["nz-label", variant === "rule" && "nz-label--rule", "sv-op__label"]}>
+          {index && variant !== "numeral" && <span class="nz-label__index">{index}</span>}
+          <span>{label}</span>
+        </p>
+      )
+    )
+  }
+  <h2 id={id} class="nz-display nz-display--h2 sv-op__title">
+    {parts[0]}{parts[1] && <span class="nz-accent">{parts[1]}</span>}{parts[2]}
+  </h2>
+  {
+    (lede || Astro.slots.has("aside")) && (
+      <div class="sv-op__side">
+        {lede && <p class="nz-lede sv-op__lede"><Nb text={lede} /></p>}
+        <slot name="aside" />
+      </div>
+    )
+  }
+</header>

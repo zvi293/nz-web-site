@@ -1,0 +1,43 @@
+---
+/**
+ * The article's FAQ: native <details> cards. The FAQPage JSON-LD is built by the page from the
+ * same `post.faq` items, in the same order, with the same text (rendered verbatim here). Static.
+ */
+import type { BlogFaqItem } from "@/content/types";
+
+interface Props {
+  items: BlogFaqItem[];
+  title: string;
+}
+const { items } = Astro.props;
+---
+
+<section id="faq" class="ar-faq" data-tone="paper" aria-labelledby="ar-faq-title">
+  <div class="nz-container ar-faq__grid">
+    <div class="ar-faq__head">
+      <p class="ar-faq__glyph" aria-hidden="true">?</p>
+      <h2 id="ar-faq-title" class="ar-faq__title">שאלות נפוצות</h2>
+      <p class="ar-faq__lede">התשובות הקצרות לשאלות שעולות הכי הרבה על הנושא.</p>
+    </div>
+    <ol class="ar-faq__list">
+      {
+        items.map((item, i) => (
+          <li>
+            <details class="ar-qa" name="ar-faq">
+              <summary class="ar-qa__q">
+                <span class="ar-qa__num" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span class="ar-qa__text">{item.question}</span>
+                <span class="ar-qa__icon" aria-hidden="true" />
+              </summary>
+              <div class="ar-qa__a">
+                <p>{item.answer}</p>
+              </div>
+            </details>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

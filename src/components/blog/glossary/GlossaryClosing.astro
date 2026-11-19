@@ -1,0 +1,36 @@
+---
+/**
+ * Glossary closing (bone): a blank catalogue card waiting for the next term, and the invitation to
+ * suggest one (WhatsApp) + the way back to the magazine. Static.
+ */
+import { WhatsAppCta } from "@/components/nz";
+import { glossaryTerms } from "@/content/glossary";
+---
+
+<section class="gl-close" data-tone="bone" aria-labelledby="gl-close-title">
+  <div class="nz-container gl-close__grid">
+    <div class="gl-blank" aria-hidden="true">
+      <p class="gl-blank__top"><span>?</span><span dir="ltr">{String(glossaryTerms.length + 1).padStart(2, "0")} / —</span></p>
+      <p class="gl-blank__name">המונח שלכם</p>
+      <span class="gl-blank__line"></span>
+      <span class="gl-blank__line"></span>
+      <span class="gl-blank__line gl-blank__line--short"></span>
+      <span class="gl-blank__hole"></span>
+    </div>
+    <div class="gl-close__text">
+      <p class="nz-label nz-label--rule">
+        <span class="nz-label__index">כרטיס חדש</span>
+        <span>המילון גדל עם השאלות שלכם</span>
+      </p>
+      <h2 id="gl-close-title" class="gl-close__title">חסר מונח במילון?</h2>
+      <p class="gl-close__body">
+        שמעתם מילה בפגישה עם ספק או בהצעת מחיר ולא הבנתם אותה? כתבו לנו. נסביר אותה בוואטסאפ, ואם היא שימושית לעוד בעלי עסקים,
+        היא תיכנס למילון.
+      </p>
+      <div class="gl-close__ctas">
+        <WhatsAppCta size="lg" label="לשאול על מונח" message="שלום, רציתי לשאול מה זה" />
+        <a class="nz-link" href="/blog/"><span class="nz-link__text">חזרה למגזין</span></a>
+      </div>
+    </div>
+  </div>
+</section>

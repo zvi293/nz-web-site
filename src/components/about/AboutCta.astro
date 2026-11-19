@@ -1,0 +1,45 @@
+---
+/**
+ * The way out of the studio: one question, the WhatsApp action, and "the next rooms":
+ * three doorways (projects, the offer, FAQ), each with a small hung thumbnail of that
+ * room's own piece. Static (no client JS).
+ */
+import { Artwork } from "@/components/art";
+import { WhatsAppCta, ArrowIcon } from "@/components/nz";
+import { aboutCta } from "@/content/about";
+
+const c = aboutCta;
+---
+
+<section class="nz-section nz-section--space-default nz-wall-light ab-cta" data-tone="bone" aria-labelledby="ab-cta-title">
+  <div class="nz-container">
+    <div class="ab-cta__main">
+      <p class="nz-label ab-cta__room"><span class="ab-cube" aria-hidden="true"></span><span>{c.room}</span></p>
+      <h2 id="ab-cta-title" class="nz-display ab-cta__title">{c.title}</h2>
+      <p class="nz-lede ab-cta__body">{c.body}</p>
+      <WhatsAppCta size="lg" label={c.cta} message={c.whatsappMessage} className="ab-cta__btn" />
+    </div>
+
+    <nav class="ab-doors" aria-labelledby="ab-doors-label">
+      <p id="ab-doors-label" class="nz-label nz-label--rule">{c.nextLabel}</p>
+      <ul class="ab-doors__list" data-reveal="stagger">
+        {
+          c.next.map((door) => (
+            <li>
+              <a href={door.href} class="ab-door">
+                <div class="ab-door__thumb" aria-hidden="true">
+                  <Artwork slug={door.art} sizes="(min-width: 1024px) 200px, 96px" ratio="4 / 5" frame alt="" />
+                </div>
+                <span class="ab-door__text">
+                  <span class="ab-door__label">{door.label}</span>
+                  <span class="ab-door__desc">{door.desc}</span>
+                </span>
+                <ArrowIcon className="ab-door__arrow" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</section>

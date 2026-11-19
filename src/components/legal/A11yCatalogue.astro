@@ -1,0 +1,93 @@
+---
+/**
+ * "מה עשינו באתר" — a catalogue of what was done, each entry with a small drawn specimen of the
+ * thing itself (a heading outline, a Tab key, a focus ring, a contrast swatch…). Items come from
+ * site-settings (list lines); specimens follow the same order (content.ts → specimens).
+ */
+import type { LegalPageSection } from "@/content/types";
+import { parseBlocks, specimens } from "./content";
+import A11yGlyph from "./A11yGlyph";
+
+interface Props {
+  section: LegalPageSection;
+}
+const { section } = Astro.props;
+const blocks = parseBlocks(section.content);
+const items = blocks.flatMap((b) => (b.type === "ul" ? b.items : []));
+const paras = blocks.flatMap((b) => (b.type === "p" ? [b.text] : []));
+---
+
+<section id={section.id} class="nz-section nz-section--space-default lg-cat" data-tone="bone" aria-labelledby="lg-cat-title">
+  <div class="nz-container">
+    <div class="lg-cat__head">
+      <p class="lg-cat__count" aria-hidden="true">{items.length}</p>
+      <div>
+        <p class="nz-label"><span class="nz-label__index">04</span><span>קטלוג</span></p>
+        <h2 id="lg-cat-title" class="nz-display nz-display--h2">{section.title}</h2>
+        <p class="lg-cat__sub">{items.length} דברים שנבנו לתוך האתר, כל אחד עם דוגמה קטנה של איך הוא נראה.</p>
+      </div>
+    </div>
+    {paras.map((p) => <p class="lg-cat__para">{p}</p>)}
+
+    <ol class="lg-cat__list">
+      {
+        items.map((item, i) => {
+          const sp = specimens[i];
+          return (
+            <li class="lg-cat__item lg-sd">
+              <span class="lg-cat__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+              <p class="lg-cat__text">{item}</p>
+              {sp && (
+                <span class={`lg-spec lg-spec--${sp}`} aria-hidden="true"><span class="lg-spec__in">
+                  {sp === "headings" && (
+                    <>
+                      <span class="lg-spec__h1">H1</span>
+                      <span class="lg-spec__h2">H2</span>
+                      <span class="lg-spec__h3">H3</span>
+                    </>
+                  )}
+                  {sp === "skip" && <span class="lg-spec__key"><bdi dir="ltr">Tab ⇥</bdi></span>}
+                  {sp === "focus" && <span class="lg-spec__pill">כפתור</span>}
+                  {sp === "contrast" && (
+                    <>
+                      <span class="lg-spec__aa">אב</span>
+                      <span class="lg-spec__ratio"><bdi dir="ltr">≥ 4.5:1</bdi></span>
+                    </>
+                  )}
+                  {sp === "alt" && (
+                    <>
+                      <span class="lg-spec__frame" />
+                      <span class="lg-spec__alt">“יד פתוחה ופרח”</span>
+                    </>
+                  )}
+                  {sp === "labels" && (
+                    <>
+                      <span class="lg-spec__label">שם מלא</span>
+                      <span class="lg-spec__field" />
+                    </>
+                  )}
+                  {sp === "motion" && (
+                    <span class="lg-spec__pause">
+                      <span />
+                      <span />
+                    </span>
+                  )}
+                  {sp === "widget" && (
+                    <span class="lg-spec__bead">
+                      <A11yGlyph />
+                    </span>
+                  )}
+                  {sp === "nojs" && (
+                    <span class="lg-spec__js">
+                      <bdi dir="ltr">JS</bdi>
+                    </span>
+                  )}
+                </span></span>
+              )}
+            </li>
+          );
+        })
+      }
+    </ol>
+  </div>
+</section>

@@ -1,23 +1,124 @@
 ---
 /**
- * /terms/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /terms/ — תנאי שימוש (room 10). Static sections + ONE island:
+ *   FinePrint  client:visible   the signature "הכתב הקטן" (a bar magnifier over the fine print)
+ * The section with id="ip" is the license target of every licensed ImageObject in the site's
+ * JSON-LD (LICENSE_URL = /terms/#ip) — keep that id.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import Terms from "@/views/Terms";
-import type { PageSeo } from "@/lib/seo";
+import LegalHero from "@/components/legal/LegalHero.astro";
+import LegalDocument from "@/components/legal/LegalDocument.astro";
+import LegalDoors from "@/components/legal/LegalDoors.astro";
+import FinePrint from "@/components/legal/FinePrint";
+import TermsExhibit from "@/components/legal/TermsExhibit.astro";
+import { roomFor } from "@/components/Breadcrumbs";
+import "@/components/legal/rooms.css";
+import { siteSettings } from "@/content/site-settings";
+import { termsPlain, readingMinutes, readingLabel } from "@/components/legal/content";
+import { webPage, COPYRIGHT_NOTICE, CREDIT_TEXT } from "@/lib/schema";
+import { heroImage, type PageSeo } from "@/lib/seo";
 
 const PATH = "/terms/";
+const ART = "ice-constellation";
+const HERO_SIZES = "(min-width: 1024px) 46vw, 100vw";
+const doc = siteSettings.terms;
+const title = "תנאי שימוש וזכויות יוצרים | NZ-web";
+const clauses = doc.sections.map((s) => ({
+  id: s.id,
+  title: s.title,
+  text: s.content.replace(/^- /gm, "").replace(/\n+/g, " ").trim(),
+  plain: termsPlain[s.id] ?? "",
+}));
+const description =
+  "תנאי השימוש באתר NZ-web: מה המידע באתר מחייב ומה לא, זכויות יוצרים ורישוי תמונות, קישורים חיצוניים, הגבלת אחריות והדין שחל, בשפה ברורה ועם תקציר.";
+
 const seo: PageSeo = {
   path: PATH,
-  title: "תנאי שימוש | NZ-web",
-  description:
-    "תנאי השימוש של אתר NZ-web – זכויות, אחריות ומדיניות השימוש בשירותי הפיתוח, עיצוב ה-UI/UX ופתרונות ה-AI שלנו.",
+  title,
+  description,
+  lcpArt: { slug: ART, sizes: HERO_SIZES },
   breadcrumb: { name: "תנאי שימוש", path: PATH },
+  jsonLd: [
+    webPage({
+      path: PATH,
+      title,
+      description,
+      primaryImage: heroImage(ART, PATH),
+      dateModified: "2026-11-19",
+      speakable: true,
+    }),
+  ],
 };
 ---
 
-<BaseLayout seo={seo}>
-  <Terms client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)] lg-page">
+  <LegalHero
+    path={PATH}
+    crumb="תנאי שימוש"
+    title="תנאי"
+    accent="שימוש"
+    lead="השימוש באתר nz-web.com כפוף לתנאים האלה: המידע באתר כללי ואינו הצעה מחייבת, העיצוב, הקוד ויצירות האמנות שייכים ל-NZ-web, ושימוש בתמונה מחייב רישיון בכתב. כל עבודה בפועל נקבעת בהצעה אישית ובהסכם נפרד, וחל עליה הדין הישראלי. הנוסח המלא מופיע למטה, עם תקציר בשפה פשוטה."
+    art={ART}
+    sizes={HERO_SIZES}
+    room={roomFor(PATH) ?? 10}
+    variant="sheet"
+    ratio="4 / 5"
+    position="62% 50%"
+    medium="פרט מתוך היצירה · כללים ברורים כמו קרח שקוף"
+    facts={[
+      { term: "עודכן", value: doc.lastUpdated },
+      { term: "זמן קריאה", value: readingLabel(readingMinutes(doc.sections)) },
+      { term: "זכויות יוצרים", value: "רישוי תמונות", href: "#ip" },
+      { term: "הכתב הקטן", value: "6 סעיפים תחת זכוכית", href: "#in-short" },
+    ]}
+  />
+
+  <section class="nz-section nz-section--space-default lg-sheet-room" data-tone="ink" id="in-short" aria-labelledby="lg-sheet-title">
+    <div class="nz-container lg-sheet-room__grid">
+      <div class="lg-sheet-room__head">
+        <p class="lg-sheet-room__note" aria-hidden="true">
+          <span class="lg-sheet-room__lens"></span>
+          <span>×2.5</span>
+        </p>
+        <h2 id="lg-sheet-title" class="nz-display nz-display--h2">
+          את <span class="nz-accent">הכתב הקטן</span> קוראים עם זכוכית
+        </h2>
+        <p class="lg-sheet-room__lede">
+          על הדף מודפסים התנאים כמו בחוזה אמיתי, באותיות קטנות. גררו את הזכוכית המגדלת לאורך הדף, או הקישו על סעיף, ומה שמתחתיה
+          הופך למשפט אחד פשוט.
+        </p>
+      </div>
+      <FinePrint client:visible clauses={clauses} />
+    </div>
+  </section>
+
+  <LegalDocument sections={doc.sections} notes={termsPlain} label="תנאי השימוש, הנוסח המלא" updated={doc.lastUpdated}>
+    <Fragment slot="after-services">
+      <TermsExhibit kind="binding" />
+    </Fragment>
+    <Fragment slot="after-links">
+      <TermsExhibit kind="exit" />
+    </Fragment>
+    <Fragment slot="after-ip">
+      <figure class="lg-license" aria-labelledby="lg-license-cap">
+        <figcaption id="lg-license-cap" class="lg-license__cap">
+          <span class="nzc-cube" aria-hidden="true"></span>
+          תעודת רישוי לתמונה
+        </figcaption>
+        <dl class="lg-license__rows">
+          <div><dt>זכויות</dt><dd>{COPYRIGHT_NOTICE}</dd></div>
+          <div><dt>קרדיט</dt><dd><bdi dir="ltr">{CREDIT_TEXT}</bdi>, עם קישור לאתר</dd></div>
+          <div><dt>רישיון</dt><dd>בכתב, לכל שימוש בנפרד</dd></div>
+        </dl>
+        <a href="/contact/" class="nz-btn nz-btn--secondary nz-btn--sm lg-license__cta">לבקשת רישיון</a>
+      </figure>
+    </Fragment>
+  </LegalDocument>
+
+  <LegalDoors
+    current={PATH}
+    title="שאלה על התנאים?"
+    line="רוצים להשתמש בתמונה מהאתר, או לא בטוחים מה סעיף מסוים אומר? כתבו לנו ונענה בשפה פשוטה."
+    message="שלום צבי, יש לי שאלה על תנאי השימוש באתר NZ-web:"
+  />
 </BaseLayout>

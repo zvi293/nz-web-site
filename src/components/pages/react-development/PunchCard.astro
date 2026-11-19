@@ -1,0 +1,85 @@
+---
+/**
+ * PunchCard — "כרטיס הנול". Page-local section of /services/react-development/ (prefix rd-).
+ * The Jacquard loom of the hero work was programmed with punched cards; here the card holds what
+ * goes into every React project. Each row = one practice (title + line) beside its own strip of
+ * punch positions: printed digits, and holes punched through to the dark room behind (the pattern
+ * is derived from the row's text, so every row has its own). Holes are punched in sequence when
+ * the card enters (html.nz-motion + [data-reveal] → [data-in]); no-JS = the punched card.
+ * The strips are decorative (aria-hidden); the rows are an ordered list.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import Nb from "@/components/service/Nb.astro";
+import { CARD_ROWS } from "./data";
+import "./react-development.css";
+
+interface Props {
+  index?: string;
+}
+const { index = "02" } = Astro.props;
+
+const COLS = 24;
+const pad = (n: number) => String(n).padStart(2, "0");
+const rows = CARD_ROWS.map((r, ri) => {
+  const codes = [...r.title].map((c) => c.charCodeAt(0));
+  const holes = Array.from({ length: COLS }, (_, j) => (codes[j % codes.length] + j * 7 + ri * 3) % 3 === 0);
+  return { ...r, ri, holes };
+});
+---
+
+<section class="nz-section nz-section--space-default rd-card-sec" data-tone="ink" aria-labelledby="rd-card-title">
+  <div class="nz-container">
+    <ServiceOpener
+      variant="rule"
+      index={index}
+      label="כרטיס הנול"
+      id="rd-card-title"
+      title="מה נכנס לכל פרויקט React שלנו"
+      lede="הנול של ז׳קאר תוכנת בכרטיסים מנוקבים, ומהם התחיל התכנות. גם אצלנו יש כרטיס קבוע: שישה דברים שנכנסים לכל פרויקט, בלי לבקש."
+    />
+
+    <div class="rd-card" data-reveal>
+      <div class="rd-card__head">
+        <p class="rd-card__id">כרטיס {pad(7)} · פיתוח React</p>
+        <p class="rd-card__cols" aria-hidden="true" dir="ltr">
+          {Array.from({ length: COLS }, (_, j) => <span>{j + 1}</span>)}
+        </p>
+      </div>
+      <ol class="rd-card__rows">
+        {
+          rows.map((r) => (
+            <li class="rd-row" style={`--r:${r.ri}`}>
+              <div class="rd-row__text">
+                <span class="rd-row__no">{pad(r.ri + 1)}</span>
+                <h3 class="rd-row__title">
+                  <Nb text={r.title} />
+                </h3>
+                <p class="rd-row__body">
+                  <Nb text={r.body} />
+                </p>
+              </div>
+              <div class="rd-row__strip" aria-hidden="true" dir="ltr">
+                {r.holes.map((h, j) =>
+                  h ? (
+                    <span class="rd-hole" style={`--j:${j}`} />
+                  ) : (
+                    <span class="rd-pos">{(r.ri + j) % 10}</span>
+                  ),
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="rd-card__foot">
+        <span>NZ-web</span>
+        <span class="rd-card__cube" aria-hidden="true"></span>
+      </p>
+    </div>
+
+    <p class="rd-card-sec__note">
+      מתלבטים בין אתר שנבנה בקוד לאתר על מערכת מוכנה? כתבנו על זה השוואה מסודרת:{" "}
+      <a class="nz-link" href="/blog/react-vs-wordpress-2026/"><span class="nz-link__text">React או WordPress, מה נכון לעסק</span></a>.
+    </p>
+  </div>
+</section>

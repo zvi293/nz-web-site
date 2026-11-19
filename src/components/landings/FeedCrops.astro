@@ -1,0 +1,131 @@
+---
+/**
+ * FeedCrops — "איפה הקליק מתחיל" (campaign page): who a campaign landing page is for, hung as a
+ * wall of small framed crops — the place each audience's click starts (a feed post, a search
+ * ad, a story, two A/B versions, a campaign board, a waitlist page), drawn in CSS, each with a
+ * caption plate (H3 + one line). Phone: two columns; tablet+: three. Static, no JS.
+ */
+import Nb from "@/components/service/Nb.astro";
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import type { ChannelItem } from "@/data/landings/types";
+import "./landings.css";
+
+interface Props {
+  data: { title: string; lede: string; items: ChannelItem[] };
+  index?: string;
+  label?: string;
+  id?: string;
+}
+const { data, index = "04", label = "איפה הקליק מתחיל", id = "lp-crops" } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, "0");
+---
+
+<section class="nz-section nz-section--space-default lp-crops" data-tone="ink" aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener variant="rule" index={index} label={label} title={data.title} id={`${id}-title`} lede={data.lede} />
+    <ul class="lp-crops__wall">
+      {
+        data.items.map((it, i) => (
+          <li class="lp-crops__item sv-sd">
+            <div class="lp-crops__frame" data-crop={it.crop} aria-hidden="true">
+              {it.crop === "feed" && (
+                <div class="lp-crops__c lp-c-feed">
+                  <span class="lp-c-row">
+                    <i class="lp-c-av" />
+                    <i class="lp-c-ln lp-c-ln--s" />
+                    <b class="lp-c-tag">ממומן</b>
+                  </span>
+                  <span class="lp-c-img" />
+                  <span class="lp-c-bar">
+                    <i class="lp-c-ln" />
+                    <b class="lp-c-btn">למידע נוסף</b>
+                  </span>
+                </div>
+              )}
+              {it.crop === "search" && (
+                <div class="lp-crops__c lp-c-search">
+                  <span class="lp-c-q">
+                    <i class="lp-c-lens" />
+                    <i class="lp-c-ln lp-c-ln--s" />
+                  </span>
+                  <span class="lp-c-res">
+                    <b class="lp-c-tag lp-c-tag--ink">ממומן</b>
+                    <i class="lp-c-ln lp-c-ln--link" />
+                    <i class="lp-c-ln" />
+                    <i class="lp-c-ln lp-c-ln--m" />
+                  </span>
+                  <span class="lp-c-res lp-c-res--dim">
+                    <i class="lp-c-ln lp-c-ln--m" />
+                    <i class="lp-c-ln lp-c-ln--s" />
+                  </span>
+                </div>
+              )}
+              {it.crop === "story" && (
+                <div class="lp-crops__c lp-c-story">
+                  <span class="lp-c-phone">
+                    <span class="lp-c-prog">
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    <span class="lp-c-sun" />
+                    <b class="lp-c-swipe">להמשך</b>
+                  </span>
+                </div>
+              )}
+              {it.crop === "variants" && (
+                <div class="lp-crops__c lp-c-variants">
+                  <span class="lp-c-page">
+                    <b class="lp-c-ab">א</b>
+                    <i class="lp-c-ln lp-c-ln--h" />
+                    <span class="lp-c-img lp-c-img--sage" />
+                    <b class="lp-c-pill" />
+                  </span>
+                  <span class="lp-c-page">
+                    <b class="lp-c-ab">ב</b>
+                    <i class="lp-c-ln lp-c-ln--h lp-c-ln--m" />
+                    <span class="lp-c-img lp-c-img--ochre" />
+                    <b class="lp-c-pill" />
+                  </span>
+                </div>
+              )}
+              {it.crop === "board" && (
+                <div class="lp-crops__c lp-c-board">
+                  {[0, 1, 2, 3].map((r) => (
+                    <span class="lp-c-brow">
+                      <i class="lp-c-dot" data-on={r === 0 ? "" : undefined} />
+                      <i class="lp-c-ln lp-c-ln--s" />
+                      <span class="lp-c-meter">
+                        <i />
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              )}
+              {it.crop === "waitlist" && (
+                <div class="lp-crops__c lp-c-wait">
+                  <i class="lp-c-ln lp-c-ln--h" />
+                  <i class="lp-c-ln lp-c-ln--m" />
+                  <span class="lp-c-field">
+                    <i />
+                    <b>להצטרפות</b>
+                  </span>
+                  <i class="lp-c-ln lp-c-ln--s lp-c-ln--faint" />
+                </div>
+              )}
+            </div>
+            <p class="lp-crops__plate">
+              <span class="lp-crops__num">{pad(i + 1)}</span>
+            </p>
+            <h3 class="lp-crops__title">
+              <Nb text={it.title} />
+            </h3>
+            <p class="lp-crops__desc">
+              <Nb text={it.description} />
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

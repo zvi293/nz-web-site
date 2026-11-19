@@ -1,15 +1,44 @@
 ---
 /**
  * /blog/<slug>/ — one static page per post in src/content/blog.ts (getStaticPaths).
- * LEGACY view rendered as one island (client:load) until the magazine is redesigned.
- * An unknown slug is simply not built → Netlify serves the real 404.
+ * The article is typeset like a catalogue essay (SITE-PLAYBOOK §11): title page with the cover
+ * artwork + wall label, answer-first summary card, serif drop cap, pull quotes, margin notes,
+ * the TOC (sticky rail ≥1100px, floating pill + bottom sheet below), FAQ, related reading and a
+ * colophon CTA. The body is rendered by renderArticleSegments (src/lib/blog.ts), including the
+ * designed blocks (steps, compare, takeaways, tip/warn, checklist, do/don't, split, diagram).
+ * Static HTML; the only island is the article's signature component (client:visible) — the TOC
+ * and the checklists are small bundled scripts. An unknown slug is not built (→ 404).
+ * OG image: public/og/blog/<slug>.jpg when it exists (1200×630 card), else the cover artwork.
  */
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import BlogPost from "@/views/BlogPost";
-import { getBlogPosts, type BlogPost as Post } from "@/lib/blog";
-import { article, webPage } from "@/lib/schema";
+import ArticleHead from "@/components/blog/ArticleHead.astro";
+import ArticleToc from "@/components/blog/ArticleToc.astro";
+import ArticleFaq from "@/components/blog/ArticleFaq.astro";
+import ArticleRelated from "@/components/blog/ArticleRelated.astro";
+import ArticleColophon from "@/components/blog/ArticleColophon.astro";
+import ArticleSignature from "@/components/articles/ArticleSignature.astro";
+import ArticleBlocks from "@/components/blog/ArticleBlocks.astro";
+import { Artwork } from "@/components/art";
+import { getSignatureMeta } from "@/components/articles";
+import "@/components/blog/article.css";
+import {
+  getBlogPosts,
+  getArticleHeadings,
+  getDepartment,
+  getIssue,
+  getRelatedPosts,
+  renderArticleSegments,
+  renderInline,
+  splitSummary,
+  countWords,
+  type BlogPost as Post,
+} from "@/lib/blog";
+import { article, faqPage, webPage } from "@/lib/schema";
 import { getAbsoluteAssetUrl } from "@/lib/site-url";
-import type { PageSeo } from "@/lib/seo";
+import { heroImage, type PageSeo } from "@/lib/seo";
+import { getArt, hasArt } from "@/lib/art";
 
 export function getStaticPaths() {
   return getBlogPosts().map((post) => ({ params: { slug: post.slug }, props: { post } }));
@@ -19,38 +48,137 @@ const { post } = Astro.props as { post: Post };
 const PATH = `/blog/${post.slug}/`;
 const title = `${post.seo_title ?? post.title} | NZ-web`;
 const description = post.excerpt;
-const cover = getAbsoluteAssetUrl(post.cover_image);
-const modified = post.updated_at ?? post.published_at;
+const modified = post.updated_at ?? post.published_at.slice(0, 10);
+const published = post.published_at;
+const artSlug = hasArt(post.art) ? post.art : "zipper-library";
+const art = getArt(artSlug);
+/* Must equal the <Artwork priority sizes> in ArticleHead.astro. */
+const COVER_SIZES = "(min-width: 1440px) 640px, (min-width: 1024px) 46vw, 100vw";
+
+const dept = getDepartment(post.category);
+const issue = getIssue(post);
+const { summary, body } = splitSummary(post.content);
+const headings = getArticleHeadings(body).filter((h) => h.level === 2);
+const signature = getSignatureMeta(post.signature);
+const segments = renderArticleSegments(body, !!signature);
+const related = getRelatedPosts(post.slug, 3);
+const faq = post.faq ?? [];
+const cover = heroImage(artSlug, PATH);
+const absoluteCover = getAbsoluteAssetUrl(art.src);
+/* a generated 1200×630 card (scripts/og) wins over the raw artwork when it exists */
+const OG_CARD = `/og/blog/${post.slug}.jpg`;
+const hasCard = existsSync(join(process.cwd(), "public", OG_CARD));
 
 const seo: PageSeo = {
   path: PATH,
   title,
   description,
-  ogImage: cover || undefined,
-  ogImageWidth: cover ? post.cover_width : undefined,
-  ogImageHeight: cover ? post.cover_height : undefined,
-  ogImageAlt: cover ? `תמונת שער למאמר: ${post.title}` : undefined,
-  article: { publishedTime: post.published_at, modifiedTime: modified, section: post.category },
-  lcpImage: post.cover_image ? { href: post.cover_image } : undefined,
-  breadcrumb: { name: post.title, path: PATH, parent: { name: "בלוג", path: "/blog/" } },
+  ogImage: hasCard ? getAbsoluteAssetUrl(OG_CARD) : absoluteCover,
+  ogImageWidth: hasCard ? 1200 : 1080,
+  ogImageHeight: hasCard ? 630 : Math.round((art.height * 1080) / art.width),
+  ogImageAlt: hasCard ? `${post.title}: כרטיס המאמר במגזין של NZ-web` : art.alt,
+  article: { publishedTime: published, modifiedTime: modified, section: post.category },
+  lcpArt: { slug: artSlug, sizes: COVER_SIZES },
+  breadcrumb: { name: post.title, path: PATH, parent: { name: "מגזין", path: "/blog/" } },
   jsonLd: [
-    webPage({ path: PATH, title, description, datePublished: post.published_at, dateModified: modified }),
+    webPage({
+      path: PATH,
+      title,
+      description,
+      primaryImage: cover,
+      datePublished: published,
+      dateModified: modified,
+      speakable: ["h1", ".lead"],
+    }),
     article({
       path: PATH,
       headline: post.title,
       description,
-      image: cover || "https://nz-web.com/og/blog.jpg",
-      datePublished: post.published_at,
+      image: cover,
+      datePublished: published,
       dateModified: modified,
       section: post.category,
       keywords: post.category,
-      wordCount: post.content ? post.content.split(/\s+/).length : undefined,
+      wordCount: countWords(post.content),
       readMinutes: post.read_time,
     }),
+    ...(faq.length ? [faqPage(faq, PATH)] : []),
   ],
 };
 ---
 
-<BaseLayout seo={seo}>
-  <BlogPost client:load slug={post.slug} />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <article class="ar" aria-labelledby="ar-title">
+    <ArticleHead post={post} dept={dept} issue={issue} artSlug={artSlug} sizes={COVER_SIZES}>
+      <section class="ar-summary" aria-label="בקצרה" slot="summary">
+        <div class="ar-summary__card">
+          <p class="ar-summary__label">
+            <span class="ar-cube" aria-hidden="true"></span>
+            <span>בקצרה</span>
+          </p>
+          {summary && <p class="lead ar-summary__text" set:html={renderInline(summary)} />}
+          <nav class="ar-inside" aria-label="מה בפנים">
+            <p class="ar-inside__label" aria-hidden="true">
+              <span>מה בפנים</span>
+              <span class="ar-inside__count">{String(headings.length).padStart(2, "0")} פרקים</span>
+            </p>
+            <ol class="ar-inside__row">
+              {
+                headings.map((h, i) => (
+                  <li>
+                    <a class="ar-chip" href={`#${h.id}`}>
+                      <span class="ar-chip__n">{String(i + 1).padStart(2, "0")}</span>
+                      <span class="ar-chip__t">{h.text}</span>
+                    </a>
+                  </li>
+                ))
+              }
+              {
+                signature && (
+                  <li>
+                    <a class="ar-chip ar-chip--sig" href="#signature">
+                      <span class="ar-cube" aria-hidden="true" />
+                      <span class="ar-chip__t">מוצג: {signature.name}</span>
+                    </a>
+                  </li>
+                )
+              }
+              {
+                faq.length > 0 && (
+                  <li>
+                    <a class="ar-chip ar-chip--faq" href="#faq">
+                      <span class="ar-chip__t">שאלות נפוצות</span>
+                    </a>
+                  </li>
+                )
+              }
+            </ol>
+          </nav>
+        </div>
+      </section>
+    </ArticleHead>
+
+    <div class="nz-container ar-layout">
+      <ArticleToc headings={headings} />
+      <div class="ar-prose" id="ar-prose" data-ar-slug={post.slug}>
+        {
+          segments.map((seg) =>
+            seg.kind === "html" ? (
+              <Fragment set:html={seg.html} />
+            ) : seg.kind === "signature" ? (
+              signature && <ArticleSignature signature={post.signature!} />
+            ) : (
+              <Artwork slug={seg.slug} sizes="(min-width: 1024px) 320px, 100vw" frame ratio="4 / 5" className="ar-split__art" />
+            ),
+          )
+        }
+        <p class="ar-endmark" aria-hidden="true"><span class="ar-cube"></span></p>
+      </div>
+    </div>
+    <ArticleBlocks />
+
+    {faq.length > 0 && <ArticleFaq items={faq} title={post.title} />}
+    <ArticleRelated posts={related} />
+    <ArticleColophon post={post} dept={dept} issue={issue} />
+  </article>
 </BaseLayout>

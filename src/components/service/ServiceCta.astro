@@ -1,0 +1,81 @@
+---
+/**
+ * ServiceCta — "the invitation": an opening-night card laid on the ink room. A paper card with
+ * a vermilion seal, the serif invitation, the WhatsApp CTA, the phone line, and the studio's
+ * hours / email as the card's small print. Behind it, the envelope.
+ *   variant "door"  the conversation room at the end of the hall (hubs): an arched doorway lit
+ *                   with warm light, the big room number "09" on the lintel, the same CTAs.
+ */
+import Nb from "./Nb.astro";
+import { WhatsAppCta } from "@/components/nz";
+import { studio } from "@/components/nz/nav";
+import { contactInfo, getTelHref } from "@/lib/contact-utils";
+import type { ServiceCtaData } from "./types";
+import "./service.css";
+
+interface Props {
+  data: ServiceCtaData;
+  /** Small line above the title (default "הזמנה לשיחה"). */
+  label?: string;
+  id?: string;
+  variant?: "invite" | "door";
+}
+
+const { data, label = "הזמנה לשיחה", id = "sv-cta", variant = "invite" } = Astro.props;
+---
+
+<section class="nz-section nz-section--space-default nz-wall-light sv-cta" data-tone="ink" aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    {variant === "door" ? (
+      <div class="sv-door sv-sd">
+        <p class="sv-door__lintel" aria-hidden="true">
+          <span class="sv-door__num">09</span>
+          <span>חדר השיחה · סוף המסדרון</span>
+        </p>
+        <div class="sv-door__arch">
+          <span class="sv-door__light" aria-hidden="true" />
+          <p class="nz-label sv-door__label">
+            <span class="nz-label__index">{label}</span>
+          </p>
+          <h2 id={`${id}-title`} class="nz-display nz-display--h2 sv-door__title">{data.title}</h2>
+          <p class="sv-door__body"><Nb text={data.body} /></p>
+          <div class="sv-invite__ctas">
+            <WhatsAppCta size="lg" label={data.button ?? "לשיחה בוואטסאפ"} message={data.message} />
+            <a href={getTelHref(contactInfo.phone)} class="nz-link">
+              <span class="nz-link__text">או בטלפון <bdi dir="ltr">{contactInfo.phone}</bdi></span>
+            </a>
+          </div>
+        </div>
+        <p class="sv-invite__print sv-door__print">
+          <span>{studio.days} <bdi dir="ltr">{studio.time}</bdi></span>
+          <span aria-hidden="true">·</span>
+          <a href={`mailto:${studio.email}`}><bdi dir="ltr">{studio.email}</bdi></a>
+        </p>
+      </div>
+    ) : (
+    <div class="sv-invite sv-sd">
+        <span class="sv-invite__envelope" aria-hidden="true" />
+        <div class="sv-invite__card" data-tone="paper">
+          <span class="sv-invite__seal" aria-hidden="true"><span>NZ</span></span>
+          <p class="nz-label sv-invite__label">
+            <span class="nz-label__index">{label}</span>
+            <span>NZ-web · סטודיו לעיצוב ובניית אתרים</span>
+          </p>
+          <h2 id={`${id}-title`} class="nz-display nz-display--h2 sv-invite__title">{data.title}</h2>
+          <p class="sv-invite__body"><Nb text={data.body} /></p>
+          <div class="sv-invite__ctas">
+            <WhatsAppCta size="lg" label={data.button ?? "לשיחה בוואטסאפ"} message={data.message} />
+            <a href={getTelHref(contactInfo.phone)} class="nz-link">
+              <span class="nz-link__text">או בטלפון <bdi dir="ltr">{contactInfo.phone}</bdi></span>
+            </a>
+          </div>
+          <p class="sv-invite__print">
+            <span>{studio.days} <bdi dir="ltr">{studio.time}</bdi></span>
+            <span aria-hidden="true">·</span>
+            <a href={`mailto:${studio.email}`}><bdi dir="ltr">{studio.email}</bdi></a>
+          </p>
+        </div>
+      </div>
+    )}
+  </div>
+</section>

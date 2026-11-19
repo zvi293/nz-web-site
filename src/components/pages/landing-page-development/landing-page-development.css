@@ -1,0 +1,275 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   /services/landing-page-development/ — page sections. Prefix lpd-.
+   DepartureBoard: an ink departures board, split-flap destinations, rows are links.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.lpd-board {
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+.lpd-board__panel {
+  position: relative;
+  margin-top: clamp(32px, 5vw, 64px);
+  padding: 18px 16px 20px;
+  background: #0c0b0a;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(239, 234, 226, 0.08), inset 0 1px 0 rgba(239, 234, 226, 0.06), 0 40px 60px -40px rgba(0, 0, 0, 0.9);
+}
+.lpd-board__panel::before,
+.lpd-board__panel::after {
+  /* two mounting bolts */
+  content: "";
+  position: absolute;
+  top: 10px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #4a4540, #1c1a18 70%);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+.lpd-board__panel::before {
+  inset-inline-start: 10px;
+}
+.lpd-board__panel::after {
+  inset-inline-end: 10px;
+}
+.lpd-board__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 8px 14px;
+  border-bottom: 1px solid rgba(239, 234, 226, 0.1);
+}
+.lpd-board__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2.25rem);
+  color: var(--bone);
+  letter-spacing: 0.02em;
+}
+.lpd-board__cols {
+  display: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--ash);
+}
+.lpd-board__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lpd-row + .lpd-row {
+  border-top: 1px solid rgba(239, 234, 226, 0.08);
+}
+.lpd-row__link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 84px;
+  grid-template-areas:
+    "code flap thumb"
+    "text text thumb"
+    "from from go";
+  column-gap: 14px;
+  row-gap: 10px;
+  padding: 18px 8px;
+  color: var(--bone);
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.4s var(--ease-gallery);
+}
+.lpd-row__link:hover {
+  background: rgba(239, 234, 226, 0.035);
+}
+.lpd-row__link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.lpd-row__code {
+  grid-area: code;
+  align-self: center;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  color: var(--ash);
+  font-variant-numeric: tabular-nums;
+}
+.lpd-flap {
+  grid-area: flap;
+  display: flex;
+  gap: 3px;
+  perspective: 400px;
+}
+.lpd-flap__t {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 42px;
+  border-radius: 3px;
+  background: linear-gradient(#1f1d1b 0 50%, #191715 50% 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 2px 0 rgba(0, 0, 0, 0.6);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.625rem;
+  line-height: 1;
+  color: #f4efe6;
+}
+.lpd-flap__t::after {
+  /* the split of the flap */
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.75);
+}
+.lpd-row__text {
+  grid-area: text;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lpd-row__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 1.15rem + 0.8vw, 1.875rem);
+  line-height: 1.12;
+  text-wrap: balance;
+}
+.lpd-row__line {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ash);
+  text-wrap: pretty;
+}
+.lpd-row__from {
+  grid-area: from;
+  align-self: center;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--bone);
+}
+.lpd-row__from-k {
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--ash);
+}
+.lpd-row__thumb {
+  grid-area: thumb;
+  align-self: start;
+  width: 84px;
+  border: 3px solid #050505;
+  outline: 1px solid rgba(239, 234, 226, 0.14);
+  transition: transform 0.6s var(--ease-gallery);
+}
+.lpd-row__go {
+  grid-area: go;
+  justify-self: end;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(239, 234, 226, 0.22);
+  color: var(--bone);
+  transition: background-color 0.4s var(--ease-gallery), border-color 0.4s var(--ease-gallery), color 0.4s;
+}
+.lpd-row__go svg {
+  width: 22px;
+  height: 14px;
+  transition: transform 0.5s var(--ease-gallery);
+}
+.lpd-row__link:hover .lpd-row__go,
+.lpd-row__link:focus-visible .lpd-row__go {
+  background: var(--vermilion-fill);
+  border-color: var(--vermilion-fill);
+  color: #fff;
+}
+.lpd-row__link:hover .lpd-row__go svg {
+  transform: translateX(-4px);
+}
+.lpd-row__link:hover .lpd-row__thumb {
+  transform: translateY(-3px);
+}
+.lpd-board__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-top: 6px;
+  padding: 14px 8px 0;
+  border-top: 1px solid rgba(239, 234, 226, 0.1);
+  font-size: 0.9375rem;
+  color: var(--ash);
+}
+.lpd-board__foot .nz-link {
+  color: var(--bone);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.lpd-board__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vermilion);
+}
+
+@media (min-width: 1024px) {
+  .lpd-board__panel {
+    padding: 26px 32px 28px;
+  }
+  .lpd-board__head {
+    display: block;
+  }
+  .lpd-board__title {
+    display: block;
+    margin-bottom: 14px;
+  }
+  .lpd-board__cols {
+    display: grid;
+    grid-template-columns: 64px 220px minmax(0, 1fr) 190px 132px 56px;
+    column-gap: 28px;
+  }
+  .lpd-row__link {
+    grid-template-columns: 64px 220px minmax(0, 1fr) 190px 132px 56px;
+    grid-template-areas: "code flap text from thumb go";
+    column-gap: 28px;
+    align-items: center;
+    padding: 22px 0;
+  }
+  .lpd-row__thumb {
+    width: 132px;
+    align-self: center;
+  }
+  .lpd-flap__t {
+    width: 38px;
+    height: 54px;
+    font-size: 2.125rem;
+  }
+  .lpd-row__from {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* the flaps flip in once, row after row */
+html.nz-motion .lpd-board__panel .lpd-flap__t > span {
+  display: inline-block;
+}
+html.nz-motion .lpd-board__panel[data-in] .lpd-flap__t {
+  animation: lpd-flip 0.5s var(--ease-gallery) both;
+  animation-delay: calc(0.25s + var(--r, 0) * 0.28s + var(--k, 0) * 0.07s);
+  transform-origin: 50% 50%;
+}
+@keyframes lpd-flip {
+  0% {
+    transform: rotateX(-88deg);
+    filter: brightness(0.5);
+  }
+  60% {
+    transform: rotateX(12deg);
+  }
+  100% {
+    transform: rotateX(0);
+    filter: none;
+  }
+}

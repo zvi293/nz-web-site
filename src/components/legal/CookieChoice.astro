@@ -1,0 +1,14 @@
+---
+/** "לשנות את בחירת העוגיות" — reopens the cookie sheet (CookieConsent listens for "nz:cookies-open"). */
+---
+
+<div class="lg-choice">
+  <p class="lg-choice__text">הבחירה שלכם בבאנר העוגיות נשמרת בדפדפן. אפשר לשנות אותה כאן, בכל רגע.</p>
+  <button type="button" class="nz-btn nz-btn--secondary nz-btn--sm" data-cookies-open>לשנות את בחירת העוגיות</button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-cookies-open]").forEach((btn) =>
+    btn.addEventListener("click", () => window.dispatchEvent(new Event("nz:cookies-open"))),
+  );
+</script>

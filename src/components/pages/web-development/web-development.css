@@ -1,0 +1,310 @@
+/* /services/web-development/ — page-local sections + the page's hero tweak. Prefix wd-.
+   "שני קירות" (TemplateVsCode): a wall of plug-in bricks beside one continuous band + a ledger. */
+
+.wd-two__plates {
+  display: grid;
+  gap: 20px;
+}
+@media (min-width: 900px) {
+  .wd-two__plates {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(24px, 3vw, 48px);
+  }
+}
+
+.wd-plate {
+  position: relative;
+  margin: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 18px;
+  padding: clamp(20px, 3vw, 36px);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: var(--shadow-sm);
+}
+.wd-plate--band {
+  background: var(--ink);
+  color: var(--bone);
+  border-color: var(--ink);
+  --fg: var(--bone);
+  --fg-muted: var(--ash);
+  --rule: var(--line-ink);
+}
+.wd-plate__tag {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font: 500 0.8125rem/1.4 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+}
+.wd-plate__no,
+.wd-ledger__no {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--vermilion-deep);
+}
+.wd-plate--band .wd-plate__no {
+  color: #f07a5c;
+}
+.wd-plate__cap {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}
+.wd-plate__cap strong {
+  color: var(--fg);
+  font-weight: 500;
+}
+
+/* the wall of bricks */
+.wd-wall {
+  display: grid;
+  gap: 6px;
+  align-content: center;
+  min-height: 210px;
+  padding-block: 8px;
+}
+.wd-wall__course {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.wd-wall__course--offset {
+  grid-template-columns: 0.5fr repeat(2, minmax(0, 1fr)) 0.5fr;
+}
+.wd-brick {
+  display: grid;
+  place-items: center;
+  min-height: 56px;
+  padding: 6px 4px;
+  background: #c8714e;
+  color: #fff8f1;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 -3px 0 rgba(18, 17, 16, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  text-align: center;
+  font: 500 0.75rem/1.25 var(--font-sans);
+  letter-spacing: 0.01em;
+  transition:
+    transform 0.7s var(--ease-gallery),
+    opacity 0.7s var(--ease-gallery);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+.wd-brick:nth-child(3n + 2) {
+  background: #b8603f;
+}
+.wd-brick:nth-child(4n + 3) {
+  background: #a9563a;
+}
+.wd-brick__t {
+  text-wrap: balance;
+}
+@media (min-width: 900px) {
+  .wd-brick {
+    min-height: 72px;
+    font-size: 0.8125rem;
+  }
+}
+html.nz-motion .wd-plate--wall[data-reveal]:not([data-in]) .wd-brick {
+  opacity: 0;
+  transform: translateY(-18px);
+}
+
+/* the one band */
+.wd-band {
+  position: relative;
+  display: grid;
+  align-content: center;
+  min-height: 210px;
+}
+.wd-band__svg {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  margin-inline: auto;
+  overflow: visible;
+}
+.wd-band__shadow {
+  fill: rgba(0, 0, 0, 0.55);
+  filter: blur(6px);
+}
+.wd-band__q {
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+/* the strip appears quad by quad along its length, once, when the plate comes in */
+html.nz-motion .wd-band__q {
+  transition: opacity 0.35s var(--ease-out);
+  transition-delay: calc(var(--i) * 9ms);
+}
+html.nz-motion .wd-plate--band[data-reveal]:not([data-in]) .wd-band__q {
+  opacity: 0;
+}
+.wd-band__notes {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.wd-band__notes li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font: 400 0.9375rem/1.4 var(--font-sans);
+  color: var(--bone);
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out);
+  transition-delay: calc(1s + var(--i, 0) * 120ms);
+}
+.wd-band__notes li::before {
+  content: "";
+  flex: none;
+  width: 18px;
+  height: 1px;
+  background: var(--vermilion);
+  transform: translateY(-4px);
+}
+html.nz-motion .wd-plate--band[data-reveal]:not([data-in]) .wd-band__notes li {
+  opacity: 0;
+  transform: translateY(8px);
+}
+@media (min-width: 900px) {
+  .wd-band__notes {
+    grid-template-columns: repeat(3, auto);
+    justify-content: center;
+    gap: 8px 22px;
+  }
+  .wd-band__notes li {
+    font-size: 0.875rem;
+  }
+}
+
+/* the ledger: a ruled table on wide screens, stacked rows on phones */
+.wd-ledger {
+  width: 100%;
+  margin-top: clamp(36px, 5vw, 64px);
+  border-collapse: collapse;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.wd-ledger thead th {
+  padding: 0 0 12px;
+  text-align: start;
+  font: 500 0.8125rem/1.4 var(--font-sans);
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  border-bottom: 1px solid var(--fg);
+}
+.wd-ledger__no {
+  margin-inline-end: 6px;
+  font-size: 1.125rem;
+}
+.wd-ledger tbody th {
+  font: 400 1.375rem/1.2 var(--font-display);
+  color: var(--fg);
+  text-align: start;
+}
+.wd-ledger tbody th,
+.wd-ledger td {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+.wd-ledger td {
+  color: var(--fg-muted);
+  padding-inline-end: 24px;
+}
+.wd-ledger td:last-child {
+  color: var(--fg);
+}
+@media (max-width: 719px) {
+  .wd-ledger thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .wd-ledger,
+  .wd-ledger tbody,
+  .wd-ledger tr,
+  .wd-ledger th,
+  .wd-ledger td {
+    display: block;
+  }
+  .wd-ledger tr {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .wd-ledger tbody th,
+  .wd-ledger td {
+    padding: 0;
+    border: 0;
+  }
+  .wd-ledger tbody th {
+    margin-bottom: 10px;
+  }
+  .wd-ledger td {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 10px;
+    padding-block: 4px;
+  }
+  .wd-ledger td::before {
+    content: attr(data-side);
+    font: 500 0.75rem/1.9 var(--font-sans);
+    letter-spacing: 0.04em;
+    color: var(--vermilion-deep);
+  }
+}
+@media (min-width: 720px) {
+  .wd-ledger tbody th {
+    width: 18%;
+  }
+  .wd-ledger td {
+    width: 41%;
+  }
+}
+
+.wd-two__fair {
+  max-width: 62ch;
+  margin: 28px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}
+
+/* Hero on phones and tablets: the work hangs first, so the first screen is never text only
+   (the owner's rule). The split-ink exhibit becomes an ink band under the header with the art
+   cropped wide; the wall label stays with it. The kit hero is untouched on desktop. */
+@media (max-width: 1023.98px) {
+  .wd-page .sv-hero {
+    padding-top: 0;
+  }
+  .wd-page .sv-hero__grid {
+    row-gap: 20px;
+  }
+  .wd-page .sv-hero__exhibit {
+    order: -1;
+    padding: 18px var(--gutter) 18px;
+  }
+  .wd-page .sv-hero__frame .nz-art__canvas {
+    aspect-ratio: 16 / 10 !important;
+  }
+  .wd-page .sv-hero__label {
+    margin-top: 12px;
+  }
+}

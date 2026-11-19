@@ -1,0 +1,82 @@
+---
+/**
+ * DepartureBoard — the hub of the three landing sub-pages, set as an airport departures board
+ * (the paper plane takes off from here): every row is one route (מסלול), its destination in
+ * split-flap tiles (the goal: פניות / לידים / שיחות), what the page does, where the traffic
+ * comes from and the route's artwork. The whole row is the link. On first view the flap tiles
+ * flip in once, row by row (html.nz-motion + [data-in]); static otherwise. Prefix lpd-.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import { Artwork } from "@/components/art";
+import type { LandingRoute } from "./data";
+import "./landing-page-development.css";
+
+interface Props {
+  routes: LandingRoute[];
+  index?: string;
+}
+const { routes, index = "02" } = Astro.props;
+---
+
+<section class="nz-section nz-section--space-default lpd-board" data-tone="ink" aria-labelledby="lpd-board-title" id="lpd-board">
+  <div class="nz-container">
+    <ServiceOpener
+      variant="rule"
+      index={index}
+      label="לוח היציאות"
+      title="שלושה סוגי דפי נחיתה, לפי היעד"
+      accent="לפי היעד"
+      id="lpd-board-title"
+      lede="כל דף נחיתה ממריא ממקום אחר ונוחת ביעד אחר. בחרו את היעד של העסק, ותגיעו לעמוד שמפרט איך בונים דף בדיוק בשבילו."
+    />
+
+    <div class="lpd-board__panel" data-reveal="fade">
+      <p class="lpd-board__head" aria-hidden="true">
+        <span class="lpd-board__title">יציאות</span>
+        <span class="lpd-board__cols">
+          <span>מסלול</span><span>יעד</span><span>הדף</span><span>מקור התנועה</span>
+        </span>
+      </p>
+      <ol class="lpd-board__rows">
+        {
+          routes.map((r, ri) => (
+            <li class="lpd-row" style={`--r:${ri}`}>
+              <a href={r.href} class="lpd-row__link">
+                <span class="lpd-row__code" aria-hidden="true">{r.code}</span>
+                <span class="lpd-flap" aria-hidden="true">
+                  {[...r.goal].map((ch, k) => (
+                    <span class="lpd-flap__t" style={`--k:${k}`}>
+                      <span>{ch}</span>
+                    </span>
+                  ))}
+                </span>
+                <span class="lpd-row__text">
+                  <span class="lpd-row__name">
+                    {r.label}
+                    <span class="nz-sr">. יעד: {r.goal}.</span>
+                  </span>
+                  <span class="lpd-row__line">{r.line}</span>
+                </span>
+                <span class="lpd-row__from">
+                  <span class="lpd-row__from-k">מקור התנועה</span>
+                  {r.from}
+                </span>
+                <span class="lpd-row__thumb" aria-hidden="true">
+                  <Artwork slug={r.art} sizes="(min-width: 1024px) 132px, 96px" ratio="1 / 1" alt="" />
+                </span>
+                <span class="lpd-row__go" aria-hidden="true">
+                  <svg viewBox="0 0 40 24" fill="none"><path d="M38 12H4m0 0 8-8M4 12l8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="lpd-board__foot">
+        <span class="lpd-board__dot" aria-hidden="true"></span>
+        מה הופך דף לממיר, שלב אחרי שלב:
+        <a href="/services/landing-pages/" class="nz-link"><span class="nz-link__text">בניית דפי נחיתה</span></a>
+      </p>
+    </div>
+  </div>
+</section>

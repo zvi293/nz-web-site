@@ -1,4 +1,5 @@
-import { ChevronLeft } from "lucide-react";
+import "@/components/legal/floating-ui.css";
+import { mobileNav, legalNav } from "@/components/nz/nav";
 
 export interface Crumb {
   label: string;
@@ -6,33 +7,59 @@ export interface Crumb {
   href?: string;
 }
 
+/** Room numbers — the order of the site map (mobile menu, then the legal pages). */
+const ROOMS = [...mobileNav.slice(1), ...legalNav].map((item) => item.href);
+
+/** "/privacy/" → 10 (01-based), or undefined for pages outside the map. */
+export function roomFor(path?: string): number | undefined {
+  if (!path) return undefined;
+  const top = `/${path.split("/").filter(Boolean)[0] ?? ""}/`;
+  const i = ROOMS.indexOf(top);
+  return i >= 0 ? i + 1 : undefined;
+}
+
+interface BreadcrumbsProps {
+  items: Crumb[];
+  className?: string;
+  /** The room number ("אולם 09"). Default: derived from `path` or the first crumb's href. */
+  room?: number;
+  /** This page's path, used to find its room. */
+  path?: string;
+  /** "ink" when the trail sits in a night room. */
+  tone?: "bone" | "ink";
+}
+
 /**
- * Visible breadcrumb trail.
+ * Gallery wayfinding: "אולם 09 · דף הבית / מדיניות פרטיות".
  *
- * The site already emits BreadcrumbList JSON-LD (PageSeo.breadcrumb in the page's .astro frontmatter), but
- * Google's guidance is that structured data should describe something the
- * visitor can actually see. This renders that same trail, and gives deep pages
- * a cheap, descriptive internal link back up the hierarchy.
- *
- * "דף הבית" is prepended automatically — callers pass only the trail below it.
+ * The visible twin of the BreadcrumbList JSON-LD (PageSeo.breadcrumb in the page frontmatter):
+ * Google wants structured data to describe something the visitor can see. Static markup — in an
+ * .astro page render it without a client directive (zero JS). "דף הבית" is prepended
+ * automatically; callers pass only the trail below it.
  */
-const Breadcrumbs = ({ items, className = "" }: { items: Crumb[]; className?: string }) => {
+const Breadcrumbs = ({ items, className = "", room, path, tone }: BreadcrumbsProps) => {
   const crumbs: Crumb[] = [{ label: "דף הבית", href: "/" }, ...items];
+  const number = room ?? roomFor(path ?? items.find((c) => c.href)?.href);
 
   return (
-    <nav aria-label="מיקום בתוך האתר" className={`mb-6 ${className}`} dir="rtl">
-      <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground md:text-sm">
+    <nav aria-label="מיקום באתר" className={`nzc-crumbs ${className}`} data-tone={tone}>
+      {number !== undefined && (
+        <span className="nzc-crumbs__room">
+          <span className="nzc-crumbs__num">אולם {String(number).padStart(2, "0")}</span>
+          <span className="nzc-crumbs__dot" aria-hidden="true" />
+        </span>
+      )}
+      <ol className="nzc-crumbs__list">
         {crumbs.map((crumb, i) => {
           const isLast = i === crumbs.length - 1;
           return (
-            <li key={`${crumb.label}-${i}`} className="flex items-center gap-1.5">
-              {i > 0 && <ChevronLeft aria-hidden="true" className="h-3 w-3 shrink-0 opacity-50" />}
+            <li key={`${crumb.label}-${i}`} className="nzc-crumbs__item">
               {isLast || !crumb.href ? (
-                <span aria-current="page" className="font-semibold text-foreground">
+                <span aria-current={isLast ? "page" : undefined} className="nzc-crumbs__here">
                   {crumb.label}
                 </span>
               ) : (
-                <a href={crumb.href} className="transition-colors hover:text-primary">
+                <a href={crumb.href} className="nzc-crumbs__link">
                   {crumb.label}
                 </a>
               )}

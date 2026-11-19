@@ -1,18 +1,76 @@
 ---
 /**
- * /services/appointment-system/ — LEGACY view rendered as ONE island (client:load) until this page is redesigned.
- * The island is server-rendered too, so the full content is in the static HTML. SEO lives here
- * (frontmatter → BaseLayout), never in the view.
+ * /services/appointment-system/ — מערכת ניהול תורים. Service system page (src/components/service).
+ * Content: src/components/pages/appointment-system/data.ts. Static sections (two page-born:
+ * MessageTrail, WeekPlanner); ONE island: the signature "חוגת הזמן" (rotary dial, client:visible).
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import AppointmentSystem from "@/views/services/AppointmentSystem";
-import { config } from "@/views/services/AppointmentSystem";
-import { servicePageSeo } from "@/lib/page-seo";
-import type { PageSeo } from "@/lib/seo";
+import ServiceHero from "@/components/service/ServiceHero.astro";
+import SignatureSlot from "@/components/service/SignatureSlot.astro";
+import ServiceFeatures from "@/components/service/ServiceFeatures.astro";
+import ServiceProcess from "@/components/service/ServiceProcess.astro";
+import ServiceOutcomes from "@/components/service/ServiceOutcomes.astro";
+import ServiceFaq from "@/components/service/ServiceFaq.astro";
+import ServiceRelated from "@/components/service/ServiceRelated.astro";
+import ServiceCta from "@/components/service/ServiceCta.astro";
+import MessageTrail from "@/components/pages/appointment-system/MessageTrail.astro";
+import WeekPlanner from "@/components/pages/appointment-system/WeekPlanner.astro";
+import TimeDial from "@/components/pages/appointment-system/TimeDial";
+import { appointmentSystem as page } from "@/components/pages/appointment-system/data";
+import { serviceSeo } from "@/lib/page-seo";
 
-const seo: PageSeo = servicePageSeo(config);
+const seo = serviceSeo(page);
 ---
 
-<BaseLayout seo={seo}>
-  <AppointmentSystem client:load />
+<BaseLayout seo={seo} mainClass="relative bg-bone pt-[var(--header-h)]">
+  <ServiceHero data={page.hero} variant={page.heroVariant} path={page.path} crumb={page.crumb} position="50% 55%" />
+
+  <MessageTrail index="01" />
+
+  <SignatureSlot
+    name="חוגת הזמן"
+    title="קבעו תור, כמו שמחייגים"
+    lede="כך הלקוחות שלכם יקבעו: בוחרים יום, מסובבים את החוגה עד השעה הפנויה, ומקבלים אישור חתום. שעות תפוסות כהות, והחוגה מדלגת עליהן."
+    hint="בחרו יום, ואז סובבו את החוגה באצבע או הקישו על שעה. כשהשעה מתחת לחץ האדום, הקישו על לקבוע את התור."
+    keys="במקלדת: חיצים על הימים ועל החוגה, Home ו-End לשעה הראשונה והאחרונה."
+    opener="rule"
+    index="02"
+    id="ap-sig"
+  >
+    <TimeDial client:visible />
+  </SignatureSlot>
+
+  <ServiceFeatures
+    title={page.features!.title}
+    lede={page.features!.lede}
+    items={page.features!.items}
+    variant="specimens"
+    tone="bone"
+    opener="numeral"
+    index="03"
+    label="מה במערכת"
+    id="ap-features"
+  />
+
+  <WeekPlanner title={page.whoFor!.title} lede={page.whoFor!.lede} items={page.whoFor!.items} index="04" />
+
+  <ServiceProcess
+    title={page.process!.title}
+    lede={page.process!.lede}
+    steps={page.process!.steps}
+    tone="bone"
+    opener="stacked"
+    index="05"
+    art={["book-garden", "turquoise-fans", "marble-maze", "emerald-curtain"]}
+    avoid={[page.hero.art, "indigo-loom", "titanium-ribbon", "shell-staircases"]}
+    id="ap-process"
+  />
+
+  <ServiceOutcomes title={page.outcomes!.title} items={page.outcomes!.items} index="06" opener="split" id="ap-outcomes" />
+
+  <ServiceFaq items={page.faqs} title="שאלות על מערכת ניהול תורים" index="07" card="plaque" id="ap-faq" />
+
+  <ServiceRelated currentPath={page.path} items={page.related} />
+
+  <ServiceCta data={page.cta!} label="הזמנה לשיחה · יומן" />
 </BaseLayout>

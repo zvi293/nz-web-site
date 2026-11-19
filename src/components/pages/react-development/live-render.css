@@ -1,0 +1,549 @@
+/* רינדור חי — type → live highlight. Prefix lr- (lr-shop = the mock shop, lr-tree = its
+   component tree). Lit = rendered in the last change: a vermilion outline in the shop (like a
+   devtools "highlight updates"), a lit thread + count in the tree. */
+
+.lr {
+  display: grid;
+  gap: 22px;
+}
+@media (min-width: 1024px) {
+  .lr {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(36px, 4vw, 72px);
+    align-items: start;
+  }
+}
+
+/* ── the shop (always a paper screen, also inside the ink room) ── */
+.lr-shop {
+  --fg: var(--ink);
+  --fg-muted: var(--graphite);
+  --rule: var(--line);
+  --focus: var(--vermilion-deep);
+  color: var(--fg);
+  display: grid;
+  gap: 14px;
+  padding: 16px 16px 12px;
+  background: var(--paper);
+  border-radius: 6px;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.75);
+}
+@media (min-width: 768px) {
+  .lr-shop {
+    padding: 22px 24px 16px;
+  }
+}
+.lr-shop .is-lit,
+.lr-shop__head.is-lit,
+.lr-shop__search.is-lit,
+.lr-shop__list.is-lit,
+.lr-shop__foot.is-lit {
+  box-shadow: 0 0 0 1.5px var(--vermilion);
+}
+.lr-shop__head,
+.lr-shop__catalog,
+.lr-shop__search,
+.lr-shop__list,
+.lr-shop__foot,
+.lr-shop__cart,
+.lr-tea {
+  position: relative;
+}
+.lr-shop__head,
+.lr-shop__catalog,
+.lr-shop__search,
+.lr-shop__list,
+.lr-shop__foot {
+  border-radius: 3px;
+  transition: box-shadow 0.25s var(--ease-out);
+}
+.lr-shop {
+  position: relative;
+}
+.lr-shop.is-lit {
+  box-shadow:
+    0 0 0 2px var(--vermilion),
+    0 30px 60px -30px rgba(0, 0, 0, 0.75);
+}
+/* Catalog holds the search and the results: a little padding so its outline stands apart */
+.lr-shop__catalog {
+  display: grid;
+  gap: 12px;
+  padding: 5px;
+  margin: -5px;
+}
+.lr-shop__catalog.is-lit {
+  box-shadow: 0 0 0 1.5px var(--vermilion), inset 0 0 0 9999px rgba(224, 64, 31, 0.04);
+}
+
+/* the devtools strip on top of the shop (phones and tablets; the tree says it on desktop) */
+.lr-shop__dev {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -16px -16px 0;
+  padding: 9px 14px;
+  border-radius: 6px 6px 0 0;
+  background: var(--ink-2, #1d1b19);
+  color: var(--ash, #b9b2a8);
+  font: 500 0.75rem/1.2 var(--font-sans);
+  letter-spacing: 0.04em;
+}
+.lr-shop__dev-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--vermilion);
+}
+.lr-shop__dev-n {
+  margin-inline-start: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--bone);
+}
+.lr-shop__dev-n b {
+  font: 400 1.125rem/1 var(--font-display);
+  color: #f3a48f;
+}
+@media (min-width: 768px) {
+  .lr-shop__dev {
+    margin: -22px -24px 0;
+    padding-inline: 24px;
+  }
+}
+@media (min-width: 1024px) {
+  .lr-shop__dev {
+    display: none;
+  }
+}
+
+/* a component's own render count, on its region in the shop */
+.lr-badge {
+  position: absolute;
+  z-index: 3;
+  top: -10px;
+  inset-inline-end: -6px;
+  min-width: 26px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--vermilion-deep);
+  color: #fff;
+  font: 600 0.6875rem/20px var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(18, 17, 16, 0.25);
+}
+.lr-badge--start {
+  inset-inline-start: -6px;
+  inset-inline-end: auto;
+}
+.lr-badge--bottom,
+.lr-badge--bottom-start {
+  top: auto;
+  bottom: -10px;
+}
+.lr-badge--bottom-start {
+  inset-inline-start: -6px;
+  inset-inline-end: auto;
+}
+.lr-tea .lr-badge {
+  top: 6px;
+  inset-inline-end: 86px;
+}
+html.nz-motion .lr-badge {
+  animation: lr-pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+@keyframes lr-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+.lr-shop__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 2px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.lr-shop__logo {
+  font: 400 1.375rem/1 var(--font-display);
+  letter-spacing: -0.01em;
+}
+.lr-shop__logo i {
+  font-style: normal;
+  color: var(--vermilion);
+  margin-inline: 1px;
+}
+.lr-shop__cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font: 500 0.875rem/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+.lr-shop__cart svg {
+  width: 20px;
+  height: 20px;
+}
+.lr-shop__search {
+  display: grid;
+  gap: 6px;
+  padding: 2px;
+}
+.lr-shop__label {
+  font: 500 0.8125rem/1.3 var(--font-sans);
+  color: var(--fg-muted);
+}
+.lr-shop__field {
+  display: flex;
+  gap: 8px;
+}
+.lr-shop__field input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(18, 17, 16, 0.35);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--ink);
+  font: 400 1rem/1 var(--font-sans);
+}
+.lr-shop__field input::placeholder {
+  color: #7b746b;
+}
+.lr-shop__field input:focus-visible {
+  outline: 2px solid var(--vermilion-deep);
+  outline-offset: 1px;
+}
+.lr-shop__demo {
+  flex: none;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bone);
+  font: 500 0.875rem/1.1 var(--font-sans);
+  cursor: pointer;
+  transition: background-color 0.3s var(--ease-out);
+}
+.lr-shop__demo:hover {
+  background: var(--vermilion-deep);
+  border-color: var(--vermilion-deep);
+}
+.lr-shop__demo:disabled {
+  cursor: default;
+  background: transparent;
+  color: var(--ink);
+}
+.lr-shop__demo:focus-visible {
+  outline: 2px solid var(--vermilion-deep);
+  outline-offset: 2px;
+}
+
+.lr-shop__ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 2px;
+}
+.lr-tea {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 6px 6px;
+  border-bottom: 1px solid var(--line);
+  border-radius: 2px;
+}
+.lr-tea:last-child {
+  border-bottom: 0;
+}
+html.nz-motion .lr-tea:not(.lr-tea--empty):not(.lr-tea--none) {
+  animation: lr-in 0.5s var(--ease-gallery) both;
+}
+@keyframes lr-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.lr-tea__text {
+  display: grid;
+  gap: 2px;
+}
+.lr-tea__name {
+  font: 400 1.125rem/1.2 var(--font-display);
+}
+.lr-tea__note {
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: var(--fg-muted);
+}
+.lr-tea__add {
+  min-width: 64px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(18, 17, 16, 0.3);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: 500 0.875rem/1 var(--font-sans);
+  cursor: pointer;
+  transition:
+    background-color 0.25s var(--ease-out),
+    color 0.25s var(--ease-out);
+}
+.lr-tea__add[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bone);
+}
+.lr-tea__add:focus-visible {
+  outline: 2px solid var(--vermilion-deep);
+  outline-offset: 2px;
+}
+.lr-tea--none {
+  display: flex;
+  font-size: 0.9375rem;
+  color: var(--fg-muted);
+}
+.lr-tea--empty {
+  background: repeating-linear-gradient(90deg, rgba(18, 17, 16, 0.08) 0 6px, transparent 6px 12px) center / 70% 1px no-repeat;
+}
+.lr-shop__foot {
+  margin: 0;
+  padding: 10px 4px 2px;
+  border-top: 1px solid var(--line);
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+}
+
+/* ── the tree ── */
+.lr-tree {
+  display: grid;
+  gap: 14px;
+}
+.lr-tree__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+.lr-tree__title {
+  margin: 0;
+  font: 400 1.375rem/1.2 var(--font-display);
+  color: var(--fg);
+}
+.lr-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--fg-muted);
+  font: 500 0.875rem/1.2 var(--font-sans);
+  cursor: pointer;
+}
+.lr-switch__track {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--fg-muted);
+  transition:
+    background-color 0.3s var(--ease-out),
+    border-color 0.3s var(--ease-out);
+}
+.lr-switch__thumb {
+  position: absolute;
+  top: 3px;
+  inset-inline-start: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--fg);
+  transition: transform 0.3s var(--ease-out);
+}
+.lr-switch[aria-checked="true"] {
+  color: var(--fg);
+}
+.lr-switch[aria-checked="true"] .lr-switch__track {
+  background: var(--vermilion);
+  border-color: var(--vermilion);
+}
+.lr-switch[aria-checked="true"] .lr-switch__thumb {
+  transform: translateX(-18px);
+  background: #fff;
+}
+.lr-switch:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.lr-tree__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lr-node {
+  --step: 18px;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding-block: 4px;
+  padding-inline-start: calc(var(--d) * var(--step) + 6px);
+  padding-inline-end: 4px;
+  border-radius: 3px;
+  /* the warp threads of the ancestors */
+  background:
+    repeating-linear-gradient(to left, rgba(239, 234, 226, 0.16) 0 1px, transparent 1px var(--step))
+    right 0 top 0 / calc(var(--d) * var(--step)) 100% no-repeat;
+  transition: background-color 0.4s var(--ease-out);
+}
+.lr-node::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  inset-inline-start: calc((var(--d) - 1) * var(--step));
+  width: calc(var(--step) - 2px);
+  height: 1px;
+  background: rgba(239, 234, 226, 0.3);
+}
+.lr-node--root::before {
+  display: none;
+}
+.lr-node__name {
+  font: 400 0.875rem/1.2 ui-monospace, "SFMono-Regular", Menlo, Consolas, "Heebo", monospace;
+  color: var(--bone);
+  transition: color 0.3s var(--ease-out);
+}
+.lr-node__role {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  color: var(--fg-muted);
+}
+.lr-node__count {
+  min-width: 38px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  font: 500 0.75rem/1 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: var(--fg-muted);
+  transition:
+    background-color 0.3s var(--ease-out),
+    color 0.3s var(--ease-out),
+    border-color 0.3s var(--ease-out);
+}
+.lr-node.is-lit {
+  background-color: rgba(224, 64, 31, 0.12);
+}
+.lr-node.is-lit::before {
+  background: var(--vermilion);
+  height: 2px;
+}
+.lr-node.is-lit .lr-node__name {
+  color: #f3a48f;
+}
+.lr-node.is-lit .lr-node__count {
+  background: var(--vermilion);
+  border-color: var(--vermilion);
+  color: #fff;
+}
+.lr-node__flash {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background: rgba(240, 122, 92, 0.45);
+  opacity: 0;
+  pointer-events: none;
+}
+html.nz-motion .lr-node__flash {
+  animation: lr-flash 0.9s var(--ease-out);
+}
+@keyframes lr-flash {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.lr-tree__sum {
+  display: grid;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+.lr-tree__stat {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+.lr-tree__n {
+  font: 300 2.5rem/1 var(--font-display);
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.lr-tree__of {
+  font: 400 1.125rem/1 var(--font-display);
+  color: var(--fg-muted);
+}
+.lr-tree__l {
+  font: 500 0.8125rem/1.3 var(--font-sans);
+  color: var(--fg-muted);
+  letter-spacing: 0.02em;
+}
+.lr--all .lr-tree__n {
+  color: #f07a5c;
+}
+.lr-tree__whys {
+  display: grid;
+}
+.lr-tree__why {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  margin: 0;
+  max-width: 60ch;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}
+
+.lr-tree__why.is-on {
+  visibility: visible;
+}
+
+/* empty TeaCard slots keep the tree the same height whatever the search shows */
+.lr-node--slot {
+  opacity: 0.4;
+}
+.lr-node--slot .lr-node__name,
+.lr-node--slot .lr-node__role {
+  color: var(--fg-muted);
+}
+.lr-node--slot .lr-node__count {
+  border-style: dashed;
+}

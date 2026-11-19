@@ -1,0 +1,74 @@
+---
+/**
+ * ServiceWhoFor — who the service is for.
+ *   names (default)  a credits wall: each audience is a large serif name, rows alternate
+ *                    alignment like names cut into a gallery wall; the line beside it explains
+ *   guide            a visitor's guide: a ruled grid of numbered entries with a title row
+ */
+import Nb from "./Nb.astro";
+import ServiceOpener from "./ServiceOpener.astro";
+import type { AudienceItem, OpenerVariant, SectionTone } from "./types";
+import "./service.css";
+
+interface Props {
+  title: string;
+  lede?: string;
+  items: AudienceItem[];
+  variant?: "names" | "guide";
+  tone?: SectionTone;
+  opener?: OpenerVariant;
+  index?: string;
+  label?: string;
+  id?: string;
+}
+
+const {
+  title,
+  lede,
+  items,
+  variant = "names",
+  tone = "bone",
+  opener = "stacked",
+  index = "04",
+  label = "למי זה מתאים",
+  id = "sv-who",
+} = Astro.props;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
+---
+
+<section class:list={["nz-section nz-section--space-default sv-who", `sv-who--${variant}`]} data-tone={tone} aria-labelledby={`${id}-title`} id={id}>
+  <div class="nz-container">
+    <ServiceOpener
+      variant={opener}
+      index={index}
+      label={label}
+      title={title}
+      id={`${id}-title`}
+      lede={lede}
+      lines={["רשימת המבקרים", `${String(items.length).padStart(2, "0")} שמות`]}
+    />
+    {
+      variant === "names" ? (
+        <ul class="sv-names">
+          {items.map((it, i) => (
+            <li class:list={["sv-names__row", "sv-sd", i % 2 === 1 && "sv-names__row--alt"]}>
+              <span class="sv-names__idx" aria-hidden="true">{pad(i)}</span>
+              <h3 class="sv-names__name"><Nb text={it.title} /></h3>
+              <p class="sv-names__line"><Nb text={it.description} /></p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <ul class:list={["sv-guide", items.length % 3 === 0 ? "sv-guide--3" : "sv-guide--2"]}>
+          {items.map((it, i) => (
+            <li class="sv-guide__cell sv-sd">
+              <span class="sv-guide__idx">{pad(i)}</span>
+              <h3 class="sv-guide__name"><Nb text={it.title} /></h3>
+              <p class="sv-guide__line"><Nb text={it.description} /></p>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</section>

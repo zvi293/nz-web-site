@@ -1,0 +1,61 @@
+---
+/**
+ * OneComponent — "רכיב אחד, מקרוב". Page-local opening essay of /services/react-development/
+ * (prefix rd-). Two short paragraphs beside a framed detail that shows React's whole idea on one
+ * tea card: the data (props) → the component → what is on the screen, and under it the same card
+ * after one value changed (only that card is drawn again). Static; the detail is a figure with a
+ * text caption, its code is aria-hidden decoration, the caption says it in words.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import Nb from "@/components/service/Nb.astro";
+import { INTRO } from "./data";
+import "./react-development.css";
+
+interface Props {
+  index?: string;
+}
+const { index = "01" } = Astro.props;
+---
+
+<section class="nz-section nz-section--space-default rd-one" data-tone="paper" aria-labelledby="rd-one-title">
+  <div class="nz-container">
+    <ServiceOpener variant="stacked" index={index} label="מבוא · רכיב אחד" lines={["אולם 03", "חדר 07"]} id="rd-one-title" title={INTRO.title} />
+
+    <div class="rd-one__grid">
+      <div class="rd-one__text">
+        {INTRO.paragraphs.map((p, i) => <p class:list={["rd-one__p", i === 0 && "rd-one__p--first"]}><Nb text={p} /></p>)}
+      </div>
+
+      <figure class="rd-detail" data-reveal>
+        <p class="rd-detail__tag"><span class="nz-label__index">פרט</span> רכיב אחד, מקרוב</p>
+        <div class="rd-detail__flow" aria-hidden="true">
+          <div class="rd-step rd-step--data">
+            <span class="rd-step__k">הנתונים</span>
+            <code class="rd-step__code" dir="ltr"
+              ><span class="rd-l"><span class="rd-c-a">name</span>: <span class="rd-c-s">"ארל גריי"</span>,</span><span class="rd-l"
+                ><span class="rd-c-a">inCart</span>: <span class="rd-c-v"><span class="rd-off">false</span><span class="rd-on">true</span></span></span
+              ></code
+            >
+          </div>
+          <span class="rd-arrow"></span>
+          <div class="rd-step rd-step--comp">
+            <span class="rd-step__k">הרכיב</span>
+            <code class="rd-step__tagname" dir="ltr">&lt;TeaCard /&gt;</code>
+            <span class="rd-step__count" dir="ltr"><span class="rd-off">×1</span><span class="rd-on">×2</span></span>
+          </div>
+          <span class="rd-arrow"></span>
+          <div class="rd-step rd-step--screen">
+            <span class="rd-step__k">מה שרואים</span>
+            <span class="rd-mini">
+              <span class="rd-mini__name">ארל גריי</span>
+              <span class="rd-mini__btn"><span class="rd-off">לסל</span><span class="rd-on">בסל ✓</span></span>
+            </span>
+          </div>
+        </div>
+        <figcaption class="rd-detail__cap">
+          הנתון <bdi>inCart</bdi> משתנה, הרכיב מצטייר שוב, והכפתור מתחלף. שאר הכרטיסים בעמוד לא נוגעים בזה.
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,55 @@
+---
+/**
+ * The last room: an unanswered question. A single open string runs across the ink room with
+ * the question written on it, the WhatsApp action, and "keep reading" links to the rooms that
+ * answer the bigger questions (the offer, the studio, services). Static.
+ */
+import { WhatsAppCta, ArrowIcon, studio } from "@/components/nz";
+
+const links = [
+  { label: "ההצעה", desc: "איך בנויים ההקמה והמנוי", href: "/packages/" },
+  { label: "הסטודיו", desc: "מי בונה את האתר ואיך", href: "/about/" },
+  { label: "השירותים", desc: "מה אפשר לבנות לעסק", href: "/services/" },
+];
+---
+
+<section class="nz-section nz-section--space-default fq-cta" data-tone="ink" aria-labelledby="fq-cta-title">
+  <div class="nz-container">
+    <div class="fq-cta__main">
+      <p class="nz-label"><span class="nz-label__index">הקודה</span><span>מיתר פתוח</span></p>
+      <h2 id="fq-cta-title" class="nz-display fq-cta__title">השאלה שלכם לא כאן?</h2>
+      <div class="fq-cta__string" aria-hidden="true">
+        <svg viewBox="0 0 1000 40" preserveAspectRatio="none" focusable="false">
+          <path d="M0 20 Q500 20 1000 20" vector-effect="non-scaling-stroke"></path>
+        </svg>
+      </div>
+      <p class="nz-lede fq-cta__body">
+        שלחו אותה בוואטסאפ, וצבי יענה לכם בעצמו. אנחנו זמינים בימים {studio.days} <bdi dir="ltr">{studio.time}</bdi>.
+      </p>
+      <div class="fq-cta__actions">
+        <WhatsAppCta size="lg" label="לשאול בוואטסאפ" message="שלום צבי, יש לי שאלה על בניית אתר לעסק שלי:" />
+        <a href="/contact/" class="nz-link fq-cta__contact">
+          <span class="nz-link__text">לכל דרכי הקשר</span>
+          <ArrowIcon className="nz-link__arrow" />
+        </a>
+      </div>
+    </div>
+
+    <nav class="fq-more" aria-labelledby="fq-more-label">
+      <p id="fq-more-label" class="nz-label nz-label--rule">ממשיכים לקרוא</p>
+      <ul class="fq-more__list">
+        {
+          links.map((l) => (
+            <li>
+              <a href={l.href} class="fq-more__link">
+                <span class="fq-more__label">{l.label}</span>
+                <span class="fq-more__desc">{l.desc}</span>
+                <ArrowIcon className="fq-more__arrow" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</section>

@@ -1,0 +1,583 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   סולם ההמרה (ConversionLadder) — prefix ldr-. Lives on ink (SignatureSlot).
+   Model: hand-over-hand climb — two thumb buttons, each pull with the other hand = one rung.
+   Phone: stage (ladder + sample page) → the two hands (fixed place, thumb row) → the card.
+   Desktop ≥1024: the stage on the end side, card + hands on the start side.
+   Levels: --lv 0 (ground) … 6 (rungs) … 7 (the light). --hr / --hl = where each hand grips.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ldr {
+  --ldr-coral: #ff6a45;
+  --ldr-rail: rgba(239, 234, 226, 0.3);
+  --ldr-span: 7;
+  display: grid;
+  gap: 18px;
+}
+
+/* ── the stage ─────────────────────────────────────────────────────────── */
+.ldr__stage {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 14px;
+  height: clamp(340px, 46svh, 420px);
+}
+.ldr__climb {
+  display: grid;
+  grid-template-rows: 58px minmax(0, 1fr) 22px;
+  min-height: 0;
+}
+.ldr__sun {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.ldr__sun-disc {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 48% 42%, #ff9a7c 0%, var(--ldr-coral) 38%, var(--vermilion) 62%, #7d2210 100%);
+  opacity: calc(0.3 + var(--lv) * 0.07);
+  transform: scale(calc(0.8 + var(--lv) * 0.025));
+}
+.ldr.is-top .ldr__sun-disc,
+html:not(.js) .ldr__sun-disc {
+  opacity: 1;
+  transform: scale(1);
+  box-shadow: 0 0 0 8px rgba(255, 106, 69, 0.14), 0 0 46px 12px rgba(255, 106, 69, 0.42);
+}
+.ldr__sun-word {
+  position: absolute;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(125, 34, 16, 0.8);
+}
+
+/* the ladder */
+.ldr__ladder {
+  position: relative;
+  min-height: 0;
+  margin-inline: 8px;
+}
+.ldr__rail {
+  position: absolute;
+  top: -6px;
+  bottom: -14px;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--ldr-rail);
+}
+.ldr__rail--r {
+  inset-inline-start: 14px;
+}
+.ldr__rail--l {
+  inset-inline-end: 14px;
+}
+.ldr__rung {
+  position: absolute;
+  inset-inline: 14px;
+  bottom: calc(var(--i) * (100% - 6px) / var(--ldr-span));
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ldr-rail);
+}
+.ldr__rung.is-lit {
+  background: var(--ldr-coral);
+  box-shadow: 0 0 10px rgba(255, 106, 69, 0.55);
+}
+.ldr__rung-n {
+  position: absolute;
+  inset-inline-end: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  color: var(--ash);
+  font-variant-numeric: tabular-nums;
+}
+.ldr__rung.is-lit .ldr__rung-n {
+  color: var(--bone);
+}
+/* the hands on the rails */
+.ldr__grip {
+  position: absolute;
+  width: 14px;
+  height: 10px;
+  margin-inline: -5px;
+  border-radius: 5px 5px 3px 3px;
+  background: var(--bone);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transform: translateY(50%);
+}
+.ldr__grip--r {
+  inset-inline-start: 14px;
+  bottom: calc(var(--hr) * (100% - 6px) / var(--ldr-span) + 2px);
+}
+.ldr__grip--l {
+  inset-inline-end: 14px;
+  bottom: calc(var(--hl) * (100% - 6px) / var(--ldr-span) + 2px);
+}
+/* the climber: the visitor's click */
+.ldr__climber {
+  position: absolute;
+  inset-inline-start: 50%;
+  bottom: calc(var(--lv) * (100% - 6px) / var(--ldr-span) + 2px);
+  width: 34px;
+  height: 34px;
+  margin-inline-start: -17px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--ldr-coral);
+  color: var(--ink);
+  box-shadow: 0 0 0 3px var(--ink), 0 6px 14px rgba(0, 0, 0, 0.55);
+  transform: translateY(50%);
+  z-index: 1;
+}
+.ldr__climber svg {
+  width: 18px;
+  height: 18px;
+}
+html:not(.js) .ldr {
+  --lv: 7 !important;
+  --hr: 7 !important;
+  --hl: 7 !important;
+}
+html.nz-motion .ldr__climber,
+html.nz-motion .ldr__grip {
+  transition: bottom 0.45s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+html.nz-motion .ldr__sun-disc {
+  transition: opacity 0.7s var(--ease-gallery), transform 0.7s var(--ease-gallery), box-shadow 0.7s var(--ease-gallery);
+}
+html.nz-motion .ldr__rung {
+  transition: background-color 0.4s var(--ease-gallery), box-shadow 0.4s var(--ease-gallery);
+}
+html.nz-motion .ldr__climber.is-slip {
+  animation: ldr-slip 0.5s var(--ease-gallery);
+}
+@keyframes ldr-slip {
+  0%, 100% { transform: translateY(50%); }
+  30% { transform: translateY(calc(50% + 10px)) rotate(-8deg); }
+  60% { transform: translateY(calc(50% + 4px)) rotate(5deg); }
+}
+.ldr__ground {
+  align-self: end;
+  text-align: center;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--ash);
+  border-top: 1px solid var(--line-ink);
+  padding-top: 4px;
+}
+
+/* ── the sample page in its frame ─────────────────────────────────────── */
+.ldr__frame {
+  margin: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 8px;
+  min-height: 0;
+}
+.ldr__sheet {
+  position: relative;
+  overflow: hidden;
+  container-type: inline-size;
+  min-height: 0;
+  background: var(--paper);
+  border-radius: 2px;
+  box-shadow: 0 0 0 6px #0a0908, 0 0 0 7px rgba(239, 234, 226, 0.12), 0 24px 40px -18px rgba(0, 0, 0, 0.8);
+  margin: 7px;
+}
+.ldr__cap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding-inline: 7px;
+}
+.ldr__cap-k {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--ash);
+}
+.ldr__cap-i {
+  font-size: 0.75rem;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── the two hands ─────────────────────────────────────────────────────── */
+.ldr__hands {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+.ldr-hand {
+  min-height: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(239, 234, 226, 0.55);
+  background: rgba(239, 234, 226, 0.06);
+  color: var(--bone);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.ldr-hand__ico {
+  width: 26px;
+  height: 26px;
+  flex: none;
+}
+.ldr-hand:hover {
+  border-color: var(--bone);
+  background: rgba(239, 234, 226, 0.12);
+}
+.ldr-hand:active {
+  transform: translateY(1px) scale(0.98);
+}
+.ldr-hand.is-used {
+  border-color: rgba(239, 234, 226, 0.2);
+  color: var(--ash);
+}
+/* the hand that should pull next */
+.ldr__hands:has(.is-used) .ldr-hand:not(.is-used) {
+  border-color: var(--ldr-coral);
+  box-shadow: 0 0 0 3px rgba(255, 106, 69, 0.18);
+}
+.ldr-hand:focus-visible,
+.ldr__again:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.ldr__meter span {
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--ldr-rail);
+}
+.ldr__meter {
+  display: flex;
+  flex-direction: column-reverse; /* bottom = rung 1 */
+  gap: 4px;
+}
+.ldr__meter span.is-on {
+  background: var(--ldr-coral);
+}
+.ldr__again {
+  grid-column: 1 / -1;
+  justify-self: center;
+  min-height: 52px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(239, 234, 226, 0.55);
+  background: none;
+  color: var(--bone);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ── the card ──────────────────────────────────────────────────────────── */
+.ldr__card {
+  min-height: 15.5rem;
+}
+.ldr-card {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+html.nz-motion .ldr-card {
+  animation: ldr-in 0.5s var(--ease-gallery) both;
+}
+@keyframes ldr-in {
+  from { opacity: 0; transform: translateY(8px); }
+}
+.ldr-card__k {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-ink);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--bone);
+}
+.ldr-card__n {
+  color: var(--ldr-coral);
+  font-variant-numeric: tabular-nums;
+}
+.ldr-card__t {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.625rem, 1.3rem + 1.4vw, 2.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  color: var(--bone);
+  text-wrap: balance;
+}
+.ldr-card__b {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--ash);
+  max-width: 36rem;
+  text-wrap: pretty;
+}
+.ldr-card__w {
+  font-size: 0.875rem;
+  color: var(--bone);
+}
+.ldr-card__w span {
+  color: var(--ash);
+  margin-inline-end: 6px;
+}
+.ldr__slip {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-inline-start: 2px solid var(--ldr-coral);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--bone);
+  background: rgba(255, 106, 69, 0.08);
+}
+html.nz-motion .ldr__slip {
+  animation: ldr-in 0.4s var(--ease-gallery) both;
+}
+
+/* the six principles as a list (recap at the top · the no-JS lesson) */
+.ldr-all {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+.ldr-all li {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line-ink);
+}
+.ldr-all__n {
+  color: var(--ldr-coral);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  padding-top: 3px;
+}
+.ldr-all__t {
+  display: grid;
+  gap: 4px;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--bone);
+}
+.ldr-all__t b {
+  font-weight: 500;
+}
+.ldr-all__body {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--ash);
+}
+.ldr-all--recap .ldr-all__body {
+  display: none; /* the recap names the steps; the bodies were read on the way up */
+}
+.ldr__static {
+  display: grid;
+  gap: 6px;
+}
+html.js .ldr__static {
+  display: none;
+}
+html:not(.js) .ldr__hands,
+html:not(.js) .ldr__card {
+  display: none;
+}
+html:not(.js) .ldr .ldr-pg__b {
+  opacity: 1;
+}
+
+/* ── the sample landing page (container units: 1u = 1/260 of the sheet) ── */
+.ldr-pg {
+  --u: calc(100cqw / 260);
+  padding: calc(14 * var(--u)) calc(14 * var(--u)) calc(40 * var(--u));
+  color: var(--ink);
+  transition: transform 0.9s var(--ease-gallery);
+  will-change: transform;
+}
+.ldr-pg__b {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: calc(6 * var(--u));
+  padding: calc(10 * var(--u));
+  margin-bottom: calc(10 * var(--u));
+  border-radius: calc(3 * var(--u));
+  opacity: 0.42;
+  transition: opacity 0.5s var(--ease-gallery), box-shadow 0.5s var(--ease-gallery), background-color 0.5s var(--ease-gallery);
+}
+.ldr-pg__b.is-past {
+  opacity: 0.78;
+}
+.ldr-pg__b.is-on {
+  opacity: 1;
+  background: #fff;
+  box-shadow: 0 0 0 calc(1.5 * var(--u)) var(--vermilion), 0 calc(10 * var(--u)) calc(22 * var(--u)) calc(-10 * var(--u)) rgba(18, 17, 16, 0.35);
+}
+.ldr-pg__brand {
+  font-family: var(--font-display);
+  font-size: calc(11 * var(--u));
+  padding-bottom: calc(6 * var(--u));
+  border-bottom: 1px solid var(--line);
+}
+.ldr-pg__kicker {
+  font-size: calc(9 * var(--u));
+  letter-spacing: 0.06em;
+  color: var(--vermilion-deep);
+}
+.ldr-pg__h {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: calc(21 * var(--u));
+  line-height: 1.08;
+}
+.ldr-pg__p {
+  font-size: calc(11 * var(--u));
+  line-height: 1.5;
+  color: var(--graphite);
+}
+.ldr-pg__btn {
+  align-self: flex-start;
+  padding: calc(7 * var(--u)) calc(14 * var(--u));
+  border-radius: 999px;
+  background: var(--vermilion-fill);
+  color: #fff;
+  font-size: calc(10.5 * var(--u));
+  font-weight: 500;
+}
+.ldr-pg__btn--wide {
+  align-self: stretch;
+  text-align: center;
+}
+.ldr-pg__img svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: calc(2 * var(--u));
+}
+.ldr-pg__cap {
+  font-size: calc(9 * var(--u));
+  color: var(--graphite);
+}
+.ldr-pg__proof {
+  flex-direction: row;
+  align-items: center;
+  gap: calc(10 * var(--u));
+}
+.ldr-pg__avatar {
+  flex: none;
+  width: calc(34 * var(--u));
+  height: calc(34 * var(--u));
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 36%, #c9a48c 0 28%, transparent 29%), radial-gradient(circle at 50% 100%, #8b6f5c 0 46%, transparent 47%), var(--bone-2);
+}
+.ldr-pg__proof-t {
+  display: flex;
+  flex-direction: column;
+  gap: calc(3 * var(--u));
+  font-size: calc(10 * var(--u));
+  line-height: 1.35;
+  color: var(--graphite);
+}
+.ldr-pg__proof-t b {
+  font-weight: 500;
+  color: var(--ink);
+  font-size: calc(11 * var(--u));
+}
+.ldr-pg__q {
+  font-family: var(--font-display);
+  font-size: calc(13 * var(--u));
+  line-height: 1.2;
+}
+.ldr-pg__a {
+  font-size: calc(10.5 * var(--u));
+  line-height: 1.45;
+  color: var(--graphite);
+}
+.ldr-pg__field {
+  padding: calc(7 * var(--u)) calc(9 * var(--u));
+  border: 1px solid rgba(18, 17, 16, 0.25);
+  border-radius: calc(3 * var(--u));
+  font-size: calc(10 * var(--u));
+  color: var(--graphite);
+  background: #fff;
+}
+.ldr-pg__wa {
+  text-align: center;
+  font-size: calc(9.5 * var(--u));
+  color: var(--graphite);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (min-width: 1024px) {
+  .ldr {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-areas: "card stage" "hands stage";
+    grid-template-rows: auto auto;
+    align-content: center;
+    column-gap: clamp(40px, 6vw, 96px);
+    row-gap: 28px;
+    align-items: start;
+  }
+  .ldr__stage {
+    grid-area: stage;
+    grid-template-columns: 132px minmax(0, 1fr);
+    gap: 28px;
+    height: 560px;
+  }
+  .ldr__card {
+    grid-area: card;
+    min-height: 17rem;
+    align-self: end;
+  }
+  .ldr__hands {
+    grid-area: hands;
+    max-width: 30rem;
+  }
+  .ldr__static {
+    grid-column: 1 / -1;
+  }
+  .ldr__ladder {
+    margin-inline: 22px;
+  }
+  .ldr__sun-disc {
+    width: 64px;
+    height: 64px;
+  }
+  .ldr__climber {
+    width: 40px;
+    height: 40px;
+    margin-inline-start: -20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ldr *,
+  .ldr *::before,
+  .ldr *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+html:not(.nz-motion) .ldr-pg {
+  transition: none;
+}

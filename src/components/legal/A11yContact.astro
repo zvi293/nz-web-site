@@ -1,0 +1,83 @@
+---
+/**
+ * "פנייה לרכז הנגישות" — opened like an envelope ("אל: רכז הנגישות" + a stamp); an index card for the coordinator (tel / mail, 44px targets) beside a
+ * report slip that shows what to write, plus a button that opens the floating accessibility menu.
+ */
+import type { LegalPageSection } from "@/content/types";
+import { parseBlocks } from "./content";
+import { getMailtoHref, getTelHref } from "@/lib/contact-utils";
+
+interface Props {
+  section: LegalPageSection;
+  name: string;
+  phone: string;
+  email: string;
+  updated: string;
+}
+const { section, name, phone, email, updated } = Astro.props;
+const paras = parseBlocks(section.content).flatMap((b) => (b.type === "p" ? [b.text] : []));
+const slip = [
+  { k: "כתובת העמוד", v: "איפה זה קרה" },
+  { k: "מה קרה", v: "תיאור קצר של הבעיה" },
+  { k: "דפדפן ומכשיר", v: "וטכנולוגיה מסייעת, אם יש" },
+];
+---
+
+<section id={section.id} class="nz-section nz-section--space-default lg-coord" data-tone="paper" aria-labelledby="lg-coord-title">
+  <div class="nz-container lg-coord__grid">
+    <div class="lg-coord__head">
+      <p class="lg-addr" aria-hidden="true">
+        <span class="lg-addr__stamp"><span class="nzc-cube"></span></span>
+        <span class="lg-addr__k">אל:</span>
+        <span class="lg-addr__v">רכז הנגישות, NZ-web</span>
+      </p>
+      <h2 id="lg-coord-title" class="nz-display nz-display--h2">{section.title}</h2>
+      {paras.slice(1).map((p) => <p class="lg-coord__text">{p}</p>)}
+    </div>
+
+    <div class="lg-coord__card" data-reveal="rise">
+      <p class="lg-coord__role">רכז הנגישות</p>
+      <p class="lg-coord__name">{name}</p>
+      <ul class="lg-coord__ways">
+        <li>
+          <a href={getTelHref(phone)} class="lg-coord__way">
+            <span class="lg-coord__way-k">טלפון</span>
+            <bdi dir="ltr" class="lg-coord__way-v">{phone}</bdi>
+          </a>
+        </li>
+        <li>
+          <a href={getMailtoHref(email)} class="lg-coord__way">
+            <span class="lg-coord__way-k">דוא״ל</span>
+            <bdi dir="ltr" class="lg-coord__way-v">{email}</bdi>
+          </a>
+        </li>
+      </ul>
+      <p class="lg-coord__updated">ההצהרה עודכנה לאחרונה ב-{updated}</p>
+    </div>
+
+    <figure class="lg-slip" data-reveal="rise" style="--reveal-delay:120ms">
+      <figcaption class="lg-slip__cap">מה כדאי לכתוב בפנייה</figcaption>
+      <ol class="lg-slip__fields">
+        {
+          slip.map((f, i) => (
+            <li class="lg-slip__field">
+              <span class="lg-slip__num">{i + 1}</span>
+              <span class="lg-slip__k">{f.k}</span>
+              <span class="lg-slip__v">{f.v}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <button type="button" class="nz-btn nz-btn--secondary nz-btn--sm lg-slip__open" data-a11y-open>
+        לפתוח את תפריט הנגישות
+      </button>
+    </figure>
+  </div>
+</section>
+
+<script>
+  /* Opens the floating accessibility menu (AccessibilityWidget listens for this event). */
+  document.querySelectorAll<HTMLButtonElement>("[data-a11y-open]").forEach((btn) =>
+    btn.addEventListener("click", () => window.dispatchEvent(new Event("nz:a11y-open"))),
+  );
+</script>

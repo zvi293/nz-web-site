@@ -1,0 +1,341 @@
+/* מהשרטוט לבניין — tracing-paper overlays (architect). Prefix vl-bp. A drafting board with the empty
+   frame of a site; five translucent sheets hinge on masking tape above it and swing down onto the
+   drawing (rotateX, origin top). Tabs under the board toggle them. */
+.vl-bp {
+  display: grid;
+  gap: 28px;
+}
+@media (min-width: 1024px) {
+  .vl-bp {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 64px;
+    align-items: center;
+  }
+}
+.vl-bp__table {
+  padding: 14px 12px 0;
+  border-radius: 4px;
+  background: #d8d1c4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 30px 60px -40px rgba(18, 17, 16, 0.6);
+}
+@media (min-width: 768px) {
+  .vl-bp__table {
+    padding: 24px 24px 0;
+  }
+}
+.vl-bp__board {
+  position: relative;
+  aspect-ratio: 400 / 320;
+  background: #fbfaf6;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12), 0 10px 22px -16px rgba(18, 17, 16, 0.6);
+  perspective: 1400px;
+}
+.vl-bp__svg {
+  /* SVG text anchors read left-to-right; Hebrew glyphs still shape correctly */
+  direction: ltr;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.vl-bp__frame,
+.vl-bp__titleblock {
+  fill: none;
+  stroke: rgba(18, 17, 16, 0.35);
+  stroke-width: 1;
+}
+.vl-bp__tb-text {
+  font-family: var(--font-sans);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  fill: #57524b;
+}
+
+/* a sheet of tracing paper */
+.vl-bp__sheet {
+  position: absolute;
+  inset: 0;
+  background: rgba(246, 244, 236, 0.32);
+  box-shadow: 0 0 0 1px rgba(18, 17, 16, 0.07);
+  transform-origin: 50% 0;
+  translate: calc((var(--k) - 2) * 1.5px) calc(var(--k) * 1px);
+  rotate: calc((var(--k) - 2) * 0.25deg);
+  pointer-events: none;
+}
+.vl-bp__sheet:not(.is-on) {
+  opacity: 0;
+  visibility: hidden;
+}
+html.nz-motion .vl-bp__sheet {
+  transition: transform 0.85s var(--ease-gallery), opacity 0.5s ease, visibility 0s linear 0s;
+}
+html.nz-motion .vl-bp__sheet:not(.is-on) {
+  opacity: 0;
+  visibility: hidden;
+  transform: rotateX(-88deg);
+  transition: transform 0.7s var(--ease-gallery), opacity 0.5s ease 0.2s, visibility 0s linear 0.7s;
+}
+/* with JS, before hydration: show the starting point (grid only), not the finished building */
+html.js .vl-bp:not(.is-live) .vl-bp__sheet:not([data-k="0"]) {
+  opacity: 0;
+  visibility: hidden;
+}
+.vl-bp__tape {
+  position: absolute;
+  top: -7px;
+  width: 38px;
+  height: 14px;
+  background: rgba(226, 211, 168, 0.88);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.vl-bp__tape--a {
+  inset-inline-start: 12%;
+  rotate: -3deg;
+}
+.vl-bp__tape--b {
+  inset-inline-end: 12%;
+  rotate: 4deg;
+}
+
+/* the lines */
+.vl-bp__ln {
+  fill: none;
+  stroke: #1b2633;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+html.nz-motion .vl-bp__sheet.is-on .vl-bp__ln {
+  animation: vl-bp-draw 1.1s var(--ease-gallery) both;
+  animation-delay: calc(0.35s + var(--k, 0) * 1s);
+}
+@keyframes vl-bp-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+.vl-bp__ln--grid {
+  stroke: rgba(46, 96, 160, 0.35);
+  stroke-width: 0.75;
+}
+.vl-bp__ln--axis {
+  stroke: rgba(46, 96, 160, 0.6);
+  stroke-dasharray: 0.02 0.015;
+}
+html.nz-motion .vl-bp__sheet.is-on .vl-bp__ln--axis {
+  animation: none;
+}
+.vl-bp__ln--dim {
+  stroke: var(--vermilion-deep);
+  stroke-width: 1;
+}
+.vl-bp__note {
+  font-family: var(--font-sans);
+  font-size: 8.5px;
+  fill: var(--vermilion-deep);
+}
+.vl-bp__ln--type {
+  stroke-width: 3.2;
+}
+.vl-bp__ln--text {
+  stroke: rgba(27, 38, 51, 0.55);
+  stroke-width: 1.6;
+}
+.vl-bp__hatch-line {
+  stroke: rgba(27, 38, 51, 0.35);
+  stroke-width: 1;
+}
+.vl-bp__fill {
+  stroke: none;
+}
+.vl-bp__fill--a {
+  fill: #2f5d4e;
+}
+.vl-bp__fill--hill {
+  fill: #9ec2a8;
+}
+.vl-bp__fill--sun {
+  fill: #f1d9a8;
+}
+.vl-bp__fill--b {
+  fill: #c9b79c;
+}
+.vl-bp__fill--c {
+  fill: #7d8f86;
+}
+.vl-bp__fill--d {
+  fill: #d8cbb6;
+}
+.vl-bp__fill--cta {
+  fill: var(--vermilion);
+}
+.vl-bp__light {
+  opacity: 0.82;
+}
+html.nz-motion .vl-bp__sheet.is-on .vl-bp__light {
+  animation: vl-bp-light 1.2s ease 0.4s both;
+}
+@keyframes vl-bp-light {
+  from {
+    opacity: 0;
+  }
+}
+.vl-bp__stamp {
+  position: absolute;
+  bottom: 14%;
+  inset-inline-start: 6%;
+  padding: 4px 10px;
+  border: 2px solid var(--vermilion-deep);
+  border-radius: 3px;
+  background: rgba(251, 250, 246, 0.9);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--vermilion-deep);
+  rotate: -6deg;
+  opacity: 0;
+  pointer-events: none;
+}
+.vl-bp.is-built .vl-bp__stamp {
+  opacity: 1;
+}
+html.nz-motion .vl-bp.is-built .vl-bp__stamp {
+  animation: vl-bp-stamp 0.5s cubic-bezier(0.3, 1.4, 0.5, 1) 0.9s both;
+}
+@keyframes vl-bp-stamp {
+  from {
+    opacity: 0;
+    scale: 1.6;
+  }
+}
+
+/* the tabs: the sheets' paper tabs hanging under the board */
+.vl-bp__tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  padding: 10px 0 12px;
+}
+.vl-bp__tab {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  min-height: 52px;
+  padding: 6px 2px 8px;
+  border: 1px solid rgba(18, 17, 16, 0.18);
+  border-top: 0;
+  border-radius: 0 0 6px 6px;
+  background: rgba(246, 244, 236, 0.55);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.3s var(--ease-gallery);
+}
+.vl-bp__tab.is-on {
+  background: var(--paper);
+  transform: translateY(4px);
+  box-shadow: 0 6px 12px -8px rgba(18, 17, 16, 0.5);
+}
+.vl-bp__tab-no {
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--graphite);
+}
+.vl-bp__tab.is-on .vl-bp__tab-no {
+  color: var(--vermilion-deep);
+}
+.vl-bp__tab-name {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.vl-bp__tab:focus-visible {
+  outline: 2px solid var(--vermilion-deep);
+  outline-offset: 2px;
+}
+
+/* side */
+.vl-bp__side {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+.vl-bp__count {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--fg-muted);
+}
+.vl-bp__count-num {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.vl-bp__say {
+  margin: 0;
+  min-height: 4.2em;
+  font-family: var(--font-display);
+  font-size: clamp(1.1875rem, 1.05rem + 0.5vw, 1.5rem);
+  line-height: 1.4;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+.vl-bp__legend {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+.vl-bp__legend li {
+  display: grid;
+  grid-template-columns: 28px auto minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: baseline;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--fg-muted);
+  transition: color 0.3s ease;
+}
+.vl-bp__legend li.is-on {
+  color: var(--fg);
+}
+.vl-bp__legend-no {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.vl-bp__legend li.is-on .vl-bp__legend-no {
+  color: var(--accent-text);
+}
+.vl-bp__legend-name {
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+.vl-bp__legend-line {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.vl-bp__all {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+html:not(.js) .vl-bp__tabs,
+html:not(.js) .vl-bp__all {
+  display: none;
+}

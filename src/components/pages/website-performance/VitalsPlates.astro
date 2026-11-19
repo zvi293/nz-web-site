@@ -1,0 +1,91 @@
+---
+/**
+ * VitalsPlates — "מה זה Core Web Vitals, ומה נחשב טוב?": three instrument plates (LCP, INP, CLS),
+ * each with its own small drawing of what the metric feels like, a plain-Hebrew definition, a
+ * three-zone scale (טוב / צריך שיפור / חלש) with Google's published "good" threshold and the
+ * usual fix. The only figures on the page — the source (web.dev) is named under the plates.
+ * Static; the drawings play once when in view (html.nz-motion + [data-in]). Prefix wp-.
+ */
+import ServiceOpener from "@/components/service/ServiceOpener.astro";
+import Nb from "@/components/service/Nb.astro";
+import { VITALS } from "./data";
+import "./website-performance.css";
+
+interface Props {
+  index?: string;
+}
+const { index = "03" } = Astro.props;
+---
+
+<section class="nz-section nz-section--space-default wp-vitals" data-tone="bone" aria-labelledby="wp-vitals-title">
+  <div class="nz-container">
+    <ServiceOpener
+      variant="stacked"
+      lines={["Core Web Vitals"]}
+      index={index}
+      label="שלושה מדדים"
+      title={"מה זה Core\u00a0Web\u00a0Vitals, ומה נחשב טוב?"}
+      accent="מה נחשב טוב?"
+      id="wp-vitals-title"
+      lede="שלושה מדדים ש-Google אוספת מגולשים אמיתיים: כמה מהר מופיע התוכן הראשי, כמה מהר הדף מגיב ללחיצה, וכמה הוא נשאר יציב בזמן הטעינה. לכל אחד יש סף שמוגדר כטוב."
+    />
+
+    <ol class="wp-vitals__plates" data-reveal="stagger">
+      {
+        VITALS.map((v, i) => (
+          <li class:list={["wp-plate", `wp-plate--${v.key.toLowerCase()}`]}>
+            <div class="wp-plate__draw" aria-hidden="true">
+              {v.key === "LCP" && (
+                <svg viewBox="0 0 200 120">
+                  <rect x="40" y="8" width="120" height="104" rx="3" class="wp-d-sheet" />
+                  <rect x="54" y="20" width="56" height="5" class="wp-d-ink" />
+                  <rect x="54" y="30" width="80" height="3" class="wp-d-mute" />
+                  <rect x="54" y="44" width="92" height="52" class="wp-d-img" />
+                  <path d="M88 86 L100 62 L112 86 Z" class="wp-d-prism" />
+                  <path d="M54 70 H88" class="wp-d-beam" />
+                  <rect x="54" y="102" width="40" height="4" rx="2" class="wp-d-ver" />
+                </svg>
+              )}
+              {v.key === "INP" && (
+                <svg viewBox="0 0 200 120">
+                  <rect x="40" y="8" width="120" height="104" rx="3" class="wp-d-sheet" />
+                  <rect x="70" y="46" width="60" height="18" rx="9" class="wp-d-btn" />
+                  <circle cx="100" cy="55" r="8" class="wp-d-ring wp-d-ring--1" />
+                  <circle cx="100" cy="55" r="16" class="wp-d-ring wp-d-ring--2" />
+                  <path d="M104 60 c4 10 10 14 18 16 l-4 14 -16 -6 -10 -16 c-2 -4 2 -7 5 -4 l5 5 -4 -14 c-1 -4 5 -5 6 -1" class="wp-d-hand" />
+                  <rect x="58" y="76" width="44" height="26" rx="2" class="wp-d-menu" />
+                  <rect x="64" y="82" width="28" height="3" class="wp-d-mute" />
+                  <rect x="64" y="90" width="20" height="3" class="wp-d-mute" />
+                </svg>
+              )}
+              {v.key === "CLS" && (
+                <svg viewBox="0 0 200 120">
+                  <rect x="40" y="8" width="120" height="104" rx="3" class="wp-d-sheet" />
+                  <rect x="54" y="18" width="92" height="22" class="wp-d-banner" />
+                  <rect x="54" y="48" width="70" height="4" class="wp-d-ink" />
+                  <rect x="54" y="57" width="92" height="3" class="wp-d-mute" />
+                  <rect x="54" y="64" width="80" height="3" class="wp-d-mute" />
+                  <rect x="54" y="38" width="56" height="16" rx="8" class="wp-d-ghost" />
+                  <rect x="54" y="78" width="56" height="16" rx="8" class="wp-d-btn wp-d-moved" />
+                  <path d="M120 46 V84" class="wp-d-arrow" />
+                  <path d="M116 79 L120 85 L124 79" class="wp-d-arrow" />
+                </svg>
+              )}
+            </div>
+            <p class="wp-plate__key"><bdi dir="ltr">{v.key}</bdi><span>{v.name}</span></p>
+            <p class="wp-plate__what"><Nb text={v.what} /></p>
+            <div class="wp-scale" role="img" aria-label={`סקאלה: טוב, צריך שיפור, חלש. טוב לפי Google: ${v.good}`}>
+              <span class="wp-scale__bar"><span class="wp-scale__z wp-scale__z--good" /><span class="wp-scale__z wp-scale__z--mid" /><span class="wp-scale__z wp-scale__z--poor" /></span>
+              <span class="wp-scale__labels" aria-hidden="true"><span>טוב</span><span>צריך שיפור</span><span>חלש</span></span>
+            </div>
+            <p class="wp-plate__good"><span>טוב:</span> {v.good}</p>
+            <p class="wp-plate__fix"><span class="wp-plate__fix-k">איך משפרים</span> <Nb text={v.fix} /></p>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="wp-vitals__src">
+      הספים לפי <bdi dir="ltr">web.dev</bdi> של Google. כדי לעבור, צריך לעמוד בהם בלפחות שלושה מכל ארבעה ביקורים, בנייד ובמחשב.
+    </p>
+  </div>
+</section>
