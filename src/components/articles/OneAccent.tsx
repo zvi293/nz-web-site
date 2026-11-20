@@ -56,12 +56,12 @@ const OneAccent = () => {
       <div className="as-oa__live as-live">
         <div className="as-oa__page" role="group" aria-label="עמוד לדוגמה: בחרו את האלמנט שיקבל את הצבע">
           <div className="as-oa__top">
-            {el("logo", "הלוגו", "", <span className="as-oa__logo">חומר</span>)}
+            {el("logo", "חומר: הלוגו", "", <span className="as-oa__logo">חומר</span>)}
             {el("nav", "קישור בתפריט: סדנאות", "", <span>סדנאות</span>)}
           </div>
           <div className="as-oa__hero">
             <div className="as-oa__text">
-              {el("badge", "מדבקת חדש", "", <span className="as-oa__pill">חדש!</span>)}
+              {el("badge", "חדש! מדבקה", "", <span className="as-oa__pill">חדש!</span>)}
               <p className="as-oa__h">
                 סדנאות קרמיקה בערב,{" "}
                 {el("word", "המילה המרכזית בכותרת: למתחילים", "", <span>למתחילים</span>)}

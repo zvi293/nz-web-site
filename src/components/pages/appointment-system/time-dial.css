@@ -208,6 +208,10 @@ html.nz-motion .tdl__hole-t {
   border-radius: 4px;
   box-shadow: 0 30px 40px -28px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.06);
   overflow: hidden;
+  /* a light card inside an ink section: the light-surface focus tokens (the inherited ink-tone
+     coral ring was 1.85:1 on paper) */
+  --focus: var(--vermilion-deep);
+  --focus-halo: rgba(239, 234, 226, 0.9);
   min-height: 236px;
 }
 .tdl-card::before {

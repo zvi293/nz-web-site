@@ -86,7 +86,9 @@ const OfferModel = () => (
 
       <div className="of-formula">
         <p className="nz-label nz-label--rule of-formula__label">{m.formula.title}</p>
-        <p className="of-formula__eq" aria-label={`${m.formula.terms.join(" ועוד ")} שווה ${m.formula.result}`}>
+        <p className="of-formula__eq">
+          {/* read as one sentence; the visual "+ / =" equation is hidden from assistive tech */}
+          <span className="nz-sr">{`${m.formula.terms.join(" ועוד ")} שווה ${m.formula.result}`}</span>
           {m.formula.terms.map((t, i) => (
             <span key={t} className="of-formula__term" aria-hidden="true">
               {i > 0 && <span className="of-formula__op">+</span>}

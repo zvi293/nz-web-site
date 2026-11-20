@@ -108,7 +108,7 @@
   font-size: 1.125rem;
 }
 .vl-qr__noise--deal {
-  background: var(--vermilion);
+  background: var(--vermilion-fill); /* white label ≥ 4.5:1 */
   color: #fff;
   letter-spacing: 0.04em;
   text-align: center;

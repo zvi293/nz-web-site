@@ -31,9 +31,23 @@
  *     every indexable dist page is listed; robots.txt references the sitemap; llms.txt exists
  *     (llms-full.txt: warn if missing); llms files are scanned for prices / banned words and
  *     their nz-web.com links must resolve.
+ * Technical SEO (search engines + structured data):
+ *   - every page has the Search Console verification meta (google-site-verification token)
+ *   - JSON-LD: every {"@id"} reference resolves inside the page's @graph; no rating/review fields;
+ *     indexable pages have <canonical>#webpage with dateModified; BreadcrumbList on every page but
+ *     "/" (positions 1…n, items are site pages, last item = canonical); FAQPage questions + answers
+ *     visible word for word and unique site-wide; BlogPosting has headline/image/dates/author/
+ *     publisher; Service.provider → #organization
+ *   - og:image exists in dist (warn when not a 1200×630 card); twitter:card/title/description/image
+ *   - sitemap <lastmod> equals the date the page states (article:modified_time / WebPage dateModified)
+ *   - robots.txt never Disallows a noindex page (its noindex would never be seen) or an indexable one
+ *   - no orphan pages; every indexable page reachable from "/" (warn when > 3 clicks deep)
  */
-import { readFileSync, existsSync, statSync, readdirSync } from "node:fs";
+import { readFileSync, existsSync, statSync, readdirSync, mkdtempSync, rmSync } from "node:fs";
 import { join, relative, resolve, sep } from "node:path";
+import { tmpdir } from "node:os";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { JSDOM, VirtualConsole } from "jsdom";
 
 /* ───────────────────────── config ───────────────────────── */
@@ -460,6 +474,205 @@ for (const [name, required] of [["llms.txt", true], ["llms-full.txt", false]]) {
     if (!fileFor(path)) broken.add(path);
   }
   for (const p of broken) E(SITE, `${name} links to a page that does not exist: ${ORIGIN}${p}`);
+}
+
+/* llms files are generated from the built pages (verbatim leads, FAQ, titles): regenerate them
+   from this dist into a temp dir and fail if the published copies drifted (a title / lead / FAQ
+   edit without `npm run llms`). Checks public/ (what the next build ships) and dist/. */
+{
+  const generator = fileURLToPath(new URL("../llms/generate.mjs", import.meta.url));
+  const publicDir = fileURLToPath(new URL("../../public/", import.meta.url));
+  const tmp = mkdtempSync(join(tmpdir(), "nz-llms-qa-"));
+  try {
+    execFileSync(process.execPath, [generator, DIST, tmp], { stdio: "pipe" });
+    for (const name of ["llms.txt", "llms-full.txt"]) {
+      const fresh = readFileSync(join(tmp, name), "utf-8");
+      for (const [label, dir] of [["public", publicDir], ["dist", DIST]]) {
+        const f = join(dir, name);
+        if (existsSync(f) && readFileSync(f, "utf-8") !== fresh)
+          E(SITE, `${label}/${name} is stale: it no longer matches the built pages (run npm run build && npm run llms)`);
+      }
+    }
+  } catch (err) {
+    E(SITE, `llms generator failed on this build: ${String(err.stderr || err.message).split("\n")[0]}`);
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
+/* ───────────────────────── technical SEO (search engines + structured data) ───────────────────────── */
+/* Search Console ownership: the verification meta of the live property must be on every page
+   (the old site's index.html had it; without it GSC verification breaks on the next deploy). */
+const GSC_TOKEN = "cT5uc8fEuMAXXvVJHQ1zD8rNW8r6s4n6cITOydELpaY";
+/** Visible-text normaliser for schema ↔ page comparisons (word joiners / bidi marks / nbsp). */
+const vis = (t) => String(t ?? "").replace(/[⁠​-‏­]/g, "").replace(/[\s ]+/g, " ").replace(/\s+([.,:;!?])/g, "$1").trim();
+const ldNodes = (doc) => {
+  const out = [];
+  doc.querySelectorAll('script[type="application/ld+json"]').forEach((s) => {
+    try {
+      const d = JSON.parse(s.textContent);
+      out.push(...(Array.isArray(d?.["@graph"]) ? d["@graph"] : [d]));
+    } catch { /* reported above */ }
+  });
+  return out;
+};
+const types = (n) => [].concat(n?.["@type"] ?? []);
+const dateOf = (v) => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v) ? v.slice(0, 10) : null);
+const REVIEW_KEYS = new Set(["aggregateRating", "review", "reviews", "ratingValue", "reviewRating", "bestRating"]);
+const faqOwners = new Map(); // question → first page
+const pageModified = new Map(); // url → YYYY-MM-DD the page states
+
+for (const pg of pages.values()) {
+  const { url, doc, indexable } = pg;
+  const G = `${url}${indexable ? "" : "  (noindex)"}`;
+
+  const gsc = [...doc.querySelectorAll('meta[name="google-site-verification"]')].map((m) => m.getAttribute("content"));
+  if (!gsc.includes(GSC_TOKEN)) E(G, `missing <meta name="google-site-verification" content="${GSC_TOKEN}"> (Search Console ownership)`);
+
+  const nodes = ldNodes(doc);
+  /* @id references resolve inside the page's own @graph */
+  const defined = new Set();
+  const refs = [];
+  const visit = (v, at) => {
+    if (Array.isArray(v)) return v.forEach((x) => visit(x, at));
+    if (!v || typeof v !== "object") return;
+    const keys = Object.keys(v);
+    if (typeof v["@id"] === "string") (keys.length > 1 ? defined.add(v["@id"]) : refs.push([v["@id"], at]));
+    for (const [k, x] of Object.entries(v)) if (k !== "@id") visit(x, `${at}.${k}`);
+    for (const k of keys) if (REVIEW_KEYS.has(k)) E(G, `rating/review field "${k}" in JSON-LD (no invented reviews or ratings)`);
+  };
+  nodes.forEach((n) => visit(n, types(n).join("+") || "node"));
+  for (const [id, at] of refs) if (!defined.has(id)) E(G, `JSON-LD @id ${id} (at ${at}) is referenced but not defined in this page's @graph`);
+
+  if (!indexable) continue;
+  const canonical = pg.canonical;
+  const webpage = nodes.find((n) => n["@id"] === `${canonical}#webpage`);
+  if (!webpage) E(G, `no WebPage node with @id ${canonical}#webpage`);
+  else if (!dateOf(webpage.dateModified)) E(G, "WebPage node has no dateModified (it is the sitemap lastmod)");
+  const metaMod = doc.querySelector('meta[property="article:modified_time"]')?.getAttribute("content");
+  const stated = dateOf(metaMod) || dateOf(webpage?.dateModified);
+  if (stated) pageModified.set(url, stated);
+
+  /* BreadcrumbList: every page but the home page; items resolve; the last item is this page */
+  const crumbs = nodes.find((n) => types(n).includes("BreadcrumbList"));
+  if (url !== "/") {
+    if (!crumbs) E(G, "no BreadcrumbList in JSON-LD");
+    else {
+      const items = crumbs.itemListElement ?? [];
+      items.forEach((it, i) => {
+        if (it.position !== i + 1) E(G, `BreadcrumbList item ${i + 1} has position ${it.position}`);
+        if (!it.name || !it.item) E(G, `BreadcrumbList item ${i + 1} needs name + item`);
+        else if (!String(it.item).startsWith(ORIGIN + "/") || !fileFor(String(it.item).slice(ORIGIN.length)))
+          E(G, `BreadcrumbList item "${it.name}" → ${it.item} is not a page of this site`);
+      });
+      if (items.length && items[items.length - 1].item !== canonical) E(G, `BreadcrumbList ends at ${items[items.length - 1].item}, not at this page (${canonical})`);
+    }
+  }
+
+  /* FAQPage = the visible Q&A, word for word; questions unique site-wide (SITE-PLAYBOOK §10) */
+  /* compared without whitespace: textOf() pads every element, so inline <bdi>/<span> would differ */
+  const squash = (t) => vis(t).replace(/\s+/g, "");
+  const text = squash(textOf(doc.body));
+  for (const faq of nodes.filter((n) => types(n).includes("FAQPage"))) {
+    for (const q of faq.mainEntity ?? []) {
+      const name = vis(q.name);
+      const answer = vis(q.acceptedAnswer?.text);
+      if (!name || !answer) { E(G, "FAQPage question without name or acceptedAnswer.text"); continue; }
+      if (!text.includes(squash(name))) E(G, `FAQPage question is not visible on the page: "${name.slice(0, 70)}"`);
+      if (!text.includes(squash(answer))) E(G, `FAQPage answer differs from the visible text: "${name.slice(0, 50)}" → "${answer.slice(0, 60)}…"`);
+      if (faqOwners.has(name) && faqOwners.get(name) !== url) E(G, `FAQ question also used on ${faqOwners.get(name)} (FAQs must be unique site-wide): "${name.slice(0, 60)}"`);
+      else faqOwners.set(name, url);
+    }
+  }
+
+  /* BlogPosting: the properties Google's Article report asks for */
+  for (const a of nodes.filter((n) => types(n).some((t) => /^(Article|BlogPosting|NewsArticle)$/.test(t)))) {
+    for (const k of ["headline", "image", "datePublished", "dateModified", "author", "publisher"]) if (!a[k]) E(G, `${types(a).join("+")} is missing "${k}"`);
+    if (a.headline && [...String(a.headline)].length > 110) W(G, `headline is ${[...a.headline].length} chars (Google truncates > 110)`);
+    if (dateOf(a.dateModified) && dateOf(a.datePublished) && dateOf(a.dateModified) < dateOf(a.datePublished)) E(G, "dateModified is before datePublished");
+  }
+
+  /* Service: provider = the business; never an offer (prices are checked above) */
+  for (const s of nodes.filter((n) => types(n).includes("Service"))) {
+    if (s.provider?.["@id"] !== `${ORIGIN}/#organization`) E(G, "Service.provider must reference #organization");
+    if (!s.name || !s.description) E(G, "Service needs name + description");
+  }
+
+  /* og:image: a real file on this site, and the 1200×630 card size (warn) */
+  const ogImg = doc.querySelector('meta[property="og:image"]')?.getAttribute("content") || "";
+  if (ogImg.startsWith(ORIGIN + "/") && !fileFor(ogImg.slice(ORIGIN.length).split(/[?#]/)[0])) E(G, `og:image does not exist in dist: ${ogImg}`);
+  const ogW = doc.querySelector('meta[property="og:image:width"]')?.getAttribute("content");
+  const ogH = doc.querySelector('meta[property="og:image:height"]')?.getAttribute("content");
+  if (ogW !== "1200" || ogH !== "630") W(G, `og:image is ${ogW ?? "?"}×${ogH ?? "?"}, not a 1200×630 card (${ogImg.replace(ORIGIN, "")})`);
+  for (const [name, want] of [["twitter:card", "summary_large_image"], ["twitter:title", null], ["twitter:description", null], ["twitter:image", ogImg]]) {
+    const v = doc.querySelector(`meta[name="${name}"]`)?.getAttribute("content");
+    if (!v) E(G, `missing ${name}`);
+    else if (want && v !== want) W(G, `${name} is "${v.slice(0, 80)}" (expected "${want.slice(0, 80)}")`);
+  }
+}
+
+/* sitemap <lastmod> = the date the page itself states (no build-date "freshness") */
+if (existsSync(sitemapFile)) {
+  const xml = readFileSync(sitemapFile, "utf-8");
+  for (const m of xml.matchAll(/<url>([\s\S]*?)<\/url>/g)) {
+    const loc = (m[1].match(/<loc>\s*([^<\s]+)\s*<\/loc>/) || [])[1];
+    const lastmod = (m[1].match(/<lastmod>\s*([^<\s]+)\s*<\/lastmod>/) || [])[1];
+    if (!loc) continue;
+    const path = loc.replace(/&amp;/g, "&").slice(ORIGIN.length);
+    const stated = pageModified.get(path);
+    if (!lastmod) E(SITE, `sitemap entry without <lastmod>: ${loc}`);
+    else if (stated && lastmod.slice(0, 10) !== stated) E(SITE, `sitemap lastmod ${lastmod} ≠ the page's dateModified ${stated}: ${loc}`);
+  }
+}
+
+/* robots.txt must not block a noindex page (a blocked page's noindex is never seen) */
+if (existsSync(robotsFile)) {
+  const disallows = [...readFileSync(robotsFile, "utf-8").matchAll(/^\s*Disallow:\s*(\S+)/gim)].map((m) => m[1]);
+  for (const pg of pages.values()) {
+    if (pg.indexable || pg.rel === "404.html") continue;
+    const hit = disallows.find((d) => pg.url.startsWith(d.replace(/\*.*$/, "")));
+    if (hit) E(SITE, `robots.txt "Disallow: ${hit}" blocks ${pg.url}, so crawlers never see its noindex — remove the Disallow`);
+  }
+  for (const pg of pages.values()) {
+    if (!pg.indexable) continue;
+    const hit = disallows.find((d) => pg.url.startsWith(d.replace(/\*.*$/, "")));
+    if (hit) E(SITE, `robots.txt "Disallow: ${hit}" blocks the indexable page ${pg.url}`);
+  }
+}
+
+/* internal linking: every indexable page linked from another page and ≤ 3 clicks from "/" */
+{
+  const targetOf = (href, base) => {
+    try {
+      const u = new URL(href, ORIGIN + base);
+      if (!/^(www\.)?nz-web\.com$/i.test(u.hostname)) return null;
+      const hit = fileFor(u.pathname);
+      return hit ? pageByFile(hit.file)?.url ?? null : null;
+    } catch { return null; }
+  };
+  const out = new Map();
+  const inbound = new Map();
+  for (const pg of pages.values()) {
+    const set = new Set();
+    for (const a of pg.doc.querySelectorAll("a[href]")) {
+      const t = targetOf(a.getAttribute("href").trim(), pg.url);
+      if (t && t !== pg.url) set.add(t);
+    }
+    out.set(pg.url, set);
+    for (const t of set) inbound.set(t, (inbound.get(t) || 0) + 1);
+  }
+  const depth = new Map([["/", 0]]);
+  const queue = ["/"];
+  while (queue.length) {
+    const cur = queue.shift();
+    for (const t of out.get(cur) ?? []) if (!depth.has(t)) { depth.set(t, depth.get(cur) + 1); queue.push(t); }
+  }
+  for (const pg of pages.values()) {
+    if (!pg.indexable || pg.url === "/") continue;
+    if (!inbound.get(pg.url)) E(SITE, `orphan page (no internal link points to it): ${pg.url}`);
+    else if (!depth.has(pg.url)) E(SITE, `page not reachable by links from the home page: ${pg.url}`);
+    else if (depth.get(pg.url) > 3) W(SITE, `page is ${depth.get(pg.url)} clicks from the home page (target ≤ 3): ${pg.url}`);
+  }
 }
 
 /* ───────────────────────── output ───────────────────────── */

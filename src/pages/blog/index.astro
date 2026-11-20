@@ -17,7 +17,7 @@ import MagazineArchive from "@/components/blog/MagazineArchive.astro";
 import MagazineGlossary from "@/components/blog/MagazineGlossary.astro";
 import MagazineLetter from "@/components/blog/MagazineLetter.astro";
 import "@/components/blog/magazine.css";
-import { collectionPage, BLOG_ID, ORG_ID, pageUrl, OG_IMAGES } from "@/lib/schema";
+import { blogNode, collectionPage, OG_IMAGES } from "@/lib/schema";
 import { getBlogPosts } from "@/lib/blog";
 import { getArt } from "@/lib/art";
 import { heroImage, type PageSeo } from "@/lib/seo";
@@ -27,7 +27,7 @@ const title = "בלוג בניית אתרים: מדריכים לבעלי עסק�
 const description =
   "בלוג בניית אתרים של NZ-web: מדריכים בעברית פשוטה על תכנון אתר לעסק, קידום בגוגל ובמנועי AI, נגישות, עיצוב ומהירות, עם תשובה קצרה בראש כל מאמר.";
 /* Must equal the <Artwork priority sizes> in MagazineZipper.astro (passed down from here). */
-const HERO_SIZES = "(min-width: 1440px) 760px, (min-width: 1024px) 54vw, 100vw";
+const HERO_SIZES = "(min-width: 1440px) 670px, (min-width: 1024px) 44vw, calc(100vw - 64px)";
 const posts = getBlogPosts();
 
 const seo: PageSeo = {
@@ -36,7 +36,7 @@ const seo: PageSeo = {
   description,
   ogImage: OG_IMAGES.blog,
   lcpArt: { slug: "zipper-library", sizes: HERO_SIZES },
-  breadcrumb: { name: "מגזין", path: PATH },
+  breadcrumb: { name: "המגזין", path: PATH },
   jsonLd: [
     ...collectionPage({
       path: PATH,
@@ -52,14 +52,7 @@ const seo: PageSeo = {
         image: p.art ? getArt(p.art).src : undefined,
       })),
     }),
-    {
-      "@type": "Blog",
-      "@id": BLOG_ID,
-      name: "המגזין של NZ-web",
-      url: pageUrl(PATH),
-      inLanguage: "he",
-      publisher: { "@id": ORG_ID },
-    },
+    blogNode(),
   ],
 };
 ---

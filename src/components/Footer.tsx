@@ -21,7 +21,7 @@ const Footer = () => {
         {/* Studio line + CTA */}
         <div className="grid gap-10 border-b border-line-ink pb-14 md:grid-cols-12 md:gap-12 md:pb-20">
           <p className="nz-display nz-display--h3 !font-light md:col-span-7 md:!text-[clamp(1.75rem,1.2rem+1.6vw,2.75rem)] md:leading-[1.15]">
-            סטודיו לעיצוב ובניית אתרים לעסקים. כל אתר מתוכנן, מעוצב ונבנה בהתאמה אישית, מהסקיצה הראשונה ועד ההשקה.
+            סטודיו לעיצוב ובניית אתרים לעסקים בישראל, בהובלת צבי משה. כל אתר מתוכנן, מעוצב ונבנה בהתאמה אישית, מהסקיצה הראשונה ועד ההשקה.
           </p>
           <div className="flex flex-col items-start gap-1 md:col-span-4 md:col-start-9 md:justify-end">
             <WhatsAppCta variant="quiet" label="לשיחה בוואטסאפ" />
@@ -69,6 +69,14 @@ const Footer = () => {
                   <a href={s.href}>{s.label}</a>
                 </li>
               ))}
+              <li>
+                {/* Withdrawing consent must be as easy as giving it: with JS this reopens the cookie
+                    card on the current page (src/scripts/global.ts); without JS it goes to the
+                    settings box on the privacy page. */}
+                <a href="/privacy/#cookie-settings" data-cookie-settings>
+                  הגדרות עוגיות
+                </a>
+              </li>
             </ul>
           </nav>
 
@@ -85,6 +93,10 @@ const Footer = () => {
                   <a href={getMailtoHref(studio.email)}>
                     <bdi dir="ltr">{studio.email}</bdi>
                   </a>
+                </li>
+                <li>
+                  {/* The Google Business Profile (the same URL as Organization.sameAs in site-graph.ts) */}
+                  <a href={studio.googleProfile}>הפרופיל שלנו בגוגל</a>
                 </li>
                 <li className="pt-2 text-[0.9375rem] text-ash">
                   שעות פעילות: {studio.days} <bdi dir="ltr">{studio.time}</bdi>

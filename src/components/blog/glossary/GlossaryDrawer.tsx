@@ -1,5 +1,6 @@
 // Signature component: מגירת הכרטיסים — riffle a card-catalogue drawer (scrub along the card tops)
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { altParts } from "./alt-parts";
 
 /**
  * "The card drawer" — the glossary's signature (/glossary/). A library card-catalogue drawer holds
@@ -126,7 +127,18 @@ const GlossaryDrawer = ({ terms }: Props) => {
           </h3>
           {t.alt && (
             <p className="gl-card__alt" dir="auto">
-              {t.alt}
+              {altParts(t.alt).map((p, k) => (
+                <Fragment key={k}>
+                  {k > 0 && " · "}
+                  {p.en ? (
+                    <span lang="en" dir="ltr">
+                      {p.text}
+                    </span>
+                  ) : (
+                    p.text
+                  )}
+                </Fragment>
+              ))}
             </p>
           )}
           <p className="gl-card__def">{t.definition}</p>

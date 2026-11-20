@@ -15,6 +15,7 @@
  * as the page's FAQPage JSON-LD.
  */
 import { faqGroups, visibleFaqItems } from "@/content/faq";
+import { resolveFurther } from "@/content/further-reading";
 
 const ROMAN = ["I", "II", "III", "IV"];
 let n = 0;
@@ -24,7 +25,7 @@ const groups = faqGroups.map((g) => ({
     .filter((i) => i.group === g.id)
     .map((item) => {
       const index = n++;
-      return { ...item, index };
+      return { ...item, index, further: item.more ? resolveFurther(item.more) : null };
     }),
 }));
 const total = n;
@@ -99,6 +100,14 @@ const miniStrings = (count: number) =>
               </summary>
               <div class="fq-q__a">
                 <p>{item.answer}</p>
+                {item.further && (
+                  <p class="fq-q__more">
+                    <span>להרחבה:</span>
+                    {[...item.further.guides, ...item.further.terms].map((l) => (
+                      <a href={l.href} dir="auto">{l.label}</a>
+                    ))}
+                  </p>
+                )}
               </div>
             </details>
           ))}
@@ -218,7 +227,13 @@ const miniStrings = (count: number) =>
 
     /* /faq/#question-id opens (and plucks) that string. */
     const openFromHash = () => {
-      const id = decodeURIComponent(location.hash.slice(1));
+      const raw = location.hash.slice(1);
+      let id = raw;
+      try {
+        id = decodeURIComponent(raw);
+      } catch {
+        /* malformed escape (e.g. #%E0): fall back to the raw hash */
+      }
       const target = id ? document.getElementById(id) : null;
       if (target instanceof HTMLDetailsElement && target.classList.contains("fq-q")) {
         target.open = true;

@@ -2,8 +2,10 @@
 /**
  * /privacy/ — מדיניות פרטיות (room 09). Static sections + ONE island:
  *   PrivacyLock  client:visible   the signature "קבוצת המנעול" (the policy in short, traced as a padlock)
- * The sections come from src/content/site-settings.ts (privacy.sections); the star summaries and
- * the document's plain-language notes from src/components/legal/content.ts.
+ * The sections come from src/content/site-settings.ts (privacy.sections); the star summaries, the
+ * document's plain-language notes and the storage list (§ "עוגיות ואחסון בדפדפן", StorageTable)
+ * from src/components/legal/content.ts. The cookie banner's "מה זה אומר" links to #collected;
+ * the reopen button lives at #cookie-settings.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import LegalHero from "@/components/legal/LegalHero.astro";
@@ -12,6 +14,7 @@ import LegalDoors from "@/components/legal/LegalDoors.astro";
 import PrivacyLock from "@/components/legal/PrivacyLock";
 import PrivacyServices from "@/components/legal/PrivacyServices.astro";
 import CookieChoice from "@/components/legal/CookieChoice.astro";
+import StorageTable from "@/components/legal/StorageTable.astro";
 import { roomFor } from "@/components/nz/nav";
 import "@/components/legal/rooms.css";
 import { siteSettings } from "@/content/site-settings";
@@ -21,7 +24,7 @@ import { heroImage, type PageSeo } from "@/lib/seo";
 
 const PATH = "/privacy/";
 const ART = "ice-constellation";
-const HERO_SIZES = "(min-width: 1024px) 46vw, 100vw";
+const HERO_SIZES = "(min-width: 1440px) 570px, (min-width: 1024px) 40vw, calc(100vw - 64px)";
 const doc = siteSettings.privacy;
 const title = "מדיניות פרטיות | NZ-web";
 const description =
@@ -39,7 +42,7 @@ const seo: PageSeo = {
       title,
       description,
       primaryImage: heroImage(ART, PATH),
-      dateModified: "2026-11-19",
+      dateModified: "2026-11-20",
       speakable: true,
     }),
   ],
@@ -52,7 +55,7 @@ const seo: PageSeo = {
     crumb="מדיניות פרטיות"
     title="מדיניות"
     accent="פרטיות"
-    lead="האתר nz-web.com לא שומר את הפרטים שלכם בשרת. פנייה יוצאת דרך וואטסאפ רק כשאתם לוחצים שלח, וכלי מדידה נטענים רק אחרי שאישרתם עוגיות. אנחנו לא מוכרים מידע, ואפשר לבקש לעיין בו, לתקן אותו או למחוק אותו בכל רגע. הנוסח המלא, סעיף אחר סעיף, מופיע למטה."
+    lead="מה שאתם כותבים בפנייה לא נשמר בשרת של האתר: הפנייה יוצאת דרך וואטסאפ או המייל שלכם, ורק כשאתם לוחצים שלח. כלי מדידה נטענים רק אחרי שאישרתם עוגיות. אנחנו לא מוכרים מידע, ואפשר לבקש לעיין בו, לתקן אותו או למחוק אותו בכל רגע. הנוסח המלא, סעיף אחר סעיף, מופיע למטה."
     art={ART}
     sizes={HERO_SIZES}
     room={roomFor(PATH) ?? 9}
@@ -91,11 +94,12 @@ const seo: PageSeo = {
         <p class="lg-flow__none"><s>שרת שמאחסן את הפנייה</s> אין שלב כזה</p>
       </figure>
     </Fragment>
+    <Fragment slot="after-cookies">
+      <StorageTable />
+      <CookieChoice />
+    </Fragment>
     <Fragment slot="after-third-parties">
       <PrivacyServices />
-    </Fragment>
-    <Fragment slot="after-rights">
-      <CookieChoice />
     </Fragment>
   </LegalDocument>
 

@@ -153,7 +153,7 @@ const HomeCollection = () => (
                 target="_blank"
                 rel="noopener"
                 className="nz-link hm-work__visit"
-                aria-label={`${w.title}: ${collection.visit} (נפתח בכרטיסייה חדשה)`}
+                aria-label={`${collection.visit}: ${w.title} (נפתח בכרטיסייה חדשה)`}
               >
                 <span className="nz-link__text">{collection.visit}</span>
                 <ExternalIcon className="nz-link__arrow" />

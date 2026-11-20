@@ -43,7 +43,7 @@ const notes = (data.notes ?? []).slice(0, 3);
           <span>NZ-web · קטלוג השירותים</span>
         </p>
       </div>
-      <aside class="sv-intro__margin" aria-label="הערות שוליים">
+      <div class="sv-intro__margin" role="group" aria-label="הערות שוליים">
         <div class="sv-intro__sticky">
           {
             data.pull && (
@@ -65,7 +65,7 @@ const notes = (data.notes ?? []).slice(0, 3);
             )
           }
         </div>
-      </aside>
+      </div>
     </div>
   </div>
 </section>

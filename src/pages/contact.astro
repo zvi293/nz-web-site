@@ -17,7 +17,7 @@ import { heroImage, type PageSeo } from "@/lib/seo";
 const PATH = "/contact/";
 const { title, description } = contactSeo;
 /* Must equal the <Artwork priority sizes> in ContactHero (passed down below). */
-const HERO_SIZES = "(min-width: 1280px) 560px, (min-width: 1024px) 40vw, 100vw";
+const HERO_SIZES = "(min-width: 1280px) 560px, (min-width: 1024px) 40vw, calc(100vw - 64px)";
 const heroSlug = contactHero.art.slug;
 
 const seo: PageSeo = {

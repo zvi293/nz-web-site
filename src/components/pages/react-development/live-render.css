@@ -4,6 +4,7 @@
 
 .lr {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* no min-content blow-out at 320px (WCAG 1.4.10) */
   gap: 22px;
 }
 @media (min-width: 1024px) {
@@ -22,6 +23,7 @@
   --focus: var(--vermilion-deep);
   color: var(--fg);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   padding: 16px 16px 12px;
   background: var(--paper);
@@ -431,12 +433,13 @@ html.nz-motion .lr-tea:not(.lr-tea--empty):not(.lr-tea--none) {
   color: var(--bone);
   transition: color 0.3s var(--ease-out);
 }
+/* the role wraps when it does not fit (narrow phones, the site's 160% text size, WCAG text
+   spacing) instead of losing its end to "…" (WCAG 1.4.4 / 1.4.12) */
 .lr-node__role {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
   font-size: 0.8125rem;
+  line-height: 1.3;
   color: var(--fg-muted);
 }
 .lr-node__count {

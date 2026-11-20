@@ -325,9 +325,13 @@ html.nz-motion .sv-enter {
 }
 .sv-line {
   display: block;
-  overflow: hidden;
   padding-block: 0.06em 0.14em;
   margin-block: -0.06em -0.14em;
+}
+/* the mask exists only for the line-rise entrance; without motion nothing is clipped (a
+   reader's own letter / word spacing never cuts a word — WCAG 1.4.12) */
+html.nz-motion .sv-line {
+  overflow: hidden;
 }
 .sv-line__in {
   display: inline-block;
@@ -1399,6 +1403,9 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   --mat: var(--vermilion-deep);
   --word: #fff6ee;
 }
+.sv-out__work:nth-child(3n + 2) .sv-out__roman {
+  opacity: 0.9; /* on the vermilion mat 0.6 fell to 2.9:1; 0.9 keeps the numeral ≥ 4.5:1 */
+}
 .sv-out__work:nth-child(3n) .sv-out__mat {
   --mat: #3b3631;
   --word: var(--bone);
@@ -1590,6 +1597,59 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   line-height: 1.65;
   color: var(--fg-muted);
 }
+/* "להרחבה במגזין": guides + glossary terms under the side card's links */
+.sv-further {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+.sv-further__label {
+  margin: 0;
+}
+.sv-further__guides {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sv-further__guides a,
+.sv-further__terms a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--fg);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 4px;
+}
+.sv-further__guides a:hover,
+.sv-further__terms a:hover {
+  text-decoration-color: currentColor;
+}
+.sv-further__terms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 14px;
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--fg-muted);
+}
+.sv-further__terms a {
+  min-width: 44px;
+  justify-content: center;
+}
+/* a guide title holds inline <span class="sv-nb"> runs: a block link keeps their spaces (a flex
+   link trims the space before each span) and still gives a 44px target */
+.sv-further__guides a {
+  display: block;
+  padding-block: 11px;
+}
 @media (min-width: 1024px) {
   .sv-faq__grid {
     grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
@@ -1648,6 +1708,11 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
 .sv-sign:hover {
   background: var(--ink-2);
   transform: translateY(-3px);
+}
+/* the card is an ink tile on a light wall: its ring sits OUTSIDE it, on bone/paper, so it takes
+   the light-surface focus colour (the ink-tone coral was 1.7:1 there) */
+.sv-sign:focus-visible {
+  outline-color: var(--vermilion-deep);
 }
 .sv-sign__top {
   grid-column: 1 / -1;
@@ -1848,7 +1913,7 @@ html.nz-motion .sv-hero__bleed-art .nz-art__img {
   height: 54px;
   border-radius: 50%;
   background: var(--vermilion-fill);
-  color: var(--bone);
+  color: #fff; /* white on --vermilion-fill ≥ 4.5:1 (bone read 4.0:1) */
   font-family: var(--font-display);
   font-weight: 500;
   font-size: 1rem;

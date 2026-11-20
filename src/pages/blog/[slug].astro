@@ -42,7 +42,7 @@ import {
   typesetHtml,
   typesetText,
 } from "@/components/blog/magazine-meta";
-import { article, faqPage, webPage } from "@/lib/schema";
+import { article, blogNode, faqPage, webPage } from "@/lib/schema";
 import { getAbsoluteAssetUrl } from "@/lib/site-url";
 import { heroImage, type PageSeo } from "@/lib/seo";
 import { getArt, hasArt } from "@/lib/art";
@@ -91,7 +91,7 @@ const seo: PageSeo = {
   ogImageAlt: hasCard ? `${post.title}: כרטיס המאמר במגזין של NZ-web` : art.alt,
   article: { publishedTime: published, modifiedTime: modified, section: post.category },
   lcpArt: { slug: artSlug, sizes: COVER_SIZES },
-  breadcrumb: { name: post.title, path: PATH, parent: { name: "מגזין", path: "/blog/" } },
+  breadcrumb: { name: post.title, path: PATH, parent: { name: "המגזין", path: "/blog/" } },
   jsonLd: [
     webPage({
       path: PATH,
@@ -115,6 +115,7 @@ const seo: PageSeo = {
       readMinutes: minutes,
     }),
     ...(faq.length ? [faqPage(faq, PATH)] : []),
+    blogNode(),
   ],
 };
 ---

@@ -15,7 +15,8 @@ export const serviceNav: ServiceNavItem[] = [
   { label: "אתר תדמית לעסק", href: "/services/business-website/", desc: "האתר שמציג את העסק ומביא פניות", art: "titanium-ribbon" },
   { label: "בניית אתרים מקצועיים", href: "/services/web-development/", desc: "מהסקיצה ועד ההשקה, בכל מסך", art: "mobius-brick" },
   { label: "פיתוח אתרים", href: "/services/website-development/", desc: "מערכות, חיבורים וקוד שמחזיק שנים", art: "shell-staircases" },
-  { label: "דפי נחיתה", href: "/services/landing-page-development/", desc: "עמוד אחד, מטרה אחת, פניות", art: "coral-ladders" },
+  { label: "בניית דפי נחיתה", href: "/services/landing-pages/", desc: "עמוד אחד, מטרה אחת, פניות", art: "coral-ladders" },
+  { label: "פיתוח דף נחיתה", href: "/services/landing-page-development/", desc: "לפי המטרה: קמפיין, לידים, בעלי מקצוע", art: "paper-plane" },
   { label: "מערכת ניהול תורים", href: "/services/appointment-system/", desc: "הזמנה אונליין ותזכורות אוטומטיות", art: "brass-clockwork" },
   { label: "פיתוח React", href: "/services/react-development/", desc: "ממשקים ואפליקציות ווב מהירים", art: "indigo-loom" },
   { label: "שיפור מהירות אתר", href: "/services/website-performance/", desc: "מאתרים מה מאט ומתקנים", art: "lime-prism" },
@@ -70,6 +71,8 @@ export const studio = {
   /** Render as: {days} <bdi dir="ltr">{time}</bdi> — the time range must stay LTR. */
   days: "א׳–ה׳",
   time: "09:00–19:00",
+  /** The Google Business Profile (Knowledge Graph id); also Organization.sameAs in src/lib/site-graph.ts. */
+  googleProfile: "https://www.google.com/search?kgmid=/g/11nq8wcnzc",
 };
 
 /** Normalises a path for "current page" checks ("/about" ≡ "/about/"). */

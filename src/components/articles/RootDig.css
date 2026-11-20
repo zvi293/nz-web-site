@@ -203,8 +203,13 @@ html.nz-motion .as-dg__leaf {
   -webkit-tap-highlight-color: transparent;
 }
 .as-dg__soil:focus-visible {
+  outline: none;
+}
+/* the clods paint over anything drawn inside the soil, so the keyboard ring sits on the plot,
+   just outside it (the 8px gutter between plots keeps it clear) */
+.as-dg__plot:has(> .as-dg__soil:focus-visible) {
   outline: 2px solid var(--focus);
-  outline-offset: -2px;
+  outline-offset: 2px;
 }
 .as-dg__soil.is-gone {
   pointer-events: none;

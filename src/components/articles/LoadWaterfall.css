@@ -81,7 +81,9 @@
 .as-wf__flag-l {
   position: absolute;
   top: 0;
-  inset-inline-start: calc(var(--lcp) * 100%);
+  /* centred on the LCP line, but never past the chart's far edge (a late LCP on a 320px phone
+     pushed the label off-screen and shifted the whole page sideways) */
+  inset-inline-start: min(calc(var(--lcp) * 100%), calc(100% - 3rem));
   translate: 50% 0;
   white-space: nowrap;
   color: #f6a58f;

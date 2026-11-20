@@ -31,3 +31,11 @@ dist-ssr
 
 # Astro generated types / cache
 .astro/
+
+# env files (keep the example)
+.env
+.env.*
+!.env.example
+
+# Netlify CLI local state
+.netlify/

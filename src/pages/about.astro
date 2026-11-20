@@ -20,7 +20,7 @@ import { heroImage, type PageSeo } from "@/lib/seo";
 const PATH = "/about/";
 const { title, description } = aboutSeo;
 /* Must equal the <Artwork priority sizes> in AboutHero (passed down below). */
-const HERO_SIZES = "(min-width: 1280px) 640px, (min-width: 1024px) 42vw, 100vw";
+const HERO_SIZES = "(min-width: 1280px) 640px, (min-width: 1024px) 42vw, calc(100vw - 64px)";
 const heroSlug = aboutHero.art.slug;
 
 const seo: PageSeo = {

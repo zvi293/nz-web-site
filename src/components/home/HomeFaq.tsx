@@ -47,7 +47,7 @@ const HomeFaq = () => (
           {faqBlock.allLink.label}
         </Button>
 
-        <aside className="hm-nudge hm-sd" aria-labelledby="hm-nudge-title">
+        <div className="hm-nudge hm-sd" role="group" aria-labelledby="hm-nudge-title">
           <div className="hm-nudge__text">
             <p id="hm-nudge-title" className="hm-nudge__title">
               {faqBlock.nudge.title}
@@ -55,7 +55,7 @@ const HomeFaq = () => (
             <p className="hm-nudge__body">{faqBlock.nudge.body}</p>
           </div>
           <WhatsAppCta label={faqBlock.nudge.cta} message={faqBlock.nudge.message} className="hm-nudge__cta" />
-        </aside>
+        </div>
       </div>
     </div>
   </section>

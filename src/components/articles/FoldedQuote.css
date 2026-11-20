@@ -97,7 +97,9 @@ html.nz-motion .as-fq__fold {
 .as-fq__n {
   font: 500 0.75rem/1 var(--font-sans);
   font-variant-numeric: tabular-nums;
-  color: var(--vermilion-deep);
+  /* a shade under --vermilion-deep: the even (folded-back) strips are #ddd5c8, where
+     --vermilion-deep reads 4.1:1; #a52c16 keeps small text ≥ 4.5:1 on both faces */
+  color: #a52c16;
 }
 .as-fq__title {
   font: 400 1.125rem/1.25 var(--font-display);
@@ -195,18 +197,18 @@ html:not(.js) .as-fq__panel {
   letter-spacing: 0.08em;
   color: var(--graphite);
 }
-.as-fq__col dd {
+.as-fq__col dd:not(.as-fq__stamp) {
   margin: 0;
   font-size: 0.9375rem;
   line-height: 1.45;
 }
-.as-fq__col.is-a-missing dd {
+.as-fq__col.is-a-missing dd:not(.as-fq__stamp) {
   color: var(--graphite);
   font-style: italic;
 }
 .as-fq__stamp {
   justify-self: start;
-  margin-top: 6px;
+  margin: 6px 0 0; /* a <dd> (the verdict on that offer's answer): no UA indent */
   padding: 2px 8px;
   border: 1.5px solid var(--vermilion-deep);
   border-radius: 3px;

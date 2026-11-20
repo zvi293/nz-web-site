@@ -52,8 +52,12 @@ html.nz-motion .ab-enter {
 }
 .ab-line {
   display: block;
-  overflow: hidden;
   padding-block-end: 0.06em;
+}
+/* the mask exists only for the line-rise entrance; without motion nothing is clipped (a
+   reader's own letter / word spacing never cuts a word — WCAG 1.4.12) */
+html.nz-motion .ab-line {
+  overflow: hidden;
 }
 .ab-line__in {
   display: inline-block;

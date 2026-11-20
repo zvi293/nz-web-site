@@ -489,7 +489,11 @@ const ScopeBubble = () => {
                     data-key={key}
                     className={`of-drop${inside ? " is-in" : ""}${away ? " is-away" : ""}`}
                     aria-pressed={inside}
-                    aria-label={c.dropLabel(item, inside)}
+                    aria-label={c.dropLabel(
+                      /* the visible short name leads the label (WCAG 2.5.3 label in name) */
+                      item.includes(short(item)) ? item : `${short(item)}, ${item}`,
+                      inside,
+                    )}
                     onClick={() => onStone(key)}
                     onPointerDown={(e) => onDown(e, g.gi, item)}
                     onPointerMove={onMove}

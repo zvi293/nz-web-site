@@ -2,11 +2,12 @@
 /**
  * /privacy/ §04 exhibit — "מי נוגע במידע, ומתי": a wiring diagram from the site to each outside
  * service. The wire itself says when: solid = always (hosting), dashed = only when you press send
- * (WhatsApp), cut by an open switch = only after you allow cookies (measurement).
+ * (WhatsApp, Gmail), cut by an open switch = only after you allow cookies (measurement).
  */
 const rows = [
   { when: "always", k: "Netlify", v: "מארח את האתר", tag: "תמיד" },
   { when: "send", k: "WhatsApp", v: "מעביר את הפנייה שלכם", tag: "רק כשלוחצים שלח" },
+  { when: "send", k: "Gmail", v: "מקבל את המייל שלכם", tag: "רק כשאתם כותבים לנו" },
   { when: "consent", k: "Google · Meta", v: "מודדים ביקורים", tag: "רק אחרי אישור עוגיות" },
 ];
 ---
@@ -38,5 +39,5 @@ const rows = [
       ))
     }
   </ol>
-  <p class="lg-svc__note">לכל אחד מהשירותים מדיניות פרטיות משלו, וייתכן שהמידע נשמר בשרתים מחוץ לישראל.</p>
+  <p class="lg-svc__note">לכל אחד מהשירותים מדיניות פרטיות משלו, והמידע עשוי להישמר בשרתים מחוץ לישראל, כולל בארצות הברית.</p>
 </figure>

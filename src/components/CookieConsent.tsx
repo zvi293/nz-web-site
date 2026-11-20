@@ -155,7 +155,7 @@ const CookieConsent = () => {
           <span className="nzc-cube" aria-hidden="true" />
           <span>
             עוגיות מדידה נטענות רק באישור.{" "}
-            <a href="/privacy/#collected" className="nzc-cookies__more" tabIndex={phase === "open" ? undefined : -1}>
+            <a href="/privacy/#cookies" className="nzc-cookies__more" tabIndex={phase === "open" ? undefined : -1}>
               מה זה אומר
             </a>
           </span>

@@ -103,8 +103,8 @@ const FoldedQuote = () => {
                     ) : (
                       <dd>{f.a}</dd>
                     )}
-                    {f.flag === "a-missing" && <span className="as-fq__stamp">לא כתוב</span>}
-                    {f.flag === "a-risk" && <span className="as-fq__stamp">כדאי לבדוק</span>}
+                    {f.flag === "a-missing" && <dd className="as-fq__stamp">לא כתוב</dd>}
+                    {f.flag === "a-risk" && <dd className="as-fq__stamp">כדאי לבדוק</dd>}
                   </div>
                   <div className="as-fq__col">
                     <dt>הצעה ב׳</dt>

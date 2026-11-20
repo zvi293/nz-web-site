@@ -316,7 +316,7 @@
 .ts-site__kicker {
   font-size: calc(var(--u) * 15);
   font-weight: 500;
-  color: #b4532a;
+  color: #9c4520; /* ≥ 4.5:1 on the mock page's cream (#b4532a read 4.4:1) */
 }
 .ts-site__h {
   font-family: var(--font-display);

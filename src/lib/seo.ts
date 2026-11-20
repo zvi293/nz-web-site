@@ -21,6 +21,9 @@
  *   ---
  *   <BaseLayout seo={seo}> … </BaseLayout>
  */
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import ogCards from "@/content/og-cards.json";
 import { getArt } from "@/lib/art";
 import { buildGraph, breadcrumb as breadcrumbNode, imageObject, pageUrl, webPage, type Crumb, type JsonLdNode } from "@/lib/schema";
 import { SITE_GRAPH } from "@/lib/site-graph";
@@ -105,7 +108,33 @@ export interface ResolvedHead {
 }
 
 const DEFAULT_DESCRIPTION =
-  "NZ-web מעצבת ובונה אתרים לעסקים בישראל: אתרי תדמית, דפי נחיתה ומערכות לקביעת תורים, בקוד שנכתב לכל לקוח, עם נגישות, מהירות ו-SEO כחלק מהעבודה.";
+  "NZ-web מעצב ובונה אתרים לעסקים בישראל: אתרי תדמית, דפי נחיתה ומערכות לקביעת תורים, בקוד שנכתב לכל לקוח, עם נגישות, מהירות ו-SEO כחלק מהעבודה.";
+
+/* ── Per-page social cards (src/content/og-cards.json, rendered by `npm run og`) ── */
+interface OgCard {
+  art: string;
+  title: string;
+  label: string;
+}
+const OG_CARDS = ogCards as Record<string, OgCard>;
+const cardKeyOfPath = (path: string) => path.replace(/^\/+|\/+$/g, "");
+const cardKeyOfUrl = (url: string) => url.match(/\/og\/([a-z0-9/-]+)\.jpg$/i)?.[1];
+
+/** The page's own generated card (absolute URL), when og-cards.json has its path and the file exists. */
+export function pageCardUrl(path: string): string | undefined {
+  const key = cardKeyOfPath(path);
+  if (!key || !OG_CARDS[key]) return undefined;
+  if (!existsSync(join(process.cwd(), "public", "og", `${key}.jpg`))) return undefined;
+  return `${SITE_URL}/og/${key}.jpg`;
+}
+
+/** og:image:alt for a generated card: what the card actually shows (its own title + artwork). */
+function cardAlt(url: string): string | undefined {
+  const key = cardKeyOfUrl(url);
+  const card = key ? OG_CARDS[key] : undefined;
+  if (!card) return undefined;
+  return `${card.title}: כרטיס של NZ-web עם היצירה „${getArt(card.art).title}”`;
+}
 
 function imageType(url: string): string | undefined {
   const path = url.split(/[?#]/)[0].toLowerCase();
@@ -135,13 +164,14 @@ export function resolveHead(seo: PageSeo): ResolvedHead {
   const description = seo.description ?? DEFAULT_DESCRIPTION;
 
   /* ── Open Graph image ── */
-  const ogImage =
-    seo.ogImage && /^https?:\/\//i.test(seo.ogImage) ? seo.ogImage : getResolvedOgImageUrl(SITE_URL, seo.ogImage);
-  const isGeneratedCard = /\/og\/[a-z0-9-]+\.jpg$/i.test(ogImage);
+  /* explicit ogImage → the page's own card (og-cards.json) → the site default */
+  const wanted = seo.ogImage ?? pageCardUrl(seo.path);
+  const ogImage = wanted && /^https?:\/\//i.test(wanted) ? wanted : getResolvedOgImageUrl(SITE_URL, wanted);
+  const isGeneratedCard = /\/og\/[a-z0-9/-]+\.jpg$/i.test(ogImage);
   const imageWidth = seo.ogImageWidth ?? (isGeneratedCard ? OG_IMAGE_SIZE.width : undefined);
   const imageHeight = seo.ogImageHeight ?? (isGeneratedCard ? OG_IMAGE_SIZE.height : undefined);
   const imageAlt =
-    seo.ogImageAlt ?? (ogImage === DEFAULT_OG_IMAGE ? DEFAULT_OG_IMAGE_ALT : isGeneratedCard ? seo.title : undefined);
+    seo.ogImageAlt ?? (ogImage === DEFAULT_OG_IMAGE ? DEFAULT_OG_IMAGE_ALT : isGeneratedCard ? cardAlt(ogImage) : undefined);
 
   /* ── JSON-LD: site stubs + page nodes (+ WebPage if missing) + breadcrumb ── */
   const nodes: unknown[] = [...SITE_GRAPH, ...(seo.jsonLd ?? [])];

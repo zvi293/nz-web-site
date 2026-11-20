@@ -4,7 +4,7 @@
  *   getArt("brushstroke-cube") → { slug, title, alt, width, height, color, lqip, tone,
  *                                  avifSrcSet, webpSrcSet, src }
  *
- * Files: src/assets/art/<slug>-{640,1080,1600}.{avif,webp} (built by `npm run art`).
+ * Files: src/assets/art/<slug>-{320,640,828,1080,1600}.{avif,webp} (built by `npm run art`).
  * Metadata: src/content/art-manifest.json (title + alt in Hebrew, dominant colour, LQIP).
  * Render it with <Artwork slug="…" /> from "@/components/art" — never a bare <img>.
  */
@@ -38,7 +38,7 @@ const files = import.meta.glob("/src/assets/art/*.{avif,webp}", {
   import: "default",
 }) as Record<string, string>;
 
-const WIDTHS = [640, 1080, 1600] as const;
+const WIDTHS = [320, 640, 828, 1080, 1600] as const;
 const cache = new Map<string, Art>();
 
 function fileUrl(slug: string, w: number, ext: "avif" | "webp"): string | undefined {

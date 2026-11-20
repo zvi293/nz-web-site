@@ -11,7 +11,8 @@
     "art": "node scripts/art/build-art.mjs",
     "qa": "node scripts/qa/site-qa.mjs",
     "shoot": "node scripts/qa/shoot.mjs",
-    "og": "node scripts/og/generate-og.mjs"
+    "og": "node scripts/og/generate-og.mjs",
+    "llms": "node scripts/llms/generate.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^7.1.9",
@@ -32,7 +33,7 @@
     "jsdom": "^20.0.3",
     "postcss": "^8.5.6",
     "puppeteer": "^24.0.0",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0"

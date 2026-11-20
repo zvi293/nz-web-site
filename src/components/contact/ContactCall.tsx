@@ -25,6 +25,11 @@ import { call as c, type Turn } from "./content";
 
 type Answers = Partial<Record<Turn["id"], string>>;
 
+/* Free-text answers are capped so the composed wa.me / mailto URL stays a sane length (some mail
+   clients and browsers refuse very long mailto: links). Everything typed is URL-encoded. */
+const NAME_MAX = 120;
+const NOTE_MAX = 800;
+
 const turns = c.turns;
 
 function compose(a: Answers): string {
@@ -77,7 +82,7 @@ const ContactCall = () => {
   const [times, setTimes] = useState<string[]>([]);
   const [startedAt, setStartedAt] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLOListElement>(null);
+  const lineRef = useRef<HTMLDivElement>(null);
   const timer = useRef<number>();
   const keyboard = useRef(false);
 
@@ -220,9 +225,9 @@ const ContactCall = () => {
         </div>
 
         {/* the line: the whole conversation so far */}
-        <ol ref={lineRef} className="ct-wire" role="log" aria-live="polite" aria-label="השיחה עם צבי" tabIndex={-1}>
+        <div ref={lineRef} className="ct-wire" role="log" aria-live="polite" aria-label="השיחה עם צבי" tabIndex={-1}>
           {phase === "idle" || phase === "dialing" ? (
-            <li className="ct-wire__idle">
+            <div className="ct-wire__idle">
               <p className="ct-wire__idle-title">על הקו יעלו:</p>
               <ul className="ct-topics">
                 {c.idleTopics.map((t, i) => (
@@ -235,17 +240,17 @@ const ContactCall = () => {
                 ))}
               </ul>
               <p className="ct-wire__note">{c.idleNote}</p>
-            </li>
+            </div>
           ) : (
             <>
-              <li className="ct-wire__start" aria-hidden="true">
+              <div className="ct-wire__start" aria-hidden="true">
                 <span className="ct-wire__start-k">
                   {c.started} {startedAt && <bdi dir="ltr">{startedAt}</bdi>}
                 </span>
                 <span className="ct-wire__start-v">{c.startedNote}</span>
-              </li>
+              </div>
               {turns.slice(0, Math.min(turn + (typing ? 0 : 1), turns.length)).map((t, i) => (
-                <li key={t.id} className="ct-turn">
+                <div key={t.id} className="ct-turn">
                   <p className="ct-msg-in">
                     <span className="nz-sr">צבי: </span>
                     {t.q}
@@ -260,10 +265,10 @@ const ContactCall = () => {
                       </span>
                     </p>
                   )}
-                </li>
+                </div>
               ))}
               {phase === "done" && !typing && (
-                <li className="ct-turn ct-turn--draft">
+                <div className="ct-turn ct-turn--draft">
                   <p className="ct-msg-in">
                     <span className="nz-sr">צבי: </span>
                     {c.closing}
@@ -272,18 +277,18 @@ const ContactCall = () => {
                     <figcaption className="ct-draft__label">{c.draftLabel}</figcaption>
                     <p className="ct-draft__text">{message}</p>
                   </figure>
-                </li>
+                </div>
               )}
               {typing && (
-                <li className="ct-typing" aria-hidden="true">
+                <div className="ct-typing" aria-hidden="true">
                   <span />
                   <span />
                   <span />
-                </li>
+                </div>
               )}
             </>
           )}
-        </ol>
+        </div>
 
         {/* the visitor's side of the call: one turn at a time */}
         <div className="ct-keys">
@@ -321,6 +326,7 @@ const ContactCall = () => {
                     id={`ct-in-${current.id}`}
                     className="ct-type__input ct-type__input--area"
                     rows={2}
+                    maxLength={NOTE_MAX}
                     placeholder={current.field.placeholder}
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
@@ -333,6 +339,7 @@ const ContactCall = () => {
                     type="text"
                     autoComplete="name"
                     enterKeyHint="send"
+                    maxLength={NAME_MAX}
                     placeholder={current.field?.placeholder}
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}

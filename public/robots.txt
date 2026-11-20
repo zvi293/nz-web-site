@@ -1,117 +1,87 @@
 # NZ-web · robots.txt · https://nz-web.com
-# Everything is crawlable except the post-submit thank-you page.
+# Everything is crawlable. Pages that must stay out of the index (/thank-you/, the 404 page) say so
+# with <meta name="robots" content="noindex, follow">: they are deliberately NOT disallowed here,
+# because a crawler that may not fetch a page never sees its noindex (Google: a blocked URL can
+# still be indexed from links, without content). scripts/qa/site-qa.mjs fails the build check if a
+# noindex page is ever disallowed again.
 #
-# Content signals (https://contentsignals.org): explicit permission for search, AI answers and AI training.
+# Content signals (https://contentsignals.org) for every crawler below:
+#   Content-Signal: search=yes, ai-input=yes, ai-train=yes
+# It is stated here as a comment on purpose: as a directive line it is not part of RFC 9309, so
+# Lighthouse / PageSpeed mark robots.txt "not valid" (SEO 92 on every page). "yes" grants nothing
+# beyond "Allow: /", which every group already has, so nothing is lost.
 # A crawler obeys only its most specific group (RFC 9309), so every named group repeats the rules
-# (the Disallow for /thank-you/ included) instead of inheriting them from "*".
+# instead of inheriting them from "*".
 
 User-agent: *
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
-Disallow: /thank-you/
 
 # ===== AI / answer-engine crawlers: explicitly welcome (GEO / AEO) =====
 
 # OpenAI (ChatGPT)
 User-agent: GPTBot
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 User-agent: OAI-SearchBot
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 User-agent: ChatGPT-User
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # Anthropic (Claude)
 User-agent: ClaudeBot
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 User-agent: Claude-User
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 User-agent: Claude-SearchBot
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 User-agent: anthropic-ai
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # Perplexity
 User-agent: PerplexityBot
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 User-agent: Perplexity-User
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # Google (Gemini, AI Overviews, other AI surfaces)
 User-agent: Google-Extended
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 User-agent: GoogleOther
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # Apple (Apple Intelligence)
 User-agent: Applebot-Extended
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # Amazon
 User-agent: Amazonbot
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # Common Crawl
 User-agent: CCBot
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # Cohere
 User-agent: cohere-ai
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # DuckDuckGo AI
 User-agent: DuckAssistBot
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # Mistral
 User-agent: MistralAI-User
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # ByteDance
 User-agent: Bytespider
 Allow: /
-Disallow: /thank-you/
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # ===== Discovery =====
 Sitemap: https://nz-web.com/sitemap.xml

@@ -125,7 +125,7 @@ const NextMove = () => {
                 className={cn("vl-nm__sq", dark && "is-dark", "is-target")}
                 style={style}
                 onClick={() => (t.move === 1 ? play1(t.id) : play2(t.id))}
-                aria-label={`מהלך ${t.move === 1 ? "ראשון" : "שני"}: ${t.title}`}
+                aria-label={`${t.word}: מהלך ${t.move === 1 ? "ראשון" : "שני"}, ${t.title}`}
               >
                 <span className="vl-nm__dot" aria-hidden="true" />
                 <span className="vl-nm__word">{t.word}</span>

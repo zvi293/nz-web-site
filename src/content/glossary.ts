@@ -108,6 +108,16 @@ export const glossaryTerms: GlossaryTerm[] = [
     seeAlso: ["cta", "landing-page"],
   },
   {
+    slug: "redirect-301",
+    name: "הפניה 301",
+    alt: "301 Redirect",
+    aliases: ["הפניה קבועה", "רידיירקט", "redirect", "מעבר אתר"],
+    tag: "קידום",
+    definition:
+      "הוראה בשרת שמעבירה גולשים ומנועי חיפוש מכתובת ישנה לכתובת חדשה, ומסמנת שהמעבר קבוע. כשמחליפים אתר, מפנים כל כתובת ישנה לעמוד המתאים באתר החדש, כדי שאף אחד לא יגיע לעמוד שגיאה.",
+    seeAlso: ["indexing", "sitemap", "search-console"],
+  },
+  {
     slug: "accessibility-statement",
     name: "הצהרת נגישות",
     alt: "Accessibility statement",
@@ -149,6 +159,28 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "המילים שאנשים מקלידים בחיפוש כשהם מחפשים את מה שאתם מציעים, למשל \"רואה חשבון בחיפה\". כל עמוד באתר מתמקד בביטוי מרכזי אחד, ומשתמש בו בכותרת ובפסקה הראשונה.",
     seeAlso: ["seo", "internal-link"],
+  },
+  {
+    slug: "appointment-system",
+    name: "מערכת ניהול תורים",
+    alt: "Online booking system",
+    aliases: ["קביעת תורים", "זימון תורים", "תורים אונליין", "יומן אונליין"],
+    tag: "תשתית",
+    definition:
+      "יומן אונליין שבו לקוחות בוחרים שירות ושעה פנויה וקובעים תור לבד, מהנייד ובכל שעה. מערכת טובה שולחת אישור ותזכורת, מאפשרת לשנות או לבטל, ולא נותנת לקבוע שני תורים באותה שעה.",
+    seeAlso: ["crm", "conversion"],
+    article: { slug: "appointment-system-guide", label: "איך בוחרים מערכת ניהול תורים" },
+  },
+  /* ── ל ── */
+  {
+    slug: "lead",
+    name: "ליד",
+    alt: "Lead · פנייה של לקוח פוטנציאלי",
+    aliases: ["לידים", "פנייה", "לקוח פוטנציאלי", "Lead generation"],
+    tag: "תוכן ושיווק",
+    definition:
+      "פנייה של לקוח פוטנציאלי שהשאיר פרטים או יצר קשר: טופס, שיחה או הודעת וואטסאפ. דף נחיתה לייצור לידים בנוי כדי לאסוף פניות כאלה, ועדיף שישאל רק את מה שצריך כדי לחזור אל הפונה.",
+    seeAlso: ["landing-page", "conversion", "crm"],
   },
   /* ── נ ── */
   {
@@ -258,6 +290,17 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "מערכת לניהול קשרי לקוחות: מקום אחד שבו נשמרים הפניות, הלקוחות, השיחות והמשימות. חיבור של טופס האתר ל-CRM עוזר לוודא שאף פנייה לא הולכת לאיבוד.",
     seeAlso: ["conversion", "cta"],
+  },
+  {
+    slug: "eeat",
+    name: "E-E-A-T",
+    alt: "Experience, Expertise, Authoritativeness, Trust",
+    aliases: ["ניסיון מומחיות סמכות ואמינות", "EEAT", "אמינות"],
+    tag: "קידום",
+    definition:
+      "קיצור של ניסיון, מומחיות, סמכות ואמינות, מתוך ההנחיות שגוגל כותבת למעריכי האיכות שלה. זה לא ציון שגוגל מחשבת לכל אתר, אבל הוא מתאר מה גוגל מחשיבה כתוכן טוב: תוכן שנכתב מניסיון אמיתי, עם שם ברור של מי שעומד מאחוריו.",
+    seeAlso: ["seo", "geo"],
+    article: { slug: "seo-2026-what-works", label: "SEO: מה באמת עובד" },
   },
   {
     slug: "cta",
@@ -413,6 +456,17 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "תעודת אבטחה שמצפינה את המידע שעובר בין הגולש לאתר, ומאפשרת לאתר להיטען בכתובת שמתחילה ב-https. דפדפנים מסמנים אתר בלי תעודה כ\"לא מאובטח\", ולכן היא הכרחית בכל אתר.",
     seeAlso: ["hosting", "domain"],
+  },
+  {
+    slug: "ttfb",
+    name: "TTFB",
+    alt: "Time to First Byte",
+    aliases: ["זמן תגובת שרת", "שרת איטי"],
+    tag: "ביצועים",
+    definition:
+      "הזמן שעובר מהבקשה של הדפדפן ועד שהשרת מתחיל לשלוח את העמוד. כל שאר הטעינה מחכה לרגע הזה, וב-web.dev גוגל ממליצה לשאוף ל-0.8 שניות או פחות.",
+    seeAlso: ["lcp", "hosting", "core-web-vitals"],
+    article: { slug: "website-speed-fix", label: "למה האתר שלכם איטי, ואיך מתקנים" },
   },
   {
     slug: "ui",

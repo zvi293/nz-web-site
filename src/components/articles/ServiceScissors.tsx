@@ -145,7 +145,7 @@ const ServiceScissors = () => {
                         type="button"
                         className={`as-sx__cut${drag?.i === i ? " is-dragging" : ""}${anim === i ? " is-cutting" : ""}`}
                         style={{ ["--p" as string]: progress(i) }}
-                        aria-label={`גזרו בין ${SERVICES[i].name} ל${SERVICES[i + 1].name}`}
+                        aria-label={`גזרו כאן: בין ${SERVICES[i].name} ל${SERVICES[i + 1].name}`}
                         onPointerDown={(e) => onDown(i, e)}
                         onPointerMove={onMove}
                         onPointerUp={onUp}

@@ -7,7 +7,7 @@
  */
 import { Artwork, MuseumLabel, getArt } from "@/components/art";
 import { formatDate, type BlogPost, type Department } from "@/lib/blog";
-import { typesetText, type MagazineIssue } from "./magazine-meta";
+import { typesetInline, type MagazineIssue } from "./magazine-meta";
 
 interface Props {
   post: BlogPost;
@@ -31,6 +31,7 @@ const modified = post.updated_at ?? post.published_at.slice(0, 10);
           <li><a href="/">דף הבית</a></li>
           <li><a href="/blog/">המגזין</a></li>
           <li><a href={`/blog/#dept-${dept.key}`}>{dept.name}</a></li>
+          <li aria-current="page"><span class="ar-crumbs__here">{post.title}</span></li>
         </ol>
       </nav>
 
@@ -41,7 +42,7 @@ const modified = post.updated_at ?? post.published_at.slice(0, 10);
         <span>{dept.name}</span>
       </p>
 
-      <h1 id="ar-title" class="ar-head__title">{typesetText(post.title)}</h1>
+      <h1 id="ar-title" class="ar-head__title" set:html={typesetInline(post.title)} />
 
       <div class="ar-byline">
         <span class="ar-byline__mark" aria-hidden="true">צ״מ</span>

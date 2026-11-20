@@ -3,14 +3,17 @@
  * /accessibility/ — הצהרת נגישות (room 08). Static sections + ONE island:
  *   Switchboard  client:visible   the signature "לוח הבקרה" (flips the real a11y settings)
  * Sections come from src/content/site-settings.ts (accessibility.sections), in order:
- *   intro → מבוא · standard → התקן · what-was-done → קטלוג · limitations → מגבלות · contact → רכז.
+ *   intro → מבוא · standard → התקן · what-was-done → קטלוג · review → יומן בדיקה · limitations → מגבלות
+ *   · contact → רכז. A11yToc (under the hero) lists them, with the board, in page order.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import LegalHero from "@/components/legal/LegalHero.astro";
 import A11yIntro from "@/components/legal/A11yIntro.astro";
 import A11yStandard from "@/components/legal/A11yStandard.astro";
 import A11yCatalogue from "@/components/legal/A11yCatalogue.astro";
+import A11yReview from "@/components/legal/A11yReview.astro";
 import A11yLimits from "@/components/legal/A11yLimits.astro";
+import A11yToc from "@/components/legal/A11yToc.astro";
 import A11yContact from "@/components/legal/A11yContact.astro";
 import LegalDoors from "@/components/legal/LegalDoors.astro";
 import Switchboard from "@/components/legal/Switchboard";
@@ -22,9 +25,18 @@ import { heroImage, type PageSeo } from "@/lib/seo";
 
 const PATH = "/accessibility/";
 const ART = "thermal-hand";
-const HERO_SIZES = "(min-width: 1024px) 46vw, 100vw";
+const HERO_SIZES = "(min-width: 1440px) 570px, (min-width: 1024px) 40vw, calc(100vw - 64px)";
 const a11y = siteSettings.accessibility;
 const byId = Object.fromEntries(a11y.sections.map((s) => [s.id, s]));
+const toc = [
+  { id: "intro", title: byId.intro.title },
+  { id: "control-board", title: "לוח הבקרה: לנסות בעצמכם" },
+  { id: "standard", title: byId.standard.title },
+  { id: "what-was-done", title: byId["what-was-done"].title },
+  { id: "review", title: byId.review.title },
+  { id: "limitations", title: byId.limitations.title },
+  { id: "contact", title: byId.contact.title },
+];
 const title = "הצהרת נגישות | NZ-web";
 const description =
   "הצהרת הנגישות של NZ-web: האתר נבנה לפי ת״י 5568 ו-WCAG 2.1 ברמה AA. מה עשינו, מה עוד לא מושלם, לוח בקרה שמאפשר לנסות את ההתאמות ופרטי רכז הנגישות.";
@@ -41,7 +53,7 @@ const seo: PageSeo = {
       title,
       description,
       primaryImage: heroImage(ART, PATH),
-      dateModified: "2026-11-19",
+      dateModified: "2026-11-20",
       speakable: true,
     }),
   ],
@@ -67,6 +79,8 @@ const seo: PageSeo = {
       { term: "רכז הנגישות", value: a11y.coordinatorName, href: "#contact" },
     ]}
   />
+
+  <A11yToc items={toc} />
 
   <A11yIntro section={byId.intro} />
 
@@ -94,6 +108,7 @@ const seo: PageSeo = {
 
   <A11yStandard section={byId.standard} />
   <A11yCatalogue section={byId["what-was-done"]} />
+  <A11yReview section={byId.review} updated={a11y.lastUpdated} />
   <A11yLimits section={byId.limitations} />
   <A11yContact
     section={byId.contact}

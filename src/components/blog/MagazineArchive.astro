@@ -7,7 +7,7 @@
 import { Artwork } from "@/components/art";
 import { hasArt } from "@/lib/art";
 import { DEPARTMENTS, getBlogPosts } from "@/lib/blog";
-import { currentIssue, magazineIssue, readMinutes, typesetText } from "./magazine-meta";
+import { currentIssue, magazineIssue, readMinutes, typesetInline } from "./magazine-meta";
 
 const inIssue = new Set(currentIssue().posts.map((p) => p.slug));
 const all = getBlogPosts();
@@ -55,8 +55,8 @@ const groups = DEPARTMENTS.map((d) => ({
                         {hasArt(p.art) && <Artwork slug={p.art} sizes="(min-width: 1024px) 180px, 104px" ratio="4 / 3" alt="" />}
                       </span>
                       <span class="mg-row__body">
-                        <span class="mg-row__title">{typesetText(p.title)}</span>
-                        <span class="mg-row__excerpt">{typesetText(p.excerpt)}</span>
+                        <span class="mg-row__title" set:html={typesetInline(p.title)} />
+                        <span class="mg-row__excerpt" set:html={typesetInline(p.excerpt)} />
                       </span>
                       <span class="mg-row__meta">
                         <span>גיליון {iss.index}</span>

@@ -6,18 +6,21 @@
  * title shown on museum labels), alt (Hebrew alt text), tone ("dark" | "light"
  * — the dominant value of the image, for choosing overlay text colour).
  *
+ * Optional avifQ (default 52): a lower AVIF quality for busy, heavily textured works that are
+ * the LCP hero of a page, so their phone file stays near 70 KB (detail is lost only in noise).
+ *
  * To add an image: add an entry here, then run `npm run art`.
  */
 export const registry = [
   { slug: "amber-sun-stair", file: "Amber Sun, White Stair-9.png", tone: "dark", title: "שמש ענבר, מדרגה לבנה", alt: "מדרגות לבנות עולות אל דיסק זהוב ענק מעל מים כהים בשעת דמדומים" },
   { slug: "lighthouse-blueprint", file: "Anatomical Lighthouse with Mechanical Bloom-25.png", tone: "light", title: "מגדלור בשרטוט", alt: "שרטוט עדין של מגדלור שבראשו פורחים עלי כותרת מכניים, קרני אור אדומות" },
-  { slug: "carnation-pavilion", file: "Blush carnation pavilion at blue hour-29.png", tone: "dark", title: "ביתן ציפורנים", alt: "ביתן זכוכית ירוק עטוף פרחי ציפורן ורודים בכיכר עירונית בשעה הכחולה" },
+  { slug: "carnation-pavilion", avifQ: 44, file: "Blush carnation pavilion at blue hour-29.png", tone: "dark", title: "ביתן ציפורנים", alt: "ביתן זכוכית ירוק עטוף פרחי ציפורן ורודים בכיכר עירונית בשעה הכחולה" },
   { slug: "brass-clockwork", file: "Brass clockwork above a black pool-13.png", tone: "dark", title: "שעון של פליז", alt: "שורת גלגלי שיניים מפליז מרחפת מעל בריכה שחורה ומשתקפת בה" },
-  { slug: "chair-bubble", file: "Burnt-orange chair floating in a soap bubble-16.png", tone: "light", title: "כיסא בבועה", alt: "כיסא עור כתום מרחף בתוך בועת סבון שקופה על רצפת טרצו מוארת" },
+  { slug: "chair-bubble", avifQ: 44, file: "Burnt-orange chair floating in a soap bubble-16.png", tone: "light", title: "כיסא בבועה", alt: "כיסא עור כתום מרחף בתוך בועת סבון שקופה על רצפת טרצו מוארת" },
   { slug: "ceramic-handsets", file: "Ceramic handsets tangled in yellow glass-22.png", tone: "light", title: "שפופרות מקרמיקה", alt: "שתי שפופרות טלפון לבנות מקרמיקה מחוברות בכבל זכוכית צהוב מסולסל על רקע צהוב" },
   { slug: "ceramic-portals", file: "Ceramic portals over starlit dunes-5.png", tone: "light", title: "שערים בדיונות", alt: "שורת שערים מקרמיקה בהירה בתוך דיונות חול, בסופם נגלה שמי לילה זרועי כוכבים" },
   { slug: "ceramics-volcanic", file: "Ceramics Rising from Volcanic Ash-21.png", tone: "dark", title: "כלים מאפר", alt: "כדים לבנים עם פנים כתום עולים מתוך אפר וולקני בתוך מסגרת עגולה כהה" },
-  { slug: "chrome-umbrella", file: "Chrome Umbrella, Impossible Yellow Hallway-23.png", tone: "dark", title: "מטריה ומסדרון", alt: "רחוב גשום בשחור־לבן, ובתוך מטריית כרום נגלה מסדרון צהוב מואר" },
+  { slug: "chrome-umbrella", avifQ: 44, file: "Chrome Umbrella, Impossible Yellow Hallway-23.png", tone: "dark", title: "מטריה ומסדרון", alt: "רחוב גשום בשחור־לבן, ובתוך מטריית כרום נגלה מסדרון צהוב מואר" },
   { slug: "cobalt-brutalist", file: "Cobalt brutalist still life-2.png", tone: "light", title: "טבע דומם בקובלט", alt: "קולאז' אדריכלי של בית בטון בהיר, קשתות כחולות ובריכה כחולה זורמת" },
   { slug: "cobalt-glass", file: "Cobalt glass interface sculpture-3.png", tone: "dark", title: "ממשק מזכוכית", alt: "פסל של לוחות זכוכית בכחול קובלט וסרט כסוף מתפתל על רקע שחור" },
   { slug: "cobalt-storefront", file: "Cobalt storefront portal over salt flats-4.png", tone: "dark", title: "חלון ראווה בקובלט", alt: "ויטרינה במסגרת כחולה עומדת במדבר מלח ומציגה נעל צהובה, רמקול ובקבוק בושם" },
@@ -30,22 +33,22 @@ export const registry = [
   { slug: "emerald-staircase", file: "Emerald Staircase to a White Dune-7.png", tone: "light", title: "גרם מדרגות אל הדיונה", alt: "גרם מדרגות לולייני ירוק בחלל בהיר שרצפתו הופכת לדיונת חול" },
   { slug: "felt-coral-drawer", file: "Felt Coral Growing from Vintage Green Drawer-29.png", tone: "light", title: "אלמוג במגירה", alt: "אלמוגים כתומים מלבד צומחים מתוך ארון מגירות ירוק וינטג'" },
   { slug: "origami-crane", file: "Floating Concrete Origami Crane-3.png", tone: "dark", title: "עגור מבטון", alt: "עגור אוריגמי מבטון מרחף מעל ערפל וגשר צר על רקע כהה" },
-  { slug: "book-garden", file: "Folded paper book becomes a misty garden-8.png", tone: "light", title: "ספר שהפך לגן", alt: "ספר פתוח שדפיו הופכים לגן יפני ערפילי עם בונסאי, גשר ופריחת דובדבן" },
+  { slug: "book-garden", avifQ: 44, file: "Folded paper book becomes a misty garden-8.png", tone: "light", title: "ספר שהפך לגן", alt: "ספר פתוח שדפיו הופכים לגן יפני ערפילי עם בונסאי, גשר ופריחת דובדבן" },
   { slug: "brushstroke-cube", file: "Hanging velvet brushstroke and vermilion cube-1.png", tone: "light", title: "משיכת מכחול", alt: "משיכת מכחול שחורה ענקית תלויה בגלריה לבנה ומוארת, וקובייה אדומה קטנה מתחתיה" },
   { slug: "harp-bridge", file: "Harp-string suspension bridge in fog-11.png", tone: "light", title: "גשר של מיתרים", alt: "גשר תלוי שהעמוד שלו הוא נבל, מיתריו הם הכבלים, נעלם בתוך ערפל" },
   { slug: "indigo-loom", file: "Indigo Loom Weaving Light-19.png", tone: "dark", title: "נול של אור", alt: "נול עץ ישן באולם תעשייתי אורג רשת דיגיטלית זוהרת של אור" },
   { slug: "kinetic-balance", file: "Kinetic Balance in Warm Light-11.png", tone: "light", title: "איזון קינטי", alt: "מובייל תלוי של צורות אדומות ואפרסק מטיל צללים על קיר חמים באור חלון" },
   { slug: "coral-ladders", file: "Ladders into coral light-10.png", tone: "dark", title: "סולמות אל האור", alt: "סולמות לבנים מובילים אל עיגול אור אלמוגי זוהר בחלל חשוך" },
   { slug: "lime-prism", file: "Lime beam through a cobalt prism-5.png", tone: "dark", title: "קרן דרך פריזמה", alt: "קרן לייזר ירוקה עוברת דרך לוחות זכוכית כחולים אל פריזמה על רצפה מבריקה" },
-  { slug: "luminous-net", file: "Luminous fishing net over dusk sands-28.png", tone: "dark", title: "רשת של אורות", alt: "רשת דייגים זרועת נורות זוהרות פרושה מעל חוף בשקיעה" },
+  { slug: "luminous-net", avifQ: 44, file: "Luminous fishing net over dusk sands-28.png", tone: "dark", title: "רשת של אורות", alt: "רשת דייגים זרועת נורות זוהרות פרושה מעל חוף בשקיעה" },
   { slug: "sneaker-pool", file: "Luminous sneaker above the pool-26.png", tone: "light", title: "נעל מעל הבריכה", alt: "נעל ספורט ירוקה זוהרת בתוך קופסה לבנה פתוחה ליד בריכה של וילה מודרנית" },
-  { slug: "keycap-hotel", file: "Luxury hotel inside a keycap-20.png", tone: "dark", title: "מלון בתוך מקש", alt: "מקש מקלדת סגול ענק שבתוכו לובי של מלון יוקרה מואר, עצי דובדבן וירח" },
-  { slug: "ultramarine-spill", file: "Midnight skyline in ultramarine spill-8.png", tone: "dark", title: "עיר בשלולית", alt: "לכה כחולה שנשפכה מבקבוק ויוצרת קו רקיע של עיר בלילה" },
-  { slug: "neon-gallery-door", file: "Neon pink seam to the gallery door-27.png", tone: "dark", title: "קו אל דלת הגלריה", alt: "דמות הולכת בדמדומים לאורך קו ניאון ורוד המוביל אל פתח של גלריה" },
+  { slug: "keycap-hotel", avifQ: 44, file: "Luxury hotel inside a keycap-20.png", tone: "dark", title: "מלון בתוך מקש", alt: "מקש מקלדת סגול ענק שבתוכו לובי של מלון יוקרה מואר, עצי דובדבן וירח" },
+  { slug: "ultramarine-spill", avifQ: 44, file: "Midnight skyline in ultramarine spill-8.png", tone: "dark", title: "עיר בשלולית", alt: "לכה כחולה שנשפכה מבקבוק ויוצרת קו רקיע של עיר בלילה" },
+  { slug: "neon-gallery-door", avifQ: 44, file: "Neon pink seam to the gallery door-27.png", tone: "dark", title: "קו אל דלת הגלריה", alt: "דמות הולכת בדמדומים לאורך קו ניאון ורוד המוביל אל פתח של גלריה" },
   { slug: "obsidian-tear", file: "Obsidian Tear in a Pink Orchard-19.png", tone: "light", title: "טיפה מאובסידיאן", alt: "טיפה שחורה ומבריקה תלויה באוויר מעל מטע עצים בפריחה ורודה" },
   { slug: "origami-lemon", file: "Origami rooms sheltering a lemon tree-14.png", tone: "light", title: "חדרים מנייר", alt: "חדרי נייר מקופלים זה בתוך זה ובלבם עץ לימון קטן באור רך" },
-  { slug: "embroidered-comet", file: "Passing the embroidered comet-1.png", tone: "dark", title: "השביט עובר מיד ליד", alt: "רקמה של שתי ידיים על בד כחול כהה, אחת מעבירה לשנייה שביט זהוב" },
-  { slug: "handbag-ice", file: "Persimmon Handbag in an Ice Bazaar-18.png", tone: "dark", title: "תיק בשוק של קרח", alt: "תיק יד כתום מוצג על בסיס קרח בתוך שוק של קרח סגול מואר בזרקור" },
+  { slug: "embroidered-comet", avifQ: 44, file: "Passing the embroidered comet-1.png", tone: "dark", title: "השביט עובר מיד ליד", alt: "רקמה של שתי ידיים על בד כחול כהה, אחת מעבירה לשנייה שביט זהוב" },
+  { slug: "handbag-ice", avifQ: 44, file: "Persimmon Handbag in an Ice Bazaar-18.png", tone: "dark", title: "תיק בשוק של קרח", alt: "תיק יד כתום מוצג על בסיס קרח בתוך שוק של קרח סגול מואר בזרקור" },
   { slug: "porcelain-shockwave", file: "Porcelain sphere through magenta shockwaves-12.png", tone: "dark", title: "כדור חרסינה", alt: "כדור חרסינה לבן חודר דרך גלי הדף שקופים בצבע מג'נטה על רקע כהה" },
   { slug: "balance-dome", file: "Red dome and mint block balance-22.png", tone: "dark", title: "איזון", alt: "חצי כיפה אדומה ולוח מנטה מאוזנים על גליל שחור באור דרמטי" },
   { slug: "ruby-amphora", file: "Ruby Amphora in a Blood-Orange Halo-30.png", tone: "dark", title: "אמפורה מאודם", alt: "בקבוק אמפורה אדום עומד בתוך פרוסת תפוז דם ענקית ומוארת" },
@@ -53,7 +56,7 @@ export const registry = [
   { slug: "paper-plane", file: "Scarlet paper plane through slate-25.png", tone: "light", title: "מטוס נייר", alt: "מטוס נייר אדום חולף ברווח צר בין שני סלעי צפחה כהים" },
   { slug: "mobius-brick", file: "Silver Möbius Through a Brick Wall-20.png", tone: "light", title: "מביוס בקיר", alt: "רצועת מביוס מכסף ונחושת עוברת דרך קיר לבנים" },
   { slug: "silver-droplet", file: "Silver droplet above a mirrored plum city-4.png", tone: "dark", title: "טיפת כסף", alt: "טיפת כסף תלויה מעל עיר בגוון שזיף שמשתקפת בתוכה" },
-  { slug: "zipper-library", file: "Skyscraper zipper reveals an orange library-1.png", tone: "light", title: "ספרייה בתוך מגדל", alt: "שרטוט של גורד שחקים שרוכסן נפתח בו וחושף ספרייה לוליינית כתומה" },
+  { slug: "zipper-library", avifQ: 44, file: "Skyscraper zipper reveals an orange library-1.png", tone: "light", title: "ספרייה בתוך מגדל", alt: "שרטוט של גורד שחקים שרוכסן נפתח בו וחושף ספרייה לוליינית כתומה" },
   { slug: "snowflake-furnace", file: "Snowflake in a red-hot glass cube-16.png", tone: "dark", title: "פתית בכבשן", alt: "פתית שלג שלם בתוך קוביית זכוכית לוהטת מול כבשן נפחות" },
   { slug: "stone-arcs", file: "Stone arcs meet in golden twilight-23.png", tone: "dark", title: "קשתות אבן", alt: "שתי קשתות אבן ענקיות נפגשות מעל חוף בשקיעה זהובה" },
   { slug: "thermal-hand", file: "Thermal Bloom from a Blue Hand-21.png", tone: "dark", title: "פריחה תרמית", alt: "צילום תרמי של יד כחולה פתוחה שממנה צומח פרח כתום זוהר" },
@@ -61,5 +64,5 @@ export const registry = [
   { slug: "shell-staircases", file: "Translucent shell staircases in ochre-2.png", tone: "light", title: "מדרגות של צדפים", alt: "גרמי מדרגות לוליינים בתוך צדפות שקופות באולם בגוון אוכרה" },
   { slug: "turquoise-fans", file: "Turquoise fans cast a fish skeleton-12.png", tone: "light", title: "מניפות וצל", alt: "מניפות נייר טורקיז מטילות על קיר בהיר צל בצורת שלד דג" },
   { slug: "marble-maze", file: "Vermilion Thread Finds the Marble Exit-6.png", tone: "light", title: "חוט במבוך", alt: "חוט אדום עובר בדרך הנכונה במבוך עגול חצוב בשיש לבן" },
-  { slug: "terracotta-waterfall", file: "Waterfall Through Terracotta Portals-17.png", tone: "light", title: "מפל בטרקוטה", alt: "קיר טרקוטה עם פתחים קשתיים שדרכם זורם מפל אל בריכה ליד הים" },
+  { slug: "terracotta-waterfall", avifQ: 44, file: "Waterfall Through Terracotta Portals-17.png", tone: "light", title: "מפל בטרקוטה", alt: "קיר טרקוטה עם פתחים קשתיים שדרכם זורם מפל אל בריכה ליד הים" },
 ];

@@ -60,11 +60,14 @@ export const ORGANIZATION: JsonLdNode = {
     "שיפור מהירות אתרים",
     'נגישות אתרים לפי ת"י 5568',
     "קידום אתרים אורגני (SEO)",
+    "GEO: התאמת אתרים למנועי תשובות מבוססי AI",
     "עיצוב UI/UX",
   ],
   openingHoursSpecification: HOURS,
   founder: { "@id": FOUNDER_ID },
-  sameAs: ["https://share.google/EdFxHaKFKBy4TeMvW"],
+  /* the Google Business Profile by its Knowledge Graph id (the share.google short link 302s to a
+     session-tracked search URL carrying this same kgmid) */
+  sameAs: ["https://www.google.com/search?kgmid=/g/11nq8wcnzc"],
 };
 
 export const FOUNDER: JsonLdNode = {

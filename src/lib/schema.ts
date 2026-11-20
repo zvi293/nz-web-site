@@ -46,7 +46,7 @@
  *   ref(id)                             { "@id": id }
  *   webPage({ path, title, description, type?, primaryImage?, datePublished?, dateModified?,
  *             speakable? (true → ["h1", ".lead"] | string[] of CSS selectors), breadcrumb?,
- *             about?, mainEntity? })
+ *             about?, mainEntity? })  dateModified defaults to SITE_LAST_UPDATED
  *   aboutPage(opts) / contactPage(opts)  webPage with type AboutPage / ContactPage, about #organization
  *   breadcrumb(items[{name,path}], path?)  BreadcrumbList; first item should be דף הבית "/"
  *   faqPage(items[{question,answer}], path)  FAQPage (#faq); answers are plain text
@@ -55,6 +55,7 @@
  *   article({ path, headline, description, image, datePublished, dateModified?, section?,
  *             keywords?, wordCount?, readMinutes?, about? })  BlogPosting (#article), author
  *             #founder, publisher #organization, licensed ImageObject.
+ *   blogNode()                          the Blog (#blog) node: /blog/ and every post include it
  *   collectionPage({ path, title, description, items[{name,path|url,description?,image?}],
  *             primaryImage?, dateModified?, speakable? })  → [CollectionPage, ItemList] (spread it)
  *   howTo({ path, name, description?, steps[{name,text,image?,url?}], totalTime? })  HowTo (#howto)
@@ -284,7 +285,8 @@ export function webPage({
     primaryImageOfPage: image,
     image: image ? ref(String(image["@id"])) : undefined,
     datePublished,
-    dateModified,
+    /* every page carries a real modification date (postbuild uses it as the sitemap <lastmod>) */
+    dateModified: dateModified ?? SITE_LAST_UPDATED,
     breadcrumb: (withBreadcrumb ?? !isHome) ? ref(`${url}#breadcrumb`) : undefined,
     mainEntity,
     speakable: selectors ? { "@type": "SpeakableSpecification", cssSelector: selectors } : undefined,
@@ -371,11 +373,11 @@ export function service({ path, name, description, image, serviceType, alternate
     alternateName,
     description,
     serviceType: serviceType ?? name,
-    inLanguage: "he",
     provider: ref(ORG_ID),
     brand: ref(ORG_ID),
     areaServed: { "@type": "Country", name: "Israel" },
-    availableLanguage: "he",
+    /* the language lives on the channel (inLanguage / availableLanguage are not Service properties) */
+    availableChannel: { "@type": "ServiceChannel", serviceUrl: url, availableLanguage: "he" },
     image: img,
     mainEntityOfPage: ref(`${url}#webpage`),
   });
@@ -435,6 +437,21 @@ export function article({
   });
 }
 
+/**
+ * The magazine (Blog, <SITE>/blog/#blog). Full node on /blog/; every post repeats it so the
+ * BlogPosting's isPartOf resolves inside the post's own @graph (same @id → same name everywhere).
+ */
+export function blogNode(): JsonLdNode {
+  return {
+    "@type": "Blog",
+    "@id": BLOG_ID,
+    name: "המגזין של NZ-web",
+    url: `${SITE}/blog/`,
+    inLanguage: "he",
+    publisher: ref(ORG_ID),
+  };
+}
+
 /* ─────────────────────────── Collections ─────────────────────────── */
 
 export interface CollectionItem {
@@ -448,10 +465,12 @@ export interface CollectionItem {
 
 export interface CollectionPageInput extends Omit<WebPageInput, "type" | "mainEntity"> {
   items: CollectionItem[];
+  /** The items are websites NZ-web built (the portfolio): each ListItem carries a WebSite with creator #organization. */
+  builtBySite?: boolean;
 }
 
 /** Hub pages: returns [CollectionPage, ItemList] — spread it into jsonLd. */
-export function collectionPage({ items, ...page }: CollectionPageInput): JsonLdNode[] {
+export function collectionPage({ items, builtBySite, ...page }: CollectionPageInput): JsonLdNode[] {
   const url = pageUrl(page.path);
   const listId = `${url}#itemlist`;
   return [
@@ -460,16 +479,17 @@ export function collectionPage({ items, ...page }: CollectionPageInput): JsonLdN
       "@type": "ItemList",
       "@id": listId,
       numberOfItems: items.length,
-      itemListElement: items.map((item, i) =>
-        clean({
-          "@type": "ListItem",
-          position: i + 1,
-          name: item.name,
-          url: item.url ? absolute(item.url) : pageUrl(item.path ?? "/"),
-          description: item.description,
-          image: item.image ? absolute(item.image) : undefined,
-        }),
-      ),
+      itemListElement: items.map((item, i) => {
+        const url = item.url ? absolute(item.url) : pageUrl(item.path ?? "/");
+        const image = item.image ? absolute(item.image) : undefined;
+        return builtBySite
+          ? {
+              "@type": "ListItem",
+              position: i + 1,
+              item: clean({ "@type": "WebSite", name: item.name, url, description: item.description, image, creator: ref(ORG_ID) }),
+            }
+          : clean({ "@type": "ListItem", position: i + 1, name: item.name, url, description: item.description, image });
+      }),
     },
   ];
 }

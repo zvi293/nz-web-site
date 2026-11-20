@@ -124,9 +124,13 @@ html.nz-motion .hm-enter {
 }
 .hm-line {
   display: block;
-  overflow: hidden;
   padding-block: 0.06em 0.12em;
   margin-block: -0.06em -0.12em;
+}
+/* the mask exists only for the rising-line entrance; without motion nothing is clipped (so a
+   reader's own letter / word spacing never cuts a word — WCAG 1.4.12) */
+html.nz-motion .hm-line {
+  overflow: hidden;
 }
 .hm-line--2,
 .hm-line--3 {
@@ -431,14 +435,18 @@ html.nz-motion .hm-exhibit__layer:first-child .nz-art__img {
     align-items: baseline;
     gap: 8px;
     min-height: 44px;
-    padding-top: 13px;
+    /* 8px of hit area on each side (net zero layout): even "מגזין" is a 44px-wide target; the
+       underline stays under the word (content-box) */
+    padding: 13px 8px 0;
+    margin-inline: -8px;
     color: var(--ink);
     font-size: 0.875rem;
     font-weight: 500;
     text-decoration: none;
     background-image: linear-gradient(currentColor, currentColor);
     background-repeat: no-repeat;
-    background-position: right 30px;
+    background-origin: content-box;
+    background-position: right 17px;
     background-size: 0% 1px;
     transition: background-size 0.6s var(--ease-gallery);
   }
@@ -809,8 +817,10 @@ html.nz-motion .hm-stack--wipe .hm-stack__item.is-past {
   html.nz-motion .hm-step {
     transition: opacity 0.6s ease;
   }
+  /* dimmed, never below the contrast floor: at 0.8 the ash body text and the coral index on
+     ink still pass 4.5:1 (0.32 measured 1.7–2.6:1, WCAG 1.4.3) */
   html.nz-motion .hm-step:not(.is-active) {
-    opacity: 0.32;
+    opacity: 0.8;
   }
   .hm-process__aside {
     display: block;
@@ -1376,7 +1386,7 @@ html.nz-motion .hm-stack--wipe .hm-stack__item.is-past {
   outline: 1px solid rgba(224, 64, 31, 0.7);
   outline-offset: -7px;
   border-radius: 3px;
-  color: var(--vermilion-deep);
+  color: #9e2a14; /* a deeper ink than --vermilion-deep: at 0.9 opacity it still reads ≥ 4.5:1 */
   transform: rotate(-9deg);
   opacity: 0.9;
   mix-blend-mode: multiply;

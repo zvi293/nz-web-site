@@ -6,7 +6,7 @@
 import { Artwork } from "@/components/art";
 import { hasArt } from "@/lib/art";
 import { getDepartment, type BlogPost } from "@/lib/blog";
-import { readMinutes, typesetText } from "./magazine-meta";
+import { readMinutes, typesetInline } from "./magazine-meta";
 
 interface Props {
   posts: BlogPost[];
@@ -38,7 +38,7 @@ const { posts } = Astro.props;
                     <span aria-hidden="true">·</span>
                     <span>{readMinutes(p)} דקות</span>
                   </span>
-                  <span class="ar-card__title">{typesetText(p.title)}</span>
+                  <span class="ar-card__title" set:html={typesetInline(p.title)} />
                 </span>
               </a>
             </li>

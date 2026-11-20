@@ -1,18 +1,25 @@
 /**
  * generate-og.mjs — per-page Open Graph cards (1200x630 JPEG) for nz-web.com.
  *
- *   npm run og                 render every card in PAGES
- *   npm run og -- home faq     render only the named cards
+ *   npm run og                       render every card (PAGES + one per blog post)
+ *   npm run og -- home faq           render only the named cards
+ *   npm run og -- blog/<slug>        render one article card
  *
  * Each card is a small "gallery wall": bone background, the NZ-web serif wordmark with the
  * vermilion cube, the page title in Hebrew (RTL), and the page's signature artwork hung in a
  * frame on the left. Output: public/og/<name>.jpg (served as https://nz-web.com/og/<name>.jpg).
  *
- * The page → URL map the app uses lives in src/lib/site-url.ts (OG_IMAGES); add a new card in
- * BOTH places. Art comes from src/assets/art/<slug>-1080.webp (see SITE-PLAYBOOK §3.5 art map).
+ * Article cards ("blog/<slug>") are built from src/content/blog.ts (cover art, seo_title ?? title,
+ * wall label "מגזין") and written to public/og/blog/<slug>.jpg; src/pages/blog/[slug].astro uses
+ * that file as og:image automatically when it exists. Re-run after adding a post or changing a
+ * post's title/art. (blog.ts is imported directly: Node ≥ 22.18 strips its type-only import.)
+ *
+ * Page cards live in src/content/og-cards.json (key = the page path without slashes); a page whose
+ * key has a rendered file uses it automatically (src/lib/seo.ts). OG_IMAGES in src/lib/site-url.ts
+ * names the hub cards for explicit use. Art comes from src/assets/art/<slug>-1080.webp (see SITE-PLAYBOOK §3.5 art map).
  * Copy rules: no prices, no package names, no invented claims (SITE-PLAYBOOK §1).
  */
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -26,38 +33,45 @@ const WIDTH = 1200;
 const HEIGHT = 630;
 const QUALITY = 85;
 
-/** name → { art slug, Hebrew title, small wall label } */
-const PAGES = {
-  home: { art: "brushstroke-cube", title: "סטודיו לעיצוב ובניית אתרים לעסקים", label: "דף הבית" },
-  services: { art: "darkroom-glow", title: "שירותי עיצוב, בנייה ופיתוח אתרים", label: "שירותים" },
-  blog: { art: "zipper-library", title: "מדריכים לבעלי עסקים על אתרים ו-SEO", label: "מגזין" },
-  about: { art: "ceramics-volcanic", title: "הסטודיו של צבי משה", label: "מי אנחנו" },
-  contact: { art: "ceramic-handsets", title: "מדברים על האתר שלכם בוואטסאפ", label: "צרו קשר" },
-  packages: { art: "chair-bubble", title: "הצעה אחת, מותאמת לעסק שלכם", label: "ההצעה" },
-  projects: { art: "neon-gallery-door", title: "אתרים שבנינו ללקוחות אמיתיים", label: "עבודות" },
-  faq: { art: "harp-bridge", title: "שאלות נפוצות על בניית אתרים", label: "שאלות נפוצות" },
-};
+/**
+ * name → { art slug, Hebrew title, small wall label }: src/content/og-cards.json, the SAME file the
+ * site reads (src/lib/seo.ts) for the card's og:image:alt and to give every page with a card
+ * (services/business-website/lawyer → /og/services/business-website/lawyer.jpg) its own og:image.
+ */
+const PAGES = JSON.parse(readFileSync(join(ROOT, "src", "content", "og-cards.json"), "utf-8"));
+
+/** One card per article: "blog/<slug>" → public/og/blog/<slug>.jpg */
+async function blogCards() {
+  const { blogPosts } = await import(pathToFileURL(join(ROOT, "src", "content", "blog.ts")).href);
+  return Object.fromEntries(
+    blogPosts.map((post) => [`blog/${post.slug}`, { art: post.art, title: post.seo_title ?? post.title, label: "מגזין" }]),
+  );
+}
 
 const fileUrl = (p) => pathToFileURL(p).href;
 
 function fontFaces() {
   const faces = [];
   for (const weight of [300, 500, 700]) {
-    for (const subset of ["hebrew", "latin"]) {
+    for (const subset of ["hebrew", "latin-core", "latin-ext"]) {
       const file = join(FONT_DIR, `frank-ruhl-${weight}-${subset}.woff2`);
       if (!existsSync(file)) continue;
+      /* Same unicode-ranges as BaseLayout's <style id="nz-fonts">. */
       const range =
         subset === "hebrew"
           ? "U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F"
-          : "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD";
+          : subset === "latin-core"
+            ? "U+0000-00BF,U+00D7,U+00F7,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+            : "U+00C0-00D6,U+00D8-00F6,U+00F8-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329";
       faces.push(
         `@font-face{font-family:'Frank Ruhl Libre';font-weight:${weight};font-style:normal;src:url('${fileUrl(file)}') format('woff2');unicode-range:${range}}`,
       );
     }
   }
   for (const weight of [400, 500]) {
-    for (const subset of ["hebrew", "latin"]) {
-      const file = join(FONT_DIR, `heebo-${weight}-${subset}.woff2`);
+    for (const subset of ["hebrew", "latin-core"]) {
+      /* Heebo is one variable file per subset (all weights share it). */
+      const file = join(FONT_DIR, `heebo-${subset}.woff2`);
       if (!existsSync(file)) continue;
       faces.push(
         `@font-face{font-family:'Heebo';font-weight:${weight};font-style:normal;src:url('${fileUrl(file)}') format('woff2')}`,
@@ -96,6 +110,7 @@ body{
 .mark{display:flex;align-items:center;gap:14px;font-weight:700;font-size:40px;letter-spacing:-.01em;line-height:1}
 .mark .cube{width:22px;height:22px;background:var(--vermilion);flex:none}
 .title{font-weight:500;font-size:64px;line-height:1.06;letter-spacing:-.015em;text-wrap:balance;max-width:560px}
+.title.is-long{font-size:54px;line-height:1.08}
 .label{font-family:'Heebo',system-ui,sans-serif;font-weight:500;font-size:19px;color:var(--graphite);
   letter-spacing:.03em;border-top:1px solid var(--line);padding-top:16px;display:flex;justify-content:space-between;gap:24px}
 .label .room::before{content:"";display:inline-block;width:8px;height:8px;background:var(--vermilion);margin-inline-end:10px;vertical-align:middle;transform:translateY(-2px)}
@@ -111,7 +126,7 @@ body{
 <body>
   <div class="text">
     <div class="mark"><span class="cube" aria-hidden="true"></span><span dir="ltr">NZ-web</span></div>
-    <h1 class="title">${escapeHtml(title)}</h1>
+    <h1 class="title${title.length > 38 ? " is-long" : ""}">${escapeHtml(title)}</h1>
     <div class="label"><span class="room">${escapeHtml(label)}</span><span dir="ltr">nz-web.com</span></div>
   </div>
   <div class="wall"><div class="frame"><div class="mat"><img src="${fileUrl(artFile)}" alt=""></div></div></div>
@@ -120,10 +135,11 @@ body{
 }
 
 async function main() {
+  const CARDS = { ...PAGES, ...(await blogCards()) };
   const only = process.argv.slice(2);
-  const names = only.length ? only : Object.keys(PAGES);
-  const unknown = names.filter((n) => !PAGES[n]);
-  if (unknown.length) throw new Error(`Unknown card(s): ${unknown.join(", ")}. Known: ${Object.keys(PAGES).join(", ")}`);
+  const names = only.length ? only : Object.keys(CARDS);
+  const unknown = names.filter((n) => !CARDS[n]);
+  if (unknown.length) throw new Error(`Unknown card(s): ${unknown.join(", ")}. Known: ${Object.keys(CARDS).join(", ")}`);
 
   mkdirSync(OUT_DIR, { recursive: true });
   const tmp = mkdtempSync(join(tmpdir(), "nz-og-"));
@@ -132,14 +148,15 @@ async function main() {
     const page = await browser.newPage();
     await page.setViewport({ width: WIDTH, height: HEIGHT, deviceScaleFactor: 1 });
     for (const name of names) {
-      const htmlFile = join(tmp, `${name}.html`);
-      writeFileSync(htmlFile, template(PAGES[name]), "utf-8");
+      const htmlFile = join(tmp, `${name.replace(/\//g, "__")}.html`);
+      writeFileSync(htmlFile, template(CARDS[name]), "utf-8");
       await page.goto(fileUrl(htmlFile), { waitUntil: "load" });
       await page.evaluate(async () => {
         await document.fonts.ready;
         await Promise.all([...document.images].map((img) => (img.complete ? null : img.decode().catch(() => null))));
       });
       const out = join(OUT_DIR, `${name}.jpg`);
+      mkdirSync(dirname(out), { recursive: true });
       await page.screenshot({
         path: out,
         type: "jpeg",

@@ -41,7 +41,7 @@ const OfferFaq = () => (
           ))}
         </div>
 
-        <aside className="of-nudge" aria-labelledby="of-nudge-title">
+        <div className="of-nudge" role="group" aria-labelledby="of-nudge-title">
           <p id="of-nudge-title" className="of-nudge__title">
             {f.nudgeTitle}
           </p>
@@ -54,7 +54,7 @@ const OfferFaq = () => (
             </a>
             {f.contactLink.after}
           </p>
-        </aside>
+        </div>
       </div>
     </div>
   </section>

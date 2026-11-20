@@ -50,6 +50,8 @@ export interface FaqItem {
   answer: string;
   visible: boolean;
   order: number;
+  /** "להרחבה" under the answer: magazine guides + glossary terms (src/content/further-reading.ts). */
+  more?: { guides: string[]; terms: string[] };
 }
 
 export interface BlogPost {

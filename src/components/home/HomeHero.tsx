@@ -177,6 +177,8 @@ const HomeHero = () => {
             <span className="nz-label hm-hero__kicker hm-enter" style={{ ["--d" as string]: "0ms" }}>
               <span className="hm-cube" aria-hidden="true" />
               <span>{hero.eyebrow}</span>
+              {/* read as one sentence by crawlers, speakable and TTS: "…לעסקים: כל אתר…" */}
+              <span className="nz-sr">: </span>
             </span>{" "}
             <span className="nz-display hm-hero__statement">
               <span className="hm-line hm-line--1">

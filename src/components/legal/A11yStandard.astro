@@ -5,6 +5,7 @@
  */
 import type { LegalPageSection } from "@/content/types";
 import { layers } from "./content";
+import LegalText from "./LegalText.astro";
 
 interface Props {
   section: LegalPageSection;
@@ -19,7 +20,7 @@ const { section } = Astro.props;
         <p class="nz-label"><span class="nz-label__index">03</span><span>התקן</span></p>
         <h2 id="lg-std-title" class="nz-display nz-display--h2">{section.title}</h2>
       </div>
-      <p class="lg-split__lede">{section.content}</p>
+      <p class="lg-split__lede"><LegalText text={section.content} /></p>
     </div>
 
     <ol class="lg-chain" data-reveal="stagger">

@@ -332,13 +332,14 @@ const MatchPairs = () => {
                   type="button"
                   className="lpm__tab"
                   aria-pressed={sel === ad.id}
-                  aria-label={`מודעה ${ad.letter}: ${ad.short}`}
                   data-fit={to ? fitOf(ad.id, to) : undefined}
                   onClick={() => choose(ad.id)}
                 >
+                  {/* The name comes from the content (WCAG 2.5.3: the visible words are in it). */}
                   <span className="lpm__tabmark" aria-hidden="true">
                     {ad.letter}
                   </span>
+                  <span className="nz-sr">{`מודעה ${ad.letter}, `}</span>
                   {ad.short}
                 </button>
               );
@@ -361,9 +362,9 @@ const MatchPairs = () => {
                 data-sel={sel === ad.id ? "" : undefined}
                 data-fit={to ? fitOf(ad.id, to) : undefined}
                 aria-pressed={sel === ad.id}
-                aria-label={`מודעה ${ad.letter}: ${ad.headline}. הכפתור: ${ad.cta}${to ? `. מחוברת לדף ${pageById(to).num}` : ""}`}
                 onClick={() => choose(ad.id)}
               >
+                <span className="nz-sr">{`מודעה ${ad.letter}: `}</span>
                 <span className="lpm__adtop" aria-hidden="true">
                   <span className="lpm__avatar">{ad.letter}</span>
                   <span className="lpm__adname">משתלת הגפן</span>
@@ -371,10 +372,12 @@ const MatchPairs = () => {
                 </span>
                 <Swatch look={ad.look} className="lpm__swatch" />
                 <span className="lpm__headline">{ad.headline}</span>
-                <span className="lpm__body">{ad.body}</span>
-                <span className="lpm__adcta" aria-hidden="true">
-                  {ad.cta}
+                <span className="lpm__body" aria-hidden="true">
+                  {ad.body}
                 </span>
+                <span className="nz-sr">. הכפתור: </span>
+                <span className="lpm__adcta">{ad.cta}</span>
+                {to && <span className="nz-sr">{`. מחוברת לדף ${pageById(to).num}`}</span>}
               </button>
             );
           })}
@@ -401,22 +404,21 @@ const MatchPairs = () => {
                   data-look={p.look}
                   data-chosen={chosen ? "" : undefined}
                   aria-pressed={chosen}
-                  aria-label={`דף ${p.num}: ${p.headline}. הכפתור: ${p.cta}${p.look === "stock" ? ". תמונת מאגר" : ""}${
-                    badges.length ? `. מחובר למודעה ${badges.map((x) => x.letter).join(", ")}` : ""
-                  }`}
                   onClick={() => pick(p.id)}
                 >
-                  <span className="lpm__pnum" aria-hidden="true">
-                    דף {p.num}
-                  </span>
+                  <span className="lpm__pnum">דף {p.num}</span>
+                  <span className="nz-sr">: </span>
                   <Swatch look={p.look} className="lpm__pswatch" />
                   <span className="lpm__ptext">
                     <span className="lpm__ptitle">{p.headline}</span>
-                    <span className="lpm__psub">{p.sub}</span>
-                    <span className="lpm__pcta" aria-hidden="true">
-                      {p.cta}
+                    <span className="lpm__psub" aria-hidden="true">
+                      {p.sub}
                     </span>
+                    <span className="nz-sr">. הכפתור: </span>
+                    <span className="lpm__pcta">{p.cta}</span>
                   </span>
+                  {p.look === "stock" && <span className="nz-sr">. תמונת מאגר</span>}
+                  {badges.length > 0 && <span className="nz-sr">{`. מחובר למודעה ${badges.map((x) => x.letter).join(", ")}`}</span>}
                   {badges.length > 0 && (
                     <span className="lpm__badges" aria-hidden="true">
                       {badges.map((x) => (
@@ -437,7 +439,6 @@ const MatchPairs = () => {
                 className="lpm__chip"
                 data-fit={v.fit}
                 tabIndex={verdictSeen ? -1 : undefined}
-                aria-label={`${v.title}: מודעה ${lastAd.letter} לדף ${lastPage.num}. לפרטים`}
                 onClick={toVerdict}
                 key={`${lastAd.id}-${lastPage.id}`}
               >
@@ -457,6 +458,7 @@ const MatchPairs = () => {
                   ))}
                   <span className="lpm__chipmore">פרטים ↓</span>
                 </span>
+                <span className="nz-sr">{`: מודעה ${lastAd.letter} לדף ${lastPage.num}. לפרטים`}</span>
               </button>
             )}
           </div>

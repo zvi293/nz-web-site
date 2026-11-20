@@ -79,6 +79,9 @@
 }
 .nf-tunnel {
   display: grid;
+  /* one track that may shrink below its content's min width: at 320px (WCAG 1.4.10 reflow)
+     the stage, the controls and the list stay inside the container instead of sliding off */
+  grid-template-columns: minmax(0, 1fr);
   margin-top: 2.25rem;
 }
 

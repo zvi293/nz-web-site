@@ -13,8 +13,12 @@
  * If an ID is not set, that tracker is simply skipped — nothing breaks.
  */
 
-const GA_ID = import.meta.env.VITE_GA_ID as string | undefined;
-const FB_PIXEL_ID = import.meta.env.VITE_FB_PIXEL_ID as string | undefined;
+/* IDs are validated before they go into a script URL (a typo or a stray character in the
+   Netlify env var must never turn into an injected URL): GA4 "G-XXXXXXXXXX", Pixel = digits. */
+const rawGa = ((import.meta.env.VITE_GA_ID as string | undefined) ?? "").trim();
+const rawFb = ((import.meta.env.VITE_FB_PIXEL_ID as string | undefined) ?? "").trim();
+const GA_ID = /^G-[A-Z0-9]{4,16}$/.test(rawGa) ? rawGa : undefined;
+const FB_PIXEL_ID = /^\d{5,20}$/.test(rawFb) ? rawFb : undefined;
 const CONSENT_KEY = "nz_web_cookie_consent";
 
 declare global {
@@ -50,7 +54,7 @@ function injectTrackers(): void {
   if (GA_ID) {
     const tag = document.createElement("script");
     tag.async = true;
-    tag.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+    tag.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GA_ID)}`;
     document.head.appendChild(tag);
 
     window.dataLayer = window.dataLayer || [];
@@ -95,12 +99,42 @@ function injectTrackers(): void {
   }
 }
 
+/**
+ * Consent withdrawn (the visitor switched to "רק חיוניות" after accepting): tell the trackers
+ * already running on this page to stop storing/sending, and delete the cookies they set
+ * (_ga, _ga_<id>, _gid, _gat*, _fbp, _fbc) on this host and on the parent domain. The next page
+ * load injects nothing (every page is a full document).
+ */
+function revokeTrackers(): void {
+  if (injected) {
+    /* Google's documented opt-out flag: stops every further gtag hit on this page (consent mode
+       alone would keep sending cookieless pings until the next page load) */
+    if (GA_ID) (window as unknown as Record<string, boolean>)[`ga-disable-${GA_ID}`] = true;
+    window.gtag?.("consent", "update", { analytics_storage: "denied", ad_storage: "denied" });
+    window.fbq?.("consent", "revoke");
+  }
+  try {
+    const host = location.hostname;
+    const domains = ["", host, `.${host}`, `.${host.split(".").slice(-2).join(".")}`];
+    for (const raw of document.cookie.split(";")) {
+      const name = raw.split("=")[0].trim();
+      if (!/^(_ga(_.+)?|_gid|_gat(_.+)?|_fbp|_fbc)$/.test(name)) continue;
+      for (const d of domains) {
+        document.cookie = `${name}=; Max-Age=0; Path=/${d ? `; Domain=${d}` : ""}; SameSite=Lax`;
+      }
+    }
+  } catch {
+    /* cookies blocked — nothing was stored either */
+  }
+}
+
 /** Inject the trackers now if consent was given, and again whenever the cookie banner records a choice. */
 export function initAnalytics(): void {
   if (typeof window === "undefined" || (!GA_ID && !FB_PIXEL_ID)) return;
-  const tryInject = () => {
+  const onChoice = () => {
     if (hasConsent()) injectTrackers();
+    else revokeTrackers();
   };
-  tryInject();
-  window.addEventListener("nz-consent-updated", tryInject);
+  if (hasConsent()) injectTrackers();
+  window.addEventListener("nz-consent-updated", onChoice);
 }

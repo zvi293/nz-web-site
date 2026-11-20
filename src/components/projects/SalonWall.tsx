@@ -231,7 +231,7 @@ const SalonWall = () => {
           if (h.w < 0) {
             return (
               <div key="reserved" className="pj-hang pj-hang--reserved" style={{ "--d": h.d, "--order": h.order } as CSSProperties}>
-                <a href="#next" className="pj-frame pj-frame--reserved" aria-label={c.reservedLabel}>
+                <a href="#next" className="pj-frame pj-frame--reserved" aria-label={`${c.reserved}: ${c.reservedLabel}`}>
                   <span className="pj-frame__mat">
                     <span className="pj-reserved__plus" aria-hidden="true" />
                     <span className="pj-reserved__text">{c.reserved}</span>

@@ -4,7 +4,7 @@ import { projectsCopy } from "./copy";
 import { works } from "./works";
 
 /** Must equal lcpArt.sizes in src/pages/projects.astro. */
-export const PROJECTS_HERO_SIZES = "(min-width: 1440px) 820px, (min-width: 1024px) 56vw, 100vw";
+export const PROJECTS_HERO_SIZES = "(min-width: 1440px) 690px, (min-width: 1024px) 47vw, calc(100vw - 64px)";
 export const PROJECTS_HERO_SLUG = "neon-gallery-door";
 
 const h = projectsCopy.hero;

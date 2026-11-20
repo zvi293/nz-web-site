@@ -109,7 +109,7 @@ const LeakyBudget = () => {
               className={`as-lb__hole${plugged[i] ? " is-plugged" : ""}`}
               style={{ insetInlineStart: `${(1 - h.x / W) * 100}%`, top: `${(h.y / H) * 100}%` }}
               aria-pressed={plugged[i]}
-              aria-label={`${h.title}: ${plugged[i] ? "נסתם" : h.leak}`}
+              aria-label={`${i + 1}: ${h.title}. ${plugged[i] ? "נסתם" : h.leak}`}
               onClick={() => toggle(i)}
             >
               <span className="as-lb__cork" aria-hidden="true">

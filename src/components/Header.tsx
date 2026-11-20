@@ -318,7 +318,7 @@ const Header = ({ pathname = "/" }: { pathname?: string }) => {
               target="_blank"
               rel="noopener noreferrer"
               className="nz-btn nz-btn--primary nz-btn--sm nz-header__wa nz-header__wa--short"
-              aria-label="לשיחה בוואטסאפ (נפתח בכרטיסייה חדשה)"
+              aria-label="וואטסאפ: לשיחה עם NZ-web (נפתח בכרטיסייה חדשה)"
             >
               <WhatsAppIcon className="nz-btn__icon" />
               <span className="nz-header__wa-text">וואטסאפ</span>
@@ -329,7 +329,7 @@ const Header = ({ pathname = "/" }: { pathname?: string }) => {
               className="nz-menu-btn"
               aria-expanded={menuOpen}
               aria-controls={menuId}
-              aria-label="פתיחת התפריט"
+              aria-label="תפריט"
               onClick={() => setMenuOpen(true)}
             >
               <span className="nz-menu-btn__label" aria-hidden="true">

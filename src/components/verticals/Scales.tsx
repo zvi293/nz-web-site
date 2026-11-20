@@ -133,17 +133,22 @@ const Scales = () => {
 
   /* Drag a weight onto the pan. Mouse / pen: at once. Touch: a short press (160ms) lifts the
      weight first — until then a swipe scrolls the page as usual; once lifted, a non-passive
-     touchmove listener keeps the page still while the weight follows the finger. */
+     touchmove listener (on the component root) keeps the page still while the weight follows the finger. */
   const overPan = (x: number, y: number) => {
     const r = panRef.current?.getBoundingClientRect();
     return !!r && x > r.left - 24 && x < r.right + 24 && y > r.top - 60 && y < r.bottom + 24;
   };
   useEffect(() => {
+    /* on the component root, not window: a non-passive touch listener on window would make every
+       touch scroll of the page wait for the main thread (INP / scroll jank); here only touches
+       that start on the scales do, and the weights live inside it */
+    const root = rootRef.current;
+    if (!root) return;
     const block = (ev: TouchEvent) => {
       if (drag.current?.lifted && ev.cancelable) ev.preventDefault();
     };
-    window.addEventListener("touchmove", block, { passive: false });
-    return () => window.removeEventListener("touchmove", block);
+    root.addEventListener("touchmove", block, { passive: false });
+    return () => root.removeEventListener("touchmove", block);
   }, []);
   const onDown = (id: string) => (e: ReactPointerEvent<HTMLButtonElement>) => {
     swallowClick.current = false;

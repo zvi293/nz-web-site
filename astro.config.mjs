@@ -19,9 +19,10 @@ const src = fileURLToPath(new URL("./src", import.meta.url));
  * "<file>?url" (a string). `.astro` files keep Astro's ImageMetadata behaviour.
  */
 const IMAGE_RE = /\.(png|jpe?g|webp|avif|gif|svg)$/i;
+/** @type {import("vite").Plugin} */
 const imageImportsAsUrl = {
   name: "nz:image-imports-as-url",
-  enforce: /** @type {const} */ ("pre"),
+  enforce: "pre",
   async resolveId(source, importer, options) {
     if (!importer || !IMAGE_RE.test(source)) return null;
     const from = importer.split("?")[0];
@@ -44,7 +45,10 @@ export default defineConfig({
   /* Internal links are fetched on hover / focus / touchstart so the next page is already in
      cache when it is clicked. Opt out per link with data-astro-prefetch="false". */
   prefetch: { prefetchAll: true, defaultStrategy: "hover" },
-  integrations: [react()],
+  /* Non-streaming SSR (renderToString): React 18's streaming renderer splits UTF-8 Hebrew at
+     chunk boundaries and leaks NUL bytes into the HTML (U+FFFD inside alt / aria-label text,
+     and a broken CSP hash if one ever lands in an inline script). Static build: no downside. */
+  integrations: [react({ experimentalDisableStreaming: true })],
   server: { port: 8080, host: true },
   vite: {
     plugins: [imageImportsAsUrl],

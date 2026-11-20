@@ -211,7 +211,7 @@ const FinePrint = ({ clauses }: Props) => {
           className="lg-fine__bar"
           role="slider"
           tabIndex={0}
-          aria-label="זכוכית מגדלת על תנאי השימוש"
+          aria-label="בשפה פשוטה: זכוכית מגדלת על תנאי השימוש"
           aria-orientation="vertical"
           aria-valuemin={1}
           aria-valuemax={n}

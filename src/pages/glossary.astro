@@ -14,7 +14,7 @@ import GlossaryIndex from "@/components/blog/glossary/GlossaryIndex.astro";
 import GlossaryClosing from "@/components/blog/glossary/GlossaryClosing.astro";
 import "@/components/blog/glossary/glossary.css";
 import { glossaryIntro, sortedTerms } from "@/content/glossary";
-import { definedTermSet, webPage, OG_IMAGES, SITE_LAST_UPDATED } from "@/lib/schema";
+import { definedTermSet, licensedImage, webPage, SITE, SITE_LAST_UPDATED } from "@/lib/schema";
 import type { PageSeo } from "@/lib/seo";
 
 const PATH = "/glossary/";
@@ -26,10 +26,23 @@ const seo: PageSeo = {
   path: PATH,
   title,
   description,
-  ogImage: OG_IMAGES.blog,
-  breadcrumb: { name: "מילון מונחים", path: PATH, parent: { name: "מגזין", path: "/blog/" } },
+  breadcrumb: { name: "מילון מונחים", path: PATH, parent: { name: "המגזין", path: "/blog/" } },
   jsonLd: [
-    webPage({ path: PATH, title, description, dateModified: SITE_LAST_UPDATED, speakable: ["h1", ".lead"] }),
+    webPage({
+      path: PATH,
+      title,
+      description,
+      /* the page has no hero artwork: its own social card is the primary image (and the sitemap image) */
+      primaryImage: licensedImage({
+        url: `${SITE}/og/glossary.jpg`,
+        width: 1200,
+        height: 630,
+        caption: "מילון מונחים לבניית אתרים: כרטיס של NZ-web",
+        id: `${SITE}${PATH}#primaryimage`,
+      }),
+      dateModified: SITE_LAST_UPDATED,
+      speakable: ["h1", ".lead"],
+    }),
     definedTermSet({
       path: PATH,
       name: glossaryIntro.title,

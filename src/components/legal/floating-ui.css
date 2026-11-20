@@ -18,11 +18,14 @@
   --nzc-gap: 14px;
   position: fixed;
   z-index: 10020;
-  bottom: calc(var(--nzc-gap) + env(safe-area-inset-bottom, 0px) + var(--nz-sheet-h, 0px));
+  bottom: calc(var(--nzc-gap) + env(safe-area-inset-bottom, 0px));
   width: 46px;
   height: 46px;
   pointer-events: none;
-  transition: bottom 0.55s var(--ease-gallery);
+  /* rides above the cookie sheet on phones: a composited transform, not an animated `bottom`
+     (which re-laid the docks out on every frame and logged layout shifts) */
+  transform: translateY(calc(-1 * var(--nz-sheet-h, 0px)));
+  transition: transform 0.55s var(--ease-gallery);
 }
 .nzc-dock--start {
   /* inline-start = the right edge in this RTL site */
@@ -51,7 +54,7 @@
     inset-inline-start: 1px;
   }
   .nzc-dock--wa {
-    bottom: calc(var(--nzc-gap) + 56px + env(safe-area-inset-bottom, 0px) + var(--nz-sheet-h, 0px));
+    bottom: calc(var(--nzc-gap) + 56px + env(safe-area-inset-bottom, 0px));
   }
 }
 @media (min-width: 768px) {
@@ -701,22 +704,4 @@ html.nz-motion .nzc-cookies:not([data-phase]) .nzc-cookies__card {
 }
 .nzc-crumbs[data-tone="ink"] {
   color: var(--ash);
-}
-
-/* ── Colour filters on <html>, not <body> ──────────────────────────────────
-   A filter on <body> makes it the containing block of every position:fixed
-   element (header, beads, sheets drift away while scrolling). On the root
-   element a filter does not do that, so the widget's grayscale / invert move up. */
-html:has(> body.a11y-grayscale) {
-  filter: grayscale(100%);
-}
-html:has(> body.a11y-invert-colors) {
-  filter: invert(100%) hue-rotate(180deg);
-}
-html:has(> body.a11y-grayscale.a11y-invert-colors) {
-  filter: grayscale(100%) invert(100%) hue-rotate(180deg);
-}
-body.a11y-grayscale,
-body.a11y-invert-colors {
-  filter: none !important;
 }

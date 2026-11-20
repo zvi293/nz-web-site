@@ -1,14 +1,81 @@
 ---
-/** "לשנות את בחירת העוגיות" — reopens the cookie sheet (CookieConsent listens for "nz:cookies-open"). */
+/**
+ * "לשנות את בחירת העוגיות" (/privacy/#cookie-settings) — shows the visitor's current choice and
+ * reopens the cookie card (CookieConsent listens for "nz:cookies-open").
+ *  - The readout is read from the same localStorage key CookieConsent writes
+ *    ("nz_web_cookie_consent") and refreshed on "nz-consent-updated" (polite live region).
+ *  - CookieConsent hydrates on idle: if the card is not open right after the click, the request
+ *    is repeated briefly, so an early click is never lost.
+ *  - Keyboard: once the card is open, focus moves to its first choice (the card sits at the end
+ *    of the page); after a choice focus comes back to this button.
+ *  - No JS: the button is hidden (it could do nothing) and the text says how to clear the choice.
+ */
 ---
 
-<div class="lg-choice">
-  <p class="lg-choice__text">הבחירה שלכם בבאנר העוגיות נשמרת בדפדפן. אפשר לשנות אותה כאן, בכל רגע.</p>
-  <button type="button" class="nz-btn nz-btn--secondary nz-btn--sm" data-cookies-open>לשנות את בחירת העוגיות</button>
+<div class="lg-choice" id="cookie-settings">
+  <p class="lg-choice__text">
+    הבחירה שלכם בבאנר העוגיות נשמרת בדפדפן. אפשר לשנות אותה כאן בכל רגע, או למחוק אותה בהגדרות הדפדפן.
+  </p>
+  <p class="lg-choice__state" data-cookies-state aria-live="polite" hidden></p>
+  <button type="button" class="nz-btn nz-btn--secondary nz-btn--sm lg-choice__btn" data-cookies-open>לשנות את בחירת העוגיות</button>
 </div>
 
 <script>
-  document.querySelectorAll<HTMLButtonElement>("[data-cookies-open]").forEach((btn) =>
-    btn.addEventListener("click", () => window.dispatchEvent(new Event("nz:cookies-open"))),
-  );
+  const KEY = "nz_web_cookie_consent";
+  const LABEL: Record<string, string> = {
+    accepted: "הבחירה הנוכחית: אישרתם עוגיות מדידה.",
+    declined: "הבחירה הנוכחית: רק חיוניות. כלי המדידה לא נטענים.",
+  };
+  const NONE = "עוד לא בחרתם. עד שתבחרו, כלי המדידה לא נטענים.";
+
+  const read = (): string | null => {
+    try {
+      return localStorage.getItem(KEY);
+    } catch {
+      return null;
+    }
+  };
+  const card = () => document.querySelector<HTMLDialogElement>("dialog.nzc-cookies");
+
+  document.querySelectorAll<HTMLElement>(".lg-choice").forEach((box) => {
+    const state = box.querySelector<HTMLElement>("[data-cookies-state]");
+    const btn = box.querySelector<HTMLButtonElement>("[data-cookies-open]");
+    if (!btn) return;
+    let waiting = false;
+
+    const paint = () => {
+      if (!state) return;
+      const v = read();
+      state.textContent = (v && LABEL[v]) || NONE;
+      state.hidden = false;
+    };
+    paint();
+
+    window.addEventListener("nz-consent-updated", () => {
+      paint();
+      if (!waiting) return;
+      waiting = false;
+      /* focus was inside the card, which just closed: bring it back here */
+      const a = document.activeElement;
+      if (!a || a === document.body || card()?.contains(a)) btn.focus();
+    });
+
+    btn.addEventListener("click", () => {
+      const ask = () => window.dispatchEvent(new Event("nz:cookies-open"));
+      ask();
+      waiting = true;
+      let tries = 0;
+      const settle = () => {
+        const dlg = card();
+        if (dlg?.open && !dlg.hasAttribute("data-phase")) {
+          dlg.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
+          return;
+        }
+        if (++tries > 25) return; /* ~5s: give up quietly, the card is not on this page */
+        if (tries % 3 === 0) ask();
+        window.setTimeout(settle, 200);
+      };
+      window.setTimeout(settle, 60);
+    });
+  });
 </script>

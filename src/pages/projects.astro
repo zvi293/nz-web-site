@@ -34,6 +34,7 @@ const seo: PageSeo = {
     description,
     primaryImage: heroImage(PROJECTS_HERO_SLUG, PATH),
     speakable: true,
+    builtBySite: true,
     items: works.map((w) => ({ name: w.title, url: w.link, description: w.description, image: w.desktop.src })),
   }),
 };

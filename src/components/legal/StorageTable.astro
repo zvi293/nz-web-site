@@ -1,0 +1,75 @@
+---
+/**
+ * /privacy/ "עוגיות ואחסון בדפדפן" exhibit — a specimen drawer: every value the site keeps in the
+ * browser, then the cookies of the measurement tools (only after consent), each as a card with its
+ * exact name, where it lives, what it is for, how long it stays and when it is written at all.
+ * Cards (not a table) so a 390px phone reads every field at full size; a <dl> per card keeps the
+ * label → value pairs for screen readers. The data and its code sources: content.ts → storageOwn /
+ * storageThird.
+ */
+import { storageOwn, storageThird, type StorageItem } from "./content";
+import LegalText from "./LegalText.astro";
+
+const groups: { id: string; title: string; note: string; tone: "own" | "third"; items: StorageItem[] }[] = [
+  {
+    id: "lg-store-own",
+    title: "נשמר במכשיר שלכם",
+    note: "חיוני לתפקוד האתר. לא נשלח אלינו ולא לאף אחד אחר.",
+    tone: "own",
+    items: storageOwn,
+  },
+  {
+    id: "lg-store-third",
+    title: "עוגיות של כלי המדידה",
+    note: "רק אחרי שאישרתם בבאנר, ורק כשהכלים פועלים באתר.",
+    tone: "third",
+    items: storageThird,
+  },
+];
+---
+
+<div class="lg-store">
+  {
+    groups.map((g) => (
+      <div class="lg-store__group" data-tone={g.tone} role="group" aria-labelledby={g.id}>
+        <div class="lg-store__head">
+          <p id={g.id} class="lg-store__title">
+            {g.title}
+            <span class="lg-store__count">{g.items.length}</span>
+          </p>
+          <p class="lg-store__note">{g.note}</p>
+        </div>
+        <ul class="lg-store__list">
+          {g.items.map((it) => (
+            <li class="lg-store__item">
+              <p class="lg-store__name">
+                <bdi dir="ltr">
+                  <code>{it.name}</code>
+                </bdi>
+                <span class="lg-store__where">
+                  <LegalText text={it.where} />
+                </span>
+              </p>
+              <dl class="lg-store__rows">
+                <div>
+                  <dt>בשביל מה</dt>
+                  <dd>
+                    <LegalText text={it.what} />
+                  </dd>
+                </div>
+                <div>
+                  <dt>כמה זמן</dt>
+                  <dd>{it.life}</dd>
+                </div>
+                <div>
+                  <dt>מתי נשמר</dt>
+                  <dd>{it.when}</dd>
+                </div>
+              </dl>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</div>

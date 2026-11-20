@@ -52,9 +52,10 @@
     X-Frame-Options              = "DENY"
     X-Content-Type-Options       = "nosniff"
     Referrer-Policy              = "strict-origin-when-cross-origin"
-    Permissions-Policy           = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), hid=(), bluetooth=(), display-capture=(), idle-detection=(), browsing-topics=(), fullscreen=(self)"
+    Permissions-Policy           = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), hid=(), bluetooth=(), midi=(), display-capture=(), idle-detection=(), screen-wake-lock=(), accelerometer=(), gyroscope=(), magnetometer=(), xr-spatial-tracking=(), publickey-credentials-get=(), otp-credentials=(), clipboard-read=(), encrypted-media=(), picture-in-picture=(), browsing-topics=(), fullscreen=(self)"
     Cross-Origin-Opener-Policy   = "same-origin"
     Cross-Origin-Resource-Policy = "same-origin"
+    X-Permitted-Cross-Domain-Policies = "none"
 
 # ── Hashed build output (Astro build.assets = "assets") and self-hosted fonts: cache forever ──
 [[headers]]
@@ -62,6 +63,8 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Fonts are NOT content-hashed, yet cached as immutable for a year: a changed font file MUST get a
+# new file name (and the old one deleted, SITE-PLAYBOOK §1.8), or returning visitors keep the old one.
 [[headers]]
   for = "/fonts/*"
   [headers.values]
@@ -105,6 +108,20 @@
   [headers.values]
     Content-Type = "text/plain; charset=utf-8"
     X-Robots-Tag = "noindex"
+
+# ── Thank-you page: noindex as an HTTP header too (second safeguard next to the page's
+#    robots meta). robots.txt must NOT Disallow it, or crawlers never see the noindex. ──
+[[headers]]
+  for = "/thank-you/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, follow"
+
+# ── RFC 9116 security contact (public/.well-known/security.txt). Renew "Expires" yearly. ──
+[[headers]]
+  for = "/.well-known/security.txt"
+  [headers.values]
+    Content-Type  = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=86400"
 
 [[headers]]
   for = "/sitemap.xml"

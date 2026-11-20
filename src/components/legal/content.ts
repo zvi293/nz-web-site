@@ -100,7 +100,7 @@ export const privacyLock: LockData = {
       section: "general",
       name: "החוק",
       summary:
-        "המדיניות נכתבה לפי חוק הגנת הפרטיות. העיקרון פשוט: אוספים רק את מה שבאמת צריך כדי לענות לכם ולעבוד איתכם.",
+        "המדיניות נכתבה לפי חוק הגנת הפרטיות, כולל תיקון 13. האחראי על המידע הוא NZ-web, של צבי משה, והעיקרון פשוט: אוספים רק את מה שבאמת צריך.",
       x: 64,
       y: 32,
       side: "right",
@@ -126,7 +126,7 @@ export const privacyLock: LockData = {
       section: "third-parties",
       name: "שירותים חיצוניים",
       summary:
-        "Netlify מארח את האתר, וואטסאפ מעביר את ההודעות, ו-Google ו-Meta מודדים רק אם אישרתם. לכל אחד מהם מדיניות פרטיות משלו.",
+        "Netlify מארח את האתר, וואטסאפ ו-Gmail מעבירים את ההודעות, ו-Google ו-Meta מודדים רק אם אישרתם. המידע עשוי להישמר מחוץ לישראל.",
       x: 25,
       y: 84,
       side: "bottom",
@@ -163,21 +163,26 @@ export const privacyLock: LockData = {
 /** One plain-language line per section of the terms (keyed by section id). */
 export const termsPlain: Record<string, string> = {
   general: "האתר שייך ל-NZ-web, של צבי משה. מי שגולש בו מסכים לתנאים האלה.",
-  services: "מה שכתוב באתר הוא מידע כללי. מה בדיוק נעשה, מתי ובאיזו תמורה, נקבע רק בהצעה אישית ובהסכם.",
+  services: "אין חבילות ואין מחירון. מה בדיוק נעשה, מתי ובאיזו תמורה, נקבע רק בהצעה אישית ובהסכם.",
   ip: "העיצוב, הקוד והיצירות באתר שלנו. רוצים להשתמש בתמונה? מבקשים רישיון בכתב ונותנים קרדיט עם קישור.",
+  use: "משתמשים באתר בהגינות: לא פורצים, לא מעמיסים ולא מתחזים.",
   links: "קישור שיוצא מהאתר מוביל לאתר של מישהו אחר. מה שקורה שם באחריות של מי שמפעיל אותו.",
   liability: "אנחנו משתדלים לדייק, אבל לפני החלטה חשובה כדאי להתייעץ עם איש מקצוע ולא לסמוך רק על האתר.",
-  law: "חל החוק הישראלי. שאלה על התנאים? כתבו לנו במייל ונענה.",
+  changes: "אם התנאים ישתנו, הנוסח החדש יופיע כאן עם תאריך.",
+  law: "חל החוק הישראלי, ובתי המשפט בישראל. שאלה על התנאים? כתבו לנו במייל ונענה.",
 };
 
 /** One plain-language line per section of the privacy policy (the document's margin notes). */
 export const privacyPlain: Record<string, string> = {
-  general: "אוספים רק מה שצריך, לפי חוק הגנת הפרטיות.",
+  general: "האחראי על המידע הוא NZ-web, ואוספים רק מה שצריך, לפי חוק הגנת הפרטיות.",
   collected: "מה שאתם שולחים בעצמכם. מדידה רק אחרי שאישרתם.",
   use: "לענות לכם ולעבוד איתכם. לא מוכרים, לא משווקים הלאה.",
-  "third-parties": "Netlify מארח, וואטסאפ מעביר, ומדידה רק באישור שלכם.",
-  security: "חיבור מוצפן, ופרטים נשמרים רק כל עוד צריך.",
+  cookies: "האתר לא שותל עוגיות משלו. עוגיות מדידה רק אחרי שאישרתם.",
+  "third-parties": "Netlify מארח, וואטסאפ ו-Gmail מעבירים, ומדידה רק באישור שלכם.",
+  retention: "פרטי פנייה נשמרים רק כל עוד צריך אותם.",
+  security: "חיבור מוצפן, ואין באתר מאגר של פרטי פונים.",
   rights: "לראות, לתקן, למחוק, לבטל הסכמה. מתי שתרצו.",
+  children: "האתר מיועד לעסקים, לא לילדים.",
   changes: "אם משהו ישתנה, הנוסח החדש יופיע כאן עם תאריך.",
 };
 
@@ -205,8 +210,8 @@ export const layers = [
   },
   {
     tag: "ההנחיות",
-    name: "הנחיות WCAG 2.1 ברמה AA",
-    line: "ההנחיות הבינלאומיות של W3C, שעליהן התקן מבוסס. מכאן נגזרות הבדיקות בכל עמוד.",
+    name: "הנחיות WCAG ברמה AA",
+    line: "ההנחיות הבינלאומיות של W3C. התקן מבוסס על גרסה 2.0, ואנחנו עובדים לפי 2.1, שכוללת אותה ומוסיפה עליה.",
   },
 ];
 
@@ -226,3 +231,78 @@ export const specimens = [
   "nojs",
 ] as const;
 export type Specimen = (typeof specimens)[number];
+
+/* ── /privacy/ §04 — what is kept in the browser, and the cookies of the measurement tools ──── */
+export interface StorageItem {
+  /** The key or cookie name, exactly as the browser shows it (Latin, rendered LTR). */
+  name: string;
+  /** Where it lives. */
+  where: string;
+  what: string;
+  /** How long it stays. */
+  life: string;
+  /** When it is written at all. */
+  when: string;
+}
+
+/**
+ * Verified against the code (Nov 2026): CookieConsent.tsx (the two consent keys), a11y-store.ts
+ * ("a11y-settings-v2", written only on a change), blog/ArticleBlocks.astro (checklist ticks),
+ * offer/ScopeBubble.tsx + pages/thank-you.astro ("nz-wa-brief", sessionStorage, written on send),
+ * lib/analytics.ts (GA4 / Meta Pixel, injected only after "accepted"). Third-party lifetimes are
+ * the providers' documented defaults. Keep this list in sync when a key is added or removed.
+ */
+export const storageOwn: StorageItem[] = [
+  {
+    name: "nz_web_cookie_consent",
+    where: "localStorage",
+    what: "הבחירה שלכם בבאנר העוגיות: אישור או רק חיוניות.",
+    life: "עד שתמחקו אותו בדפדפן",
+    when: "כשבוחרים בבאנר",
+  },
+  {
+    name: "nz_web_cookie_preferences",
+    where: "localStorage",
+    what: "אותה בחירה, לפי סוג: חיוניות, מדידה, שיווק.",
+    life: "עד שתמחקו אותו בדפדפן",
+    when: "כשבוחרים בבאנר",
+  },
+  {
+    name: "a11y-settings-v2",
+    where: "localStorage",
+    what: "ההגדרות שבחרתם בתפריט הנגישות, כמו גודל טקסט וניגודיות.",
+    life: "עד שתמחקו אותו בדפדפן",
+    when: "רק אם שיניתם הגדרה",
+  },
+  {
+    name: "nz-check:<מאמר>:<רשימה>",
+    where: "localStorage",
+    what: "הסימונים שלכם ברשימות הבדיקה שבמאמרים.",
+    life: "עד שתמחקו אותו בדפדפן",
+    when: "רק אם סימנתם פריט",
+  },
+  {
+    name: "nz-wa-brief",
+    where: "sessionStorage",
+    what: "ההודעה שניסחתם בעמוד ההצעה, כדי שעמוד התודה יוכל לפתוח אותה שוב בוואטסאפ.",
+    life: "עד שסוגרים את הלשונית",
+    when: "כשלוחצים לשלוח",
+  },
+];
+
+export const storageThird: StorageItem[] = [
+  {
+    name: "_ga, _ga_<מזהה>",
+    where: "עוגייה של Google",
+    what: "Google Analytics: מבחין בין ביקורים כדי לספור אותם, בלי לזהות אתכם בשם.",
+    life: "לפי Google: עד שנתיים",
+    when: "רק אחרי אישור",
+  },
+  {
+    name: "_fbp, _fbc",
+    where: "עוגייה של Meta",
+    what: "Meta Pixel: מדידת קמפיינים ופרסום ב-Facebook וב-Instagram.",
+    life: "לפי Meta: עד 90 יום",
+    when: "רק אחרי אישור",
+  },
+];

@@ -10,10 +10,10 @@
 import { HERO_SIZES } from "@/components/service";
 import type { ServicePageData } from "@/components/service/types";
 import { faqPage, service, webPage, OG_IMAGES, SITE_LAST_UPDATED } from "@/lib/schema";
-import { heroImage, type PageSeo } from "@/lib/seo";
+import { heroImage, pageCardUrl, type PageSeo } from "@/lib/seo";
 
 export interface ServiceSeoOptions {
-  /** Social card (default OG_IMAGES.services). */
+  /** Social card (default: the page's own card from og-cards.json, else OG_IMAGES.services). */
   ogImage?: string;
   /** Extra JSON-LD nodes (e.g. collectionPage() for a hub, howTo()). */
   jsonLd?: unknown[];
@@ -62,7 +62,7 @@ export function serviceSeo(data: ServicePageData, opts: ServiceSeoOptions = {}):
     path,
     title,
     description,
-    ogImage: opts.ogImage ?? OG_IMAGES.services,
+    ogImage: opts.ogImage ?? pageCardUrl(path) ?? OG_IMAGES.services,
     lcpArt: { slug: hero.art, sizes },
     breadcrumb: { name: data.crumb.name, path, parent, trail: data.crumb.trail },
     jsonLd: nodes,

@@ -4,7 +4,7 @@
  * same `post.faq` items, in the same order, with the same text (rendered verbatim here). Static.
  */
 import type { BlogFaqItem } from "@/content/types";
-import { typesetText } from "./magazine-meta";
+import { typesetInline } from "./magazine-meta";
 
 interface Props {
   items: BlogFaqItem[];
@@ -29,11 +29,11 @@ const { items } = Astro.props;
                 <span class="ar-qa__num" aria-hidden="true">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span class="ar-qa__text">{typesetText(item.question)}</span>
+                <span class="ar-qa__text" set:html={typesetInline(item.question)} />
                 <span class="ar-qa__icon" aria-hidden="true" />
               </summary>
               <div class="ar-qa__a">
-                <p>{typesetText(item.answer)}</p>
+                <p set:html={typesetInline(item.answer)} />
               </div>
             </details>
           </li>

@@ -50,11 +50,14 @@ const AccessibilityWidget = () => {
   const beadRef = useRef<HTMLButtonElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
   const guideRef = useRef<HTMLDivElement>(null);
+  /** Whatever opened the menu (the bead, or a [data-a11y-open] button on the statement page): focus returns there. */
+  const openerRef = useRef<HTMLElement | null>(null);
 
   /* ── open / close (native dialog + one history entry for the BACK button) ── */
   const show = useCallback(() => {
     const dlg = dialogRef.current;
     if (!dlg || dlg.open) return;
+    openerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const html = document.documentElement;
     html.classList.add("nzc-scroll-pinned");
     dlg.showModal();
@@ -80,7 +83,10 @@ const AccessibilityWidget = () => {
       setOpen(false);
       document.documentElement.classList.remove("nzc-scroll-pinned");
       if (history.state?.nzA11y) history.back();
-      beadRef.current?.focus({ preventScroll: true });
+      const opener = openerRef.current;
+      openerRef.current = null;
+      const target = opener && opener.isConnected && opener !== document.body && !dlg.contains(opener) ? opener : beadRef.current;
+      target?.focus({ preventScroll: true });
     };
     const onPop = () => {
       if (dlg.open) dlg.close();

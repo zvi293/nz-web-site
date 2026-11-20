@@ -6,7 +6,9 @@
  *   npm run art -- --force — re-encode everything
  *
  * Output:
- *   src/assets/art/<slug>-<width>.{avif,webp}   (widths 640 / 1080 / 1600)
+ *   src/assets/art/<slug>-<width>.{avif,webp}   (widths 320 / 640 / 828 / 1080 / 1600)
+ *   AVIF is 4:2:0 (chroma at half resolution: invisible on these works, ~20% lighter) at quality 52,
+ *   or the entry's `avifQ` for busy LCP heroes. 320 serves thumbnails, 828 serves DPR-2 phones.
  *   src/content/art-manifest.json               (size, dominant colour, LQIP, title, alt, tone)
  */
 import fs from "node:fs";
@@ -19,7 +21,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const SRC_DIR = path.join(ROOT, "תמונות תדמית");
 const OUT_DIR = path.join(ROOT, "src/assets/art");
 const MANIFEST = path.join(ROOT, "src/content/art-manifest.json");
-const WIDTHS = [640, 1080, 1600];
+const WIDTHS = [320, 640, 828, 1080, 1600];
 const force = process.argv.includes("--force");
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -49,7 +51,7 @@ for (const item of registry) {
   for (const w of WIDTHS) {
     const width = Math.min(w, meta.width);
     const base = sharp(src).resize({ width, withoutEnlargement: true });
-    await base.clone().avif({ quality: 52, effort: 5 }).toFile(path.join(OUT_DIR, `${item.slug}-${w}.avif`));
+    await base.clone().avif({ quality: item.avifQ ?? 52, effort: 5, chromaSubsampling: "4:2:0" }).toFile(path.join(OUT_DIR, `${item.slug}-${w}.avif`));
     await base.clone().webp({ quality: 74, effort: 5 }).toFile(path.join(OUT_DIR, `${item.slug}-${w}.webp`));
   }
   const { dominant } = await sharp(src).stats();

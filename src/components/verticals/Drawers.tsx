@@ -226,7 +226,7 @@ const Drawers = () => {
         <span className="vl-dr__plinth" aria-hidden="true" />
       </div>
 
-      <aside className="vl-dr__plan" aria-label="מפת האתר">
+      <div className="vl-dr__plan" role="group" aria-label="מפת האתר">
         <p className="vl-dr__plan-head">מפת האתר</p>
         <ol className="vl-dr__tree">
           <li className="vl-dr__root">עמוד הבית</li>
@@ -242,7 +242,7 @@ const Drawers = () => {
         <p className="vl-dr__say" aria-live="polite">
           {say || "כל מגירה היא עמוד שירות אחד. עמוד אחד, שאלה אחת, חיפוש אחד."}
         </p>
-      </aside>
+      </div>
     </div>
   );
 };

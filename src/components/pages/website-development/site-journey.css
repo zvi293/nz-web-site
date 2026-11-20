@@ -190,8 +190,8 @@ html.nz-motion .sj-rope.is-shake .sj-rope__closed {
   color: var(--sj-ground, var(--ink));
 }
 .sj-st.is-on .sj-st__post {
-  background: var(--vermilion);
-  border-color: var(--vermilion);
+  background: var(--vermilion-fill); /* white numeral ≥ 4.5:1 (on --vermilion it read 4.3:1) */
+  border-color: var(--vermilion-fill);
   color: #fff;
   transform: scale(1.08);
 }

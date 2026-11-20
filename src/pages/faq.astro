@@ -16,7 +16,7 @@ import { heroImage, type PageSeo } from "@/lib/seo";
 const PATH = "/faq/";
 const { title, description } = faqSeo;
 /* Must equal the <Artwork priority sizes> in FaqHero (passed down below). */
-const HERO_SIZES = "(min-width: 1440px) 780px, (min-width: 1024px) 55vw, 100vw";
+const HERO_SIZES = "(min-width: 1440px) 780px, (min-width: 1024px) 55vw, calc(100vw - 64px)";
 const HERO_SLUG = "harp-bridge";
 
 /* The page renders the groups in this same order (before → build → after), so the JSON-LD

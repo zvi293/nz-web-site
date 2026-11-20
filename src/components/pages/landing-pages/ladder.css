@@ -419,7 +419,7 @@ html:not(.js) .ldr__card {
   display: none;
 }
 html:not(.js) .ldr .ldr-pg__b {
-  opacity: 1;
+  filter: none;
 }
 
 /* ── the sample landing page (container units: 1u = 1/260 of the sheet) ── */
@@ -438,14 +438,16 @@ html:not(.js) .ldr .ldr-pg__b {
   padding: calc(10 * var(--u));
   margin-bottom: calc(10 * var(--u));
   border-radius: calc(3 * var(--u));
-  opacity: 0.42;
-  transition: opacity 0.5s var(--ease-gallery), box-shadow 0.5s var(--ease-gallery), background-color 0.5s var(--ease-gallery);
+  /* blocks not reached yet are drawn in grey, not faded: text keeps ≥4.5:1 (opacity .42 put the
+     sample copy at 1.4–2.7:1, WCAG 1.4.3); passed blocks get half their colour back */
+  filter: grayscale(1);
+  transition: filter 0.5s var(--ease-gallery), box-shadow 0.5s var(--ease-gallery), background-color 0.5s var(--ease-gallery);
 }
 .ldr-pg__b.is-past {
-  opacity: 0.78;
+  filter: grayscale(0.5);
 }
 .ldr-pg__b.is-on {
-  opacity: 1;
+  filter: none;
   background: #fff;
   box-shadow: 0 0 0 calc(1.5 * var(--u)) var(--vermilion), 0 calc(10 * var(--u)) calc(22 * var(--u)) calc(-10 * var(--u)) rgba(18, 17, 16, 0.35);
 }

@@ -76,7 +76,7 @@ const AdmissionTicket = () => {
     if (!el) return;
     const fine = window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 1024px)");
     const onMove = (e: PointerEvent) => {
-      if (!fine.matches || !motionAllowed() || drag.current?.active) return;
+      if (!fine.matches || !motionAllowed() || drag.current) return; /* no tilt while the ticket is held */
       const r = el.getBoundingClientRect();
       const px = (e.clientX - r.left) / r.width - 0.5;
       const py = (e.clientY - r.top) / r.height - 0.5;

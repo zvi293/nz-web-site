@@ -1,0 +1,64 @@
+---
+/**
+ * "איך נבדקה הנגישות" — the inspection log of the statement: what was checked, with what, at which
+ * widths, set like a calibration slip (a numbered row per check with a ticked box), and a footer
+ * line with the date of the last check and of the statement (regulation 35 asks for both).
+ * Copy: site-settings (accessibility.sections → id "review").
+ */
+import type { LegalPageSection } from "@/content/types";
+import { parseBlocks } from "./content";
+import LegalText from "./LegalText.astro";
+
+interface Props {
+  section: LegalPageSection;
+  updated: string;
+}
+const { section, updated } = Astro.props;
+const blocks = parseBlocks(section.content);
+const items = blocks.flatMap((b) => (b.type === "ul" ? b.items : []));
+const paras = blocks.flatMap((b) => (b.type === "p" ? [b.text] : []));
+---
+
+<section id={section.id} class="nz-section nz-section--space-default lg-review" data-tone="paper" aria-labelledby="lg-review-title">
+  <div class="nz-container">
+    <div class="lg-split">
+      <div class="lg-split__title">
+        <p class="nz-label"><span class="nz-label__index">05</span><span>בדיקה</span></p>
+        <h2 id="lg-review-title" class="nz-display nz-display--h2">{section.title}</h2>
+      </div>
+      {
+        paras[0] && (
+          <p class="lg-split__lede">
+            <LegalText text={paras[0]} />
+          </p>
+        )
+      }
+    </div>
+
+    <div class="lg-log" data-reveal="rise">
+      <p class="lg-log__cap" aria-hidden="true">
+        <span class="nzc-cube"></span>
+        יומן בדיקה
+      </p>
+      <ol class="lg-log__list">
+        {
+          items.map((item, i) => (
+            <li class="lg-log__row">
+              <span class="lg-log__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+              <span class="lg-log__text">
+                <LegalText text={item} />
+              </span>
+              <span class="lg-log__tick" aria-hidden="true">
+                <svg viewBox="0 0 16 16">
+                  <path d="M3.5 8.5 6.5 11.5 12.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+      {paras.slice(1).map((p) => <p class="lg-log__note"><LegalText text={p} /></p>)}
+      <p class="lg-log__foot">ההצהרה עודכנה לאחרונה ב-{updated}</p>
+    </div>
+  </div>
+</section>

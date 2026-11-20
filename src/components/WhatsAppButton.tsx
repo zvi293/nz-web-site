@@ -92,6 +92,9 @@ const WhatsAppButton = () => {
     <div
       ref={dockRef}
       className="nzc-dock nzc-dock--end nzc-dock--wa"
+      /* a small landmark while it is on screen, so no page content sits outside landmarks */
+      role={shown ? "complementary" : undefined}
+      aria-label={shown ? "וואטסאפ" : undefined}
       data-nz-float=""
       data-a11y-exclude="true"
       data-primary=""

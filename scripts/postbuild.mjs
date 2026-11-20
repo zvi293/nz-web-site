@@ -5,42 +5,74 @@
  *     - every built page (dist/**\/index.html) except noindex pages and 404.html;
  *     - <loc> = the trailing-slash URL (same as each page's self-canonical);
  *     - <lastmod>: blog posts → updated_at ?? published_at (from article:modified_time /
- *       article:published_time in the page head), every other page → the build date;
+ *       article:published_time in the page head), every other page → the dateModified of its
+ *       <canonical>#webpage JSON-LD node (build date only if a page has none, with a warning);
  *     - image sitemap (xmlns:image): one <image:image> per page for its hero, read from the HTML:
  *       <link rel="preload" as="image"> first (largest srcset candidate), else the first
- *       <img fetchpriority="high">.
+ *       <img fetchpriority="high">, else the page's og:image (its social card).
  *
  *  2. dist/_headers — the Content-Security-Policy for "/*" (Netlify applies _headers from the
  *     publish dir). Astro inlines a few tiny executable scripts (the island runtime
  *     <astro-island> + its client:load/idle/visible directives) and BaseLayout has one boot script
  *     (motion gate + saved a11y settings, before first paint). Every inline executable <script>
  *     in every page is hashed (sha256) into script-src, so no 'unsafe-inline' is needed.
- *     JSON-LD blocks are data (CSP does not apply) and are skipped. The rest of the policy is the
- *     same as before; netlify.toml keeps every OTHER header and no longer sets a CSP.
+ *     JSON-LD blocks are data (CSP does not apply) and are skipped. The rest of the policy is in
+ *     CSP_REST below; netlify.toml keeps every OTHER header and never sets a CSP. Inline event
+ *     handlers / javascript: URLs in the markup are reported (the policy blocks them).
  *
  * Never edits pages. Exits 1 only if dist/ is missing.
  */
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, sep } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const DIST = join(ROOT, "dist");
+/* `node scripts/postbuild.mjs --dist <dir>` post-processes another build folder (e.g. a scratch
+   `astro build --outDir <dir>`); default ./dist. */
+const distArg = process.argv.indexOf("--dist");
+const DIST = distArg > 0 && process.argv[distArg + 1] ? resolve(process.argv[distArg + 1]) : join(ROOT, "dist");
 const SITE = "https://nz-web.com";
 const TODAY = new Date().toISOString().slice(0, 10);
 
-/* ── CSP (identical to the policy that used to live in netlify.toml, plus the hashes) ── */
-const SCRIPT_HOSTS = ["https://www.googletagmanager.com", "https://www.google-analytics.com", "https://connect.facebook.net"];
+/* ── CSP: script-src = 'self' + the sha256 of every inline script + the tracker hosts ──
+ * Tracker hosts follow Google's published CSP for GA4 / the Google tag (*.googletagmanager.com
+ * for the loader, *.google-analytics.com + *.analytics.google.com for the beacons) and Meta's
+ * Pixel (connect.facebook.net for fbevents.js, www.facebook.com/tr for the beacon). They only
+ * matter after cookie consent (src/lib/analytics.ts injects nothing before that), and are listed
+ * only when the build has that tracker's ID (see `trackers` below).
+ * If "Google signals" is ever switched on in GA4, add https://*.g.doubleclick.net and
+ * https://www.google.com to img-src + connect-src (Google's signals endpoints).
+ * No iframes, workers, plugins or inline event handlers exist on the site, hence 'none' / 'self'. */
+/* Tracker hosts are allowed only when the build actually has the tracker: the IDs are read with
+   Vite's own loadEnv (process.env + .env files, exactly what the bundle saw) and validated with the
+   same patterns as src/lib/analytics.ts. No ID → no third-party host in the policy at all. */
+const trackers = await (async () => {
+  try {
+    const { loadEnv } = await import("vite");
+    const env = loadEnv("production", ROOT, ["PUBLIC_", "VITE_"]);
+    return {
+      ga: /^G-[A-Z0-9]{4,16}$/.test((env.VITE_GA_ID ?? "").trim()),
+      fb: /^\d{5,20}$/.test((env.VITE_FB_PIXEL_ID ?? "").trim()),
+    };
+  } catch {
+    return { ga: true, fb: true }; // cannot tell → keep both allowed (never block a configured tracker)
+  }
+})();
+const GA = trackers.ga;
+const FB = trackers.fb;
+const hosts = (...list) => list.filter(Boolean).map((h) => ` ${h}`).join("");
+const SCRIPT_HOSTS = [GA && "https://*.googletagmanager.com", FB && "https://connect.facebook.net"].filter(Boolean);
 const CSP_REST = [
+  "script-src-attr 'none'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://*.google-analytics.com https://www.googletagmanager.com https://www.facebook.com",
+  `img-src 'self' data: blob:${hosts(GA && "https://*.google-analytics.com", GA && "https://*.googletagmanager.com", FB && "https://www.facebook.com")}`,
   "font-src 'self'",
-  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://connect.facebook.net",
+  `connect-src 'self'${hosts(GA && "https://*.google-analytics.com", GA && "https://*.analytics.google.com", GA && "https://*.googletagmanager.com", FB && "https://www.facebook.com", FB && "https://connect.facebook.net")}`,
   "media-src 'self'",
   "manifest-src 'self'",
-  "worker-src 'self' blob:",
-  "frame-src 'self'",
+  "worker-src 'self'",
+  "frame-src 'none'",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self' https://wa.me https://api.whatsapp.com",
@@ -121,7 +153,9 @@ function primaryImageOf(html) {
     const url = absoluteUrl(attr(tag, "src"));
     if (url) return url;
   }
-  return null;
+  /* no hero image (e.g. /glossary/): the page's own social card, so every indexable page has one */
+  const og = metaContent(html, "property", "og:image");
+  return og ? absoluteUrl(og) : null;
 }
 
 function metaContent(html, key, value) {
@@ -133,6 +167,22 @@ function metaContent(html, key, value) {
 
 const isNoindex = (html) => /noindex/i.test(metaContent(html, "name", "robots") || "");
 
+/** dateModified of the page's own WebPage node (<canonical>#webpage) in its JSON-LD @graph. */
+function webPageModified(html, loc) {
+  for (const m of html.matchAll(/<script\b[^>]*type\s*=\s*["']?application\/ld\+json["']?[^>]*>([\s\S]*?)<\/script>/gi)) {
+    let data;
+    try {
+      data = JSON.parse(m[1]);
+    } catch {
+      continue;
+    }
+    const nodes = Array.isArray(data?.["@graph"]) ? data["@graph"] : [data];
+    const page = nodes.find((n) => n && n["@id"] === `${loc}#webpage`);
+    if (typeof page?.dateModified === "string") return page.dateModified;
+  }
+  return null;
+}
+
 /* ── main ── */
 if (!existsSync(join(DIST, "index.html"))) {
   console.error("✗ dist/index.html not found — run `astro build` first.");
@@ -143,6 +193,7 @@ const files = walk(DIST);
 const pages = [];
 const hashes = new Map(); // hash → first file that has it
 let inlineCount = 0;
+const cspWarnings = []; // markup the CSP will block (see the guard in the loop below)
 
 for (const file of files) {
   const rel = relative(DIST, file).split(sep).join("/");
@@ -159,6 +210,12 @@ for (const file of files) {
     const hash = `'sha256-${createHash("sha256").update(m[2], "utf8").digest("base64")}'`;
     if (!hashes.has(hash)) hashes.set(hash, rel);
   }
+  /* CSP guard: inline event handlers (onclick="…") and javascript: URLs are blocked by the policy
+     (script-src-attr 'none', no 'unsafe-inline'), so they would silently do nothing in production. */
+  const html_ = html.replace(/<script\b[\s\S]*?<\/script>/gi, "");
+  for (const m of html_.matchAll(/<[a-z][\w-]*\s[^>]*?\s(on[a-z]+)\s*=|\b(?:href|src|action|formaction)\s*=\s*["']?\s*javascript:/gi)) {
+    cspWarnings.push(`${rel}: ${m[1] ? `inline handler ${m[1]}=` : "javascript: URL"}`);
+  }
 
   /* Sitemap candidates: directory pages only (index.html), never 404.html. */
   if (!rel.endsWith("index.html")) continue;
@@ -167,7 +224,14 @@ for (const file of files) {
     console.log(`  · ${path}  (noindex — not in sitemap)`);
     continue;
   }
-  const modified = metaContent(html, "property", "article:modified_time") || metaContent(html, "property", "article:published_time");
+  /* Real lastmod (SITE-PLAYBOOK §5): the article's modified/published time, else the WebPage
+     node's dateModified (SITE_LAST_UPDATED or the page's own `updated`), never the build date
+     unless the page states no date at all (then it is reported). */
+  const modified =
+    metaContent(html, "property", "article:modified_time") ||
+    metaContent(html, "property", "article:published_time") ||
+    webPageModified(html, `${SITE}${path}`);
+  if (!modified) console.log(`  ! ${path}  has no dateModified — sitemap lastmod falls back to the build date`);
   pages.push({
     path,
     lastmod: modified ? modified.slice(0, 10) : TODAY,
@@ -219,5 +283,9 @@ writeFileSync(
 `,
   "utf-8",
 );
-console.log(`  ✓ _headers — CSP with ${hashes.size} inline-script hash(es) (${inlineCount} inline scripts across ${files.length} HTML files)`);
+console.log(`  ✓ _headers — CSP with ${hashes.size} inline-script hash(es) (${inlineCount} inline scripts across ${files.length} HTML files); tracker hosts: GA4 ${GA ? "on" : "off"}, Meta Pixel ${FB ? "on" : "off"}`);
 for (const [hash, file] of hashes) console.log(`      ${hash}  first seen in ${file}`);
+if (cspWarnings.length) {
+  console.warn(`  ⚠ ${cspWarnings.length} piece(s) of markup the CSP will block (move them into a <script> / addEventListener):`);
+  for (const w of [...new Set(cspWarnings)].slice(0, 20)) console.warn(`      ${w}`);
+}

@@ -86,7 +86,8 @@
   place-items: center;
   min-height: 56px;
   padding: 6px 4px;
-  background: #c8714e;
+  /* three fired-clay tones, each dark enough for the cream label (≥ 4.5:1) */
+  background: #ad5a3b;
   color: #fff8f1;
   border-radius: 2px;
   box-shadow:
@@ -101,10 +102,10 @@
   transition-delay: calc(var(--i, 0) * 60ms);
 }
 .wd-brick:nth-child(3n + 2) {
-  background: #b8603f;
+  background: #a2512f;
 }
 .wd-brick:nth-child(4n + 3) {
-  background: #a9563a;
+  background: #984a2d;
 }
 .wd-brick__t {
   text-wrap: balance;

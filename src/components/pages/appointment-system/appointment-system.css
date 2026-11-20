@@ -369,7 +369,7 @@ html.nz-motion .ap-trail[data-in] .ap-msg {
   top: -9px;
   padding: 0 4px;
   border-radius: 999px;
-  background: var(--vermilion);
+  background: var(--vermilion-fill); /* white 11px label ≥ 4.5:1 */
   color: #fff;
   font-size: 0.6875rem;
   font-weight: 700;

@@ -8,7 +8,7 @@ import { Artwork } from "@/components/art";
 import { getSignatureMeta } from "@/components/articles";
 import { hasArt } from "@/lib/art";
 import { formatDate, getDepartment } from "@/lib/blog";
-import { currentIssue, readMinutes, typesetText } from "./magazine-meta";
+import { currentIssue, readMinutes, typesetInline } from "./magazine-meta";
 
 const { issue, posts } = currentIssue();
 const [lead, ...rest] = posts;
@@ -24,7 +24,7 @@ const sig = (key?: string) => getSignatureMeta(key)?.name;
           <span class="nz-label__index">גיליון {issue.index}</span>
           <span>{issue.month}</span>
         </p>
-        <h2 id="mg-issue-title" class="mg-mast__title">{typesetText(`בגיליון הזה: ${posts.length} מאמרים, ${posts.length} מוצגים`)}</h2>
+        <h2 id="mg-issue-title" class="mg-mast__title" set:html={typesetInline(`בגיליון הזה: ${posts.length} מאמרים, ${posts.length} מוצגים`)} />
       </div>
       <p class="mg-mast__lede">
         כל מאמר בגיליון מגיע עם רכיב אינטראקטיבי משלו, שמראה את הרעיון בפועל במקום רק להסביר אותו.
@@ -37,7 +37,7 @@ const sig = (key?: string) => getSignatureMeta(key)?.name;
           <article class="mg-story mg-story--lead" data-mg-dept={getDepartment(lead.category).key} data-mg-post={lead.slug}>
             <a href={`/blog/${lead.slug}/`} class="mg-story__link">
               <span class="mg-story__plate" aria-hidden="true">
-                {hasArt(lead.art) && <Artwork slug={lead.art} sizes="(min-width: 1024px) 48vw, 100vw" ratio="3 / 2" alt="" />}
+                {hasArt(lead.art) && <Artwork slug={lead.art} sizes="(min-width: 1024px) 48vw, calc(100vw - 48px)" ratio="3 / 2" alt="" />}
               </span>
               <span class="mg-story__body">
                 <span class="mg-story__meta">
@@ -45,8 +45,8 @@ const sig = (key?: string) => getSignatureMeta(key)?.name;
                   <span aria-hidden="true">·</span>
                   <span>{readMinutes(lead)} דקות קריאה</span>
                 </span>
-                <h3 class="mg-story__title">{typesetText(lead.title)}</h3>
-                <span class="mg-story__excerpt">{typesetText(lead.excerpt)}</span>
+                <h3 class="mg-story__title" set:html={typesetInline(lead.title)} />
+                <span class="mg-story__excerpt" set:html={typesetInline(lead.excerpt)} />
                 {sig(lead.signature) && (
                   <span class="mg-story__exhibit">
                     <span class="mg-cube" aria-hidden="true" />
@@ -70,7 +70,7 @@ const sig = (key?: string) => getSignatureMeta(key)?.name;
                   <span class="mg-story__idx">{String(i + 2).padStart(2, "0")}</span>
                   <span class="mg-story__dept">{getDepartment(p.category).name}</span>
                 </span>
-                <h3 class="mg-story__title">{typesetText(p.title)}</h3>
+                <h3 class="mg-story__title" set:html={typesetInline(p.title)} />
                 {sig(p.signature) && (
                   <span class="mg-story__exhibit">
                     <span class="mg-cube" aria-hidden="true" />

@@ -1,8 +1,8 @@
 ---
 /**
  * "מגבלות ידועות" — opened by a placard hung on two wires ("הודעה למבקרים"), the way a museum
- * tells visitors what is closed; each limit is a wall label at a doorway ("outside our walls"),
- * with an arrow pointing out of the room. The closing line signs off under the placard.
+ * tells visitors what is closed; each limit is a wall label at a doorway ("מגבלה · 01"), with an
+ * arrow pointing out of the room (some limits are inside the site, some are outside services). The closing line signs off under the placard.
  */
 import type { LegalPageSection } from "@/content/types";
 import { parseBlocks } from "./content";
@@ -42,7 +42,7 @@ const words = ["אחת", "שתיים", "שלוש", "ארבע", "חמש", "שש"]
               </svg>
             </span>
             <span class="lg-door__body">
-              <span class="lg-door__tag">מחוץ לאולם · {String(i + 1).padStart(2, "0")}</span>
+              <span class="lg-door__tag">מגבלה · {String(i + 1).padStart(2, "0")}</span>
               <span class="lg-door__text">{item}</span>
             </span>
           </li>

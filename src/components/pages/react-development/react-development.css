@@ -119,7 +119,7 @@ html.nz-motion .rd-card[data-reveal]:not([data-in]) .rd-hole {
     gap: 4px;
     margin: 0;
     font: 500 9px/1 var(--font-sans);
-    color: rgba(42, 36, 27, 0.45);
+    color: rgba(42, 36, 27, 0.72); /* printed column numbers: faint, but ≥ 4.5:1 on the card */
     text-align: center;
     font-variant-numeric: tabular-nums;
   }

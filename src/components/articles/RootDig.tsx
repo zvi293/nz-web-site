@@ -228,7 +228,7 @@ const RootDig = () => {
                 <button
                   type="button"
                   className={`as-dg__soil${open ? " is-gone" : ""}`}
-                  aria-label={`חפרו בחלקה ${i + 1}`}
+                  aria-label={`${String(i + 1).padStart(2, "0")}: חפרו בחלקה`}
                   aria-hidden={open}
                   tabIndex={open ? -1 : 0}
                   onPointerDown={(e) => {

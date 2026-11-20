@@ -170,8 +170,10 @@ html.nz-motion .mg-hero__statement {
   background: radial-gradient(ellipse 60% 55% at 48.5% 0%, rgba(233, 135, 62, 0.34), transparent 75%),
     radial-gradient(ellipse 50% 40% at 48.5% 100%, rgba(233, 135, 62, 0.14), transparent 75%);
 }
+/* a floor, not a fixed height: with the site's text-size control (up to 160%) or browser text
+   zoom the shelves outgrow it, and a fixed box clipped the first shelf out of view (WCAG 1.4.4) */
 html.js .mg-zip.is-ready .mg-zip__panel {
-  height: 344px;
+  min-height: 344px;
   display: grid;
   align-content: center;
 }
@@ -266,7 +268,7 @@ html.nz-motion .mg-zip.is-ready .mg-zip__shelf {
 }
 @media (min-width: 768px) {
   html.js .mg-zip.is-ready .mg-zip__panel {
-    height: 420px;
+    min-height: 420px;
   }
   .mg-zip__link {
     grid-template-columns: 2.6rem minmax(0, 1fr) auto;
@@ -874,7 +876,7 @@ html.js .mg-zip.is-ready .mg-zip__pull {
 }
 .mg-row__link {
   display: grid;
-  grid-template-columns: 104px 1fr;
+  grid-template-columns: 104px minmax(0, 1fr); /* minmax: long words wrap at 200% text, no sideways scroll */
   grid-template-areas: "plate body" "plate meta";
   gap: 6px 16px;
   align-items: start;
@@ -898,7 +900,10 @@ html.js .mg-zip.is-ready .mg-zip__pull {
 .mg-row__body {
   grid-area: body;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 6px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .mg-row__title {
   font-family: var(--font-display);
@@ -922,7 +927,8 @@ html.js .mg-zip.is-ready .mg-zip__pull {
 .mg-row__meta {
   grid-area: meta;
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 0 12px;
   font-size: 0.75rem;
   letter-spacing: 0.04em;
   color: var(--ash);

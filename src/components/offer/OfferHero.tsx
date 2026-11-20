@@ -3,7 +3,7 @@ import { Button, WhatsAppCta } from "@/components/nz";
 import { offerPage } from "@/content/offer";
 
 /** Must equal lcpArt.sizes in src/pages/packages.astro, or the hero downloads twice. */
-export const OFFER_HERO_SIZES = "(min-width: 1440px) 680px, (min-width: 1024px) 48vw, 100vw";
+export const OFFER_HERO_SIZES = "(min-width: 1440px) 580px, (min-width: 1024px) 47vw, calc(100vw - 64px)";
 export const OFFER_HERO_SLUG = "chair-bubble";
 
 const h = offerPage.hero;

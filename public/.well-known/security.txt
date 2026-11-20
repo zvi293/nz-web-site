@@ -1,0 +1,6 @@
+# Security contact for nz-web.com (RFC 9116).
+# Found a vulnerability? Please email the details. Hebrew or English.
+Contact: mailto:zstore.ai295@gmail.com
+Expires: 2027-11-19T00:00:00.000Z
+Preferred-Languages: he, en
+Canonical: https://nz-web.com/.well-known/security.txt

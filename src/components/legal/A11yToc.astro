@@ -1,0 +1,53 @@
+---
+/**
+ * The statement's table of contents ("בעמוד הזה"), right under the hero. The statement is a run of
+ * rooms rather than one document, so the contents are a floor plan of those rooms: a <details>
+ * on phones (closed, one 56px row, so the board stays near the top), an always-open row of
+ * numbered stops on desktop. Same look as the document TOC of /privacy/ and /terms/.
+ */
+interface Props {
+  items: { id: string; title: string }[];
+}
+const { items } = Astro.props;
+const two = (n: number) => String(n).padStart(2, "0");
+const list = items.map((s, i) => ({ ...s, n: two(i + 1) }));
+---
+
+<nav class="lg-pagetoc" aria-label="תוכן העניינים של ההצהרה">
+  <div class="nz-container">
+    <details class="lg-toc__details lg-pagetoc__details">
+      <summary class="lg-toc__summary">
+        <span>תוכן העניינים</span>
+        <span class="lg-toc__count">{list.length} חלקים</span>
+        <span class="lg-toc__chev" aria-hidden="true"></span>
+      </summary>
+      <ol class="lg-toc__list">
+        {
+          list.map((s) => (
+            <li>
+              <a href={`#${s.id}`} class="lg-toc__link">
+                <span class="lg-toc__num">{s.n}</span>
+                <span>{s.title}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </details>
+    <div class="lg-pagetoc__rail">
+      <p class="lg-pagetoc__title">תוכן העניינים</p>
+      <ol class="lg-pagetoc__list">
+        {
+          list.map((s) => (
+            <li>
+              <a href={`#${s.id}`} class="lg-pagetoc__link">
+                <span class="lg-toc__num">{s.n}</span>
+                <span>{s.title}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</nav>

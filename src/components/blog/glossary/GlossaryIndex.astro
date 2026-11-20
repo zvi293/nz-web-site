@@ -14,6 +14,7 @@
 import { HEBREW_LETTERS, glossaryTerms, sortedTerms, termLetter, usedLetters } from "@/content/glossary";
 import { getBlogPost } from "@/lib/blog";
 import GlossaryPlate from "./GlossaryPlate.astro";
+import { altParts } from "./alt-parts";
 
 /* which plate follows which letter group */
 const PLATES: Record<string, "address" | "journey" | "vitals"> = { ד: "address", ר: "journey", L: "vitals" };
@@ -110,7 +111,18 @@ const haystack = (t: (typeof terms)[number]) =>
                         </h3>
                         {t.alt && (
                           <span class="gl-term__alt" dir="auto">
-                            {t.alt}
+                            {altParts(t.alt).map((p, i) => (
+                              <>
+                                {i > 0 && " · "}
+                                {p.en ? (
+                                  <span lang="en" dir="ltr">
+                                    {p.text}
+                                  </span>
+                                ) : (
+                                  p.text
+                                )}
+                              </>
+                            ))}
                           </span>
                         )}
                         <span class="gl-term__tag">{t.tag}</span>
