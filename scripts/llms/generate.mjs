@@ -243,7 +243,7 @@ const full = [
   "## מדיניות",
   "",
   ...POLICY.map((p) => `- ${link(p)}: ${P(p).lead}`),
-  "- רכז נגישות: צבי משה, 058-7292029, zvi293293@gmail.com",
+  "- רכז נגישות: צבי משה, 058-7292029, zstore.ai295@gmail.com",
   "",
   "## English summary",
   "",

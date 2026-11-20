@@ -43,7 +43,7 @@ Sister sites by the same owner (different brands, different looks — never copy
 
 - WhatsApp / phone: 058-7292029 → `https://wa.me/972587292029?text=...` (always `target="_blank" rel="noopener"`).
 - Email: **zstore.ai295@gmail.com** (nzweb295@gmail.com is retired — must not appear anywhere).
-- Owner: צבי משה. Accessibility coordinator: צבי משה, zvi293293@gmail.com, 058-7292029.
+- Owner: צבי משה. Accessibility coordinator: צבי משה, zstore.ai295@gmail.com, 058-7292029.
 - Hours: א׳–ה׳ 09:00–19:00. Service area: all of Israel (do not write "שירות בכל הארץ" as a slogan).
 - Contact form → composes a WhatsApp message (no backend).
 - Real portfolio (src/content/projects.ts) — real client sites only.
